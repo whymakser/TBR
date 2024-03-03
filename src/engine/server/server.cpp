@@ -2429,7 +2429,7 @@ void CServer::PumpNetwork()
 {
 	CNetChunk Packet;
 	TOKEN ResponseToken;
-	bool Sevendown;
+	bool Sevendown = false;
 
 	m_NetServer.Update();
 
