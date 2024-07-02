@@ -3316,7 +3316,7 @@ void CCharacter::HandleTiles(int Index)
 		const char *pPort = str_find(Config()->m_SvRedirectServerTilePorts, aBuf);
 		int Port = pPort && (pPort + 2) ? atoi(pPort + 2) : 0;
 		if (TrySafelyRedirectClient(Port))
-			GameServer()->CreateDeath(m_Pos, m_pPlayer->GetCID(), TeamMask());
+			Die(WEAPON_SELF);
 		else
 			LoadRedirectTile(Port);
 		return;
