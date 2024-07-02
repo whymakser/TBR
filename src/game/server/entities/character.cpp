@@ -3315,15 +3315,8 @@ void CCharacter::HandleTiles(int Index)
 		str_format(aBuf, sizeof(aBuf), "%d:", SwitchNumber);	
 		const char *pPort = str_find(Config()->m_SvRedirectServerTilePorts, aBuf);
 		int Port = pPort && (pPort + 2) ? atoi(pPort + 2) : 0;
-		if (TrySafelyRedirectClient(Port))
-		{
-			if (m_Alive) // unsupported client got kicked already, so calling Die() again will crash the srv
-				Die(WEAPON_SELF);
-		}
-		else
-		{
+		if (!TrySafelyRedirectClient(Port))
 			LoadRedirectTile(Port);
-		}
 		return;
 	}
 
@@ -4845,8 +4838,11 @@ bool CCharacter::TrySafelyRedirectClient(int Port, bool Force)
 	if (TrySafelyRedirectClientImpl(Port))
 	{
 		// Forcefully move the dummy asell, but dont send redirect a second time
-		if (pDummyChar)
-			pDummyChar->TrySafelyRedirectClientImpl(Port);
+		Die(WEAPON_SELF);
+		if (pDummyChar && pDummyChar->TrySafelyRedirectClientImpl(Port))
+		{
+			pDummyChar->Die(WEAPON_SELF);
+		}
 		return true;
 	}
 	return false;
@@ -4883,6 +4879,7 @@ bool CCharacter::LoadRedirectTile(int Port)
 	if (!Port)
 		return false;
 
+	vec2 Pos;
 	const char *pList = Config()->m_SvRedirectServerTilePorts;
 	while (1)
 	{
@@ -4894,7 +4891,7 @@ bool CCharacter::LoadRedirectTile(int Port)
 		sscanf(pList, "%d:%d", &EntryNumber, &EntryPort);
 		if (EntryNumber > 0 && EntryPort == Port)
 		{
-			vec2 Pos = GameServer()->Collision()->GetRandomRedirectTile(EntryNumber);
+			Pos = GameServer()->Collision()->GetRandomRedirectTile(EntryNumber);
 			if (Pos != vec2(-1, -1))
 			{
 				ForceSetPos(Pos);
@@ -4904,11 +4901,6 @@ bool CCharacter::LoadRedirectTile(int Port)
 					Passive(true, -1, true);
 				}
 			}
-			else
-			{
-				if (GameServer()->m_pController->CanSpawn(&Pos, ENTITY_SPAWN))
-					ForceSetPos(Pos);
-			}
 			return true;
 		}
 
@@ -4917,6 +4909,9 @@ bool CCharacter::LoadRedirectTile(int Port)
 			pList++;
 	}
 
+	// nothing found, send to spawn tile
+	if (GameServer()->m_pController->CanSpawn(&Pos, ENTITY_SPAWN))
+		ForceSetPos(Pos);
 	return false;
 }
 
