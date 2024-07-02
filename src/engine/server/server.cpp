@@ -556,7 +556,7 @@ void CServer::RedirectClient(int ClientID, int Port, bool Verbose)
 	Msg.AddInt(Port);
 	SendMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_FLUSH, ClientID);
 
-	m_aClients[ClientID].m_RedirectDropTime = time_get() + time_freq() * 10;
+	m_aClients[ClientID].m_RedirectDropTime = time_get() + time_freq() * 5;
 	m_aClients[ClientID].m_State = CClient::STATE_REDIRECTED;
 }
 
@@ -712,9 +712,10 @@ int CServer::ClientCountry(int ClientID) const
 		return -1;
 }
 
-bool CServer::ClientIngame(int ClientID) const
+bool CServer::ClientIngame(int ClientID, bool Redirected) const
 {
-	return ClientID >= 0 && ClientID < MAX_CLIENTS && (m_aClients[ClientID].m_State == CServer::CClient::STATE_INGAME || m_aClients[ClientID].m_State == CClient::STATE_DUMMY);
+	return ClientID >= 0 && ClientID < MAX_CLIENTS && (m_aClients[ClientID].m_State == CClient::STATE_INGAME || m_aClients[ClientID].m_State == CClient::STATE_DUMMY
+		|| (Redirected && m_aClients[ClientID].m_State == CClient::STATE_REDIRECTED));
 }
 
 static inline bool RepackMsg(const CMsgPacker *pMsg, CPacker &Packer, bool Sevendown)
