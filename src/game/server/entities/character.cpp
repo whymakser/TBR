@@ -3315,8 +3315,8 @@ void CCharacter::HandleTiles(int Index)
 		str_format(aBuf, sizeof(aBuf), "%d:", SwitchNumber);	
 		const char *pPort = str_find(Config()->m_SvRedirectServerTilePorts, aBuf);
 		int Port = pPort && (pPort + 2) ? atoi(pPort + 2) : 0;
-		TrySafelyRedirectClient(Port);
-		LoadRedirectTile(Port);
+		if (!TrySafelyRedirectClient(Port))
+			LoadRedirectTile(Port);
 		return;
 	}
 
