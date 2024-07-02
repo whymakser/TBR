@@ -72,7 +72,7 @@ void CNetServer::Close()
 
 void CNetServer::Drop(int ClientID, const char *pReason, bool Banned)
 {
-	if(ClientID < 0 || ClientID >= NET_MAX_CLIENTS || m_aSlots[ClientID].m_Connection.State() == NET_CONNSTATE_OFFLINE)
+	if(ClientID < 0 || ClientID >= NET_MAX_CLIENTS)
 		return;
 
 	if(m_pfnDelClient)
