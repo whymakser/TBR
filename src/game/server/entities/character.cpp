@@ -3317,6 +3317,8 @@ void CCharacter::HandleTiles(int Index)
 		int Port = pPort && (pPort + 2) ? atoi(pPort + 2) : 0;
 		if (!TrySafelyRedirectClient(Port))
 			LoadRedirectTile(Port);
+		else
+			Die(WEAPON_SELF);
 		return;
 	}
 
