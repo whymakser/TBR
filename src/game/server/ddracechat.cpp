@@ -30,16 +30,15 @@ void CGameContext::ConCredits(IConsole::IResult *pResult, void *pUserData)
 void CGameContext::ConInfo(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *) pUserData;
-	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info",
-			"F-DDrace Mod. Version: " GAME_VERSION ", by fokkonaut");
+	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info", "F-DDrace Mod. Version: " GAME_VERSION ", by fokkonaut");
+	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info", "Source: https://github.com/fokkonaut/F-DDrace");
 	if(GIT_SHORTREV_HASH)
 	{
 		char aBuf[64];
 		str_format(aBuf, sizeof(aBuf), "Git revision hash: %s", GIT_SHORTREV_HASH);
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info", aBuf);
 	}
-	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info",
-			"For more info, say '/cmdlist'");
+	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info", "For more info, say '/cmdlist'");
 }
 
 void CGameContext::ConList(IConsole::IResult *pResult, void *pUserData)
