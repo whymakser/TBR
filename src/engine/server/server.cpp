@@ -2228,7 +2228,7 @@ void CServer::UpdateRegisterServerInfo()
 
 	sha256_str(m_CurrentMapSha256, aMapSha256, sizeof(aMapSha256));
 
-	char aInfo[16384];
+	char aInfo[32768];
 	str_format(aInfo, sizeof(aInfo),
 		"{"
 		"\"max_clients\":%d,"
