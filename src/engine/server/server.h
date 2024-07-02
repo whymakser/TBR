@@ -421,6 +421,8 @@ public:
 
 	void SendRconCmdAdd(const IConsole::CCommandInfo *pCommandInfo, int ClientID);
 	void SendRconCmdRem(const IConsole::CCommandInfo *pCommandInfo, int ClientID);
+	int GetConsoleAccessLevel(int ClientId);
+	int NumRconCommands(int ClientId);
 	void UpdateClientRconCommands();
 	void SendMapListEntryAdd(const CMapListEntry *pMapListEntry, int ClientID);
 	void SendMapListEntryRem(const CMapListEntry *pMapListEntry, int ClientID);

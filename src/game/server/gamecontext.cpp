@@ -1533,9 +1533,21 @@ void CGameContext::ProgressVoteOptions(int ClientID)
 		}
 	}
 
+	if(pPl->m_SendVoteIndex == 0)
+	{
+		CNetMsg_Sv_VoteOptionGroupStart StartMsg;
+		Server()->SendPackMsg(&StartMsg, MSGFLAG_VITAL, ClientID);
+	}
+
 	Server()->SendMsg(&Msg, MSGFLAG_VITAL, ClientID);
 
 	pPl->m_SendVoteIndex += NumVotesToSend;
+	if(pPl->m_SendVoteIndex == m_NumVoteOptions)
+	{
+		CNetMsg_Sv_VoteOptionGroupEnd EndMsg;
+		Server()->SendPackMsg(&EndMsg, MSGFLAG_VITAL, ClientID);
+	}
+
 }
 
 void CGameContext::OnClientEnter(int ClientID)

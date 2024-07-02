@@ -1292,17 +1292,39 @@ void CServer::SendRconCmdRem(const IConsole::CCommandInfo *pCommandInfo, int Cli
 	SendMsg(&Msg, MSGFLAG_VITAL, ClientID);
 }
 
+int CServer::GetConsoleAccessLevel(int ClientId)
+{
+	return m_aClients[ClientId].m_Authed == AUTHED_ADMIN ? IConsole::ACCESS_LEVEL_ADMIN : m_aClients[ClientId].m_Authed == AUTHED_MOD ? IConsole::ACCESS_LEVEL_MOD : IConsole::ACCESS_LEVEL_HELPER;
+}
+
+int CServer::NumRconCommands(int ClientId)
+{
+	int Num = 0;
+	int ConsoleAccessLevel = GetConsoleAccessLevel(ClientId);
+	for(const IConsole::CCommandInfo *pCmd = Console()->FirstCommandInfo(ConsoleAccessLevel, CFGFLAG_SERVER);
+		pCmd; pCmd = pCmd->NextCommandInfo(ConsoleAccessLevel, CFGFLAG_SERVER))
+	{
+		Num++;
+	}
+	return Num;
+}
+
 void CServer::UpdateClientRconCommands()
 {
 	for(int ClientID = Tick() % MAX_RCONCMD_RATIO; ClientID < MAX_CLIENTS; ClientID += MAX_RCONCMD_RATIO)
 	{
 		if(m_aClients[ClientID].m_State != CClient::STATE_EMPTY && m_aClients[ClientID].m_Authed)
 		{
-			int ConsoleAccessLevel = m_aClients[ClientID].m_Authed == AUTHED_ADMIN ? IConsole::ACCESS_LEVEL_ADMIN : m_aClients[ClientID].m_Authed == AUTHED_MOD ? IConsole::ACCESS_LEVEL_MOD : IConsole::ACCESS_LEVEL_HELPER;
+			int ConsoleAccessLevel = GetConsoleAccessLevel(ClientID);
 			for(int i = 0; i < MAX_RCONCMD_SEND && m_aClients[ClientID].m_pRconCmdToSend; ++i)
 			{
 				SendRconCmdAdd(m_aClients[ClientID].m_pRconCmdToSend, ClientID);
 				m_aClients[ClientID].m_pRconCmdToSend = m_aClients[ClientID].m_pRconCmdToSend->NextCommandInfo(ConsoleAccessLevel, CFGFLAG_SERVER);
+				if(m_aClients[ClientID].m_pRconCmdToSend == 0)
+				{
+					CMsgPacker Msg(NETMSG_RCON_CMD_GROUP_END, true);
+					SendMsg(&Msg, MSGFLAG_VITAL, ClientID);
+				}
 			}
 		}
 	}
@@ -1822,6 +1844,14 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 						// AUTHED_ADMIN - AuthLevel gets the proper IConsole::ACCESS_LEVEL_<x>
 						// TODO: Check if it still does
 						m_aClients[ClientID].m_pRconCmdToSend = Console()->FirstCommandInfo(AUTHED_ADMIN - AuthLevel, CFGFLAG_SERVER);
+						CMsgPacker MsgStart(NETMSG_RCON_CMD_GROUP_START, true);
+						MsgStart.AddInt(NumRconCommands(ClientID));
+						SendMsg(&MsgStart, MSGFLAG_VITAL, ClientID);
+						if(m_aClients[ClientID].m_pRconCmdToSend == 0)
+						{
+							CMsgPacker MsgEnd(NETMSG_RCON_CMD_GROUP_END, true);
+							SendMsg(&MsgEnd, MSGFLAG_VITAL, ClientID);
+						}
 
 						// TODO: Check if we want to send all maps to all rcon clients
 						if(m_aClients[ClientID].m_Version >= MIN_MAPLIST_CLIENTVERSION && !m_aClients[ClientID].m_Sevendown)
