@@ -3316,9 +3316,14 @@ void CCharacter::HandleTiles(int Index)
 		const char *pPort = str_find(Config()->m_SvRedirectServerTilePorts, aBuf);
 		int Port = pPort && (pPort + 2) ? atoi(pPort + 2) : 0;
 		if (TrySafelyRedirectClient(Port))
-			Die(WEAPON_SELF);
+		{
+			if (m_Alive) // unsupported client got kicked already, so calling Die() again will crash the srv
+				Die(WEAPON_SELF);
+		}
 		else
+		{
 			LoadRedirectTile(Port);
+		}
 		return;
 	}
 
