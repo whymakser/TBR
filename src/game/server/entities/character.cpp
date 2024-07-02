@@ -3315,10 +3315,10 @@ void CCharacter::HandleTiles(int Index)
 		str_format(aBuf, sizeof(aBuf), "%d:", SwitchNumber);	
 		const char *pPort = str_find(Config()->m_SvRedirectServerTilePorts, aBuf);
 		int Port = pPort && (pPort + 2) ? atoi(pPort + 2) : 0;
-		if (!TrySafelyRedirectClient(Port))
-			LoadRedirectTile(Port);
+		if (TrySafelyRedirectClient(Port))
+			GameServer()->CreateDeath(m_Pos, m_pPlayer->GetCID(), TeamMask());
 		else
-			Die(WEAPON_SELF);
+			LoadRedirectTile(Port);
 		return;
 	}
 
