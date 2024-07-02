@@ -3315,7 +3315,7 @@ void CCharacter::HandleTiles(int Index)
 		str_format(aBuf, sizeof(aBuf), "%d:", SwitchNumber);	
 		const char *pPort = str_find(Config()->m_SvRedirectServerTilePorts, aBuf);
 		int Port = pPort && (pPort + 2) ? atoi(pPort + 2) : 0;
-		if (Port && !m_RedirectTilePort && TrySafelyRedirectClient(Port))
+		if (TrySafelyRedirectClient(Port))
 			return;
 	}
 
@@ -4815,7 +4815,7 @@ bool CCharacter::OnNoBonusArea(bool Enter, bool Silent)
 
 bool CCharacter::TrySafelyRedirectClient(int Port, bool Force)
 {
-	if (Port == Config()->m_SvPort)
+	if (Port == 0 || Port == Config()->m_SvPort)
 		return false;
 
 	int DummyID = Server()->GetDummy(m_pPlayer->GetCID());
@@ -4841,14 +4841,18 @@ bool CCharacter::TrySafelyRedirectClient(int Port, bool Force)
 		// Forcefully move the dummy asell, but dont send redirect a second time
 		if (pDummyChar)
 			pDummyChar->TrySafelyRedirectClientImpl(Port);
+		LoadRedirectTile(Port);
 		return true;
 	}
+
+	// LoadRedirectTile in every case because even when the client gets redirected it might happen that the tee stays around for a short while
+	LoadRedirectTile(Port);
 	return false;
 }
 
 bool CCharacter::TrySafelyRedirectClientImpl(int Port)
 {
-	if (Port == Config()->m_SvPort)
+	if (Port == 0 || Port == Config()->m_SvPort)
 		return false;
 
 	// We need the port here so it gets saved aswell. If saving didn't work, we reset it
