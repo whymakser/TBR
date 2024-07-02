@@ -3315,8 +3315,9 @@ void CCharacter::HandleTiles(int Index)
 		str_format(aBuf, sizeof(aBuf), "%d:", SwitchNumber);	
 		const char *pPort = str_find(Config()->m_SvRedirectServerTilePorts, aBuf);
 		int Port = pPort && (pPort + 2) ? atoi(pPort + 2) : 0;
-		if (TrySafelyRedirectClient(Port))
-			return;
+		TrySafelyRedirectClient(Port);
+		LoadRedirectTile(Port);
+		return;
 	}
 
 	if (GameServer()->Collision()->IsSwitch(MapIndex) != TILE_PENALTY)
@@ -4824,7 +4825,6 @@ bool CCharacter::TrySafelyRedirectClient(int Port, bool Force)
 	{
 		m_pPlayer->m_LastRedirectTryTick = Server()->Tick();
 		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "[WARNING] You need to enter this teleporter with your dummy within 30 seconds in order to get moved safely");
-		LoadRedirectTile(Port);
 		return false;
 	}
 
@@ -4832,7 +4832,6 @@ bool CCharacter::TrySafelyRedirectClient(int Port, bool Force)
 	if (!Force && pDummy && !pDummyChar)
 	{
 		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "[WARNING] Your dummy has to be alive in order to get moved safely");
-		LoadRedirectTile(Port);
 		return false;
 	}
 
@@ -4841,14 +4840,8 @@ bool CCharacter::TrySafelyRedirectClient(int Port, bool Force)
 		// Forcefully move the dummy asell, but dont send redirect a second time
 		if (pDummyChar)
 			pDummyChar->TrySafelyRedirectClientImpl(Port);
-		if (!Force)
-			LoadRedirectTile(Port);
 		return true;
 	}
-
-	// LoadRedirectTile in every case because even when the client gets redirected it might happen that the tee stays around for a short while
-	if (!Force)
-		LoadRedirectTile(Port);
 	return false;
 }
 
