@@ -560,7 +560,7 @@ int CGameWorld::PlayerMap::Remove(int MapID)
 
 void CGameWorld::PlayerMap::Update()
 {
-	if (!m_pGameWorld->Server()->ClientIngame(m_ClientID, true) || !GetPlayer() || GetPlayer()->m_IsDummy)
+	if (!m_pGameWorld->Server()->ClientIngame(m_ClientID) || !GetPlayer() || GetPlayer()->m_IsDummy)
 		return;
 
 	bool ResortReserved = m_ResortReserved;
@@ -573,7 +573,7 @@ void CGameWorld::PlayerMap::Update()
 
 		CPlayer *pPlayer = m_pGameWorld->GameServer()->m_apPlayers[i];
 
-		if (!m_pGameWorld->Server()->ClientIngame(i, true) || !pPlayer)
+		if (!m_pGameWorld->Server()->ClientIngame(i) || !pPlayer)
 		{
 			Remove(m_pReverseMap[i]);
 			m_aReserved[i] = false;

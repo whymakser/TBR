@@ -712,10 +712,9 @@ int CServer::ClientCountry(int ClientID) const
 		return -1;
 }
 
-bool CServer::ClientIngame(int ClientID, bool Redirected) const
+bool CServer::ClientIngame(int ClientID) const
 {
-	return ClientID >= 0 && ClientID < MAX_CLIENTS && (m_aClients[ClientID].m_State == CClient::STATE_INGAME || m_aClients[ClientID].m_State == CClient::STATE_DUMMY
-		|| (Redirected && m_aClients[ClientID].m_State == CClient::STATE_REDIRECTED));
+	return ClientID >= 0 && ClientID < MAX_CLIENTS && (m_aClients[ClientID].m_State == CServer::CClient::STATE_INGAME || m_aClients[ClientID].m_State == CClient::STATE_DUMMY);
 }
 
 static inline bool RepackMsg(const CMsgPacker *pMsg, CPacker &Packer, bool Sevendown)
