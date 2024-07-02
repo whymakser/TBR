@@ -4841,12 +4841,14 @@ bool CCharacter::TrySafelyRedirectClient(int Port, bool Force)
 		// Forcefully move the dummy asell, but dont send redirect a second time
 		if (pDummyChar)
 			pDummyChar->TrySafelyRedirectClientImpl(Port);
-		LoadRedirectTile(Port);
+		if (!Force)
+			LoadRedirectTile(Port);
 		return true;
 	}
 
 	// LoadRedirectTile in every case because even when the client gets redirected it might happen that the tee stays around for a short while
-	LoadRedirectTile(Port);
+	if (!Force)
+		LoadRedirectTile(Port);
 	return false;
 }
 
