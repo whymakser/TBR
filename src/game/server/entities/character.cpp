@@ -4879,7 +4879,7 @@ bool CCharacter::LoadRedirectTile(int Port)
 	const char *pList = Config()->m_SvRedirectServerTilePorts;
 	while (1)
 	{
-		if (!pList)
+		if (!pList || !pList[0])
 			break;
 
 		int EntryNumber = 0;
