@@ -71,7 +71,7 @@ void CPickup::SetRespawnTime(bool Init)
 	{
 		if (m_Subtype == WEAPON_TASER)
 		{
-			RespawnTime = Config()->m_SvBatteryRespawnTime * 60;
+			RespawnTime = Config()->m_SvTaserBatteryRespawnTime * 60;
 		}
 		else if (m_Subtype == WEAPON_PORTAL_RIFLE && Config()->m_SvPortalRifleAmmo)
 		{
