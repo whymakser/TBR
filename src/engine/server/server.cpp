@@ -544,7 +544,7 @@ void CServer::RedirectClient(int ClientID, int Port, bool Verbose)
 		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "redirect", aBuf);
 	}
 
-	if(SupportsRedirect)
+	if(!SupportsRedirect)
 	{
 		bool SamePort = Port == Config()->m_SvPort;
 		str_format(aBuf, sizeof(aBuf), "Redirect unsupported: please connect to port %d", Port);
