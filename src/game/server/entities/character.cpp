@@ -4837,9 +4837,13 @@ bool CCharacter::TrySafelyRedirectClient(int Port, bool Force)
 
 	if (TrySafelyRedirectClientImpl(Port))
 	{
-		// Forcefully move the dummy asell, but dont send redirect a second time
-		Die(WEAPON_SELF);
-		if (pDummyChar && pDummyChar->TrySafelyRedirectClientImpl(Port))
+		// Check if we're alive in case we got kicked and killed by unsupported redirect
+		if (m_Alive)
+		{
+			Die(WEAPON_SELF);
+		}
+		// Forcefully move the dummy asell
+		if (pDummyChar && pDummyChar->TrySafelyRedirectClientImpl(Port) && pDummyChar->m_Alive)
 		{
 			pDummyChar->Die(WEAPON_SELF);
 		}
@@ -4900,8 +4904,8 @@ bool CCharacter::LoadRedirectTile(int Port)
 					m_RedirectPassiveEndTick = Server()->Tick() + Server()->TickSpeed() * 3;
 					Passive(true, -1, true);
 				}
+				return true;
 			}
-			return true;
 		}
 
 		// jump to next comma, if it exists skip it so we can start the next loop run with the next data
