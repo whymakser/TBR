@@ -940,7 +940,7 @@ void CPlayer::OnDisconnect()
 	// Make sure to call this before the character dies because on disconnect it should drop the money even when frozen
 	if (GameServer()->Config()->m_SvDropsOnDeath && m_pCharacter)
 		m_pCharacter->DropMoney(GetWalletMoney());
-	KillCharacter();
+
 	GameServer()->Arenas()->OnPlayerLeave(m_ClientID, true);
 	GameServer()->Logout(GetAccID());
 
@@ -981,6 +981,8 @@ void CPlayer::OnDisconnect()
 			}
 		}
 	}
+
+	KillCharacter();
 }
 
 void CPlayer::TranslatePlayerFlags(CNetObj_PlayerInput *NewInput)
