@@ -895,7 +895,10 @@ void CGameContext::ConSetJumps(IConsole::IResult *pResult, void *pUserData)
 	int Victim = pResult->NumArguments() ? pResult->GetVictim() : pResult->m_ClientID;
 	CCharacter* pChr = pSelf->GetPlayerChar(Victim);
 	if (pChr)
-		pChr->SetCoreJumps(pResult->NumArguments() > 1 ? pResult->GetInteger(1) : 2);
+	{
+		pChr->m_DDRaceState = DDRACE_CHEAT;
+		pChr->SetJumps(pResult->NumArguments() > 1 ? pResult->GetInteger(1) : 2);
+	}
 }
 
 void CGameContext::ConInfiniteJumps(IConsole::IResult *pResult, void *pUserData)

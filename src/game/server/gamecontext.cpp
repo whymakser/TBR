@@ -6615,8 +6615,6 @@ void CGameContext::ProcessSpawnBlockProtection(int ClientID)
 		pKiller->m_SpawnBlockScore++;
 		if (Config()->m_SvSpawnBlockProtection)
 		{
-			SendChatTarget(Killer, "[WARNING] Spawnblocking is illegal");
-
 			if (pKiller->m_SpawnBlockScore > 2)
 			{
 				char aBuf[128];
@@ -6624,6 +6622,10 @@ void CGameContext::ProcessSpawnBlockProtection(int ClientID)
 				SendChatPolice(aBuf);
 				SendChatTarget(Killer, "Police is searching you because of spawnblocking");
 				pKiller->m_EscapeTime += Server()->TickSpeed() * 120; // + 2 minutes escape time
+			}
+			else
+			{
+				SendChatTarget(Killer, "[WARNING] Spawnblocking is illegal");
 			}
 		}
 	}

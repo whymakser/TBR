@@ -96,6 +96,7 @@ void CCharacterCore::Reset()
 	m_MoveRestrictionExtra.m_VipPlus = false;
 	m_FakeTuneCID = -1;
 	m_FightStarted = false;
+	m_EndlessHook = false;
 }
 
 void CCharacterCore::Tick(bool UseInput)
@@ -196,6 +197,8 @@ void CCharacterCore::Tick(bool UseInput)
 			SetHookedPlayer(-1);
 			m_HookState = HOOK_IDLE;
 			m_HookPos = m_Pos;
+			// Reset hook tick, we don't want it to increase no-bonus score cuz it's only resetted when new hook starts
+			m_HookTick = 0;
 		}
 	}
 
@@ -412,8 +415,11 @@ void CCharacterCore::Tick(bool UseInput)
 		}
 
 		// release hook (max hook time is 1.25)
-		m_HookTick++;
-		if(m_HookedPlayer != -1 && (m_HookTick > SERVER_TICK_SPEED+SERVER_TICK_SPEED/5 || (m_HookedPlayer < MAX_CLIENTS && !m_pWorld->m_apCharacters[m_HookedPlayer])))
+		if (m_HookedPlayer != -1)
+		{
+			m_HookTick++;
+		}
+		if(m_HookedPlayer != -1 && ((!m_EndlessHook && HookDurationExceeded()) || (m_HookedPlayer < MAX_CLIENTS && !m_pWorld->m_apCharacters[m_HookedPlayer])))
 		{
 			SetHookedPlayer(-1);
 			m_HookState = HOOK_RETRACTED;

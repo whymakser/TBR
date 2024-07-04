@@ -133,4 +133,13 @@ enum
 	VERSION_DDNET_ZOOM_CURSOR = 18001,
 };
 
+enum Scoreformat
+{
+	SCORE_TIME = 0,
+	SCORE_LEVEL,
+	SCORE_BLOCK_POINTS,
+	SCORE_BONUS,
+	NUM_SCORE_MODES
+};
+
 #endif

@@ -182,6 +182,7 @@ public:
 	void StaffInd(bool Set = true, int FromID = -1, bool Silent = false);
 	void RainbowName(bool Set = true, int FromID = -1, bool Silent = false);
 	void Confetti(bool Set = true, int FromID = -1, bool Silent = false);
+	void SetJumps(int NewJumps, bool Silent = false);
 
 private:
 	// player controlling this character
@@ -475,23 +476,29 @@ public:
 	int m_LastInOutTeleporter;
 
 	// no bonus area
+	void IncreaseNoBonusScore(int Summand = 1);
 	bool OnNoBonusArea(bool Enter, bool Silent = false);
 	struct SNoBonusContext
 	{
 		bool m_InArea = false;
+		int m_Score = 0;
 
 		struct SNoBonusSave
 		{
 			bool NonEmpty()
 			{
-				return m_EndlessHook || m_InfiniteJumps;
+				return m_EndlessHook || m_InfiniteJumps || m_Jumps > m_NoBonusMaxJumps;
 			}
 			bool m_EndlessHook = false;
 			bool m_InfiniteJumps = false;
+			int m_Jumps = 0;
+			// Config()->m_SvNoBonusMaxJumps
+			int m_NoBonusMaxJumps = 0;
 		} m_SavedBonus;
 	};
 	SNoBonusContext m_NoBonusContext;
 	int64 m_LastNoBonusTick;
+	int m_LastJumpedTotal;
 
 	// helicopter
 	CHelicopter *m_pHelicopter;

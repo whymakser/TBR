@@ -1402,6 +1402,8 @@ void CCharacter::Tick()
 		if (F) m_Core.SetFlagInfo(i, F->GetPos(), F->IsAtStand(), F->GetVel(), F->GetCarrier());
 	}
 
+	// We don't want to reset the hooktick to 0, because we need it in order to detect hook duration for no-bonus punishment
+	m_Core.m_EndlessHook = m_EndlessHook || (m_Super && Config()->m_SvEndlessSuperHook);
 	m_Core.m_Input = m_Input;
 	m_Core.Tick(true);
 
@@ -2191,6 +2193,9 @@ void CCharacter::SnapCharacter(int SnappingClient, int ID)
 		}
 		else if (!Server()->Translate(pCharacter->m_HookedPlayer, SnappingClient))
 			pCharacter->m_HookedPlayer = -1;
+
+		if (m_Core.m_EndlessHook)
+			pCharacter->m_HookTick = 0;
 	}
 
 	pCharacter->m_Emote = m_pPlayer->m_SpookyGhost ? EMOTE_SURPRISE : m_EmoteType;
@@ -3232,26 +3237,7 @@ void CCharacter::HandleTiles(int Index)
 		{
 			NewJumps = -1;
 		}
-
-		if(NewJumps != m_Core.m_Jumps)
-		{
-			char aBuf[256];
-			if(NewJumps == -1)
-				str_format(aBuf, sizeof(aBuf), "You only have your ground jump now");
-			else if (NewJumps == 1)
-				str_format(aBuf, sizeof(aBuf), "You can jump %d time", NewJumps);
-			else
-				str_format(aBuf, sizeof(aBuf), "You can jump %d times", NewJumps);
-			GameServer()->SendChatTarget(GetPlayer()->GetCID(), aBuf);
-
-			if (NewJumps > m_MaxJumps && m_DDRaceState != DDRACE_CHEAT && !FightStarted)
-			{
-				m_pPlayer->GiveXP(NewJumps * 100, "upgrading jumps");
-				m_MaxJumps = NewJumps;
-			}
-
-			m_Core.m_Jumps = NewJumps;
-		}
+		SetJumps(NewJumps);
 	}
 	else if (GameServer()->Collision()->IsSwitch(MapIndex) == TILE_PENALTY && !m_LastPenalty)
 	{
@@ -3623,9 +3609,6 @@ void CCharacter::DDracePostCoreTick()
 		m_EmoteStop = -1;
 	}
 
-	if (m_EndlessHook || (m_Super && Config()->m_SvEndlessSuperHook))
-		m_Core.m_HookTick = 0;
-
 	m_FrozenLastTick = false;
 
 	if ((m_DeepFreeze || m_pPlayer->m_ClanProtectionPunished) && !m_Super)
@@ -3994,6 +3977,7 @@ void CCharacter::FDDraceInit()
 	m_LastNoBonusTick = 0;
 	m_RedirectTilePort = 0;
 	m_RedirectPassiveEndTick = 0;
+	m_LastJumpedTotal = 0;
 }
 
 void CCharacter::CreateDummyHandle(int Dummymode)
@@ -4191,6 +4175,25 @@ void CCharacter::FDDraceTick()
 	{
 		m_RedirectPassiveEndTick = 0;
 		Passive(false, -1, true);
+	}
+
+	// Decrease no-bonus score so we are back to 0 at some point
+	if (m_NoBonusContext.m_Score > 0 && Server()->Tick() % (Server()->TickSpeed() * Config()->m_SvNoBonusScoreDecrease) == 0)
+	{
+		m_NoBonusContext.m_Score--;
+	}
+
+	// No-bonus area bonus using punishment
+	if (m_Core.m_JumpedTotal != m_LastJumpedTotal && m_Core.m_JumpedTotal >= Config()->m_SvNoBonusMaxJumps)
+	{
+		IncreaseNoBonusScore();
+	}
+	m_LastJumpedTotal = m_Core.m_JumpedTotal;
+
+	// Add a score every .5 seconds when duration exceeded, endless is op
+	if (m_Core.HookDurationExceeded() && Server()->Tick() % (Server()->TickSpeed() / 2) == 0)
+	{
+		IncreaseNoBonusScore();
 	}
 
 	// update
@@ -4786,6 +4789,38 @@ void CCharacter::ForceSetPos(vec2 Pos)
 	}
 }
 
+void CCharacter::IncreaseNoBonusScore(int Summand)
+{
+	if (!m_NoBonusContext.m_InArea || Config()->m_SvNoBonusScoreTreshold == 0)
+		return;
+
+	m_NoBonusContext.m_Score += Summand;
+
+	bool Wanted = m_NoBonusContext.m_Score >= Config()->m_SvNoBonusScoreTreshold;
+	if (Wanted)
+	{
+		// +2 minutes escape time
+		m_pPlayer->m_EscapeTime += Server()->TickSpeed() * 120;
+	}
+
+	// treshold to span: [1] = warn when we got fucked up already, [2,3] = warn one before reaching treshold, [4...] = warn on every 3rd
+	int MessageSpan = min(max(Config()->m_SvNoBonusScoreTreshold-1, 1), 3);
+	if (m_NoBonusContext.m_Score % MessageSpan == 0)
+	{
+		if (Wanted)
+		{
+			char aBuf[128];
+			str_format(aBuf, sizeof(aBuf), "'%s' is using bonus illegally. Catch him!", Server()->ClientName(m_pPlayer->GetCID()));
+			GameServer()->SendChatPolice(aBuf);
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Police is searching you because of illegal bonus use");
+		}
+		else
+		{
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), "[WARNING] Using bonus in no-bonus area is illegal");
+		}
+	}
+}
+
 bool CCharacter::OnNoBonusArea(bool Enter, bool Silent)
 {
 	// We check whether it got set this tick already, because that can happen when someone tries to skip the tile using ninja.
@@ -4793,22 +4828,31 @@ bool CCharacter::OnNoBonusArea(bool Enter, bool Silent)
 		return false;
 
 	m_NoBonusContext.m_InArea = !m_NoBonusContext.m_InArea;
+	m_NoBonusContext.m_SavedBonus.m_NoBonusMaxJumps = Config()->m_SvNoBonusMaxJumps;
 	m_LastNoBonusTick = Server()->Tick();
+
+	// If treshold is set, we don't disable bonus and we keep track of the treshold to see when we want to be searched by the police, more fun
+	if (Config()->m_SvNoBonusScoreTreshold > 0)
+		return true;
 
 	// Save or load previous bonuses
 	if (Enter)
 	{
 		m_NoBonusContext.m_SavedBonus.m_EndlessHook = m_EndlessHook;
 		m_NoBonusContext.m_SavedBonus.m_InfiniteJumps = m_SuperJump;
+		m_NoBonusContext.m_SavedBonus.m_Jumps = m_Core.m_Jumps;
 		EndlessHook(false, -1, Silent);
 		InfiniteJumps(false, -1, Silent);
+		SetJumps(min(m_Core.m_Jumps, Config()->m_SvNoBonusMaxJumps), Silent);
 	}
 	else
 	{
 		EndlessHook(m_NoBonusContext.m_SavedBonus.m_EndlessHook, -1, Silent);
 		InfiniteJumps(m_NoBonusContext.m_SavedBonus.m_InfiniteJumps, -1, Silent);
+		SetJumps(m_NoBonusContext.m_SavedBonus.m_Jumps, Silent);
 		m_NoBonusContext.m_SavedBonus.m_EndlessHook = false;
 		m_NoBonusContext.m_SavedBonus.m_InfiniteJumps = false;
+		m_NoBonusContext.m_SavedBonus.m_Jumps = 2;
 	}
 
 	return true;
@@ -5282,4 +5326,30 @@ void CCharacter::Confetti(bool Set, int FromID, bool Silent)
 {
 	m_Confetti = Set;
 	GameServer()->SendExtraMessage(CONFETTI, m_pPlayer->GetCID(), Set, FromID, Silent);
+}
+
+void CCharacter::SetJumps(int NewJumps, bool Silent)
+{
+	if (NewJumps == m_Core.m_Jumps)
+		return;
+
+	if (!Silent)
+	{
+		char aBuf[256];
+		if(NewJumps == -1)
+			str_format(aBuf, sizeof(aBuf), "You only have your ground jump now");
+		else if (NewJumps == 1)
+			str_format(aBuf, sizeof(aBuf), "You can jump %d time", NewJumps);
+		else
+			str_format(aBuf, sizeof(aBuf), "You can jump %d times", NewJumps);
+		GameServer()->SendChatTarget(GetPlayer()->GetCID(), aBuf);
+	}
+
+	if (NewJumps > m_MaxJumps && m_DDRaceState != DDRACE_CHEAT && !GameServer()->Arenas()->FightStarted(m_pPlayer->GetCID()))
+	{
+		m_pPlayer->GiveXP(NewJumps * 100, "upgrading jumps");
+		m_MaxJumps = NewJumps;
+	}
+
+	m_Core.m_Jumps = NewJumps;
 }

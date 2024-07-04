@@ -1274,11 +1274,15 @@ void CGameContext::ConScore(IConsole::IResult* pResult, void* pUserData)
 		pPlayer->m_ScoreMode = SCORE_LEVEL;
 	else if (!str_comp_nocase(aFormat, "points"))
 		pPlayer->m_ScoreMode = SCORE_BLOCK_POINTS;
+	else if (!str_comp_nocase(aFormat, "bonus") && pSelf->Config()->m_SvAllowBonusScoreMode)
+		pPlayer->m_ScoreMode = SCORE_BONUS;
 	else
 	{
 		pSelf->SendChatTarget(pResult->m_ClientID, "~~~ Score Format ~~~");
 		pSelf->SendChatTarget(pResult->m_ClientID, "Use '/score <format>' to change the displayed score.");
-		pSelf->SendChatTarget(pResult->m_ClientID, "time, level, points");
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "time, level, points%s", pSelf->Config()->m_SvAllowBonusScoreMode ? ", bonus" : "");
+		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 		Changed = false;
 	}
 

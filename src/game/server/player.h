@@ -25,13 +25,6 @@ enum Gamemode
 	GAMEMODE_VANILLA
 };
 
-enum Scoreformat
-{
-	SCORE_TIME = 0,
-	SCORE_LEVEL,
-	SCORE_BLOCK_POINTS
-};
-
 enum Portals
 {
 	PORTAL_FIRST,

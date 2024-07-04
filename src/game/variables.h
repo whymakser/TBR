@@ -237,8 +237,8 @@ MACRO_CONFIG_INT(SvMaxObjectsPlotBig, sv_max_objects_plot_big, 150, 0, 500, CFGF
 MACRO_CONFIG_INT(SvMaxObjectsFreeDraw, sv_max_objects_free_draw, 500, 0, 2000, CFGFLAG_SERVER|CFGFLAG_GAME, "Maximum amount of objects that can be placed in free draw", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvLightSpeedups, sv_light_speedups, 1, 0, 1, CFGFLAG_SERVER, "Whether draw editor speedups use light mode (heavy mode not recommended)", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvPlotEditorCategories, sv_plot_editor_categories, 128, "pickups,walls,doors,speedups,teleporters,transform", CFGFLAG_SERVER, "Comma separated list (pickups,walls,doors,speedups,teleporters,transform)", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvEditorPresetLevel, sv_editor_preset_level, AUTHED_ADMIN, AUTHED_NO, NUM_AUTHEDS, CFGFLAG_SERVER, "Required auth level to use the draw editor preset save/load feature", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvClearFreeDrawLevel, sv_clear_free_draw_level, AUTHED_ADMIN, AUTHED_NO, NUM_AUTHEDS, CFGFLAG_SERVER, "Required auth level to clear free draw area (clearplot 0)", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvEditorPresetLevel, sv_editor_preset_level, AUTHED_ADMIN, AUTHED_NO, NUM_AUTHEDS-1, CFGFLAG_SERVER, "Required auth level to use the draw editor preset save/load feature", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvClearFreeDrawLevel, sv_clear_free_draw_level, AUTHED_ADMIN, AUTHED_NO, NUM_AUTHEDS-1, CFGFLAG_SERVER, "Required auth level to clear free draw area (clearplot 0)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvEditorMaxDistance, sv_editor_max_distance, 750, 0, 99999, CFGFLAG_SERVER, "Maximum distance to place something with draw editor", AUTHED_ADMIN)
 
 // taser battery
@@ -251,8 +251,8 @@ MACRO_CONFIG_INT(SvSnakeDiagonal, sv_snake_diagonal, 0, 0, 1, CFGFLAG_SERVER, "W
 MACRO_CONFIG_INT(SvSnakeSmooth, sv_snake_smooth, 1, 0, 1, CFGFLAG_SERVER, "Whether snake moves smoothly", AUTHED_ADMIN)
 
 // chat
-MACRO_CONFIG_INT(SvAtEveryoneLevel, sv_ateveryone_level, AUTHED_MOD, AUTHED_NO, NUM_AUTHEDS, CFGFLAG_SERVER, "Required auth level to use @everyone in chat", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvChatAdminPingLevel, sv_chat_admin_ping_level, AUTHED_NO, AUTHED_NO, NUM_AUTHEDS, CFGFLAG_SERVER, "Required auth level to ping authed players in chat", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvAtEveryoneLevel, sv_ateveryone_level, AUTHED_MOD, AUTHED_NO, NUM_AUTHEDS-1, CFGFLAG_SERVER, "Required auth level to use @everyone in chat", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvChatAdminPingLevel, sv_chat_admin_ping_level, AUTHED_NO, AUTHED_NO, NUM_AUTHEDS-1, CFGFLAG_SERVER, "Required auth level to ping authed players in chat", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvLolFilter, sv_lol_filter, 1, 0, 1, CFGFLAG_SERVER, "I like turtles.", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvLocalChat, sv_local_chat, 1, 0, 1, CFGFLAG_SERVER, "Whether local chat is enabled (deactivates sv_authed_highlighted)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvWhisperLog, sv_whisper_log, 0, 0, 1, CFGFLAG_SERVER, "Whether whisper messages get logged aswell", AUTHED_ADMIN)
@@ -325,7 +325,7 @@ MACRO_CONFIG_STR(SvDiscordURL, sv_discord_url, 128, "", CFGFLAG_SERVER, "Discord
 // antibot
 MACRO_CONFIG_INT(SvAntibotTreshold, sv_antibot_treshold, 0, 0, 16, CFGFLAG_SERVER, "Treshold for antibot autoban (0=off)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvAntibotBanMinutes, sv_antibot_ban_minutes, 10000, 0, 99999, CFGFLAG_SERVER, "Time in minutes a player gets banned for by antibot", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvAntibotReportsLevel, sv_antibot_reports_level, AUTHED_ADMIN, AUTHED_NO, NUM_AUTHEDS, CFGFLAG_SERVER, "Required auth level to see antibot reports", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvAntibotReportsLevel, sv_antibot_reports_level, AUTHED_ADMIN, AUTHED_NO, NUM_AUTHEDS-1, CFGFLAG_SERVER, "Required auth level to see antibot reports", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvAntibotReportsFilter, sv_antibot_reports_filter, 1, 0, 1, CFGFLAG_SERVER, "Whether antibot reports are filtered if they are legit", AUTHED_ADMIN)
 
 // whois
@@ -338,10 +338,17 @@ MACRO_CONFIG_INT(SvWeakHook, sv_weak_hook, 0, 0, 1, CFGFLAG_SERVER, "Whether eve
 MACRO_CONFIG_INT(SvStoppersPassthrough, sv_stoppers_passthrough, 0, 0, 1, CFGFLAG_SERVER, "Whether tees can pass through stoppers with enough speed", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvShotgunBug, sv_shotgun_bug, 0, 0, 1, CFGFLAG_SERVER, "Whether firing shotgun while standing in another tee gives an insane boost", AUTHED_ADMIN)
 
+// score
+MACRO_CONFIG_INT(SvDefaultScoreMode, sv_default_score_mode, SCORE_LEVEL, 0, NUM_SCORE_MODES-1, CFGFLAG_SERVER, "Default score (0=time, 1=level, 2=blockpoints, 3=bonus)", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvAllowBonusScoreMode, sv_allow_bonus_score_mode, 0, 0, 1, CFGFLAG_SERVER, "Whether bonus score can be seen using '/score'", AUTHED_ADMIN)
+// no-bonus area
+MACRO_CONFIG_INT(SvNoBonusMaxJumps, sv_no_bonus_max_jumps, 2, 2, 9999, CFGFLAG_SERVER, "Maximum number of jumps in no-bonus area (treshold=0: set this amount, else: start score increase at this)", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvNoBonusScoreTreshold, sv_bonus_score_treshold, 20, 0, 100, CFGFLAG_SERVER, "Treshold value for bonus score in no-bonus area (0=bonus removal)", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvNoBonusScoreDecrease, sv_bonus_score_decrease, 10, 0, 60, CFGFLAG_SERVER, "Time in seconds between bonus score decrease", AUTHED_ADMIN)
+
 // other
 MACRO_CONFIG_INT(SvHideMinigamePlayers, sv_hide_minigame_players, 1, 0, 1, CFGFLAG_SERVER, "Whether players in different minigames are shown in the scoreboard", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvRainbowSpeedDefault, sv_rainbow_speed_default, 5, 1, 50, CFGFLAG_SERVER, "Default speed for rainbow", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvDefaultScoreMode, sv_default_score_mode, 1, 0, 2, CFGFLAG_SERVER, "Default score (0 = time, 1 = level, 2 = blockpoints)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvOldJetpackSound, sv_old_jetpack_sound, 0, 0, 1, CFGFLAG_SERVER, "Whether to use the default gun sound for jetpack or another sound", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvBlockPointsDelay, sv_block_points_delay, 20, 0, 600, CFGFLAG_SERVER|CFGFLAG_GAME, "Seconds a tee has to be alive in order to give block points to the killer", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvAlwaysTeleWeapon, sv_always_tele_weapon, 1, 0, 1, CFGFLAG_SERVER|CFGFLAG_GAME, "Whether tele weapons can be used on any block or only on marked ones", AUTHED_ADMIN)

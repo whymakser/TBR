@@ -567,6 +567,11 @@ void CPlayer::Snap(int SnappingClient)
 			Score = GameServer()->m_Accounts[GetAccID()].m_Level;
 		else if (pSnapping->m_ScoreMode == SCORE_BLOCK_POINTS)
 			Score = GameServer()->m_Accounts[GetAccID()].m_BlockPoints;
+		else if (pSnapping->m_ScoreMode == SCORE_BONUS)
+		{
+			Score = m_pCharacter ? m_pCharacter->m_NoBonusContext.m_Score : 0;
+			AccUsed = false;
+		}
 
 		if (AccUsed && GetAccID() < ACC_START)
 			Score = 0;
