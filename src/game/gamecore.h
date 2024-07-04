@@ -275,7 +275,7 @@ public:
 
 	bool m_FightStarted;
 
-	bool HookDurationExceeded() { return m_HookTick > SERVER_TICK_SPEED+SERVER_TICK_SPEED/5; }
+	bool HookDurationExceeded(int AdditionalTicks = 0) { return m_HookTick > SERVER_TICK_SPEED+SERVER_TICK_SPEED/5+AdditionalTicks; }
 	bool m_EndlessHook;
 
 	int m_Id;
