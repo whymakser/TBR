@@ -4799,8 +4799,8 @@ void CCharacter::IncreaseNoBonusScore(int Summand)
 	bool Wanted = m_NoBonusContext.m_Score >= Config()->m_SvNoBonusScoreTreshold;
 	if (Wanted)
 	{
-		// +2 minutes escape time
-		m_pPlayer->m_EscapeTime += Server()->TickSpeed() * 120;
+		// +2 minutes escape time initially, add 30 seconds for each extra score
+		m_pPlayer->m_EscapeTime = Server()->TickSpeed() * (m_pPlayer->m_EscapeTime ? 30 : 120);
 	}
 
 	// treshold to span: [1] = warn when we got fucked up already, [2,3] = warn one before reaching treshold, [4...] = warn on every 3rd
