@@ -4186,7 +4186,7 @@ void CCharacter::FDDraceTick()
 	// No-bonus area bonus using punishment
 	// Add a score every .5 seconds when duration exceeded, endless is op
 	if ((m_Core.m_JumpedTotal != m_LastJumpedTotal && m_Core.m_JumpedTotal >= Config()->m_SvNoBonusMaxJumps)
-		|| (m_Core.HookDurationExceeded(Server()->TickSpeed() / 3) && Server()->Tick() % (Server()->TickSpeed() / 2) == 0))
+		|| (m_Core.HookDurationExceeded(Server()->TickSpeed() / 5) && Server()->Tick() % (Server()->TickSpeed() / 2) == 0))
 	{
 		IncreaseNoBonusScore();
 	}
