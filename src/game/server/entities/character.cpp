@@ -4791,7 +4791,7 @@ void CCharacter::ForceSetPos(vec2 Pos)
 
 void CCharacter::IncreaseNoBonusScore(int Summand)
 {
-	if (!m_NoBonusContext.m_InArea || Config()->m_SvNoBonusScoreTreshold == 0)
+	if (!m_NoBonusContext.m_InArea || Config()->m_SvNoBonusScoreTreshold == 0 || m_pPlayer->m_IsDummy)
 		return;
 
 	m_NoBonusContext.m_Score += Summand;
