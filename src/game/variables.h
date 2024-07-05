@@ -343,7 +343,7 @@ MACRO_CONFIG_INT(SvDefaultScoreMode, sv_default_score_mode, SCORE_LEVEL, 0, NUM_
 MACRO_CONFIG_INT(SvAllowBonusScoreMode, sv_allow_bonus_score_mode, 0, 0, 1, CFGFLAG_SERVER, "Whether bonus score can be seen using '/score'", AUTHED_ADMIN)
 // no-bonus area
 MACRO_CONFIG_INT(SvNoBonusMaxJumps, sv_no_bonus_max_jumps, 2, 2, 9999, CFGFLAG_SERVER, "Maximum number of jumps in no-bonus area (treshold=0: set this amount, else: start score increase at this)", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvNoBonusScoreTreshold, sv_bonus_score_treshold, 15, 0, 100, CFGFLAG_SERVER, "Treshold value for bonus score in no-bonus area (0=bonus removal)", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvNoBonusScoreTreshold, sv_bonus_score_treshold, 10, 0, 100, CFGFLAG_SERVER, "Treshold value for bonus score in no-bonus area (0=bonus removal)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvNoBonusScoreDecrease, sv_bonus_score_decrease, 10, 0, 60, CFGFLAG_SERVER, "Time in seconds between bonus score decrease", AUTHED_ADMIN)
 
 // other
