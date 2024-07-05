@@ -593,7 +593,15 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 		MuteChecked = SpamProtectionClientID;
 	}
 	else
+	{
+		if (Mode == CHAT_POLICE_CHANNEL)
+		{
+			str_format(aBuf, sizeof(aBuf), "[POLICE-CHANNEL] %s", aText);
+			str_copy(aText, aBuf, sizeof(aText));
+		}
+
 		str_format(aBuf, sizeof(aBuf), "*** %s", aText);
+	}
 
 	const char *pModeStr;
 	if (Mode == CHAT_WHISPER)
@@ -602,6 +610,8 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 		pModeStr = 0;
 	else if(Mode == CHAT_TEAM)
 		pModeStr = "teamchat";
+	else if(Mode == CHAT_POLICE_CHANNEL)
+		pModeStr = "police";
 	else
 		pModeStr = "chat";
 
@@ -610,7 +620,7 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, pModeStr, aBuf);
 	}
 
-	if (!(Flags&CHAT_NO_WEBHOOK) && (Mode == CHAT_ALL || Mode == CHAT_ATEVERYONE ||
+	if (!(Flags&CHAT_NO_WEBHOOK) && (Mode == CHAT_ALL || Mode == CHAT_ATEVERYONE || Mode == CHAT_POLICE_CHANNEL ||
 		(Mode == CHAT_TEAM && ChatterClientID >= 0 && GetDDRaceTeam(ChatterClientID) == 0)))
 	{
 		char aWebhookName[32];
@@ -713,6 +723,13 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 
 		for (int i = 0; i < MAX_CLIENTS; i++)
 			if (!IsMuted(MuteChecked, i) && IsLocal(ChatterClientID, i) && !str_comp(Server()->GetLanguage(i), "none"))
+				SendChatMsg(&Msg, MsgFlags|MSGFLAG_VITAL, i);
+	}
+	else if (Mode == CHAT_POLICE_CHANNEL)
+	{
+		Msg.m_Mode = CHAT_ALL;
+		for (int i = 0; i < MAX_CLIENTS; i++)
+			if (m_apPlayers[i] && m_Accounts[m_apPlayers[i]->GetAccID()].m_PoliceLevel && !m_apPlayers[i]->m_EscapeTime)
 				SendChatMsg(&Msg, MsgFlags|MSGFLAG_VITAL, i);
 	}
 	else // Mode == CHAT_WHISPER
@@ -6563,11 +6580,7 @@ bool CGameContext::LineShouldHighlight(const char *pLine, const char *pName)
 
 void CGameContext::SendChatPolice(const char *pMessage)
 {
-	char aBuf[256];
-	str_format(aBuf, sizeof(aBuf), "[POLICE-CHANNEL] %s", pMessage);
-	for (int i = 0; i < MAX_CLIENTS; i++)
-		if (m_apPlayers[i] && m_Accounts[m_apPlayers[i]->GetAccID()].m_PoliceLevel)
-			SendChatTarget(i, aBuf);
+	SendChat(-1, CHAT_POLICE_CHANNEL, -1, pMessage);
 }
 
 bool CGameContext::JailPlayer(int ClientID, int Seconds)

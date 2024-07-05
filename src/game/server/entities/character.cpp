@@ -600,9 +600,8 @@ void CCharacter::FireWeapon()
 
 					int TargetCID = pTarget->GetPlayer()->GetCID();
 
-					// police catch gangster
-					if (pTarget->GetPlayer()->m_EscapeTime && !pTarget->GetPlayer()->IsMinigame() && pTarget->m_FreezeTime
-						&& pAccount->m_PoliceLevel)
+					// police catch gangster // disallow catching while being wanted yourself
+					if (pTarget->GetPlayer()->m_EscapeTime && !pTarget->GetPlayer()->IsMinigame() && pTarget->m_FreezeTime && pAccount->m_PoliceLevel && !m_pPlayer->m_EscapeTime)
 					{
 						char aBuf[256];
 						int Minutes = clamp((int)(pTarget->GetPlayer()->m_EscapeTime / Server()->TickSpeed()) / 100, 10, 20);
