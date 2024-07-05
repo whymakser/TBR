@@ -4869,7 +4869,7 @@ bool CCharacter::OnNoBonusArea(bool Enter, bool Silent)
 		SetJumps(m_NoBonusContext.m_SavedBonus.m_Jumps, Silent);
 		m_NoBonusContext.m_SavedBonus.m_EndlessHook = false;
 		m_NoBonusContext.m_SavedBonus.m_InfiniteJumps = false;
-		m_NoBonusContext.m_SavedBonus.m_Jumps = 2;
+		m_NoBonusContext.m_SavedBonus.m_Jumps = 0;
 	}
 
 	return true;
