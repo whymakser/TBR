@@ -562,7 +562,16 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 	int MuteChecked = ChatterClientID;
 
 	char aBuf[512], aText[256];
-	str_copy(aText, pText, sizeof(aText));
+	if (Mode == CHAT_POLICE_CHANNEL)
+	{
+		str_format(aBuf, sizeof(aBuf), "[POLICE-CHANNEL] %s", pText);
+		str_copy(aText, aBuf, sizeof(aText));
+	}
+	else
+	{
+		str_copy(aText, pText, sizeof(aText));
+	}
+
 	if(ChatterClientID >= 0 && ChatterClientID < MAX_CLIENTS)
 	{
 		// Can happen when translating a player message and that player left the server before translator finished...
@@ -594,12 +603,6 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 	}
 	else
 	{
-		if (Mode == CHAT_POLICE_CHANNEL)
-		{
-			str_format(aBuf, sizeof(aBuf), "[POLICE-CHANNEL] %s", aText);
-			str_copy(aText, aBuf, sizeof(aText));
-		}
-
 		str_format(aBuf, sizeof(aBuf), "*** %s", aText);
 	}
 
