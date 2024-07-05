@@ -499,6 +499,7 @@ public:
 	SNoBonusContext m_NoBonusContext;
 	int64 m_LastNoBonusTick;
 	int m_LastJumpedTotal;
+	int64 m_HookExceededTick;
 
 	// helicopter
 	CHelicopter *m_pHelicopter;

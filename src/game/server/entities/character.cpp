@@ -3978,6 +3978,7 @@ void CCharacter::FDDraceInit()
 	m_RedirectTilePort = 0;
 	m_RedirectPassiveEndTick = 0;
 	m_LastJumpedTotal = 0;
+	m_HookExceededTick = 0;
 }
 
 void CCharacter::CreateDummyHandle(int Dummymode)
@@ -4184,13 +4185,31 @@ void CCharacter::FDDraceTick()
 	}
 
 	// No-bonus area bonus using punishment
-	// Add a score every .5 seconds when duration exceeded, endless is op
-	if ((m_Core.m_JumpedTotal != m_LastJumpedTotal && m_Core.m_JumpedTotal >= Config()->m_SvNoBonusMaxJumps)
-		|| (m_Core.HookDurationExceeded(Server()->TickSpeed() / 5) && Server()->Tick() % (Server()->TickSpeed() / 2) == 0))
+	if (m_Core.m_JumpedTotal != m_LastJumpedTotal && m_Core.m_JumpedTotal >= Config()->m_SvNoBonusMaxJumps)
 	{
 		IncreaseNoBonusScore();
 	}
 	m_LastJumpedTotal = m_Core.m_JumpedTotal;
+
+	// endless hook
+	if (m_Core.HookDurationExceeded(Server()->TickSpeed() / 5))
+	{
+		if (!m_HookExceededTick)
+		{
+			m_HookExceededTick = Server()->Tick();
+		}
+
+		if ((Server()->Tick() - m_HookExceededTick) % (Server()->TickSpeed() / 2) == 0)
+		{
+			// Add a score every .5 seconds when duration exceeded, endless is op
+			IncreaseNoBonusScore();
+		}
+	}
+	else
+	{
+		m_HookExceededTick = 0;
+	}
+	
 
 	// update
 	m_DrawEditor.Tick();
@@ -4799,8 +4818,8 @@ void CCharacter::IncreaseNoBonusScore(int Summand)
 		m_pPlayer->m_EscapeTime += Server()->TickSpeed() * (m_pPlayer->m_EscapeTime ? 30 : 120);
 	}
 
-	// treshold to span: [1] = warn when we got fucked up already, [2,3] = warn one before reaching treshold, [4...] = warn on every 3rd
-	int MessageSpan = min(max(Config()->m_SvNoBonusScoreTreshold-1, 1), 3);
+	// treshold to span: [1] = warn when we got fucked up already, [2,4] = warn one before reaching treshold, [5...] = warn on every 4th
+	int MessageSpan = min(max(Config()->m_SvNoBonusScoreTreshold-1, 1), 4);
 	if (m_NoBonusContext.m_Score % MessageSpan == 0)
 	{
 		if (Wanted)
