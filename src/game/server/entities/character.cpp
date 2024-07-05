@@ -2405,14 +2405,17 @@ CGameTeams* CCharacter::Teams()
 	return &((CGameControllerDDRace*)GameServer()->m_pController)->m_Teams;
 }
 
-CTuningParams *CCharacter::Tuning(int Zone)
+void CCharacter::ApplyLockedTunings(bool SendTuningParams)
 {
-	if (Zone == -1)
-		Zone = m_TuneZone;
-	CTuningParams *pTunings = Zone > 0 ? &GameServer()->TuningList()[Zone] : GameServer()->Tuning();
-	static CTuningParams Tuning;
-	Tuning = GameServer()->ApplyLockedTunings(*pTunings, m_LockedTunings);
-	return &Tuning;
+	CTuningParams* pTunings = m_TuneZone > 0 ? &GameServer()->TuningList()[m_TuneZone] : GameServer()->Tuning();
+	m_Core.m_Tuning = *GameServer()->ApplyLockedTunings(pTunings, m_LockedTunings);
+	if (SendTuningParams)
+		GameServer()->SendTuningParams(m_pPlayer->GetCID());
+}
+
+CTuningParams *CCharacter::Tuning()
+{
+	return &m_Core.m_Tuning;
 }
 
 IAntibot *CCharacter::Antibot()
@@ -3513,13 +3516,13 @@ void CCharacter::HandleTuneLayer()
 
 		if(m_LockedTunings != m_LastLockedTunings)
 		{
-			GameServer()->SendTuningParams(m_pPlayer->GetCID());
+			ApplyLockedTunings(); // Update before sending new tuning params, or it will create prediction errors
 			SendTuneMsg(GameServer()->m_aaTuneLockMsg[TuneLock == -1 ? 0 : TuneLock]); // -1 = tune lock reset, number 0 is used to set the message
 			m_LastLockedTunings = m_LockedTunings;
 		}
 	}
 
-	m_Core.m_pWorld->m_Tuning = *Tuning(); // throw tunings from specific zone into gamecore
+	ApplyLockedTunings(false); // throw tunings from specific zone into gamecore
 
 	if (m_TuneZone != m_TuneZoneOld) // don't send tunigs all the time
 	{

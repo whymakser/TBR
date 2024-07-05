@@ -209,9 +209,9 @@ public:
 	IAntibot *Antibot() { return m_pAntibot; }
 
 	LOCKED_TUNES *LockedTuning() { return &m_vLockedTuning[0]; }
-	bool SetLockedTune(LOCKED_TUNES *pLockedTunings, CLockedTune Tune);
+	bool SetLockedTune(LOCKED_TUNES *pLockedTunings, CLockedTune &Tune);
 	void ApplyTuneLock(LOCKED_TUNES *pLockedTunings, int TuneLock);
-	CTuningParams ApplyLockedTunings(CTuningParams Tuning, LOCKED_TUNES LockedTunings);
+	CTuningParams *ApplyLockedTunings(CTuningParams *pTuning, LOCKED_TUNES &LockedTunings);
 
 	CGameContext();
 	~CGameContext();

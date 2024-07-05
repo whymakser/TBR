@@ -1455,7 +1455,7 @@ void CGameContext::ConTuneLockPlayer(IConsole::IResult *pResult, void *pUserData
 	CLockedTune LockedTune(pParam, Value);
 	if (!pSelf->SetLockedTune(&pChr->m_LockedTunings, LockedTune))
 		return;
-	pSelf->SendTuningParams(Victim);
+	pChr->ApplyLockedTunings();
 
 	char aBuf[128];
 	str_format(aBuf, sizeof(aBuf), "Set '%s' to %.2f for '%s'", pParam, Value, pSelf->Server()->ClientName(Victim));
@@ -1479,7 +1479,7 @@ void CGameContext::ConTuneLockPlayerReset(IConsole::IResult *pResult, void *pUse
 		{
 			CLockedTune LockedTune(pParam, Value);
 			pSelf->SetLockedTune(&pChr->m_LockedTunings, LockedTune);
-			pSelf->SendTuningParams(Victim);
+			pChr->ApplyLockedTunings();
 			str_format(aBuf, sizeof(aBuf), "Reset '%s' for '%s'", pParam, pSelf->Server()->ClientName(Victim));
 			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", aBuf);
 		}
@@ -1491,7 +1491,7 @@ void CGameContext::ConTuneLockPlayerReset(IConsole::IResult *pResult, void *pUse
 	else
 	{
 		pChr->m_LockedTunings.clear();
-		pSelf->SendTuningParams(Victim);
+		pChr->ApplyLockedTunings();
 		str_format(aBuf, sizeof(aBuf), "Reset all locked tunings for '%s'", pSelf->Server()->ClientName(Victim));
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "tuning", aBuf);
 	}

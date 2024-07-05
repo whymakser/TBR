@@ -169,13 +169,13 @@ class CCharacter *CGameContext::GetPlayerChar(int ClientID)
 CTuningParams *CGameContext::Tuning(int ClientID, int Zone)
 {
 	if(GetPlayerChar(ClientID))
-		return GetPlayerChar(ClientID)->Tuning(Zone);
+		return GetPlayerChar(ClientID)->Tuning();
 	if(Zone > 0)
 		return &TuningList()[Zone];
 	return &m_Tuning;
 }
 
-bool CGameContext::SetLockedTune(LOCKED_TUNES *pLockedTunings, CLockedTune Tune)
+bool CGameContext::SetLockedTune(LOCKED_TUNES *pLockedTunings, CLockedTune &Tune)
 {
 	const char *pParam = Tune.m_aParam;
 	float NewValue = Tune.m_Value;
@@ -213,11 +213,13 @@ void CGameContext::ApplyTuneLock(LOCKED_TUNES *pLockedTunings, int TuneLock)
 		SetLockedTune(pLockedTunings, LockedTuning()[TuneLock][i]);
 }
 
-CTuningParams CGameContext::ApplyLockedTunings(CTuningParams Tuning, LOCKED_TUNES LockedTunings)
+CTuningParams *CGameContext::ApplyLockedTunings(CTuningParams *pTuning, LOCKED_TUNES &LockedTunings)
 {
+	static CTuningParams Tuning;
+	Tuning = *pTuning;
 	for(unsigned int i = 0; i < LockedTunings.size(); i++)
 		Tuning.Set(LockedTunings[i].m_aParam, LockedTunings[i].m_Value);
-	return Tuning;
+	return &Tuning;
 }
 
 void CGameContext::SetBotDetected(int ClientID)
