@@ -4820,24 +4820,25 @@ void CCharacter::IncreaseNoBonusScore(int Summand)
 		// +2 minutes escape time initially, add 30 seconds for each extra score
 		m_pPlayer->m_EscapeTime += Server()->TickSpeed() * (m_pPlayer->m_EscapeTime ? 30 : 120);
 	}
-	
+
+	// treshold to span: [1] = warn when we got fucked up already, [2,4] = warn one before reaching treshold, [5...] = warn on every 4th
+	int MessageSpan = min(max(Config()->m_SvNoBonusScoreTreshold-1, 1), 4);
+
 	// When we get our initial escape time we always want to send a message
-	if (!ForceSendMessage && m_NoBonusContext.m_LastMsgTick && Server()->Tick() < m_NoBonusContext.m_LastMsgTick + Server()->TickSpeed() * 3)
-		return;
-
-	if (Wanted)
+	if (ForceSendMessage || m_NoBonusContext.m_Score % MessageSpan == 0)
 	{
-		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "'%s' is using bonus illegally. Catch him!", Server()->ClientName(m_pPlayer->GetCID()));
-		GameServer()->SendChatPolice(aBuf);
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Police is searching you because of illegal bonus use");
+		if (Wanted)
+		{
+			char aBuf[128];
+			str_format(aBuf, sizeof(aBuf), "'%s' is using bonus illegally. Catch him!", Server()->ClientName(m_pPlayer->GetCID()));
+			GameServer()->SendChatPolice(aBuf);
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Police is searching you because of illegal bonus use");
+		}
+		else
+		{
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), "[WARNING] Using bonus in no-bonus area is illegal");
+		}
 	}
-	else
-	{
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "[WARNING] Using bonus in no-bonus area is illegal");
-	}
-
-	m_NoBonusContext.m_LastMsgTick = Server()->Tick();
 }
 
 bool CCharacter::OnNoBonusArea(bool Enter, bool Silent)
