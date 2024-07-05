@@ -483,6 +483,7 @@ public:
 	{
 		bool m_InArea = false;
 		int m_Score = 0;
+		int64 m_LastMsgTick = 0;
 
 		struct SNoBonusSave
 		{
