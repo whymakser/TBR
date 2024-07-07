@@ -166,7 +166,7 @@ class CCharacter *CGameContext::GetPlayerChar(int ClientID)
 	return m_apPlayers[ClientID]->GetCharacter();
 }
 
-CTuningParams *CGameContext::Tuning(int ClientID, int Zone)
+CTuningParams *CGameContext::TuningFromChrOrZone(int ClientID, int Zone)
 {
 	if(GetPlayerChar(ClientID))
 		return GetPlayerChar(ClientID)->Tuning();
@@ -365,7 +365,7 @@ void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamag
 		l = 1 - clamp((l - InnerRadius) / (Radius - InnerRadius), 0.0f, 1.0f);
 
 		int TuneZone = (Owner == -1 || !m_apPlayers[Owner]) ? 0 : m_apPlayers[Owner]->m_TuneZone;
-		float Strength = Tuning(Owner, TuneZone)->m_ExplosionStrength;
+		float Strength = TuningFromChrOrZone(Owner, TuneZone)->m_ExplosionStrength;
 
 		float Dmg = Strength * l;
 		if (!(int)Dmg) continue;
@@ -1117,8 +1117,14 @@ void CGameContext::SendTuningParams(int ClientID, int Zone)
 		return;
 	}
 
+	// F-DDrace
 	static CTuningParams Tunings;
-	Tunings = *Tuning(ClientID, Zone);
+	CTuningParams *pTunings = Zone > 0 ? &TuningList()[Zone] : Tuning();
+	CCharacter *pChr = GetPlayerChar(ClientID);
+	if (pChr)
+		Tunings = *ApplyLockedTunings(pTunings, pChr->m_LockedTunings);
+	else
+		Tunings = *pTunings;
 
 	// set projectile tunings to normal ones, if they are different in zones for example its handled in CProjectile
 	Tunings.m_GrenadeCurvature = m_Tuning.m_GrenadeCurvature;
@@ -1128,8 +1134,6 @@ void CGameContext::SendTuningParams(int ClientID, int Zone)
 	Tunings.m_GunCurvature = m_Tuning.m_GunCurvature;
 	Tunings.m_GunSpeed = m_Tuning.m_GunSpeed;
 
-	// F-DDrace
-	CCharacter *pChr = GetPlayerChar(ClientID);
 	if (pChr)
 	{
 		if (pChr->m_FakeTuneCollision || pChr->m_InSnake)
@@ -1177,6 +1181,7 @@ void CGameContext::SendTuningParams(int ClientID, int Zone)
 
 void CGameContext::OnTick()
 {
+	Config()->m_SvTestingCommands = 1;
 	if(m_TeeHistorianActive)
 	{
 		if(!m_TeeHistorian.Starting())

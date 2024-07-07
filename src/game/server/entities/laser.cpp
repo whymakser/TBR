@@ -25,8 +25,15 @@ CLaser::CLaser(CGameWorld* pGameWorld, vec2 Pos, vec2 Direction, float StartEner
 	m_TaserFreezeTime = TaserFreezeTime;
 	m_TeleportCancelled = false;
 	m_IsBlueTeleport = false;
-	m_TuneZone = GameServer()->Collision()->IsTune(GameServer()->Collision()->GetMapIndex(m_Pos));
 	m_TeamMask = GameServer()->GetPlayerChar(Owner) ? GameServer()->GetPlayerChar(Owner)->TeamMask() : Mask128();
+
+	m_TuneZone = GameServer()->Collision()->IsTune(GameServer()->Collision()->GetMapIndex(m_Pos));
+	CTuningParams *pTuning = GameServer()->TuningFromChrOrZone(m_Owner, m_TuneZone);
+	m_ShotgunStrength = pTuning->m_ShotgunStrength;
+	m_BounceNum = pTuning->m_LaserBounceNum;
+	m_BounceCost = pTuning->m_LaserBounceCost;
+	m_BounceDelay = pTuning->m_LaserBounceDelay;
+
 	GameWorld()->InsertEntity(this);
 	DoBounce();
 }
@@ -78,8 +85,6 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 	m_Energy = -1;
 	if (m_Type == WEAPON_SHOTGUN)
 	{
-		float Strength = GameServer()->Tuning(m_Owner, m_TuneZone)->m_ShotgunStrength;
-
 		static const vec2 StackedLaserShotgunBugSpeed = vec2(-2147483648.0f, -2147483648.0f);
 		vec2 Vel = IsCharacter ? pChr->Core()->m_Vel : pEnt->GetVel();
 		vec2 Pos = IsCharacter ? pChr->Core()->m_Pos : pEnt->GetPos();
@@ -88,12 +93,12 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 
 		if (!Config()->m_SvOldLaser)
 		{
-			Temp = Vel + normalize(m_PrevPos - Pos) * Strength;
+			Temp = Vel + normalize(m_PrevPos - Pos) * m_ShotgunStrength;
 			ShotgunBug = m_PrevPos == Pos;
 		}
 		else if (pOwnerChar)
 		{
-			Temp = Vel + normalize(pOwnerChar->Core()->m_Pos - Pos) * Strength;
+			Temp = Vel + normalize(pOwnerChar->Core()->m_Pos - Pos) * m_ShotgunStrength;
 			ShotgunBug = pOwnerChar->Core()->m_Pos == Pos;
 		}
 
@@ -181,7 +186,7 @@ void CLaser::DoBounce()
 			m_Pos = TempPos;
 			m_Dir = normalize(TempDir);
 
-			m_Energy -= distance(m_From, m_Pos) + GameServer()->Tuning(m_Owner, m_TuneZone)->m_LaserBounceCost;
+			m_Energy -= distance(m_From, m_Pos) + m_BounceCost;
 
 			if (Res == TILE_TELEINWEAPON && ((CGameControllerDDRace*)GameServer()->m_pController)->m_TeleOuts[z - 1].size())
 			{
@@ -195,7 +200,7 @@ void CLaser::DoBounce()
 				m_WasTele = false;
 			}
 
-			if (m_Bounces > GameServer()->Tuning(m_Owner, m_TuneZone)->m_LaserBounceNum)
+			if (m_Bounces > m_BounceNum)
 				m_Energy = -1;
 
 			GameServer()->CreateSound(m_Pos, SOUND_LASER_BOUNCE, m_TeamMask);
@@ -291,8 +296,7 @@ void CLaser::Tick()
 		}
 	}
 
-	float Delay = GameServer()->Tuning(m_Owner, m_TuneZone)->m_LaserBounceDelay;
-	if ((Server()->Tick() - m_EvalTick) > (Server()->TickSpeed() * Delay / 1000.0f))
+	if ((Server()->Tick() - m_EvalTick) > (Server()->TickSpeed() * m_BounceDelay / 1000.0f))
 		DoBounce();
 }
 

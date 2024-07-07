@@ -46,6 +46,8 @@ private:
 	int m_Bouncing;
 	bool m_Freeze;
 	int m_TuneZone;
+	float m_Curvature;
+	float m_Speed;
 
 	bool m_Spooky;
 
@@ -59,8 +61,8 @@ private:
 
 	virtual void TickDeferred();
 	void CalculateVel();
-	void GetOriginalTunings(float *pCurvature, float *pSpeed, bool Pure = false);
-	void GetTunings(float *pCurvature, float *pSpeed);
+	void GetOriginalTunings(float *pCurvature, float *pSpeed);
+	void DetermineTuning();
 
 public:
 
