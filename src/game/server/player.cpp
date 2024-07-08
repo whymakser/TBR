@@ -1373,7 +1373,7 @@ void CPlayer::TryRespawn()
 	{
 		Index = TILE_JAIL;
 	}
-	else if ((m_PlotSpawn && !m_ToggleSpawn) || (!m_PlotSpawn && m_ToggleSpawn))
+	else if (((m_PlotSpawn && !m_ToggleSpawn) || (!m_PlotSpawn && m_ToggleSpawn)) && !m_EscapeTime)
 	{
 		int PlotID = GameServer()->GetPlotID(GetAccID());
 		if (PlotID > 0)
