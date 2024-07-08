@@ -3980,6 +3980,7 @@ void CCharacter::FDDraceInit()
 	m_RedirectTilePort = 0;
 	m_RedirectPassiveEndTick = 0;
 	m_LastJumpedTotal = 0;
+	m_DidFirstIllegalJump = false;
 	m_HookExceededTick = 0;
 }
 
@@ -4187,24 +4188,36 @@ void CCharacter::FDDraceTick()
 	}
 
 	// No-bonus area bonus using punishment
-	if (m_Core.m_JumpedTotal != m_LastJumpedTotal && m_Core.m_JumpedTotal >= Config()->m_SvNoBonusMaxJumps)
+	if (m_Core.m_JumpedTotal >= Config()->m_SvNoBonusMaxJumps)
 	{
-		IncreaseNoBonusScore();
+		if (m_Core.m_JumpedTotal != m_LastJumpedTotal)
+		{
+			IncreaseNoBonusScore(!m_DidFirstIllegalJump ? 2 : 1);
+		}
+		// add 2 when doing the first illegal air jump
+		m_DidFirstIllegalJump = true;
+	}
+	else
+	{
+		m_DidFirstIllegalJump = false;
 	}
 	m_LastJumpedTotal = m_Core.m_JumpedTotal;
 
 	// endless hook
 	if (m_Core.HookDurationExceeded(Server()->TickSpeed() / 5))
 	{
+		// add 2 when firstly exceeding the hook duration
+		bool FirstlyExceeded = false;
 		if (!m_HookExceededTick)
 		{
 			m_HookExceededTick = Server()->Tick();
+			FirstlyExceeded = true;
 		}
 
 		if ((Server()->Tick() - m_HookExceededTick) % (Server()->TickSpeed() / 2) == 0)
 		{
 			// Add a score every .5 seconds when duration exceeded, endless is op
-			IncreaseNoBonusScore();
+			IncreaseNoBonusScore(FirstlyExceeded ? 2 : 1);
 		}
 	}
 	else
