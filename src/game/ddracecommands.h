@@ -110,7 +110,7 @@ CONSOLE_COMMAND("redirect_port", "i[port] ?v[id]", CFGFLAG_SERVER, ConRedirectPo
 
 // savedtees
 CONSOLE_COMMAND("save_drop", "?v[id] ?f[hours] ?r[text]", CFGFLAG_SERVER, ConSaveDrop, this, "Saves stats of player v for i hours and kicks him", AUTHED_ADMIN)
-CONSOLE_COMMAND("list_saved_tees", "", CFGFLAG_SERVER, ConListSavedTees, this, "List all saved players with basic info", AUTHED_HELPER)
+CONSOLE_COMMAND("list_saved_tees", "", CFGFLAG_SERVER, ConListSavedTees, this, "List all saved players with basic info", AUTHED_MOD)
 
 // 1vs1 tourna
 CONSOLE_COMMAND("1vs1_global_create", "?i[scorelimit] ?i[killborder]", CFGFLAG_SERVER, Con1VS1GlobalCreate, this, "Creates a 1vs1 arena to let other people fight there", AUTHED_ADMIN)
