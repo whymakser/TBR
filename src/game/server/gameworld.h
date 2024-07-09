@@ -300,8 +300,6 @@ public:
 		class CCharacter *pThisOnly = 0, bool CheckPlotTaserDestroy = false, bool PlotDoorOnly = false);
 	bool IntersectLinePortalBlocker(vec2 Pos0, vec2 Pos1);
 	int IntersectDoorsUniqueNumbers(vec2 Pos, float Radius, CDoor **ppDoors, int Max);
-
-	bool IsDrawEditorType(int Type) { return Type == ENTTYPE_DOOR || Type == ENTTYPE_PICKUP || Type == ENTTYPE_SPEEDUP || Type == ENTTYPE_TELEPORTER; }
 };
 
 #endif
