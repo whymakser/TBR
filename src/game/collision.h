@@ -214,9 +214,9 @@ public:
 	int GetFTileRaw(vec2 Pos) { return GetFTileRaw(Pos.x, Pos.y); }
 
 	// IntersectLineDoor: returns -1 when intersected with a plot built laserwall, otherwise returns the number of the intersected laser wall
-	int IntersectLineDoor(vec2 Pos0, vec2 Pos1, vec2* pOutCollision, vec2* pOutBeforeCollision, int Team, bool PlotDoorOnly, bool ClosedOnly = true, bool IncludeDrawDoor = false);
+	int IntersectLineDoor(vec2 Pos0, vec2 Pos1, vec2* pOutCollision, vec2* pOutBeforeCollision, int Team, bool PlotDoorOnly, bool ClosedOnly = true);
 	bool TestBoxDoor(vec2 Pos, vec2 Size, int Team, bool PlotDoorOnly, bool ClosedOnly = true);
-	int CheckPointDoor(vec2 Pos, int Team, bool PlotDoorOnly, bool ClosedOnly, bool IncludeDrawDoor = false);
+	int CheckPointDoor(vec2 Pos, int Team, bool PlotDoorOnly, bool ClosedOnly);
 	void UnsetDCollisionAt(float x, float y, int Number);
 
 	// plots

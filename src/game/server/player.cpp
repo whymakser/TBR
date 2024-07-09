@@ -207,7 +207,6 @@ void CPlayer::Reset()
 
 	m_SpawnBlockScore = 0;
 	m_EscapeTime = 0;
-	m_PrevEscapeTime = 0;
 	m_JailTime = 0;
 	m_SilentFarm = 0;
 	m_SkipSetViewPos = 0;
@@ -250,8 +249,7 @@ void CPlayer::Tick()
 	if (m_ChatScore > 0)
 		m_ChatScore--;
 
-	int AccID = GetAccID();
-	Server()->SetClientScore(m_ClientID, GameServer()->Config()->m_SvDefaultScoreMode == SCORE_TIME ? m_Score : GameServer()->Config()->m_SvDefaultScoreMode == SCORE_LEVEL ? GameServer()->m_Accounts[AccID].m_Level : GameServer()->m_Accounts[AccID].m_BlockPoints);
+	Server()->SetClientScore(m_ClientID, GameServer()->Config()->m_SvDefaultScoreMode == SCORE_TIME ? m_Score : GameServer()->Config()->m_SvDefaultScoreMode == SCORE_LEVEL ? GameServer()->m_Accounts[GetAccID()].m_Level : GameServer()->m_Accounts[GetAccID()].m_BlockPoints);
 
 	// do latency stuff
 	if (!m_IsDummy)
@@ -421,17 +419,6 @@ void CPlayer::Tick()
 			GameServer()->SendBroadcast(aBuf, m_ClientID, false);
 		}
 	}
-	// Update plot destroy end tick, in case we leave
-	// if prevtime is 0: we got initially wanted, if escapetime > prevtime: escapetime was added
-	if (m_PrevEscapeTime == 0 || m_EscapeTime > m_PrevEscapeTime)
-	{
-		int PlotID = GameServer()->GetPlotID(AccID);
-		if (PlotID >= PLOT_START)
-		{
-			GameServer()->m_aPlots[PlotID].m_DestroyEndTick = Server()->Tick() + m_EscapeTime;
-		}
-	}
-	m_PrevEscapeTime = m_EscapeTime;
 
 	MinigameRequestTick();
 	MinigameAfkCheck();
@@ -1386,7 +1373,7 @@ void CPlayer::TryRespawn()
 	{
 		Index = TILE_JAIL;
 	}
-	else if ((m_PlotSpawn && !m_ToggleSpawn) || (!m_PlotSpawn && m_ToggleSpawn))
+	else if (((m_PlotSpawn && !m_ToggleSpawn) || (!m_PlotSpawn && m_ToggleSpawn)) && !m_EscapeTime)
 	{
 		int PlotID = GameServer()->GetPlotID(GetAccID());
 		if (PlotID > 0)

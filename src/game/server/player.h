@@ -342,7 +342,6 @@ public:
 
 	// police
 	int64 m_EscapeTime;
-	int64 m_PrevEscapeTime;
 	int64 m_JailTime;
 	int m_SpawnBlockScore;
 

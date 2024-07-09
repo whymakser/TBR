@@ -129,7 +129,19 @@ bool CDrawEditor::RemoveEntity(CEntity *pEntity)
 	if (pEntity->m_TransformCID != -1 && pEntity->m_TransformCID != GetCID())
 		return false;
 
-	return SafelyDestroyDrawEntity(pEntity);
+	for (unsigned i = 0; i < GameServer()->m_aPlots[pEntity->m_PlotID].m_vObjects.size(); i++)
+		if (GameServer()->m_aPlots[pEntity->m_PlotID].m_vObjects[i] == pEntity)
+		{
+			GameServer()->m_aPlots[pEntity->m_PlotID].m_vObjects.erase(GameServer()->m_aPlots[pEntity->m_PlotID].m_vObjects.begin() + i);
+			break;
+		}
+
+	// We want to remove the collision instantly so that transform move can place objects on the same posititon
+	// we dont need to do it for plot draw doors, because they are handled as doors and can have multiple on the same position anyways
+	if (pEntity->GetObjType() == CGameWorld::ENTTYPE_SPEEDUP || pEntity->GetObjType() == CGameWorld::ENTTYPE_TELEPORTER || pEntity->GetObjType() == CGameWorld::ENTTYPE_BUTTON)
+		pEntity->ResetCollision(true);
+	GameServer()->m_World.DestroyEntity(pEntity);
+	return true;
 }
 
 int CDrawEditor::GetPlotID()
@@ -1326,21 +1338,4 @@ void CDrawEditor::StopTransform(bool Silent)
 		if (m_Transform.m_vSelected[i]->m_TransformCID == GetCID())
 			m_Transform.m_vSelected[i]->m_TransformCID = -1;
 	m_Transform.m_vSelected.clear();
-}
-
-bool CDrawEditor::SafelyDestroyDrawEntity(CEntity *pEntity)
-{
-	for (unsigned i = 0; i < GameServer()->m_aPlots[pEntity->m_PlotID].m_vObjects.size(); i++)
-		if (GameServer()->m_aPlots[pEntity->m_PlotID].m_vObjects[i] == pEntity)
-		{
-			GameServer()->m_aPlots[pEntity->m_PlotID].m_vObjects.erase(GameServer()->m_aPlots[pEntity->m_PlotID].m_vObjects.begin() + i);
-			break;
-		}
-
-	// We want to remove the collision instantly so that transform move can place objects on the same posititon
-	// we dont need to do it for plot draw doors, because they are handled as doors and can have multiple on the same position anyways
-	if (pEntity->GetObjType() == CGameWorld::ENTTYPE_SPEEDUP || pEntity->GetObjType() == CGameWorld::ENTTYPE_TELEPORTER || pEntity->GetObjType() == CGameWorld::ENTTYPE_BUTTON)
-		pEntity->ResetCollision(true);
-	GameServer()->m_World.DestroyEntity(pEntity);
-	return true;
 }

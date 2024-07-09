@@ -1950,7 +1950,7 @@ int CCollision::IntersectLineNoBonus(vec2 Pos0, vec2 Pos1, vec2* pOutCollision, 
 	return 0;
 }
 
-int CCollision::IntersectLineDoor(vec2 Pos0, vec2 Pos1, vec2* pOutCollision, vec2* pOutBeforeCollision, int Team, bool PlotDoorOnly, bool ClosedOnly, bool IncludeDrawDoor)
+int CCollision::IntersectLineDoor(vec2 Pos0, vec2 Pos1, vec2* pOutCollision, vec2* pOutBeforeCollision, int Team, bool PlotDoorOnly, bool ClosedOnly)
 {
 	if (!m_pDoor || (PlotDoorOnly && !m_NumPlots))
 		return 0;
@@ -1966,7 +1966,7 @@ int CCollision::IntersectLineDoor(vec2 Pos0, vec2 Pos1, vec2* pOutCollision, vec
 		int Ny = clamp(round_to_int(Pos.y) / 32, 0, m_Height - 1);
 		int Index = Ny * m_Width + Nx;
 
-		int Number = CheckPointDoor(Pos, Team, PlotDoorOnly, ClosedOnly, IncludeDrawDoor);
+		int Number = CheckPointDoor(Pos, Team, PlotDoorOnly, ClosedOnly);
 		if (Number != -1)
 		{
 			if (pOutCollision)
@@ -1986,7 +1986,7 @@ int CCollision::IntersectLineDoor(vec2 Pos0, vec2 Pos1, vec2* pOutCollision, vec
 	return 0;
 }
 
-int CCollision::CheckPointDoor(vec2 Pos, int Team, bool PlotDoorOnly, bool ClosedOnly, bool IncludeDrawDoor)
+int CCollision::CheckPointDoor(vec2 Pos, int Team, bool PlotDoorOnly, bool ClosedOnly)
 {
 	int Index = GetPureMapIndex(Pos);
 	if (Index < 0 || !m_pDoor)
@@ -1995,9 +1995,7 @@ int CCollision::CheckPointDoor(vec2 Pos, int Team, bool PlotDoorOnly, bool Close
 	for (unsigned int i = 0; i < m_pDoor[Index].m_vTiles.size(); i++)
 	{
 		int Number = m_pDoor[Index].m_vTiles[i].m_Number;
-		if (m_pDoor[Index].m_vTiles[i].m_Index == TILE_STOPA
-			&& (!PlotDoorOnly || (IsPlotDoor(Number) || (IncludeDrawDoor && (IsPlotDrawDoor(Number) || Number == 0))))
-			&& (m_pSwitchers[Number].m_Status[Team] || !ClosedOnly))
+		if (m_pDoor[Index].m_vTiles[i].m_Index == TILE_STOPA && (!PlotDoorOnly || IsPlotDoor(Number)) && (m_pSwitchers[Number].m_Status[Team] || !ClosedOnly))
 			return Number;
 	}
 	return -1;

@@ -551,6 +551,7 @@ public:
 
 	int64 m_LastTaserUse;
 	int GetTaserStrength();
+	float GetTaserFreezeTime();
 
 	// broadcast and ddrace hud
 	bool ShowAmmoHud();
