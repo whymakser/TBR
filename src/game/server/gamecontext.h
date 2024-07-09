@@ -431,6 +431,8 @@ public:
 		int m_Size;
 		vec2 m_ToTele;
 		std::vector<CEntity *> m_vObjects;
+		int64 m_DestroyEndTick;
+		int m_DoorHealth;
 	} m_aPlots[MAX_PLOTS];
 
 	enum PlotVariables
@@ -445,6 +447,7 @@ public:
 
 	void SetPlotDoorStatus(int PlotID, bool Close);
 	void SetPlotDrawDoorStatus(int PlotID, int Door, bool Close);
+	void SetPlotDrawDoorStatus(int Number, bool Close);
 	void ClearPlot(int PlotID);
 	int GetPlotID(int AccID);
 	void ExpirePlots();
@@ -454,9 +457,13 @@ public:
 	bool IsFullHour() { return Server()->Tick() % (Server()->TickSpeed() * 60 * 60) == m_FullHourOffsetTicks; }
 	bool HasPlotByIP(int ClientID);
 
-	int IntersectedLineDoor(vec2 Pos0, vec2 Pos1, int Team, bool PlotDoorOnly, bool ClosedOnly = true);
+	int IntersectedLineDoor(vec2 Pos0, vec2 Pos1, int Team, bool PlotDoorOnly, bool ClosedOnly = true, vec2 *pOutPos = 0, bool IncludePlotDrawDoor = false);
 	void RemovePortalsFromPlot(int PlotID);
 	bool IsPlotEmpty(int PlotID);
+
+	bool PlotCanBeRaided(int PlotID);
+	bool CanClosePlotDoor(int PlotID);
+	bool OnPlotDoorTaser(int PlotID, int TaserStrength, int ClientID);
 
 	//account
 	int GetAccIDByUsername(const char *pUsername);

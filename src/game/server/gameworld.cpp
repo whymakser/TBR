@@ -1053,11 +1053,18 @@ int CGameWorld::FindEntitiesTypes(vec2 Pos, float Radius, CEntity **ppEnts, int 
 	return Num;
 }
 
-CEntity *CGameWorld::IntersectEntityTypes(vec2 Pos0, vec2 Pos1, float Radius, vec2& NewPos, CEntity *pNotThis, int CollideWith, int Types, CCharacter *pThisOnly)
+CEntity *CGameWorld::IntersectEntityTypes(vec2 Pos0, vec2 Pos1, float Radius, vec2& NewPos, CEntity *pNotThis, int CollideWith, int Types, CCharacter *pThisOnly, bool CheckPlotTaserDestroy)
 {
 	// Find other players
 	float ClosestLen = distance(Pos0, Pos1) * 100.0f;
 	CEntity *pClosest = 0;
+
+	int Number = 0;
+	vec2 DoorIntersectPos;
+	if ((Types&1<<ENTTYPE_DOOR))
+	{
+		Number = GameServer()->IntersectedLineDoor(Pos0, Pos1, 0, true, true, &DoorIntersectPos, true);
+	}
 
 	for (int i = 0; i < NUM_ENTTYPES; i++)
 	{
@@ -1067,32 +1074,60 @@ CEntity *CGameWorld::IntersectEntityTypes(vec2 Pos0, vec2 Pos1, float Radius, ve
 		CEntity *p = FindFirst(i);
 		for(; p; p = p->TypeNext())
  		{
-			if(p == pNotThis)
-				continue;
-
-			if (pThisOnly && p != pThisOnly)
-				continue;
-
-			if (i == ENTTYPE_FLAG && ((CFlag *)p)->GetCarrier())
-				continue;
-
-			if (CollideWith != -1)
+			vec2 EntityPos = p->m_Pos;
+			float ProximityRadius = p->m_ProximityRadius;
+			if (!CheckPlotTaserDestroy || (i != ENTTYPE_DOOR && i != ENTTYPE_PICKUP && i != ENTTYPE_BUTTON && i != ENTTYPE_SPEEDUP && i != ENTTYPE_TELEPORTER))
 			{
-				CCharacter *pChr = 0;
-				if (i == ENTTYPE_CHARACTER)
-					pChr = (CCharacter *)p;
-				else if (i == ENTTYPE_FLAG || i == ENTTYPE_PICKUP_DROP || i == ENTTYPE_MONEY)
-					pChr = ((CAdvancedEntity *)p)->GetOwner();
-
-				if (pChr && !pChr->CanCollide(CollideWith))
+				if(p == pNotThis)
 					continue;
+
+				if (pThisOnly && p != pThisOnly)
+					continue;
+
+				if (i == ENTTYPE_FLAG && ((CFlag *)p)->GetCarrier())
+					continue;
+
+				if (CollideWith != -1)
+				{
+					CCharacter *pChr = 0;
+					if (i == ENTTYPE_CHARACTER)
+						pChr = (CCharacter *)p;
+					else if (i == ENTTYPE_FLAG || i == ENTTYPE_PICKUP_DROP || i == ENTTYPE_MONEY)
+						pChr = ((CAdvancedEntity *)p)->GetOwner();
+
+					if (pChr && !pChr->CanCollide(CollideWith))
+						continue;
+				}
+			}
+			else
+			{
+				int PlotID = p->m_PlotID;
+				if (!GameServer()->PlotCanBeRaided(PlotID))
+					continue;
+
+				if (i == ENTTYPE_DOOR && Number != 0)
+				{
+					// plot built laser draw walls
+					if (Number == -1)
+						Number = 0;
+					if (p->m_Number != Number || p->m_BrushCID != -1 || p->m_TransformCID != -1)
+						continue;
+					EntityPos = DoorIntersectPos;
+					ProximityRadius = ((CDoor *)p)->GetLength();
+				}
+				else if (i == ENTTYPE_TELEPORTER)
+				{
+					// Virtually increase teleporter entity size because we're checking for taser destroy
+					// we don't want the taser to be teleported by a weapon teleporter instead of getting destroyed
+					ProximityRadius *= 1.75f;
+				}
 			}
 
 			vec2 IntersectPos;
-			if (closest_point_on_line(Pos0, Pos1, p->m_Pos, IntersectPos))
+			if (closest_point_on_line(Pos0, Pos1, EntityPos, IntersectPos))
 			{
-				float Len = distance(p->m_Pos, IntersectPos);
-				if(Len < p->m_ProximityRadius+Radius)
+				float Len = distance(EntityPos, IntersectPos);
+				if(Len < ProximityRadius+Radius)
 				{
 					Len = distance(Pos0, IntersectPos);
 					if(Len < ClosestLen)
