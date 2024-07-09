@@ -3987,7 +3987,6 @@ void CCharacter::FDDraceInit()
 	m_RedirectTilePort = 0;
 	m_RedirectPassiveEndTick = 0;
 	m_LastJumpedTotal = 0;
-	m_DidFirstIllegalJump = false;
 	m_HookExceededTick = 0;
 }
 
@@ -4199,14 +4198,10 @@ void CCharacter::FDDraceTick()
 	{
 		if (m_Core.m_JumpedTotal != m_LastJumpedTotal)
 		{
-			IncreaseNoBonusScore(!m_DidFirstIllegalJump ? 2 : 1);
+			// add 2 when doing the first illegal air jump
+			bool FirstlyExceeded = m_Core.m_JumpedTotal == Config()->m_SvNoBonusMaxJumps;
+			IncreaseNoBonusScore(FirstlyExceeded ? 2 : 1);
 		}
-		// add 2 when doing the first illegal air jump
-		m_DidFirstIllegalJump = true;
-	}
-	else
-	{
-		m_DidFirstIllegalJump = false;
 	}
 	m_LastJumpedTotal = m_Core.m_JumpedTotal;
 

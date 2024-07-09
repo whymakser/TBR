@@ -500,7 +500,6 @@ public:
 	SNoBonusContext m_NoBonusContext;
 	int64 m_LastNoBonusTick;
 	int m_LastJumpedTotal;
-	bool m_DidFirstIllegalJump;
 	int64 m_HookExceededTick;
 
 	// helicopter
