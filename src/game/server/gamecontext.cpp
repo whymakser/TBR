@@ -5395,7 +5395,7 @@ bool CGameContext::IsPlotEmpty(int PlotID)
 
 bool CGameContext::PlotCanBeRaided(int PlotID)
 {
-	return PlotID >= PLOT_START && m_aPlots[PlotID].m_DestroyEndTick > Server()->Tick();
+	return PlotID >= PLOT_START && m_aPlots[PlotID].m_DestroyEndTick > Server()->Tick() && Config()->m_SvPoliceTaserPlotRaid;
 }
 
 bool CGameContext::PlotDoorDestroyed(int PlotID)

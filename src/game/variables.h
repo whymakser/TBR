@@ -242,6 +242,7 @@ MACRO_CONFIG_INT(SvClearFreeDrawLevel, sv_clear_free_draw_level, AUTHED_ADMIN, A
 MACRO_CONFIG_INT(SvEditorMaxDistance, sv_editor_max_distance, 750, 0, 99999, CFGFLAG_SERVER, "Maximum distance to place something with draw editor", AUTHED_ADMIN)
 
 // taser officers can shoot doors of wanted players' plots
+MACRO_CONFIG_INT(SvPoliceTaserPlotRaid, sv_police_taser_plot_raid, 1, 0, 1, CFGFLAG_SERVER, "Whether police taser can destroy plots of wanted players", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvPlotDoorHealth, sv_plot_door_health, 30, 0, 1000, CFGFLAG_SERVER|CFGFLAG_GAME, "Initial plot door health to withstand tasers", AUTHED_ADMIN)
 
 // taser battery
