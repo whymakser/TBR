@@ -461,7 +461,7 @@ public:
 	void RemovePortalsFromPlot(int PlotID);
 	bool IsPlotEmpty(int PlotID);
 
-	bool PlotCanBeRaided(int PlotID);
+	bool PlotCanBeRaided(int PlotID, int ClientID = -1);
 	bool PlotDoorDestroyed(int PlotID);
 	bool OnPlotDoorTaser(int PlotID, int TaserStrength, int ClientID, vec2 Pos);
 

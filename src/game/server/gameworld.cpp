@@ -1101,7 +1101,8 @@ CEntity *CGameWorld::IntersectEntityTypes(vec2 Pos0, vec2 Pos1, float Radius, ve
 			else
 			{
 				int PlotID = p->m_PlotID;
-				if (!GameServer()->PlotCanBeRaided(PlotID))
+				// using collidewith here, but should be the person trying to intersect
+				if (!GameServer()->PlotCanBeRaided(PlotID, CollideWith))
 					continue;
 
 				if (i == ENTTYPE_DOOR)

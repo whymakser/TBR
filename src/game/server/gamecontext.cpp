@@ -5393,8 +5393,11 @@ bool CGameContext::IsPlotEmpty(int PlotID)
 	return true;
 }
 
-bool CGameContext::PlotCanBeRaided(int PlotID)
+bool CGameContext::PlotCanBeRaided(int PlotID, int ClientID)
 {
+	int AccID = GetAccIDByUsername(m_aPlots[PlotID].m_aOwner);
+	if (AccID >= ACC_START && m_Accounts[AccID].m_ClientID == ClientID)
+		return false;
 	return PlotID >= PLOT_START && m_aPlots[PlotID].m_DestroyEndTick > Server()->Tick() && Config()->m_SvPoliceTaserPlotRaid;
 }
 
@@ -5405,7 +5408,7 @@ bool CGameContext::PlotDoorDestroyed(int PlotID)
 
 bool CGameContext::OnPlotDoorTaser(int PlotID, int TaserStrength, int ClientID, vec2 Pos)
 {
-	if (PlotID < PLOT_START || !PlotCanBeRaided(PlotID))
+	if (PlotID < PLOT_START || !PlotCanBeRaided(PlotID, ClientID))
 		return false;
 
 	int Diff = TaserStrength - max(TaserStrength - m_aPlots[PlotID].m_DoorHealth, 0);
@@ -5431,7 +5434,7 @@ bool CGameContext::OnPlotDoorTaser(int PlotID, int TaserStrength, int ClientID, 
 
 	char aBuf[64];
 	str_format(aBuf, sizeof(aBuf), "Plot %d Door Health [%d/%d]", PlotID, m_aPlots[PlotID].m_DoorHealth, Config()->m_SvPlotDoorHealth);
-	SendBroadcast(aBuf, ClientID, false);
+	SendBroadcast(aBuf, ClientID);
 	return false;
 }
 
