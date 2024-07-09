@@ -1053,11 +1053,18 @@ int CGameWorld::FindEntitiesTypes(vec2 Pos, float Radius, CEntity **ppEnts, int 
 	return Num;
 }
 
-CEntity *CGameWorld::IntersectEntityTypes(vec2 Pos0, vec2 Pos1, float Radius, vec2& NewPos, CEntity *pNotThis, int CollideWith, int Types, CCharacter *pThisOnly)
+CEntity *CGameWorld::IntersectEntityTypes(vec2 Pos0, vec2 Pos1, float Radius, vec2& NewPos, CEntity *pNotThis, int CollideWith, int Types, CCharacter *pThisOnly, bool CheckPlotTaserDestroy, bool PlotDoorOnly)
 {
 	// Find other players
 	float ClosestLen = distance(Pos0, Pos1) * 100.0f;
 	CEntity *pClosest = 0;
+
+	int Number = 0;
+	vec2 DoorIntersectPos;
+	if (CheckPlotTaserDestroy && (Types&1<<ENTTYPE_DOOR))
+	{
+		Number = GameServer()->IntersectedLineDoor(Pos0, Pos1, 0, PlotDoorOnly, true, &DoorIntersectPos);
+	}
 
 	for (int i = 0; i < NUM_ENTTYPES; i++)
 	{
@@ -1067,32 +1074,78 @@ CEntity *CGameWorld::IntersectEntityTypes(vec2 Pos0, vec2 Pos1, float Radius, ve
 		CEntity *p = FindFirst(i);
 		for(; p; p = p->TypeNext())
  		{
-			if(p == pNotThis)
-				continue;
-
-			if (pThisOnly && p != pThisOnly)
-				continue;
-
-			if (i == ENTTYPE_FLAG && ((CFlag *)p)->GetCarrier())
-				continue;
-
-			if (CollideWith != -1)
+			float ProximityRadius = p->m_ProximityRadius;
+			if (!CheckPlotTaserDestroy || (i != ENTTYPE_DOOR && i != ENTTYPE_PICKUP && i != ENTTYPE_BUTTON && i != ENTTYPE_SPEEDUP && i != ENTTYPE_TELEPORTER))
 			{
-				CCharacter *pChr = 0;
-				if (i == ENTTYPE_CHARACTER)
-					pChr = (CCharacter *)p;
-				else if (i == ENTTYPE_FLAG || i == ENTTYPE_PICKUP_DROP || i == ENTTYPE_MONEY)
-					pChr = ((CAdvancedEntity *)p)->GetOwner();
-
-				if (pChr && !pChr->CanCollide(CollideWith))
+				if(p == pNotThis)
 					continue;
+
+				if (pThisOnly && p != pThisOnly)
+					continue;
+
+				if (i == ENTTYPE_FLAG && ((CFlag *)p)->GetCarrier())
+					continue;
+
+				if (CollideWith != -1)
+				{
+					CCharacter *pChr = 0;
+					if (i == ENTTYPE_CHARACTER)
+						pChr = (CCharacter *)p;
+					else if (i == ENTTYPE_FLAG || i == ENTTYPE_PICKUP_DROP || i == ENTTYPE_MONEY)
+						pChr = ((CAdvancedEntity *)p)->GetOwner();
+
+					if (pChr && !pChr->CanCollide(CollideWith))
+						continue;
+				}
+			}
+			else
+			{
+				int PlotID = p->m_PlotID;
+				if (!GameServer()->PlotCanBeRaided(PlotID))
+					continue;
+
+				if (i == ENTTYPE_DOOR)
+				{
+					if (Number == 0)
+						continue;
+					// plot built laser draw walls
+					int RealNumber = Number == -1 ? 0 : Number;
+					// we can't really support no-collision doors (drawings) for now, cause they don't give a DoorIntersectPos. but wont hinder us from getting a wanted out of plot
+					if (p->m_Number != RealNumber || p->m_BrushCID != -1 || p->m_TransformCID != -1 || !p->m_Collision)
+						continue;
+
+					CDoor *pDoor = (CDoor *)p;
+					ProximityRadius = 14.f * 1.75f;
+					vec2 ClosestPoint;
+					if (closest_point_on_line(pDoor->GetPos(), pDoor->GetToPos(), DoorIntersectPos, ClosestPoint))
+					{
+						float Len = distance(DoorIntersectPos, ClosestPoint);
+						if(Len < ProximityRadius+Radius)
+						{
+							Len = distance(Pos0, DoorIntersectPos);
+							if (Len < ClosestLen)
+							{
+								NewPos = DoorIntersectPos;
+								ClosestLen = Len;
+								pClosest = p;
+							}
+						}
+					}
+					continue;
+				}
+				else if (i == ENTTYPE_TELEPORTER)
+				{
+					// Virtually increase teleporter entity size because we're checking for taser destroy
+					// we don't want the taser to be teleported by a weapon teleporter instead of getting destroyed
+					ProximityRadius *= 1.75f;
+				}
 			}
 
 			vec2 IntersectPos;
 			if (closest_point_on_line(Pos0, Pos1, p->m_Pos, IntersectPos))
 			{
 				float Len = distance(p->m_Pos, IntersectPos);
-				if(Len < p->m_ProximityRadius+Radius)
+				if(Len < ProximityRadius+Radius)
 				{
 					Len = distance(Pos0, IntersectPos);
 					if(Len < ClosestLen)

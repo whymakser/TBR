@@ -500,10 +500,10 @@ void CCharacter::FireWeapon()
 	vec2 ProjStartPos = m_Pos+TempDirection*GetProximityRadius()*0.75f;
 
 	// doing this before the loop so that m_LastTaserUse is not yet updated when having spread taser
-	float TaserFreezeTime = 0.f;
+	int TaserStrength = 0;
 	if (GetActiveWeapon() == WEAPON_TASER)
 	{
-		TaserFreezeTime = GetTaserFreezeTime();
+		TaserStrength = GetTaserStrength();
 		m_LastTaserUse = Server()->Tick();
 	}
 
@@ -559,7 +559,14 @@ void CCharacter::FireWeapon()
 						bool Status = GameServer()->Collision()->m_pSwitchers[pDoor->m_Number].m_Status[Team()];
 						if (pDoor->m_PlotID > 0 && !IsPlotDrawDoor)
 						{
-							GameServer()->SetPlotDoorStatus(pDoor->m_PlotID, !Status);
+							if (!Status && GameServer()->PlotDoorDestroyed(pDoor->m_PlotID))
+							{
+								GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You can't close your door because the police destroyed it");
+							}
+							else
+							{
+								GameServer()->SetPlotDoorStatus(pDoor->m_PlotID, !Status);
+							}
 						}
 						else
 						{
@@ -768,7 +775,7 @@ void CCharacter::FireWeapon()
 			case WEAPON_TASER:
 			case WEAPON_LASER:
 			{
-				new CLaser(GameWorld(), m_Pos, Direction, Tuning()->m_LaserReach, m_pPlayer->GetCID(), GetActiveWeapon(), TaserFreezeTime);
+				new CLaser(GameWorld(), m_Pos, Direction, Tuning()->m_LaserReach, m_pPlayer->GetCID(), GetActiveWeapon(), TaserStrength);
 
 				if (Sound)
 					GameServer()->CreateSound(m_Pos, SOUND_LASER_FIRE, TeamMask());
@@ -4651,11 +4658,6 @@ int CCharacter::GetTaserStrength()
 	int AccID = m_pPlayer->GetAccID();
 	int TaserLevel = AccID >= ACC_START ? GameServer()->m_Accounts[AccID].m_TaserLevel : 10;
 	return clamp((int)((Server()->Tick() - m_LastTaserUse) * 2 / Server()->TickSpeed()), 0, TaserLevel);
-}
-
-float CCharacter::GetTaserFreezeTime()
-{
-	return GetTaserStrength() / 10.f;
 }
 
 bool CCharacter::ShowAmmoHud()

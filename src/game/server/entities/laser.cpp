@@ -10,7 +10,7 @@
 #include <engine/shared/config.h>
 #include <game/server/teams.h>
 
-CLaser::CLaser(CGameWorld* pGameWorld, vec2 Pos, vec2 Direction, float StartEnergy, int Owner, int Type, float TaserFreezeTime)
+CLaser::CLaser(CGameWorld* pGameWorld, vec2 Pos, vec2 Direction, float StartEnergy, int Owner, int Type, int TaserStrength)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_LASER, Pos)
 {
 	m_Pos = Pos;
@@ -22,7 +22,7 @@ CLaser::CLaser(CGameWorld* pGameWorld, vec2 Pos, vec2 Direction, float StartEner
 	m_TelePos = vec2(0, 0);
 	m_WasTele = false;
 	m_Type = Type;
-	m_TaserFreezeTime = TaserFreezeTime;
+	m_TaserStrength = TaserStrength;
 	m_TeleportCancelled = false;
 	m_IsBlueTeleport = false;
 	m_TeamMask = GameServer()->GetPlayerChar(Owner) ? GameServer()->GetPlayerChar(Owner)->TeamMask() : Mask128();
@@ -44,17 +44,41 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 	CCharacter* pOwnerChar = GameServer()->GetPlayerChar(m_Owner);
 	bool pDontHitSelf = Config()->m_SvOldLaser || (m_Bounces == 0 && !m_WasTele);
 
+	bool CheckPlotTaserDestroy = false;
+	bool PlotDoorOnly = true;
 	int Types = (1<<CGameWorld::ENTTYPE_CHARACTER);
 	if (Config()->m_SvInteractiveDrops && m_Type == WEAPON_SHOTGUN)
+	{
 		Types |= (1<<CGameWorld::ENTTYPE_FLAG) | (1<<CGameWorld::ENTTYPE_PICKUP_DROP) | (1<<CGameWorld::ENTTYPE_MONEY);
+	}
+	else if (m_Type == WEAPON_TASER)
+	{
+		CPlayer *pOwner = m_Owner >= 0 ? GameServer()->m_apPlayers[m_Owner] : 0;
+		if (pOwner)
+		{
+			CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[pOwner->GetAccID()];
+			if (pAccount->m_PoliceLevel >= 4)
+			{
+				Types |= (1<<CGameWorld::ENTTYPE_DOOR);
+				CheckPlotTaserDestroy = true;
+			}
+			if (pAccount->m_PoliceLevel >= 5)
+			{
+				Types |= (1<<CGameWorld::ENTTYPE_PICKUP) | (1<<CGameWorld::ENTTYPE_BUTTON) | (1<<CGameWorld::ENTTYPE_SPEEDUP) | (1<<CGameWorld::ENTTYPE_TELEPORTER);
+				CheckPlotTaserDestroy = true;
+				// Allow only tasering the door with police 4. police 5 can also destroy objects ON the plot
+				PlotDoorOnly = false;
+			}
+		}
+	}
 	CCharacter *pChr = 0;
 	CAdvancedEntity *pEnt = 0;
 	CEntity *pIntersected = 0;
 
 	if (pOwnerChar ? (!(pOwnerChar->m_Hit & CCharacter::DISABLE_HIT_RIFLE) && (m_Type == WEAPON_LASER || m_Type == WEAPON_TASER)) || (!(pOwnerChar->m_Hit & CCharacter::DISABLE_HIT_SHOTGUN) && m_Type == WEAPON_SHOTGUN) : Config()->m_SvHit)
-		pIntersected = GameWorld()->IntersectEntityTypes(m_Pos, To, 0.f, At, pDontHitSelf ? pOwnerChar : 0, m_Owner, Types);
+		pIntersected = GameWorld()->IntersectEntityTypes(m_Pos, To, 0.f, At, pDontHitSelf ? pOwnerChar : 0, m_Owner, Types, 0, CheckPlotTaserDestroy, PlotDoorOnly);
 	else
-		pIntersected = GameWorld()->IntersectEntityTypes(m_Pos, To, 0.f, At, pDontHitSelf ? pOwnerChar : 0, m_Owner, Types, pOwnerChar);
+		pIntersected = GameWorld()->IntersectEntityTypes(m_Pos, To, 0.f, At, pDontHitSelf ? pOwnerChar : 0, m_Owner, Types, pOwnerChar, CheckPlotTaserDestroy, PlotDoorOnly);
 
 	bool IsCharacter = false;
 	if (pIntersected)
@@ -64,7 +88,7 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 		{
 			pChr = (CCharacter *)pIntersected;
 		}
-		else
+		else if (m_Type == WEAPON_SHOTGUN)
 		{
 			pEnt = (CAdvancedEntity *)pIntersected;
 			if (pEnt->GetObjType() == CGameWorld::ENTTYPE_FLAG)
@@ -77,12 +101,21 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 		}
 	}
 
-	if ((!IsCharacter && !pEnt) || ((IsCharacter && !pChr) || (IsCharacter && pChr == pOwnerChar && Config()->m_SvOldLaser) || (pChr != pOwnerChar && pOwnerChar ? (pOwnerChar->m_Hit & CCharacter::DISABLE_HIT_RIFLE && (m_Type == WEAPON_LASER || m_Type == WEAPON_TASER)) || (pOwnerChar->m_Hit & CCharacter::DISABLE_HIT_SHOTGUN && m_Type == WEAPON_SHOTGUN) : !Config()->m_SvHit)))
-		return false;
+	bool IsPlotTaser = CheckPlotTaserDestroy && pIntersected && pIntersected->m_PlotID >= PLOT_START;
+	if (!IsPlotTaser)
+	{
+		if ((!IsCharacter && !pEnt) || ((IsCharacter && !pChr) || (IsCharacter && pChr == pOwnerChar && Config()->m_SvOldLaser) || (pChr != pOwnerChar && pOwnerChar ? (pOwnerChar->m_Hit & CCharacter::DISABLE_HIT_RIFLE && (m_Type == WEAPON_LASER || m_Type == WEAPON_TASER)) || (pOwnerChar->m_Hit & CCharacter::DISABLE_HIT_SHOTGUN && m_Type == WEAPON_SHOTGUN) : !Config()->m_SvHit)))
+			return false;
 
+		m_Energy = -1;
+	}
+	else
+	{
+		m_Energy -= distance(From, At);
+	}
 	m_From = From;
 	m_Pos = At;
-	m_Energy = -1;
+
 	if (m_Type == WEAPON_SHOTGUN)
 	{
 		static const vec2 StackedLaserShotgunBugSpeed = vec2(-2147483648.0f, -2147483648.0f);
@@ -125,10 +158,31 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 	}
 	else if (m_Type == WEAPON_TASER)
 	{
-		if (pOwnerChar)
+		if (pChr)
 		{
-			pChr->Freeze(m_TaserFreezeTime);
+			pChr->Freeze(m_TaserStrength / 10.f);
 			pChr->m_GotLasered = true;
+		}
+	 	else if (IsPlotTaser)
+		{
+			// taser destroy
+			if (pIntersected->IsPlotDoor())
+			{
+				if (GameServer()->OnPlotDoorTaser(pIntersected->m_PlotID, m_TaserStrength, m_Owner, At))
+				{
+					GameServer()->SetPlotDoorStatus(pIntersected->m_PlotID, false);
+				}
+				m_Energy = -1;
+			}
+			else if (pOwnerChar)
+			{
+				pOwnerChar->m_DrawEditor.SafelyDestroyDrawEntity(pIntersected);
+			}
+
+			m_TaserStrength -= 2;
+			if (m_TaserStrength <= 0)
+				m_Energy = -1;
+			return true;
 		}
 	}
 	pChr->TakeDamage(vec2(0.f, 0.f), vec2(0, 0), g_pData->m_Weapons.m_aId[GameServer()->GetWeaponType(m_Type)].m_Damage, m_Owner, m_Type);

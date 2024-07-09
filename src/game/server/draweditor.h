@@ -219,5 +219,7 @@ public:
 	// used in snap functions of available entities to draw, returns true if the SnappingClient is not able to see the preview
 	bool OnSnapPreview(CEntity *pEntity);
 	bool TryEnterPresetName(const char *pName);
+
+	bool SafelyDestroyDrawEntity(CEntity *pEntity);
 };
 #endif //GAME_SERVER_DRAWEDITOR_H

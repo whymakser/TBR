@@ -2492,6 +2492,11 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 			pSelf->SendChatTarget(pResult->m_ClientID, "You have to be inside your plot to edit your plot");
 			return;
 		}
+		else if (pChr->GetPlayer()->m_EscapeTime)
+		{
+			pSelf->SendChatTarget(pResult->m_ClientID, "You can't edit your plot while living the life of a gangster.");
+			return;
+		}
 
 		if (pSelf->Arenas()->FightStarted(pResult->m_ClientID))
 			return;
@@ -2555,7 +2560,7 @@ void CGameContext::ConPoliceInfo(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *)pUserData;
 
 	int Page = pResult->GetInteger(0);
-	int MaxPages = 4;	//////UPDATE THIS WITH EVERY PAGE YOU ADD
+	int MaxPages = 6;	//////UPDATE THIS WITH EVERY PAGE YOU ADD
 	if (!Page || Page > MaxPages)
 		Page = 1;
 
@@ -2577,6 +2582,10 @@ void CGameContext::ConPoliceInfo(IConsole::IResult *pResult, void *pUserData)
 			Level = 25;
 		else if (Policelevel == 3)
 			Level = 30;
+		else if (Policelevel == 4)
+			Level = 40;
+		else if (Policelevel == 5)
+			Level = 50;
 
 		str_format(aPolice, sizeof(aPolice), "[POLICE %d]", Policelevel);
 		pSelf->SendChatTarget(pResult->m_ClientID, aPolice);
@@ -2591,6 +2600,10 @@ void CGameContext::ConPoliceInfo(IConsole::IResult *pResult, void *pUserData)
 			pSelf->SendChatTarget(pResult->m_ClientID, "- '/policehelper'");
 		else if (Policelevel == 3)
 			pSelf->SendChatTarget(pResult->m_ClientID, "- taser license ('/taser')");
+		else if (Policelevel == 4)
+			pSelf->SendChatTarget(pResult->m_ClientID, "- Officers can taser a plot door of a wanted player to deal damage and destroy it");
+		else if (Policelevel == 5)
+			pSelf->SendChatTarget(pResult->m_ClientID, "- Taser will destroy plot objects of a wanted player");
 	}
 	else
 	{

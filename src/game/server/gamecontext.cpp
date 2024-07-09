@@ -1181,6 +1181,7 @@ void CGameContext::SendTuningParams(int ClientID, int Zone)
 
 void CGameContext::OnTick()
 {
+	Config()->m_SvTestingCommands = 1;
 	if(m_TeeHistorianActive)
 	{
 		if(!m_TeeHistorian.Starting())
@@ -1441,6 +1442,17 @@ void CGameContext::OnTick()
 	{
 		ExpirePlots();
 		ExpireSavedIdentities();
+	}
+
+	// Check if plot destroy is over, player is not wanted anymore as it seems
+	for (int i = PLOT_START; i < Collision()->m_NumPlots + 1; i++)
+	{
+		if (m_aPlots[i].m_DestroyEndTick && !PlotCanBeRaided(i))
+		{
+			// Reset door health
+			m_aPlots[i].m_DestroyEndTick = 0;
+			m_aPlots[i].m_DoorHealth = Config()->m_SvPlotDoorHealth;
+		}
 	}
 
 #ifdef CONF_DEBUG
@@ -4110,6 +4122,8 @@ void CGameContext::FDDraceInitPreMapInit()
 		m_aPlots[i].m_Size = 0;
 		m_aPlots[i].m_ToTele = vec2(-1, -1);
 		m_aPlots[i].m_vObjects.clear();
+		m_aPlots[i].m_DestroyEndTick = 0;
+		m_aPlots[i].m_DoorHealth = Config()->m_SvPlotDoorHealth;
 	}
 }
 
@@ -5303,6 +5317,8 @@ void CGameContext::ExpirePlots()
 			m_aPlots[i].m_aOwner[0] = 0;
 			m_aPlots[i].m_aDisplayName[0] = 0;
 			m_aPlots[i].m_ExpireDate = 0;
+			m_aPlots[i].m_DestroyEndTick = 0;
+			m_aPlots[i].m_DoorHealth = Config()->m_SvPlotDoorHealth;
 			ClearPlot(i);
 			SetPlotDoorStatus(i, true);
 		}
@@ -5329,6 +5345,15 @@ void CGameContext::SetPlotDrawDoorStatus(int PlotID, int Door, bool Close)
 		Collision()->m_pSwitchers[Switch].m_Status[i] = Close;
 }
 
+void CGameContext::SetPlotDrawDoorStatus(int Number, bool Close)
+{
+	if (!Collision()->IsPlotDrawDoor(Number) || !Collision()->m_pSwitchers)
+		return;
+
+	for (int i = 0; i < VANILLA_MAX_CLIENTS; i++)
+		Collision()->m_pSwitchers[Number].m_Status[i] = Close;
+}
+
 void CGameContext::ClearPlot(int PlotID)
 {
 	if (PlotID >= 0 && PlotID <= Collision()->m_NumPlots)
@@ -5339,9 +5364,9 @@ void CGameContext::ClearPlot(int PlotID)
 	}
 }
 
-int CGameContext::IntersectedLineDoor(vec2 Pos0, vec2 Pos1, int Team, bool PlotDoorOnly, bool ClosedOnly)
+int CGameContext::IntersectedLineDoor(vec2 Pos0, vec2 Pos1, int Team, bool PlotDoorOnly, bool ClosedOnly, vec2 *pOutIntersected)
 {
-	int Number = Collision()->IntersectLineDoor(Pos0, Pos1, 0, 0, Team, PlotDoorOnly, ClosedOnly);
+	int Number = Collision()->IntersectLineDoor(Pos0, Pos1, pOutIntersected, 0, Team, PlotDoorOnly, ClosedOnly);
 	return Number; // can be used as bool, -1 is plot built laser wall which would return true too
 }
 
@@ -5367,6 +5392,48 @@ bool CGameContext::IsPlotEmpty(int PlotID)
 		if (GetPlayerChar(i) && GetPlayerChar(i)->GetCurrentTilePlotID(true) == PlotID)
 			return false;
 	return true;
+}
+
+bool CGameContext::PlotCanBeRaided(int PlotID)
+{
+	return PlotID >= PLOT_START && m_aPlots[PlotID].m_DestroyEndTick > Server()->Tick();
+}
+
+bool CGameContext::PlotDoorDestroyed(int PlotID)
+{
+	return m_aPlots[PlotID].m_DoorHealth <= 0;
+}
+
+bool CGameContext::OnPlotDoorTaser(int PlotID, int TaserStrength, int ClientID, vec2 Pos)
+{
+	if (PlotID < PLOT_START || !PlotCanBeRaided(PlotID))
+		return false;
+
+	int Diff = TaserStrength - max(TaserStrength - m_aPlots[PlotID].m_DoorHealth, 0);
+	m_aPlots[PlotID].m_DoorHealth -= Diff;
+	CreateDamage(Pos, ClientID, vec2(0, 0), Diff, 0, false);
+
+	if (m_aPlots[PlotID].m_DoorHealth <= 0)
+	{
+		m_aPlots[PlotID].m_DoorHealth = 0;
+		SendBroadcast("", ClientID, false);
+		CreateDeath(Pos, ClientID);
+		int AccID = GetAccIDByUsername(m_aPlots[PlotID].m_aOwner);
+		if (AccID >= ACC_START)
+		{
+			int PlotOwner = m_Accounts[AccID].m_ClientID;
+			if (PlotOwner >= 0 && m_apPlayers[PlotOwner])
+			{
+				SendChatTarget(PlotOwner, "The police have gained access to your plot in hopes of finding you");
+			}
+		}
+		return true;
+	}
+
+	char aBuf[64];
+	str_format(aBuf, sizeof(aBuf), "Plot %d Door Health [%d/%d]", PlotID, m_aPlots[PlotID].m_DoorHealth, Config()->m_SvPlotDoorHealth);
+	SendBroadcast(aBuf, ClientID, false);
+	return false;
 }
 
 void CGameContext::SetExpireDateDays(time_t *pDate, float Days)
