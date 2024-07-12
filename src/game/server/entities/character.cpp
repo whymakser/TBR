@@ -4914,12 +4914,12 @@ bool CCharacter::TrySafelyRedirectClient(int Port, bool Force)
 		// Check if we're alive in case we got kicked and killed by unsupported redirect
 		if (m_Alive)
 		{
-			m_pPlayer->KillCharacter(WEAPON_SELF);
+			m_pPlayer->KillCharacter(WEAPON_GAME);
 		}
 		// Forcefully move the dummy asell
 		if (pDummyChar && pDummyChar->TrySafelyRedirectClientImpl(Port) && pDummyChar->m_Alive)
 		{
-			pDummy->KillCharacter(WEAPON_SELF);
+			pDummy->KillCharacter(WEAPON_GAME);
 		}
 		return true;
 	}
