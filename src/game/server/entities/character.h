@@ -556,6 +556,7 @@ public:
 	bool ShowAmmoHud();
 	int NumDDraceHudRows();
 	int GetDDNetCharacterFlags(int SnappingClient = -1);
+	int GetDDNetCharacterNinjaActivationTick();
 	void SendBroadcastHud(const char *pMessage);
 
 	// ResetNumInputs() gets called when player is paused or when (un)setting teecontrol. its to prevent weird shooting and weapon switching after unpause/(un)setting teecontrol

@@ -2074,20 +2074,7 @@ void CCharacter::Snap(int SnappingClient)
 
 	// otherwise show our normal tee and send ddnet character stuff
 	SnapCharacter(SnappingClient, ID);
-
-	// Send ddnet info of the guy we are spectating, because rainbowname is hacky and sets spectatorid to ourselve if rainbowname is close to us
-	if (RainbowNameAffected)
-	{
-		CCharacter *pSpectating = GameServer()->GetPlayerChar(m_pPlayer->GetSpectatorID());
-		if (pSpectating)
-		{
-			pSpectating->SnapDDNetCharacter(SnappingClient, ID);
-		}
-	}
-	else
-	{
-		SnapDDNetCharacter(SnappingClient, ID);
-	}
+	SnapDDNetCharacter(SnappingClient, ID);
 }
 
 void CCharacter::SnapDDNetCharacter(int SnappingClient, int ID)
@@ -2096,29 +2083,45 @@ void CCharacter::SnapDDNetCharacter(int SnappingClient, int ID)
 	if(!pDDNetCharacter)
 		return;
 
+	// Send ddnet info of the guy we are spectating, because rainbowname is hacky and sets spectatorid to ourselve if rainbowname is close to us
+	{
+		bool RainbowNameAffected = SnappingClient == m_pPlayer->GetCID() && GameServer()->m_RainbowName.IsAffected(SnappingClient);
+		CCharacter *pSpectating = GameServer()->GetPlayerChar(m_pPlayer->GetSpectatorID());
+		int Flags, Jumps, JumpedTotal, NinjaActivationTick;
+		if (RainbowNameAffected && pSpectating)
+		{
+			Flags = pSpectating->GetDDNetCharacterFlags(SnappingClient);
+			Jumps = pSpectating->m_Core.m_Jumps;
+			JumpedTotal = pSpectating->m_Core.m_JumpedTotal;
+			NinjaActivationTick = pSpectating->GetDDNetCharacterNinjaActivationTick();
+		}
+		else
+		{
+			Flags = GetDDNetCharacterFlags(SnappingClient);
+			Jumps = m_Core.m_Jumps;
+			JumpedTotal = m_Core.m_JumpedTotal;
+			NinjaActivationTick = GetDDNetCharacterNinjaActivationTick();
+		}
+
+		pDDNetCharacter->m_Flags = Flags;
+		pDDNetCharacter->m_Jumps = Jumps;
+		pDDNetCharacter->m_JumpedTotal = JumpedTotal;
+		pDDNetCharacter->m_NinjaActivationTick = NinjaActivationTick;
+	}
+
 	CPlayer *pSnap = SnappingClient >= 0 ? GameServer()->m_apPlayers[SnappingClient] : 0;
-	pDDNetCharacter->m_Flags = GetDDNetCharacterFlags(SnappingClient);
-	pDDNetCharacter->m_FreezeEnd = m_DeepFreeze ? -1 : m_FreezeTime == 0 ? 0 : Server()->Tick() + m_FreezeTime;
-	pDDNetCharacter->m_Jumps = m_Core.m_Jumps;
-	pDDNetCharacter->m_TeleCheckpoint = m_TeleCheckpoint;
 	pDDNetCharacter->m_StrongWeakID = pSnap ? (Config()->m_SvWeakHook ? pSnap->m_aStrongWeakID[ID] : SnappingClient == m_pPlayer->GetCID() ? 1 : 0) : m_StrongWeakID;
-
-	// Display Informations
-	bool NinjaBarFull = m_DrawEditor.Active() || (GetActiveWeapon() == WEAPON_NINJA && m_ScrollNinja) || GetActiveWeapon() == WEAPON_TELEKINESIS;
-
-	pDDNetCharacter->m_JumpedTotal = m_Core.m_JumpedTotal;
-	pDDNetCharacter->m_NinjaActivationTick = NinjaBarFull ? Server()->Tick() : m_Ninja.m_ActivationTick;
+	pDDNetCharacter->m_FreezeEnd = m_DeepFreeze ? -1 : m_FreezeTime == 0 ? 0 : Server()->Tick() + m_FreezeTime;
 	pDDNetCharacter->m_FreezeStart = m_FreezeTick;
-	if(m_IsFrozen)
-	{
-		pDDNetCharacter->m_Flags |= CHARACTERFLAG_IN_FREEZE;
-	}
-	if(Teams()->IsPractice(Team()))
-	{
-		pDDNetCharacter->m_Flags |= CHARACTERFLAG_PRACTICE_MODE;
-	}
+	pDDNetCharacter->m_TeleCheckpoint = m_TeleCheckpoint;
 	pDDNetCharacter->m_TargetX = m_Core.m_Input.m_TargetX;
 	pDDNetCharacter->m_TargetY = m_Core.m_Input.m_TargetY;
+}
+
+int CCharacter::GetDDNetCharacterNinjaActivationTick()
+{
+	bool NinjaBarFull = m_DrawEditor.Active() || (GetActiveWeapon() == WEAPON_NINJA && m_ScrollNinja) || GetActiveWeapon() == WEAPON_TELEKINESIS;;
+	return NinjaBarFull ? Server()->Tick() : m_Ninja.m_ActivationTick;
 }
 
 int CCharacter::GetDDNetCharacterFlags(int SnappingClient)
@@ -2173,6 +2176,8 @@ int CCharacter::GetDDNetCharacterFlags(int SnappingClient)
 		Flags |= CHARACTERFLAG_WEAPON_NINJA;
 	//if(m_Core.m_LiveFrozen)
 	//	Flags |= CHARACTERFLAG_NO_MOVEMENTS;
+	if(m_IsFrozen)
+		Flags |= CHARACTERFLAG_IN_FREEZE;
 	if(Teams()->IsPractice(Team()))
 		Flags |= CHARACTERFLAG_PRACTICE_MODE;
 	if(Teams()->TeamLocked(Team()) || m_NoBonusContext.m_SavedBonus.NonEmpty())
