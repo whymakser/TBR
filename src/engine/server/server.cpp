@@ -1523,10 +1523,10 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				else
 				{
 					m_aClients[ClientID].m_State = CClient::STATE_CONNECTING;
-					if (Config()->m_SvDefaultMapDesign[0] && GetDummy(ClientID) == -1)
-						ChangeMapDesign(ClientID, Config()->m_SvDefaultMapDesign);
-					else
+					if (GetDummy(ClientID) != -1 || !ChangeMapDesign(ClientID, Config()->m_SvDefaultMapDesign))
+					{
 						SendMap(ClientID);
+					}
 				}
 			}
 		}
@@ -1583,6 +1583,8 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 
 					CMsgPacker Msg(NETMSG_MAP_DATA, true);
 					Msg.AddRaw(&pMapData[Offset], ChunkSize);
+					if (str_comp(Config()->m_SvMapDesignPath, "designs") != 0)
+						Msg.AddInt(&m_aClients[ClientID].m_MapChunk);
 					SendMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH, ClientID);
 
 					if(Config()->m_Debug)
