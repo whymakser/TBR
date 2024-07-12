@@ -174,12 +174,9 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 				}
 				m_Energy = -1;
 			}
-			else if (pOwnerChar)
+			else if (pOwnerChar && pOwnerChar->m_DrawEditor.SafelyDestroyDrawEntity(pIntersected))
 			{
-				if (pOwnerChar->m_DrawEditor.SafelyDestroyDrawEntity(pIntersected))
-				{
-					GameServer()->CreateDeath(At, m_Owner);
-				}
+				GameServer()->CreateDeath(At, m_Owner);
 			}
 
 			m_TaserStrength -= 2;
