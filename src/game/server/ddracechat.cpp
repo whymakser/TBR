@@ -2381,7 +2381,7 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 			return;
 		}
 
-		if (pPlayer->m_EscapeTime)
+		if (pSelf->PlotCanBeRaided(OwnPlotID))
 		{
 			pSelf->SendChatTarget(pResult->m_ClientID, "You can't sell your plot when being wanted");
 			return;
@@ -2442,7 +2442,7 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 			return;
 		}
 
-		if (pPlayer->m_EscapeTime)
+		if (pSelf->PlotCanBeRaided(OwnPlotID))
 		{
 			pSelf->SendChatTarget(pResult->m_ClientID, "You can't swap plots when being wanted");
 			return;
@@ -2518,7 +2518,7 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 			pSelf->SendChatTarget(pResult->m_ClientID, "You have to be inside your plot to edit your plot");
 			return;
 		}
-		else if (pChr->GetPlayer()->m_EscapeTime)
+		else if (pSelf->PlotCanBeRaided(OwnPlotID))
 		{
 			pSelf->SendChatTarget(pResult->m_ClientID, "You can't edit your plot while living the life of a gangster.");
 			return;

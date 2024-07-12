@@ -1451,6 +1451,15 @@ void CGameContext::OnTick()
 			// Reset door health
 			m_aPlots[i].m_DestroyEndTick = 0;
 			m_aPlots[i].m_DoorHealth = Config()->m_SvPlotDoorHealth;
+			int AccID = GetAccIDByUsername(m_aPlots[i].m_aOwner);
+			if (AccID >= ACC_START)
+			{
+				int ClientID = m_Accounts[AccID].m_ClientID;
+				if (ClientID >= 0 && m_apPlayers[ClientID])
+				{
+					SendChatTarget(ClientID, "Your plot is no longer subject to a search warrant and can no longer be destroyed");
+				}
+			}
 		}
 	}
 
