@@ -423,7 +423,7 @@ void CPlayer::Tick()
 	}
 	// Update plot destroy end tick, in case we leave
 	// if prevtime is 0: we got initially wanted, if escapetime > prevtime: escapetime was added
-	if (m_PrevEscapeTime == 0 || m_EscapeTime > m_PrevEscapeTime)
+	if (m_EscapeTime > m_PrevEscapeTime)
 	{
 		int PlotID = GameServer()->GetPlotID(AccID);
 		if (PlotID >= PLOT_START)
