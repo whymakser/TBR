@@ -427,6 +427,8 @@ void CPlayer::Tick()
 	// if prevtime is 0: we got initially wanted, if escapetime > prevtime: escapetime was added
 	if (m_EscapeTime > m_PrevEscapeTime)
 	{
+		CancelPlotAuction();
+		CancelPlotSwap();
 		int PlotID = GameServer()->GetPlotID(AccID);
 		if (PlotID >= PLOT_START)
 		{

@@ -2381,6 +2381,12 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 			return;
 		}
 
+		if (pPlayer->m_EscapeTime)
+		{
+			pSelf->SendChatTarget(pResult->m_ClientID, "You can't sell your plot when being wanted");
+			return;
+		}
+
 		if (pPlayer->m_LastPlotAuction && pPlayer->m_LastPlotAuction + pSelf->Server()->TickSpeed() * 60 > pSelf->Server()->Tick())
 		{
 			pSelf->SendChatTarget(pResult->m_ClientID, "You can only do auctions once a minute");
@@ -2433,6 +2439,12 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 		if (pPlayer->GetAccID() < ACC_START)
 		{
 			pSelf->SendChatTarget(pResult->m_ClientID, "You are not logged in");
+			return;
+		}
+
+		if (pPlayer->m_EscapeTime)
+		{
+			pSelf->SendChatTarget(pResult->m_ClientID, "You can't swap plots when being wanted");
 			return;
 		}
 
