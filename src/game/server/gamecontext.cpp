@@ -732,7 +732,7 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 	{
 		Msg.m_Mode = CHAT_ALL;
 		for (int i = 0; i < MAX_CLIENTS; i++)
-			if (m_apPlayers[i] && m_Accounts[m_apPlayers[i]->GetAccID()].m_PoliceLevel && !m_apPlayers[i]->m_EscapeTime)
+			if (m_apPlayers[i] && m_Accounts[m_apPlayers[i]->GetAccID()].m_PoliceLevel)
 				SendChatMsg(&Msg, MsgFlags|MSGFLAG_VITAL, i);
 	}
 	else // Mode == CHAT_WHISPER
