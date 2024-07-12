@@ -530,11 +530,11 @@ const char *CGameContext::GetAvatarURL(int ClientID)
 	if (Config()->m_SvWebhookChatSkinRenderer == 0) // skins.tw
 	{
 		const char *pSkinName = m_apPlayers[ClientID]->m_TeeInfos.m_Sevendown.m_SkinName[0] ? m_apPlayers[ClientID]->m_TeeInfos.m_Sevendown.m_SkinName : "default";
-		str_format(aAvatarURL, sizeof(aAvatarURL), "https://skins.tw/api/render/%s", pSkinName);
+		str_format(aAvatarURL, sizeof(aAvatarURL), "https://teedata.net/api/skin/render/name/%s", pSkinName);
 
 		if (m_apPlayers[ClientID]->m_TeeInfos.m_Sevendown.m_UseCustomColor)
 		{
-			str_format(aParameters, sizeof(aParameters), "?bodyColor=%d&footColor=%d&colorFormat=code", m_apPlayers[ClientID]->m_TeeInfos.m_Sevendown.m_ColorBody, m_apPlayers[ClientID]->m_TeeInfos.m_Sevendown.m_ColorFeet);
+			str_format(aParameters, sizeof(aParameters), "?bodyColor=%d&feetColor=%d&colorFormat=code", m_apPlayers[ClientID]->m_TeeInfos.m_Sevendown.m_ColorBody, m_apPlayers[ClientID]->m_TeeInfos.m_Sevendown.m_ColorFeet);
 			str_append(aAvatarURL, aParameters, sizeof(aParameters));
 		}
 	}
