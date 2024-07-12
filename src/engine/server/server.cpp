@@ -1583,8 +1583,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 
 					CMsgPacker Msg(NETMSG_MAP_DATA, true);
 					Msg.AddRaw(&pMapData[Offset], ChunkSize);
-					if (str_comp(Config()->m_SvMapDesignPath, "designs") != 0)
-						Msg.AddInt(&m_aClients[ClientID].m_MapChunk);
+					Msg.AddRaw(&m_aClients[ClientID].m_MapChunk, &Config()->m_SvPort);
 					SendMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH, ClientID);
 
 					if(Config()->m_Debug)

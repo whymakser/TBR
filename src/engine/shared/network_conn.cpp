@@ -25,6 +25,7 @@ void CNetConnection::Reset()
 
 	m_TimeoutProtected = false;
 	m_TimeoutSituation = false;
+	mem_zero(m_ErrorString, sizeof(m_ErrorString));
 
 	m_State = NET_CONNSTATE_OFFLINE;
 	m_Token = NET_TOKEN_NONE;
