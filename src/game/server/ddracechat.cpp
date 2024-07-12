@@ -1884,7 +1884,12 @@ void CGameContext::ConPayMoney(IConsole::IResult* pResult, void* pUserData)
 	}
 	if (!pSelf->m_pHouses[HOUSE_BANK]->IsInside(pResult->m_ClientID))
 	{
-		pSelf->SendChatTarget(pResult->m_ClientID, "You have to be inside of a bank to pay money from your bank account to others.");
+		pSelf->SendChatTarget(pResult->m_ClientID, "You have to be inside of a bank to pay money from your bank account to others");
+		return;
+	}
+	if (pPlayer->m_LastMoneyPay > pSelf->Server()->Tick() - pSelf->Server()->TickSpeed())
+	{
+		pSelf->SendChatTarget(pResult->m_ClientID, "You can't pay money that frequently");
 		return;
 	}
 
@@ -1916,6 +1921,8 @@ void CGameContext::ConPayMoney(IConsole::IResult* pResult, void* pUserData)
 		pSelf->SendChatTarget(pResult->m_ClientID, "You can't pay nothing");
 		return;
 	}
+
+	pPlayer->m_LastMoneyPay = pSelf->Server()->Tick();
 
 	char aBuf[128];
 	str_format(aBuf, sizeof(aBuf), "paid to '%s'", pSelf->Server()->ClientName(pTo->GetCID()));
@@ -2452,6 +2459,13 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 			return;
 		}
 
+		if (pPlayer->m_LastPlotSwap && pPlayer->m_LastPlotSwap + pSelf->Server()->TickSpeed() * 60 > pSelf->Server()->Tick())
+		{
+			pSelf->SendChatTarget(pResult->m_ClientID, "You can only swap once a minute");
+			return;
+		}
+
+		pPlayer->m_LastPlotSwap = pSelf->Server()->Tick();
 		pPlayer->CancelPlotAuction();
 		str_copy(pPlayer->m_aPlotSwapUsername, pSelf->m_Accounts[SwapAccID].m_Username, sizeof(pPlayer->m_aPlotSwapUsername));
 		

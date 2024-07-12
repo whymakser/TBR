@@ -21,6 +21,7 @@ public:
 	void AddInt(int *i);
 	void AddInt(int i);
 	void AddString(const char *pStr, int Limit);
+	void AddRaw(int *pData, int *Size);
 	void AddRaw(const void *pData, int Size);
 
 	int Size() const { return (int)(m_pCurrent-m_aBuffer); }

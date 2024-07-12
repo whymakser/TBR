@@ -2884,6 +2884,8 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				return;
 			}
 
+			pPlayer->m_LastKill = Server()->Tick();
+
 			int Fight = Arenas()->GetClientFight(ClientID);
 			if (!Arenas()->FightStarted(ClientID))
 			{	
@@ -2922,8 +2924,6 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				SendChatTarget(ClientID, "Wallet kill Protection enabled. If you really want to kill, type /kill");
 				return;
 			}
-
-			pPlayer->m_LastKill = Server()->Tick();
 
 			CPlayer *pControlledTee = pPlayer->m_pControlledTee;
 			if (pControlledTee)

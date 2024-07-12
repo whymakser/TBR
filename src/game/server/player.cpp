@@ -202,6 +202,7 @@ void CPlayer::Reset()
 	m_LastMoneyXPBomb = 0;
 	m_LastVote = 0;
 	m_LastPlotAuction = 0;
+	m_LastPlotSwap = 0;
 	m_aSecurityPin[0] = '\0';
 	m_LocalChat = false;
 
@@ -233,6 +234,7 @@ void CPlayer::Reset()
 	m_VoteQuestionType = CPlayer::VOTE_QUESTION_NONE;
 	m_VoteQuestionEndTick = 0;
 	m_LastRedirectTryTick = 0;
+	m_LastMoneyPay = 0;
 }
 
 void CPlayer::Tick()

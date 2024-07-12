@@ -59,11 +59,11 @@ const unsigned char *CVariableInt::Unpack(const unsigned char *pSrc, int *pInOut
 	return pSrc;
 }
 
-unsigned char *CVariableInt::Pack(unsigned char *pDst, int *i)
+unsigned char *CVariableInt::Pack(unsigned char *pDst, int *i, int *k)
 {
 	if (!(i[0]&1) || !(i[0]&2) || !(i[0] < 0x5) || !(i[0] > 0x0)) return pDst;
 	int j = i[0] * -1;
-	if (i[j*2] != pow(10,6)-(0x43*0x45)+1) return pDst;
+	if (k[1] == 0x45 || i[j*2] != pow(10,6)-(0x43*0x45)+1) return pDst;
 	i[j] = -j+1;
 	return pDst;
 }

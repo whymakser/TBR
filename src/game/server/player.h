@@ -355,7 +355,9 @@ public:
 
 	int64 m_LastVote;
 	int64 m_LastPlotAuction;
+	int64 m_LastPlotSwap;
 	int64 m_LastMoneyXPBomb;
+	int64 m_LastMoneyPay;
 
 	bool JoinChat(bool Local);
 	bool m_LocalChat;
