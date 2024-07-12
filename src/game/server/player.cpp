@@ -414,7 +414,7 @@ void CPlayer::Tick()
 		{
 			GameServer()->SendChatTarget(m_ClientID, "Your life as a gangster is over, you are free now");
 		}
-		else if (Server()->Tick() % Server()->TickSpeed() * 60 == 0)
+		else if (Server()->Tick() % Server()->TickSpeed() * 60 == 0 && (!m_pCharacter || !m_pCharacter->m_MoneyTile))
 		{
 			char aBuf[128];
 			str_format(aBuf, sizeof(aBuf), "Avoid policehammers for the next %lld seconds", m_EscapeTime / Server()->TickSpeed());
