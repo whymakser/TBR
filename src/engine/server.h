@@ -73,7 +73,7 @@ public:
 	virtual bool IsMain(int ClientID) = 0;
 	virtual const char *GetLanguage(int ClientID) = 0;
 	virtual void SetLanguage(int ClientID, const char *pLanguage) = 0;
-	virtual void ChangeMapDesign(int ClientID, const char *pName) = 0;
+	virtual bool ChangeMapDesign(int ClientID, const char *pName) = 0;
 	virtual const char *GetMapDesign(int ClientID) = 0;
 	virtual void LoadMapDesigns() = 0;
 

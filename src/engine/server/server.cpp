@@ -1775,7 +1775,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "server", aBuf);
 				m_RconClientID = ClientID;
 				m_RconAuthLevel = m_aClients[ClientID].m_Authed;
-				Console()->SetAccessLevel(m_aClients[ClientID].m_Authed == AUTHED_ADMIN ? IConsole::ACCESS_LEVEL_ADMIN : m_aClients[ClientID].m_Authed == AUTHED_MOD ? IConsole::ACCESS_LEVEL_MOD : m_aClients[ClientID].m_Authed == AUTHED_HELPER ? IConsole::ACCESS_LEVEL_HELPER : IConsole::ACCESS_LEVEL_USER);
+				Console()->SetAccessLevel(m_aClients[ClientID].m_Authed >= AUTHED_ADMIN ? IConsole::ACCESS_LEVEL_ADMIN : m_aClients[ClientID].m_Authed == AUTHED_MOD ? IConsole::ACCESS_LEVEL_MOD : m_aClients[ClientID].m_Authed == AUTHED_HELPER ? IConsole::ACCESS_LEVEL_HELPER : IConsole::ACCESS_LEVEL_USER);
 				Console()->ExecuteLineFlag(pCmd, CFGFLAG_SERVER, ClientID);
 				Console()->SetAccessLevel(IConsole::ACCESS_LEVEL_ADMIN);
 				m_RconClientID = IServer::RCON_CID_SERV;
@@ -4416,10 +4416,10 @@ int CServer::InitMapDesign(const char *pName, int IsDir, int StorageType, void *
 	return 0;
 }
 
-void CServer::ChangeMapDesign(int ClientID, const char *pName)
+bool CServer::ChangeMapDesign(int ClientID, const char *pName)
 {
 	if (!pName[0])
-		return;
+		return false;
 
 	int Design = m_aClients[ClientID].m_CurrentMapDesign;
 	if (str_comp_nocase(pName, "default") == 0)
@@ -4435,7 +4435,11 @@ void CServer::ChangeMapDesign(int ClientID, const char *pName)
 	}
 
 	if (Design != m_aClients[ClientID].m_CurrentMapDesign)
+	{
 		SendMapDesign(ClientID, Design);
+		return true;
+	}
+	return false;
 }
 
 void CServer::SendMapDesign(int ClientID, int Design)

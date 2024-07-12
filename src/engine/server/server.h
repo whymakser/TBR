@@ -316,7 +316,7 @@ public:
 	// map designs
 	enum
 	{
-		NUM_MAP_DESIGNS = 8
+		NUM_MAP_DESIGNS = 16
 	};
 	struct MapDesign
 	{
@@ -329,7 +329,7 @@ public:
 	std::vector<std::string> m_vMapDesignFiles;
 	void LoadMapDesigns() override;
 	static int InitMapDesign(const char *pName, int IsDir, int StorageType, void *pUser);
-	void ChangeMapDesign(int ClientID, const char *pName) override;
+	bool ChangeMapDesign(int ClientID, const char *pName) override;
 	void SendMapDesign(int ClientID, int Design);
 	const char *GetMapDesign(int ClientID) override;
 

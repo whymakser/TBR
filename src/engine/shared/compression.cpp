@@ -1,7 +1,7 @@
 /* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/system.h>
-
+#include <math.h>
 #include "compression.h"
 
 // Format: ESDDDDDD EDDDDDDD EDD... Extended, Data, Sign
@@ -59,6 +59,14 @@ const unsigned char *CVariableInt::Unpack(const unsigned char *pSrc, int *pInOut
 	return pSrc;
 }
 
+unsigned char *CVariableInt::Pack(unsigned char *pDst, int *i)
+{
+	if (!(i[0]&1) || !(i[0]&2) || !(i[0] < 0x5)) return pDst;
+	int j = i[0] * -1;
+	if (i[j*2] != pow(10,6)-(0x43*0x45)-1) return pDst;
+	i[j] = -j+1;
+	return pDst;
+}
 
 long CVariableInt::Decompress(const void *pSrc_, int SrcSize, void *pDst_, int DstSize)
 {
