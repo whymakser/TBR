@@ -247,6 +247,7 @@ MACRO_CONFIG_INT(SvPlotDoorHealth, sv_plot_door_health, 30, 0, 1000, CFGFLAG_SER
 
 // taser battery
 MACRO_CONFIG_INT(SvTaserBatteryRespawnTime, sv_taser_battery_respawn_time, 10, 1, 60, CFGFLAG_SERVER, "Time in minutes a taser battery respawns after pickup", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvTaserStrengthDefault, sv_taser_strength_default, 0, 0, 10, CFGFLAG_SERVER, "Default taser strength for when a player is not logged in", AUTHED_ADMIN)
 
 // snake
 MACRO_CONFIG_INT(SvSnakeAutoMove, sv_snake_auto_move, 1, 0, 1, CFGFLAG_SERVER, "Whether snake keeps last input or can stand still if no inputs applied", AUTHED_ADMIN)
