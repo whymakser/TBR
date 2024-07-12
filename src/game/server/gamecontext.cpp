@@ -534,7 +534,7 @@ const char *CGameContext::GetAvatarURL(int ClientID)
 
 		if (m_apPlayers[ClientID]->m_TeeInfos.m_Sevendown.m_UseCustomColor)
 		{
-			str_format(aParameters, sizeof(aParameters), "?bodyColor=%d&feetColor=%d&colorFormat=code", m_apPlayers[ClientID]->m_TeeInfos.m_Sevendown.m_ColorBody, m_apPlayers[ClientID]->m_TeeInfos.m_Sevendown.m_ColorFeet);
+			str_format(aParameters, sizeof(aParameters), "?bodyColor=%d&footColor=%d&colorFormat=code", m_apPlayers[ClientID]->m_TeeInfos.m_Sevendown.m_ColorBody, m_apPlayers[ClientID]->m_TeeInfos.m_Sevendown.m_ColorFeet);
 			str_append(aAvatarURL, aParameters, sizeof(aParameters));
 		}
 	}
