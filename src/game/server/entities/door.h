@@ -39,6 +39,8 @@ public:
 	vec2 GetToPos() { return m_To; }
 	virtual ~CDoor();
 
+	bool GetIntersectPos(vec2 Pos0, vec2 Pos1, float Radius, vec2 *pOutPosIntersected);
+
 	virtual void Reset();
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);

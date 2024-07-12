@@ -457,11 +457,11 @@ public:
 	bool IsFullHour() { return Server()->Tick() % (Server()->TickSpeed() * 60 * 60) == m_FullHourOffsetTicks; }
 	bool HasPlotByIP(int ClientID);
 
-	int IntersectedLineDoor(vec2 Pos0, vec2 Pos1, int Team, bool PlotDoorOnly, bool ClosedOnly = true, vec2 *pOutPos = 0);
+	int IntersectedLineDoor(vec2 Pos0, vec2 Pos1, int Team, bool PlotDoorOnly, bool ClosedOnly = true);
 	void RemovePortalsFromPlot(int PlotID);
 	bool IsPlotEmpty(int PlotID);
 
-	bool PlotCanBeRaided(int PlotID, int ClientID = -1);
+	bool PlotCanBeRaided(int PlotID);
 	bool PlotDoorDestroyed(int PlotID);
 	bool OnPlotDoorTaser(int PlotID, int TaserStrength, int ClientID, vec2 Pos);
 

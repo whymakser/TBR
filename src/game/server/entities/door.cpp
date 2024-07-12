@@ -28,6 +28,38 @@ CDoor::~CDoor()
 	ResetCollision(true);
 }
 
+bool CDoor::GetIntersectPos(vec2 Pos0, vec2 Pos1, float Radius, vec2 *pOutPosIntersected)
+{
+	float d = distance(Pos0, Pos1);
+	vec2 Last = Pos0;
+
+	for (float f = 0; f < d; f++)
+	{
+		float a = f / d;
+		vec2 Pos = mix(Pos0, Pos1, a);
+
+		float Dist = distance(Pos, m_Pos);
+		if (Dist < m_Length)
+		{
+			vec2 ClosestPoint;
+			if (closest_point_on_line(m_Pos, m_To, Pos, ClosestPoint))
+			{
+				Dist = distance(Pos, ClosestPoint);
+				if (Dist < Radius)
+				{
+					if (pOutPosIntersected)
+						*pOutPosIntersected = Pos;
+					return true;
+				}
+			}
+		}
+		Last = Pos;
+	}
+	if (pOutPosIntersected)
+		*pOutPosIntersected = Pos1;
+	return false;
+}
+
 void CDoor::SetDirection(float Rotation)
 {
 	m_Rotation = Rotation;

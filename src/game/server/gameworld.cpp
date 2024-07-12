@@ -1059,13 +1059,6 @@ CEntity *CGameWorld::IntersectEntityTypes(vec2 Pos0, vec2 Pos1, float Radius, ve
 	float ClosestLen = distance(Pos0, Pos1) * 100.0f;
 	CEntity *pClosest = 0;
 
-	int Number = 0;
-	vec2 DoorIntersectPos;
-	if (CheckPlotTaserDestroy && (Types&1<<ENTTYPE_DOOR))
-	{
-		Number = GameServer()->IntersectedLineDoor(Pos0, Pos1, 0, PlotDoorOnly, true, &DoorIntersectPos);
-	}
-
 	for (int i = 0; i < NUM_ENTTYPES; i++)
 	{
 		if (!(Types&1<<i))
@@ -1101,35 +1094,32 @@ CEntity *CGameWorld::IntersectEntityTypes(vec2 Pos0, vec2 Pos1, float Radius, ve
 			else
 			{
 				int PlotID = p->m_PlotID;
-				// using collidewith here, but should be the person trying to intersect
-				if (!GameServer()->PlotCanBeRaided(PlotID, CollideWith))
+				if (!GameServer()->PlotCanBeRaided(PlotID))
 					continue;
 
 				if (i == ENTTYPE_DOOR)
 				{
-					if (Number == 0)
-						continue;
-					// plot built laser draw walls
-					int RealNumber = Number == -1 ? 0 : Number;
-					// we can't really support no-collision doors (drawings) for now, cause they don't give a DoorIntersectPos. but wont hinder us from getting a wanted out of plot
-					if (p->m_Number != RealNumber || p->m_BrushCID != -1 || p->m_TransformCID != -1 || !p->m_Collision)
+					bool IsPlotDoor = p->IsPlotDoor();
+					if (p->m_BrushCID != -1 || p->m_TransformCID != -1 || (PlotDoorOnly && !IsPlotDoor))
 						continue;
 
 					CDoor *pDoor = (CDoor *)p;
-					ProximityRadius = 14.f * 1.75f;
-					vec2 ClosestPoint;
-					if (closest_point_on_line(pDoor->GetPos(), pDoor->GetToPos(), DoorIntersectPos, ClosestPoint))
+					if (IsPlotDoor)
 					{
-						float Len = distance(DoorIntersectPos, ClosestPoint);
-						if(Len < ProximityRadius+Radius)
+						int Team = GameServer()->GetPlayerChar(CollideWith) ? GameServer()->GetPlayerChar(CollideWith)->Team() : 0;
+						if (!GameServer()->Collision()->m_pSwitchers || !GameServer()->Collision()->m_pSwitchers[pDoor->m_Number].m_Status[Team])
+							continue;
+					}
+
+					vec2 ClosestPoint;
+					if (pDoor->GetIntersectPos(Pos0, Pos1, 32.f/2, &ClosestPoint))
+					{
+						float Len = distance(Pos0, ClosestPoint);
+						if (Len < ClosestLen)
 						{
-							Len = distance(Pos0, DoorIntersectPos);
-							if (Len < ClosestLen)
-							{
-								NewPos = DoorIntersectPos;
-								ClosestLen = Len;
-								pClosest = p;
-							}
+							NewPos = ClosestPoint;
+							ClosestLen = Len;
+							pClosest = p;
 						}
 					}
 					continue;

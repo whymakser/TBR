@@ -1181,6 +1181,7 @@ void CGameContext::SendTuningParams(int ClientID, int Zone)
 
 void CGameContext::OnTick()
 {
+	Config()->m_SvTestingCommands = 1;
 	if(m_TeeHistorianActive)
 	{
 		if(!m_TeeHistorian.Starting())
@@ -5363,9 +5364,9 @@ void CGameContext::ClearPlot(int PlotID)
 	}
 }
 
-int CGameContext::IntersectedLineDoor(vec2 Pos0, vec2 Pos1, int Team, bool PlotDoorOnly, bool ClosedOnly, vec2 *pOutIntersected)
+int CGameContext::IntersectedLineDoor(vec2 Pos0, vec2 Pos1, int Team, bool PlotDoorOnly, bool ClosedOnly)
 {
-	int Number = Collision()->IntersectLineDoor(Pos0, Pos1, pOutIntersected, 0, Team, PlotDoorOnly, ClosedOnly);
+	int Number = Collision()->IntersectLineDoor(Pos0, Pos1, 0, 0, Team, PlotDoorOnly, ClosedOnly);
 	return Number; // can be used as bool, -1 is plot built laser wall which would return true too
 }
 
@@ -5393,11 +5394,8 @@ bool CGameContext::IsPlotEmpty(int PlotID)
 	return true;
 }
 
-bool CGameContext::PlotCanBeRaided(int PlotID, int ClientID)
+bool CGameContext::PlotCanBeRaided(int PlotID)
 {
-	int AccID = GetAccIDByUsername(m_aPlots[PlotID].m_aOwner);
-	if (AccID >= ACC_START && m_Accounts[AccID].m_ClientID == ClientID)
-		return false;
 	return PlotID >= PLOT_START && m_aPlots[PlotID].m_DestroyEndTick > Server()->Tick() && Config()->m_SvPoliceTaserPlotRaid;
 }
 
@@ -5408,7 +5406,7 @@ bool CGameContext::PlotDoorDestroyed(int PlotID)
 
 bool CGameContext::OnPlotDoorTaser(int PlotID, int TaserStrength, int ClientID, vec2 Pos)
 {
-	if (PlotID < PLOT_START || !PlotCanBeRaided(PlotID, ClientID))
+	if (PlotID < PLOT_START || !PlotCanBeRaided(PlotID) || m_aPlots[PlotID].m_DoorHealth <= 0)
 		return false;
 
 	int Diff = TaserStrength - max(TaserStrength - m_aPlots[PlotID].m_DoorHealth, 0);
