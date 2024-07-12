@@ -4651,7 +4651,7 @@ int CCharacter::GetTaserStrength()
 {
 	// If player isnt logged in set his taserlevel to 10, so that he can use taser when given via rcon. he is not able to pick a taser pickup up, so he doesnt have level 10 to abuse
 	int AccID = m_pPlayer->GetAccID();
-	int TaserLevel = AccID >= ACC_START ? GameServer()->m_Accounts[AccID].m_TaserLevel : 10;
+	int TaserLevel = AccID >= ACC_START ? GameServer()->m_Accounts[AccID].m_TaserLevel : 0;
 	return clamp((int)((Server()->Tick() - m_LastTaserUse) * 2 / Server()->TickSpeed()), 0, TaserLevel);
 }
 
