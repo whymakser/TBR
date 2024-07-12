@@ -95,6 +95,7 @@ public:
 	virtual void TickPaused();
 	virtual void Snap(int SnappingClient);
 	void SnapCharacter(int SnappingClient, int ID);
+	void SnapDDNetCharacter(int SnappingClient, int ID);
 	virtual void PostSnap();
 
 	bool CanSnapCharacter(int SnappingClient);

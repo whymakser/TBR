@@ -1976,7 +1976,8 @@ void CCharacter::Snap(int SnappingClient)
 	if (!CanSnapCharacter(SnappingClient))
 		return;
 
-	if(!IsSnappingCharacterInView(SnappingClient) && SendDroppedFlagCooldown(SnappingClient) == -1)
+	bool RainbowNameAffected = SnappingClient == m_pPlayer->GetCID() && GameServer()->m_RainbowName.IsAffected(SnappingClient);
+	if(!IsSnappingCharacterInView(SnappingClient) && !RainbowNameAffected && SendDroppedFlagCooldown(SnappingClient) == -1)
 		return;
 
 	// F-DDrace
@@ -2074,10 +2075,28 @@ void CCharacter::Snap(int SnappingClient)
 	// otherwise show our normal tee and send ddnet character stuff
 	SnapCharacter(SnappingClient, ID);
 
+	// Send ddnet info of the guy we are spectating, because rainbowname is hacky and sets spectatorid to ourselve if rainbowname is close to us
+	if (RainbowNameAffected)
+	{
+		CCharacter *pSpectating = GameServer()->GetPlayerChar(m_pPlayer->GetSpectatorID());
+		if (pSpectating)
+		{
+			pSpectating->SnapDDNetCharacter(SnappingClient, ID);
+		}
+	}
+	else
+	{
+		SnapDDNetCharacter(SnappingClient, ID);
+	}
+}
+
+void CCharacter::SnapDDNetCharacter(int SnappingClient, int ID)
+{
 	CNetObj_DDNetCharacter *pDDNetCharacter = static_cast<CNetObj_DDNetCharacter *>(Server()->SnapNewItem(NETOBJTYPE_DDNETCHARACTER, ID, sizeof(CNetObj_DDNetCharacter)));
 	if(!pDDNetCharacter)
 		return;
 
+	CPlayer *pSnap = SnappingClient >= 0 ? GameServer()->m_apPlayers[SnappingClient] : 0;
 	pDDNetCharacter->m_Flags = GetDDNetCharacterFlags(SnappingClient);
 	pDDNetCharacter->m_FreezeEnd = m_DeepFreeze ? -1 : m_FreezeTime == 0 ? 0 : Server()->Tick() + m_FreezeTime;
 	pDDNetCharacter->m_Jumps = m_Core.m_Jumps;
@@ -2246,7 +2265,19 @@ void CCharacter::SnapCharacter(int SnappingClient, int ID)
 	}
 	pCharacter->m_TriggeredEvents = Events;
 
-	pCharacter->m_Weapon = GameServer()->GetWeaponType(m_ActiveWeapon);
+	if (SnappingClient == m_pPlayer->GetCID() && GameServer()->m_RainbowName.IsAffected(SnappingClient))
+	{
+		CCharacter *pSpectating = GameServer()->GetPlayerChar(m_pPlayer->GetSpectatorID());
+		if (pSpectating)
+		{
+			pCharacter->m_Weapon = GameServer()->GetWeaponType(pSpectating->m_ActiveWeapon);
+		}
+	}
+	else
+	{
+		pCharacter->m_Weapon = GameServer()->GetWeaponType(m_ActiveWeapon);
+	}
+
 	pCharacter->m_AttackTick = m_AttackTick;
 
 	// change eyes and use ninja graphic if player is freeze
