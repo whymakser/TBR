@@ -2093,13 +2093,13 @@ void CCharacter::SnapDDNetCharacter(int SnappingClient, int ID)
 		int Flags, Jumps, JumpedTotal, NinjaActivationTick;
 		if (RainbowNameAffected && pSpectating)
 		{
-			// Add one jump when we're grounded and he isn't, remove one jump when we're not grounded but he is
-			int AddOrRemJump = (int)m_IsGrounded - (int)pSpectating->m_IsGrounded;
-
 			Flags = pSpectating->GetDDNetCharacterFlags(SnappingClient);
 			Jumps = pSpectating->m_Core.m_Jumps;
-			JumpedTotal = pSpectating->m_Core.m_JumpedTotal + AddOrRemJump;
+			JumpedTotal = pSpectating->m_Core.m_JumpedTotal;
 			NinjaActivationTick = pSpectating->GetDDNetCharacterNinjaActivationTick();
+			Config()->m_SvTestingCommands = 1;
+			// Add one jump when we're grounded and he isn't, remove one jump when we're not grounded but he is
+			JumpedTotal += (int)m_IsGrounded - (int)pSpectating->m_IsGrounded;
 		}
 		else
 		{
@@ -2241,9 +2241,10 @@ void CCharacter::SnapCharacter(int SnappingClient, int ID)
 	pCharacter->m_Armor = 0;
 	pCharacter->m_Direction = m_Input.m_Direction;
 
+	bool RainbowNameAffected = SnappingClient == m_pPlayer->GetCID() && GameServer()->m_RainbowName.IsAffected(SnappingClient);
 	int Events = m_TriggeredEvents;
 	// jump is used for flying up, annoying air jump effect otherwise
-	if (SnappingClient == m_pPlayer->GetCID() && (m_pHelicopter || m_Snake.Active()))
+	if (SnappingClient == m_pPlayer->GetCID() && (m_pHelicopter || m_Snake.Active() || RainbowNameAffected))
 	{
 		pCharacter->m_Jumped |= 2;
 		Events |= COREEVENTFLAG_AIR_JUMP;
@@ -2276,7 +2277,7 @@ void CCharacter::SnapCharacter(int SnappingClient, int ID)
 	}
 	pCharacter->m_TriggeredEvents = Events;
 
-	if (SnappingClient == m_pPlayer->GetCID() && GameServer()->m_RainbowName.IsAffected(SnappingClient))
+	if (RainbowNameAffected)
 	{
 		CCharacter *pSpectating = GameServer()->GetPlayerChar(m_pPlayer->GetSpectatorID());
 		if (pSpectating)
