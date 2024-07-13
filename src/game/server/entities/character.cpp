@@ -2094,7 +2094,7 @@ void CCharacter::SnapDDNetCharacter(int SnappingClient, int ID)
 		if (RainbowNameAffected && pSpectating)
 		{
 			// Add one jump when we're grounded and he isn't, remove one jump when we're not grounded but he is
-			int AddOrRemJump = (int)IsGrounded(false) - (int)pSpectating->IsGrounded(false);
+			int AddOrRemJump = (int)m_IsGrounded - (int)pSpectating->m_IsGrounded;
 
 			Flags = pSpectating->GetDDNetCharacterFlags(SnappingClient);
 			Jumps = pSpectating->m_Core.m_Jumps;
@@ -2268,7 +2268,7 @@ void CCharacter::SnapCharacter(int SnappingClient, int ID)
 			pCharacter->m_Jumped &= ~2;
 
 		// skidding, from game/client/components/players.cpp
-		if (SnappingClient != m_pPlayer->GetCID() && IsGrounded() && ((pCharacter->m_Direction == -1 && (pCharacter->m_VelX/256.f) > 0.f) || (pCharacter->m_Direction == 1 && (pCharacter->m_VelX/256.f) < 0.f)))
+		if (SnappingClient != m_pPlayer->GetCID() && m_IsGrounded && ((pCharacter->m_Direction == -1 && (pCharacter->m_VelX/256.f) > 0.f) || (pCharacter->m_Direction == 1 && (pCharacter->m_VelX/256.f) < 0.f)))
 		{
 			pCharacter->m_Direction = 0;
 			pCharacter->m_VelX = 0;
@@ -3742,6 +3742,8 @@ void CCharacter::DDracePostCoreTick()
 
 	if (!m_IsFrozen)
 		m_FirstFreezeTick = 0;
+
+	m_IsGrounded = IsGrounded();
 }
 
 bool CCharacter::Freeze(float Seconds)
@@ -4030,6 +4032,7 @@ void CCharacter::FDDraceInit()
 	m_RedirectPassiveEndTick = 0;
 	m_LastJumpedTotal = 0;
 	m_HookExceededTick = 0;
+	m_IsGrounded = false;
 }
 
 void CCharacter::CreateDummyHandle(int Dummymode)

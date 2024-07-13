@@ -77,7 +77,7 @@ bool CArenas::IsGrounded(CCharacter *pChr)
 	if (!pChr)
 		return false;
 	int Fight = GetClientFight(pChr->GetPlayer()->GetCID());
-	return pChr->IsGrounded() || GameServer()->Collision()->IsFightBorder(vec2(pChr->GetPos().x, pChr->GetPos().y), Fight)
+	return pChr->IsGrounded(true) || GameServer()->Collision()->IsFightBorder(vec2(pChr->GetPos().x, pChr->GetPos().y), Fight)
 		|| GameServer()->Collision()->IsFightBorder(vec2(pChr->GetPos().x, pChr->GetPos().y + pChr->GetProximityRadius() + 4), Fight);
 }
 

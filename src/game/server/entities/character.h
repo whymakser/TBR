@@ -101,7 +101,7 @@ public:
 	bool CanSnapCharacter(int SnappingClient);
 	bool IsSnappingCharacterInView(int SnappingClientId);
 
-	bool IsGrounded(bool CheckDoor = true);
+	bool IsGrounded(bool CheckDoor = false);
 
 	void SetWeapon(int W);
 	void SetSolo(bool Solo);
@@ -548,6 +548,7 @@ public:
 	int64 m_LastWantedLogout;
 
 	bool m_GotLasered;
+	bool m_IsGrounded;
 
 	int64 m_LastTaserUse;
 	int GetTaserStrength();
