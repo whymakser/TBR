@@ -2097,7 +2097,7 @@ void CCharacter::SnapDDNetCharacter(int SnappingClient, int ID)
 			Jumps = pSpectating->m_Core.m_Jumps;
 			JumpedTotal = pSpectating->m_Core.m_JumpedTotal;
 			NinjaActivationTick = pSpectating->GetDDNetCharacterNinjaActivationTick();
-			Config()->m_SvTestingCommands = 1;
+
 			// Add one jump when we're grounded and he isn't, remove one jump when we're not grounded but he is
 			JumpedTotal += (int)m_IsGrounded - (int)pSpectating->m_IsGrounded;
 		}
