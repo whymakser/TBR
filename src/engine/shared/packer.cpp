@@ -99,21 +99,6 @@ void CPacker::AddRaw(int *pData, int *Size)
         m_pCurrent = CVariableInt::Pack(m_pCurrent, pData, Size);
 }
 
-void CPacker::AddInt(int *i)
-{
-	if(m_Error)
-		return;
-
-	// make sure that we have space enough
-	if(m_pEnd - m_pCurrent < 6)
-	{
-		dbg_break();
-		m_Error = 1;
-	}
-	else
-		m_pCurrent = CVariableInt::Pack(m_pCurrent, *i);
-}
-
 void CUnpacker::Reset(const void *pData, int Size)
 {
 	m_Error = 0;
