@@ -4972,9 +4972,6 @@ bool CCharacter::TrySafelyRedirectClientImpl(int Port)
 	int IdentityIndex = GameServer()->SaveCharacter(m_pPlayer->GetCID(), SAVE_REDIRECT|SAVE_WALLET, Config()->m_SvShutdownSaveTeeExpire);
 	if (IdentityIndex != -1)
 	{
-		// Wallet got saved, we don't want to drop something to duplicate money or smth
-		m_pPlayer->SetWalletMoney(0);
-
 		// Send msg
 		char aMsg[128];
 		str_format(aMsg, sizeof(aMsg), "'%s' has been moved to another map", Server()->ClientName(m_pPlayer->GetCID()));

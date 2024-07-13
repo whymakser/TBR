@@ -6305,8 +6305,6 @@ void CGameContext::SaveDrop(int ClientID, float Hours, const char *pReason)
 
 	// Save character
 	SaveCharacter(ClientID, SAVE_WALLET, Hours);
-	// Remove wallet money so we dont automatically drop it on disconnect because it is saved already
-	m_apPlayers[ClientID]->SetWalletMoney(0);
 
 	// Drop the client
 	((CServer *)Server())->m_NetServer.Drop(ClientID, pReason);
@@ -6327,11 +6325,21 @@ int CGameContext::SaveCharacter(int ClientID, int Flags, float Hours)
 	pChr->GetPlayer()->StopPlotEditing();
 	pChr->UnsetSpookyGhost();
 
+	// Remove wallet money so we dont automatically drop it on disconnect because it is saved already
+	if (Flags & SAVE_WALLET)
+	{
+		m_apPlayers[ClientID]->SetWalletMoney(0);
+	}
+
 	// Pretend we leave no bonus area so we can save the real values, and later override it by calling this function again
 	if (pChr->m_NoBonusContext.m_InArea)
 	{
 		pChr->OnNoBonusArea(false);
-		pChr->m_NoBonusContext.m_InArea = true;
+		// Pretend we left the no bonus area on redirect. If wanted, the other map should add a tile to enable it again, same like after jail release, its not set.
+		if (!(Flags & SAVE_REDIRECT))
+		{
+			pChr->m_NoBonusContext.m_InArea = true;
+		}
 	}
 
 	// save identity to cache
