@@ -175,17 +175,20 @@ void CCharacter::SetSolo(bool Solo)
 	Teams()->m_Core.SetSolo(m_pPlayer->GetCID(), Solo);
 }
 
-bool CCharacter::IsGrounded()
+bool CCharacter::IsGrounded(bool CheckDoor)
 {
 	if (GameServer()->Collision()->CheckPoint(m_Pos.x + GetProximityRadius() / 2, m_Pos.y + GetProximityRadius() / 2 + 5))
 		return true;
 	if (GameServer()->Collision()->CheckPoint(m_Pos.x - GetProximityRadius() / 2, m_Pos.y + GetProximityRadius() / 2 + 5))
 		return true;
 
-	int MoveRestrictionsBelow = GameServer()->Collision()->GetMoveRestrictions(m_Pos + vec2(0, GetProximityRadius() / 2 + 4), 0.0f, m_Core.m_MoveRestrictionExtra);
-	if(MoveRestrictionsBelow&CANTMOVE_DOWN)
+	if (CheckDoor)
 	{
-		return true;
+		int MoveRestrictionsBelow = GameServer()->Collision()->GetMoveRestrictions(m_Pos + vec2(0, GetProximityRadius() / 2 + 4), 0.0f, m_Core.m_MoveRestrictionExtra);
+		if (MoveRestrictionsBelow & CANTMOVE_DOWN)
+		{
+			return true;
+		}
 	}
 
 	return false;
@@ -2090,9 +2093,12 @@ void CCharacter::SnapDDNetCharacter(int SnappingClient, int ID)
 		int Flags, Jumps, JumpedTotal, NinjaActivationTick;
 		if (RainbowNameAffected && pSpectating)
 		{
+			// Add one jump when we're grounded and he isn't, remove one jump when we're not grounded but he is
+			int AddOrRemJump = (int)IsGrounded(false) - (int)pSpectating->IsGrounded(false);
+
 			Flags = pSpectating->GetDDNetCharacterFlags(SnappingClient);
 			Jumps = pSpectating->m_Core.m_Jumps;
-			JumpedTotal = pSpectating->m_Core.m_JumpedTotal;
+			JumpedTotal = pSpectating->m_Core.m_JumpedTotal + AddOrRemJump;
 			NinjaActivationTick = pSpectating->GetDDNetCharacterNinjaActivationTick();
 		}
 		else

@@ -101,7 +101,7 @@ public:
 	bool CanSnapCharacter(int SnappingClient);
 	bool IsSnappingCharacterInView(int SnappingClientId);
 
-	bool IsGrounded();
+	bool IsGrounded(bool CheckDoor = true);
 
 	void SetWeapon(int W);
 	void SetSolo(bool Solo);
