@@ -2232,7 +2232,7 @@ void CGameContext::ConPlotInfo(IConsole::IResult* pResult, void* pUserData)
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "plot", aBuf);
 	str_format(aBuf, sizeof(aBuf), "Door status: %d", pSelf->Collision()->m_pSwitchers ? pSelf->Collision()->m_pSwitchers[pSelf->Collision()->GetSwitchByPlot(PlotID)].m_Status[0] : 0);
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "plot", aBuf);
-	str_format(aBuf, sizeof(aBuf), "Destroy Seconds: %d", pSelf->m_aPlots[PlotID].m_DestroyEndTick ? (pSelf->m_aPlots[PlotID].m_DestroyEndTick - pSelf->Server()->Tick()) / pSelf->Server()->TickSpeed() : 0);
+	str_format(aBuf, sizeof(aBuf), "Destroy Seconds: %lld", pSelf->m_aPlots[PlotID].m_DestroyEndTick ? (pSelf->m_aPlots[PlotID].m_DestroyEndTick - pSelf->Server()->Tick()) / pSelf->Server()->TickSpeed() : 0);
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "plot", aBuf);
 	str_format(aBuf, sizeof(aBuf), "Door Health: %d", pSelf->m_aPlots[PlotID].m_DoorHealth);
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "plot", aBuf);
