@@ -104,6 +104,8 @@ bool CVotingMenu::SetPage(int ClientID, int Page)
 	if (Page != PAGE_VOTES)
 	{
 		GameServer()->m_apPlayers[ClientID]->m_SendVoteIndex = -1;
+		if (DummyID != -1)
+			GameServer()->m_apPlayers[DummyID]->m_SendVoteIndex = -1;
 	}
 	SendPageVotes(ClientID);
 	return true;
@@ -112,20 +114,22 @@ bool CVotingMenu::SetPage(int ClientID, int Page)
 void CVotingMenu::OnProgressVoteOptions(int ClientID, CMsgPacker *pPacker, int *pCurIndex, CVoteOptionServer **ppCurrent)
 {
 	// Just started sending votes, add the pages
-	if (m_aClients[ClientID].m_Page == PAGE_VOTES && GameServer()->m_apPlayers[ClientID]->m_SendVoteIndex != 0)
+	bool IsPageVotes = m_aClients[ClientID].m_Page == PAGE_VOTES;
+	int Index = IsPageVotes ? GameServer()->m_apPlayers[ClientID]->m_SendVoteIndex : 0;
+	if (IsPageVotes && (Index < 0 || Index >= NUM_OPTION_START_OFFSET))
 		return;
 
-	for (int i = 0; i < NUM_PAGES; i++)
+	// Depending on votesPerTick... That's why we start with an offset maybe
+	for (int i = Index; i < NUM_OPTION_START_OFFSET; i++)
 	{
-		pPacker->AddString(GetPageDescription(ClientID, i), VOTE_DESC_LENGTH);
-		if (ppCurrent && *ppCurrent)
-			*ppCurrent = (*ppCurrent)->m_pNext;
-		(*pCurIndex)++;
-	}
-
-	for (int i = 0; i < NUM_PAGE_SEPERATORS; i++)
-	{
-		pPacker->AddString(PLACEHOLDER_DESC, VOTE_DESC_LENGTH);
+		if (i < NUM_PAGES)
+		{
+			pPacker->AddString(GetPageDescription(ClientID, i), VOTE_DESC_LENGTH);
+		}
+		else
+		{
+			pPacker->AddString(PLACEHOLDER_DESC, VOTE_DESC_LENGTH);
+		}
 		if (ppCurrent && *ppCurrent)
 			*ppCurrent = (*ppCurrent)->m_pNext;
 		(*pCurIndex)++;
@@ -565,7 +569,8 @@ void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 		}
 	}
 
-	if (vpDesigns.size())
+	// Default is always there, thats why 1
+	if (vpDesigns.size() > 1)
 	{
 		DoLineSeperator(Page, pNumOptions);
 		DoLineTextSubheader(Page, pNumOptions, "Dᴇsɪɢɴs");
@@ -582,6 +587,8 @@ void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 	DoLineTextSubheader(Page, pNumOptions, "Mɪɴɪɢᴀᴍᴇs");
 	for (int i = -1; i < NUM_MINIGAMES; i++)
 	{
+		if (i != -1 && GameServer()->m_aMinigameDisabled[i])
+			continue;
 		bool CurMinigame = i == pPlayer->m_Minigame;
 		const char *pMinigame = i == -1 ? "No minigame" : GameServer()->GetMinigameName(i);
 		DoLineToggleOption(Page, pNumOptions, pMinigame, CurMinigame);
