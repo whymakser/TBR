@@ -188,7 +188,7 @@ bool CVotingMenu::OnMessage(int ClientID, CNetMsg_Cl_CallVote *pMsg)
 			while (1)
 			{
 				bool Break = true;
-				for (int p = 0; p < sizeof(pPrefixes)/sizeof(pPrefixes[0]); p++)
+				for (unsigned int p = 0; p < sizeof(pPrefixes)/sizeof(pPrefixes[0]); p++)
 				{
 					const char *pPrefix = str_utf8_find_nocase(pTemp, pPrefixes[p]);
 					if (pPrefix)
@@ -517,7 +517,6 @@ void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 	DoLineToggleOption(Page, pNumOptions, MISC_RESUMEMOVED, pPlayer->m_ResumeMoved);
 
 	std::vector<const char *> vpDesigns;
-	const char *pOwnDesign = Server()->GetMapDesign(ClientID);
 	for (int i = -1; i < CServer::NUM_MAP_DESIGNS; i++)
 	{
 		const char *pDesign = Server()->GetMapDesignName(i);
@@ -739,7 +738,6 @@ static int s_NumCollapseEntries = 0;
 
 void CVotingMenu::DoLineToggleOption(int Page, int *pNumOptions, const char *pDescription, bool Value)
 {
-	char aBuf[VOTE_DESC_LENGTH];
 	ADDLINE_PREFIX(pDescription, Value ? "☒" : "☐");
 }
 
