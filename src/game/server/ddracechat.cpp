@@ -2133,7 +2133,6 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 {
 	CGameContext* pSelf = (CGameContext*)pUserData;
 	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
-	CCharacter *pChr = pPlayer->GetCharacter();
 	if (!pPlayer)
 		return;
 
