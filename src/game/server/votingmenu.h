@@ -63,7 +63,7 @@ class CVotingMenu
 	{
 		int m_Page;
 		int64 m_LastVoteMsg;
-		int64 m_LastVotesSend;
+		int64 m_NextVoteSendTick;
 		// Collapses
 		bool m_ShowAccountInfo;
 		bool m_ShowPlotInfo;

@@ -73,7 +73,7 @@ void CVotingMenu::Reset(int ClientID)
 {
 	m_aClients[ClientID].m_Page = PAGE_VOTES;
 	m_aClients[ClientID].m_LastVoteMsg = 0;
-	m_aClients[ClientID].m_LastVotesSend = 0;
+	m_aClients[ClientID].m_NextVoteSendTick = 0;
 	m_aClients[ClientID].m_ShowAccountInfo = false;
 	m_aClients[ClientID].m_ShowPlotInfo = false;
 	m_aClients[ClientID].m_ShowAccountStats = false;
@@ -613,7 +613,7 @@ void CVotingMenu::Tick()
 		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
 		if (!pPlayer)
 			continue;
-		if (m_aClients[i].m_LastVotesSend + Server()->TickSpeed() * 3 > Server()->Tick())
+		if (m_aClients[i].m_NextVoteSendTick > Server()->Tick())
 			continue;
 
 		// 0.7 doesnt have playerflag_in_menu anymore, so we update them automatically every 3s if something changed, even when not in menu /shrug
@@ -713,7 +713,8 @@ void CVotingMenu::SendPageVotes(int ClientID, bool ResendVotesPage)
 	if (!GameServer()->m_apPlayers[ClientID])
 		return;
 
-	m_aClients[ClientID].m_LastVotesSend = Server()->Tick();
+	int Seconds = Server()->IsSevendown(ClientID) ? 1 : 3;
+	m_aClients[ClientID].m_NextVoteSendTick = Server()->Tick() + Server()->TickSpeed() * Seconds;
 	int Page = GetPage(ClientID);
 	if (Page == PAGE_VOTES)
 	{
