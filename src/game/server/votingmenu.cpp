@@ -60,7 +60,12 @@ void CVotingMenu::Init(CGameContext *pGameServer)
 		for (int j = 0; j < NUM_PAGE_MAX_OPTIONS; j++)
 			m_aPages[i].m_aaTempDesc[j][0] = 0;
 
-	AddPlaceholderVotes();
+	// Don't add the placeholders again when the map changes. The voteOptionHeap in CGameContext is not destroyed, so we do not have to add placeholders another time
+	if (!m_Initialized)
+	{
+		AddPlaceholderVotes();
+		m_Initialized = true;
+	}
 }
 
 void CVotingMenu::Reset(int ClientID)

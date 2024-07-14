@@ -57,6 +57,7 @@ class CVotingMenu
 	CGameContext *m_pGameServer;
 	CGameContext *GameServer() const;
 	IServer *Server() const;
+	bool m_Initialized;
 
 	struct SClientVoteInfo
 	{
@@ -105,6 +106,10 @@ class CVotingMenu
 	bool DoLineCollapse(int Page, int *pNumOptions, const char *pDescription, bool ShowContent, int NumEntries);
 
 public:
+	CVotingMenu()
+	{
+		m_Initialized = false;
+	}
 	void Init(CGameContext *pGameServer);
 	void Tick();
 	void AddPlaceholderVotes();
