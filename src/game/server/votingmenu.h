@@ -45,12 +45,13 @@ class CVotingMenu
 		PREVFLAG_ACC_VIP_PLUS_RAINBOWNAME = 1 << 13,
 		// Acc Info
 		PREVFLAG_SHOW_ACC_INFO = 1 << 14,
-		PREVFLAG_SHOW_PLOT_INFO = 1 << 15,
+		PREVFLAG_SHOW_ACC_STATS = 1 << 15,
+		PREVFLAG_SHOW_PLOT_INFO = 1 << 16,
 		// Acc Misc
-		PREVFLAG_ACC_MISC_SILENTFARM = 1 << 16,
-		PREVFLAG_ACC_NINJAJETPACK = 1 << 17,
+		PREVFLAG_ACC_MISC_SILENTFARM = 1 << 17,
+		PREVFLAG_ACC_NINJAJETPACK = 1 << 18,
 		// Acc Plot
-		PREVFLAG_PLOT_SPAWN = 1 << 18,
+		PREVFLAG_PLOT_SPAWN = 1 << 19,
 	};
 
 	CGameContext *m_pGameServer;
@@ -61,8 +62,10 @@ class CVotingMenu
 	{
 		int m_Page;
 		int64 m_LastVoteMsg;
+		// Collapses
 		bool m_ShowAccountInfo;
 		bool m_ShowPlotInfo;
+		bool m_ShowAccountStats;
 
 		struct SPrevStats
 		{

@@ -11,11 +11,13 @@
 CGameContext *CVotingMenu::GameServer() const { return m_pGameServer; }
 IServer *CVotingMenu::Server() const { return GameServer()->Server(); }
 
+// Font: https://fsymbols.com/generators/smallcaps/
 // Not a normal space: https://www.cogsci.ed.ac.uk/~richard/utf-8.cgi?input=%E2%80%8A&mode=char
 static const char *PLACEHOLDER_DESC = " ";
 // Acc
 static const char *COLLAPSE_HEADER_ACC_INFO = "Aᴄᴄᴏᴜɴᴛ Iɴғᴏ";
-static const char *COLLAPSE_HEADER_PLOT_INFO = "Pʟᴏᴛ Iɴғᴏ";
+static const char *COLLAPSE_HEADER_ACC_STATS = "Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs";
+static const char *COLLAPSE_HEADER_PLOT_INFO = "Pʟᴏᴛ";
 // Acc Misc
 static const char *ACC_MISC_SILENTFARM = "Silent Farm";
 static const char *ACC_MISC_NINJAJETPACK = "Ninjajetpack";
@@ -50,7 +52,6 @@ void CVotingMenu::Init(CGameContext *pGameServer)
 		Reset(i);
 	}
 
-	// https://fsymbols.com/generators/smallcaps/
 	str_copy(m_aPages[PAGE_VOTES].m_aName, "Vᴏᴛᴇs", sizeof(m_aPages[PAGE_VOTES].m_aName));
 	str_copy(m_aPages[PAGE_ACCOUNT].m_aName, "Aᴄᴄᴏᴜɴᴛ", sizeof(m_aPages[PAGE_ACCOUNT].m_aName));
 	str_copy(m_aPages[PAGE_MISCELLANEOUS].m_aName, "Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs", sizeof(m_aPages[PAGE_MISCELLANEOUS].m_aName));
@@ -68,6 +69,7 @@ void CVotingMenu::Reset(int ClientID)
 	m_aClients[ClientID].m_LastVoteMsg = 0;
 	m_aClients[ClientID].m_ShowAccountInfo = false;
 	m_aClients[ClientID].m_ShowPlotInfo = false;
+	m_aClients[ClientID].m_ShowAccountStats = false;
 	m_aClients[ClientID].m_PrevStats.m_Flags = 0;
 	m_aClients[ClientID].m_PrevStats.m_Minigame = MINIGAME_NONE;
 }
@@ -231,6 +233,11 @@ void CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc)
 		if (IsCollapseHeader(pDesc, COLLAPSE_HEADER_ACC_INFO))
 		{
 			m_aClients[ClientID].m_ShowAccountInfo = !m_aClients[ClientID].m_ShowAccountInfo;
+			return;
+		}
+		if (IsCollapseHeader(pDesc, COLLAPSE_HEADER_ACC_STATS))
+		{
+			m_aClients[ClientID].m_ShowAccountStats = !m_aClients[ClientID].m_ShowAccountStats;
 			return;
 		}
 		if (IsCollapseHeader(pDesc, COLLAPSE_HEADER_PLOT_INFO))
@@ -456,13 +463,45 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 		DoLineText(Page, pNumOptions, aBuf);
 		str_format(aBuf, sizeof(aBuf), "E-Mail: %s", pAccount->m_aEmail);
 		DoLineText(Page, pNumOptions, aBuf);
+
+		// This does not count to NumEntries anymore, s_NumCollapseEntries is 0 by now again. We wanna add a seperator only if this thing is opened
+		DoLineSeperator(Page, pNumOptions);
+	}
+
+	if (DoLineCollapse(Page, pNumOptions, COLLAPSE_HEADER_ACC_STATS, m_aClients[ClientID].m_ShowAccountStats, 12))
+	{
+		str_format(aBuf, sizeof(aBuf), "Level [%d]", pAccount->m_Level);
+		DoLineText(Page, pNumOptions, aBuf);
+		str_format(aBuf, sizeof(aBuf), "XP [%lld/%lld]", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level));
+		DoLineText(Page, pNumOptions, aBuf);
+		str_format(aBuf, sizeof(aBuf), "Bank [%lld]", pAccount->m_Money);
+		DoLineText(Page, pNumOptions, aBuf);
+		str_format(aBuf, sizeof(aBuf), "Wallet [%lld]", pPlayer->GetWalletMoney());
+		DoLineText(Page, pNumOptions, aBuf);
+		str_format(aBuf, sizeof(aBuf), "Police [%d]", pAccount->m_PoliceLevel);
+		DoLineText(Page, pNumOptions, aBuf);
+
+		DoLineTextSubheader(Page, pNumOptions, "Cᴏʟʟᴇᴄᴛᴀʙʟᴇs");
+		str_format(aBuf, sizeof(aBuf), "Taser Battery [%d]", pAccount->m_TaserBattery);
+		DoLineText(Page, pNumOptions, aBuf);
+		str_format(aBuf, sizeof(aBuf), "Portal Battery [%d]", pAccount->m_PortalBattery);
+		DoLineText(Page, pNumOptions, aBuf);
+
+		DoLineTextSubheader(Page, pNumOptions, "Bʟᴏᴄᴋ");
+		str_format(aBuf, sizeof(aBuf), "Points: %d", pAccount->m_BlockPoints);
+		DoLineText(Page, pNumOptions, aBuf);
+		str_format(aBuf, sizeof(aBuf), "Kills: %d", pAccount->m_Kills);
+		DoLineText(Page, pNumOptions, aBuf);
+		str_format(aBuf, sizeof(aBuf), "Deaths: %d", pAccount->m_Deaths);
+		DoLineText(Page, pNumOptions, aBuf);
+
+		// This does not count to NumEntries anymore, s_NumCollapseEntries is 0 by now again. We wanna add a seperator only if this thing is opened
+		DoLineSeperator(Page, pNumOptions);
 	}
 
 	int PlotID = GameServer()->GetPlotID(AccID);
 	if (PlotID >= PLOT_START)
 	{
-		DoLineSeperator(Page, pNumOptions);
-
 		char aPlotHeader[32];
 		str_format(aPlotHeader, sizeof(aPlotHeader), "%s %d", COLLAPSE_HEADER_PLOT_INFO, PlotID);
 		if (DoLineCollapse(Page, pNumOptions, aPlotHeader, m_aClients[ClientID].m_ShowPlotInfo, 4))
@@ -607,6 +646,8 @@ void CVotingMenu::Tick()
 		// Acc info
 		if (m_aClients[i].m_ShowAccountInfo)
 			Flags |= PREVFLAG_SHOW_ACC_INFO;
+		if (m_aClients[i].m_ShowAccountStats)
+			Flags |= PREVFLAG_SHOW_ACC_STATS;
 		if (m_aClients[i].m_ShowPlotInfo)
 			Flags |= PREVFLAG_SHOW_PLOT_INFO;
 		// Acc Misc
@@ -775,7 +816,7 @@ bool CVotingMenu::DoLineCollapse(int Page, int *pNumOptions, const char *pDescri
 	{
 		// Add one for the bottom line
 		s_NumCollapseEntries = NumEntries;
-		str_format(aBuf, sizeof(aBuf), "╭─           %s     [-]", pDescription);
+		str_format(aBuf, sizeof(aBuf), "╭─           %s     [‒]", pDescription);
 	}
 	else
 	{
