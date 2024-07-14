@@ -401,7 +401,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 {
 	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 	CCharacter *pChr = pPlayer->GetCharacter();
-	int Page = GetPage(ClientID);
+	const int Page = GetPage(ClientID);
 
 	char aBuf[128];
 	time_t tmp;
@@ -637,72 +637,88 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 	if (!pPlayer || !pChr || !pStats)
 		return false;
 
-	int Flags = 0;
-
-	// Misc
-	if (pPlayer->m_HideDrawings)
-		Flags |= PREVFLAG_MISC_HIDEDRAWINGS;
-	if (pPlayer->m_WeaponIndicator)
-		Flags |= PREVFLAG_MISC_WEAPONINDICATOR;
-	if (pPlayer->m_ZoomCursor)
-		Flags |= PREVFLAG_MISC_ZOOMCURSOR;
-	if (pPlayer->m_ResumeMoved)
-		Flags |= PREVFLAG_MISC_RESUMEMOVED;
-	// VIP
-	if ((pChr && pChr->m_Rainbow) || pPlayer->m_InfRainbow)
-		Flags |= PREVFLAG_ACC_VIP_RAINBOW;
-	if (pChr && (pChr->m_Bloody || pChr->m_StrongBloody))
-		Flags |= PREVFLAG_ACC_VIP_BLOODY;
-	if (pChr && pChr->m_Atom)
-		Flags |= PREVFLAG_ACC_VIP_ATOM;
-	if (pChr && pChr->m_Trail)
-		Flags |= PREVFLAG_ACC_VIP_TRAIL;
-	if (pChr && pChr->m_aSpreadWeapon[WEAPON_GUN])
-		Flags |= PREVFLAG_ACC_VIP_SPREADGUN;
-	// VIP Plus
-	if (pChr && pChr->m_HookPower == RAINBOW)
-		Flags |= PREVFLAG_ACC_VIP_PLUS_RAINBOWHOOK;
-	if (pChr && pChr->m_RotatingBall)
-		Flags |= PREVFLAG_ACC_VIP_PLUS_ROTATINGBALL;
-	if (pChr && pChr->m_EpicCircle)
-		Flags |= PREVFLAG_ACC_VIP_PLUS_EPICCIRCLE;
-	if (pChr && pChr->m_Lovely)
-		Flags |= PREVFLAG_ACC_VIP_PLUS_LOVELY;
-	if (pPlayer->m_RainbowName)
-		Flags |= PREVFLAG_ACC_VIP_PLUS_RAINBOWNAME;
-	// Acc info
-	if (m_aClients[ClientID].m_ShowAccountInfo)
-		Flags |= PREVFLAG_SHOW_ACC_INFO;
-	if (m_aClients[ClientID].m_ShowAccountStats)
-		Flags |= PREVFLAG_SHOW_ACC_STATS;
-	if (m_aClients[ClientID].m_ShowPlotInfo)
-		Flags |= PREVFLAG_SHOW_PLOT_INFO;
-	// Acc Misc
-	if (pPlayer->m_SilentFarm)
-		Flags |= PREVFLAG_ACC_MISC_SILENTFARM;
-	if (pPlayer->m_NinjaJetpack)
-		Flags |= PREVFLAG_ACC_NINJAJETPACK;
-	// Plot
-	if (pPlayer->m_PlotSpawn)
-		Flags |= PREVFLAG_PLOT_SPAWN;
+	const int Page = GetPage(ClientID);
 
 	int AccID = pPlayer->GetAccID();
 	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[AccID];
-	CVotingMenu::SClientVoteInfo::SPrevStats Stats;
+	CVotingMenu::SClientVoteInfo::SPrevStats Stats = *pStats;
+	int Flags = 0;
+
+	// Misc
+	if (Page == PAGE_MISCELLANEOUS)
+	{
+		if (pPlayer->m_HideDrawings)
+			Flags |= PREVFLAG_MISC_HIDEDRAWINGS;
+		if (pPlayer->m_WeaponIndicator)
+			Flags |= PREVFLAG_MISC_WEAPONINDICATOR;
+		if (pPlayer->m_ZoomCursor)
+			Flags |= PREVFLAG_MISC_ZOOMCURSOR;
+		if (pPlayer->m_ResumeMoved)
+			Flags |= PREVFLAG_MISC_RESUMEMOVED;
+		Stats.m_Minigame = pPlayer->m_Minigame;
+		Stats.m_ScoreMode = pPlayer->m_ScoreMode;
+	}
+	else if (Page == PAGE_ACCOUNT)
+	{
+		// VIP
+		if (pAccount->m_VIP)
+		{
+			if ((pChr && pChr->m_Rainbow) || pPlayer->m_InfRainbow)
+				Flags |= PREVFLAG_ACC_VIP_RAINBOW;
+			if (pChr && (pChr->m_Bloody || pChr->m_StrongBloody))
+				Flags |= PREVFLAG_ACC_VIP_BLOODY;
+			if (pChr && pChr->m_Atom)
+				Flags |= PREVFLAG_ACC_VIP_ATOM;
+			if (pChr && pChr->m_Trail)
+				Flags |= PREVFLAG_ACC_VIP_TRAIL;
+			if (pChr && pChr->m_aSpreadWeapon[WEAPON_GUN])
+				Flags |= PREVFLAG_ACC_VIP_SPREADGUN;
+
+			// VIP Plus
+			if (pAccount->m_VIP == VIP_PLUS)
+			{
+				if (pChr && pChr->m_HookPower == RAINBOW)
+					Flags |= PREVFLAG_ACC_VIP_PLUS_RAINBOWHOOK;
+				if (pChr && pChr->m_RotatingBall)
+					Flags |= PREVFLAG_ACC_VIP_PLUS_ROTATINGBALL;
+				if (pChr && pChr->m_EpicCircle)
+					Flags |= PREVFLAG_ACC_VIP_PLUS_EPICCIRCLE;
+				if (pChr && pChr->m_Lovely)
+					Flags |= PREVFLAG_ACC_VIP_PLUS_LOVELY;
+				if (pPlayer->m_RainbowName)
+					Flags |= PREVFLAG_ACC_VIP_PLUS_RAINBOWNAME;
+			}
+		}
+		
+		// Acc Misc
+		if (pPlayer->m_SilentFarm)
+			Flags |= PREVFLAG_ACC_MISC_SILENTFARM;
+		if (pAccount->m_Ninjajetpack && pPlayer->m_NinjaJetpack)
+			Flags |= PREVFLAG_ACC_NINJAJETPACK;
+		// Plot
+		if (m_aClients[ClientID].m_ShowPlotInfo && pPlayer->m_PlotSpawn && GameServer()->GetPlotID(AccID) >= PLOT_START)
+		{
+			Flags |= PREVFLAG_PLOT_SPAWN;
+		}
+
+		if (m_aClients[ClientID].m_ShowAccountStats)
+		{
+			Stats.m_Acc.m_XP = pAccount->m_XP;
+			Stats.m_Acc.m_Money = pAccount->m_Money;
+			Stats.m_Acc.m_WalletMoney = pPlayer->GetWalletMoney();
+			Stats.m_Acc.m_PoliceLevel = pAccount->m_PoliceLevel;
+			Stats.m_Acc.m_TaserBattery = pAccount->m_TaserBattery;
+			Stats.m_Acc.m_PortalBattery = pAccount->m_PortalBattery;
+			Stats.m_Acc.m_Points = pAccount->m_BlockPoints;
+			Stats.m_Acc.m_Kills = pAccount->m_Kills;
+			Stats.m_Acc.m_Deaths = pAccount->m_Deaths;
+			Stats.m_Acc.m_Euros = pAccount->m_Euros;
+			str_copy(Stats.m_Acc.m_aContact, pAccount->m_aContact, sizeof(Stats.m_Acc.m_aContact));
+		}
+	}
+
 	Stats.m_Flags = Flags;
-	Stats.m_Minigame = pPlayer->m_Minigame;
-	Stats.m_ScoreMode = pPlayer->m_ScoreMode;
-	Stats.m_Acc.m_XP = pAccount->m_XP;
-	Stats.m_Acc.m_Money = pAccount->m_Money;
-	Stats.m_Acc.m_WalletMoney = pPlayer->GetWalletMoney();
-	Stats.m_Acc.m_PoliceLevel = pAccount->m_PoliceLevel;
-	Stats.m_Acc.m_TaserBattery = pAccount->m_TaserBattery;
-	Stats.m_Acc.m_PortalBattery = pAccount->m_PortalBattery;
-	Stats.m_Acc.m_Points = pAccount->m_BlockPoints;
-	Stats.m_Acc.m_Kills = pAccount->m_Kills;
-	Stats.m_Acc.m_Deaths = pAccount->m_Deaths;
-	Stats.m_Acc.m_Euros = pAccount->m_Euros;
-	str_copy(Stats.m_Acc.m_aContact, pAccount->m_aContact, sizeof(Stats.m_Acc.m_aContact));
+	
 	// fill
 	*pStats = Stats;
 	return true;
@@ -715,7 +731,7 @@ void CVotingMenu::SendPageVotes(int ClientID, bool ResendVotesPage)
 
 	int Seconds = Server()->IsSevendown(ClientID) ? 1 : 3;
 	m_aClients[ClientID].m_NextVoteSendTick = Server()->Tick() + Server()->TickSpeed() * Seconds;
-	int Page = GetPage(ClientID);
+	const int Page = GetPage(ClientID);
 	if (Page == PAGE_VOTES)
 	{
 		// No need to resend votes when we login, we only want to update the other pages with new values
