@@ -433,7 +433,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 
 	bool ShowEuros = GameServer()->Config()->m_SvEuroMode || pAccount->m_Euros > 0;
 	bool ShowPortalDate = GameServer()->Config()->m_SvPortalRifleShop || pAccount->m_PortalRifle;
-	if (DoLineCollapse(Page, pNumOptions, COLLAPSE_HEADER_ACC_INFO, m_aClients[ClientID].m_ShowAccountInfo, 6 + (int)ShowEuros + (int)ShowPortalDate))
+	if (DoLineCollapse(Page, pNumOptions, COLLAPSE_HEADER_ACC_INFO, m_aClients[ClientID].m_ShowAccountInfo, 5 + (int)ShowEuros + (int)ShowPortalDate))
 	{
 		str_format(aBuf, sizeof(aBuf), "Account Name: %s", pAccount->m_Username);
 		DoLineText(Page, pNumOptions, aBuf);
