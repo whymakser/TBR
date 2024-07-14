@@ -1604,6 +1604,8 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   teehistorian.h
   teeinfo.cpp
   teeinfo.h
+  votingmenu.cpp
+  votingmenu.h
   whois.cpp
   whois.h
 )

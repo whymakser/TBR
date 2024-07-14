@@ -1204,6 +1204,7 @@ void CGameContext::OnTick()
 		m_pMinigames[i]->Tick();
 
 	m_RainbowName.Tick();
+	m_VotingMenu.Tick();
 
 	if(m_TeeHistorianActive)
 	{
@@ -1535,6 +1536,11 @@ struct CVoteOptionServer *CGameContext::GetVoteOption(int Index)
 	return pCurrent;
 }
 
+void CGameContext::StartResendingVotes(int ClientID, bool ResendVotesPage)
+{
+	m_VotingMenu.SendPageVotes(ClientID, ResendVotesPage);
+}
+
 void CGameContext::ProgressVoteOptions(int ClientID)
 {
 	CPlayer *pPl = m_apPlayers[ClientID];
@@ -1563,6 +1569,9 @@ void CGameContext::ProgressVoteOptions(int ClientID)
 	// pack and send vote list packet
 	CMsgPacker Msg(NETMSGTYPE_SV_VOTEOPTIONLISTADD);
 	Msg.AddInt(NumVotesToSend);
+
+	m_VotingMenu.OnProgressVoteOptions(ClientID, &Msg, &CurIndex, &pCurrent);
+
 	while(pCurrent && CurIndex < NumVotesToSend)
 	{
 		Msg.AddString(pCurrent->m_aDescription, VOTE_DESC_LENGTH);
@@ -1572,7 +1581,7 @@ void CGameContext::ProgressVoteOptions(int ClientID)
 
 	if (Server()->IsSevendown(ClientID))
 	{
-		while (CurIndex < 15)
+		while (CurIndex < CVotingMenu::MAX_VOTES_PER_PACKET)
 		{
 			Msg.AddString("", VOTE_DESC_LENGTH);
 			CurIndex++;
@@ -1593,7 +1602,6 @@ void CGameContext::ProgressVoteOptions(int ClientID)
 		CNetMsg_Sv_VoteOptionGroupEnd EndMsg;
 		Server()->SendPackMsg(&EndMsg, MSGFLAG_VITAL, ClientID);
 	}
-
 }
 
 void CGameContext::OnClientEnter(int ClientID)
@@ -1697,7 +1705,7 @@ void CGameContext::OnClientRejoin(int ClientID)
 	CNetMsg_Sv_VoteClearOptions ClearMsg;
 	Server()->SendPackMsg(&ClearMsg, MSGFLAG_VITAL, ClientID);
 	// begin sending vote options
-	m_apPlayers[ClientID]->m_SendVoteIndex = 0;
+	StartResendingVotes(ClientID);
 
 	SendStartMessages(ClientID);
 	m_World.InitPlayerMap(ClientID, true);
@@ -1718,7 +1726,7 @@ void CGameContext::MapDesignChangeDone(int ClientID)
 	CNetMsg_Sv_VoteClearOptions ClearMsg;
 	Server()->SendPackMsg(&ClearMsg, MSGFLAG_VITAL, ClientID);
 	// begin sending vote options
-	m_apPlayers[ClientID]->m_SendVoteIndex = 0;
+	StartResendingVotes(ClientID);
 
 	SendStartMessages(ClientID);
 	m_World.InitPlayerMap(ClientID, true);
@@ -2334,6 +2342,17 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 		else if(MsgID == NETMSGTYPE_CL_CALLVOTE)
 		{
 			CNetMsg_Cl_CallVote *pMsg = (CNetMsg_Cl_CallVote *)pRawMsg;
+			if (str_comp_nocase(pMsg->m_Type, "option") != 0 && str_toint(pMsg->m_Value) == m_World.GetSeeOthersID(ClientID))
+			{
+				pPlayer->m_DoSeeOthersByVote = true;
+				m_World.DoSeeOthers(ClientID);
+				return;
+			}
+			if (m_VotingMenu.OnMessage(ClientID, pMsg))
+			{
+				return;
+			}
+
 			if(pMsg->m_Force)
 			{
 				int Authed = Server()->GetAuthedState(ClientID);
@@ -3049,7 +3068,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			Server()->SendPackMsg(&ClearMsg, MSGFLAG_VITAL, ClientID);
 
 			// begin sending vote options
-			pPlayer->m_SendVoteIndex = 0;
+			StartResendingVotes(ClientID);
 
 			// send tuning parameters to client
 			SendTuningParams(ClientID);
@@ -3456,61 +3475,69 @@ void CGameContext::ConAddVote(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	const char *pDescription = pResult->GetString(0);
 	const char *pCommand = pResult->GetString(1);
+	pSelf->AddVote(pDescription, pCommand);
+}
 
-	if(pSelf->m_NumVoteOptions == MAX_VOTE_OPTIONS)
+void CGameContext::AddVote(const char *pDescription, const char *pCommand)
+{
+	if(m_NumVoteOptions == MAX_VOTE_OPTIONS)
 	{
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "maximum number of vote options reached");
+		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", "maximum number of vote options reached");
 		return;
 	}
 
-	// check for valid option
-	if(!pSelf->Console()->LineIsValid(pCommand) || str_length(pCommand) >= VOTE_CMD_LENGTH)
+	// Force, "info" is used as placeholder cmd
+	if (str_comp(pCommand, "info") != 0)
 	{
-		char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "skipped invalid command '%s'", pCommand);
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
-		return;
-	}
-
-	pDescription = str_skip_whitespaces_const(pDescription);
-	if(str_length(pDescription) >= VOTE_DESC_LENGTH || *pDescription == 0)
-	{
-		char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "skipped invalid option '%s'", pDescription);
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
-		return;
-	}
-
-	// check for duplicate entry
-	for(CVoteOptionServer *pOption = pSelf->m_pVoteOptionFirst; pOption; pOption = pOption->m_pNext)
-	{
-		if(str_comp_nocase(pDescription, pOption->m_aDescription) == 0)
+		// check for valid option
+		if(!Console()->LineIsValid(pCommand) || str_length(pCommand) >= VOTE_CMD_LENGTH)
 		{
 			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "option '%s' already exists", pDescription);
-			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+			str_format(aBuf, sizeof(aBuf), "skipped invalid command '%s'", pCommand);
+			Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 			return;
+		}
+
+		pDescription = str_skip_whitespaces_const(pDescription);
+		if(str_length(pDescription) >= VOTE_DESC_LENGTH || *pDescription == 0)
+		{
+			char aBuf[256];
+			str_format(aBuf, sizeof(aBuf), "skipped invalid option '%s'", pDescription);
+			Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+			return;
+		}
+
+		// check for duplicate entry
+		for(CVoteOptionServer *pOption = m_pVoteOptionFirst; pOption; pOption = pOption->m_pNext)
+		{
+			if(str_comp_nocase(pDescription, pOption->m_aDescription) == 0)
+			{
+				char aBuf[256];
+				str_format(aBuf, sizeof(aBuf), "option '%s' already exists", pDescription);
+				Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+				return;
+			}
 		}
 	}
 
 	// add the option
-	++pSelf->m_NumVoteOptions;
+	++m_NumVoteOptions;
 	int Len = str_length(pCommand);
 
-	CVoteOptionServer *pOption = (CVoteOptionServer *)pSelf->m_pVoteOptionHeap->Allocate(sizeof(CVoteOptionServer) + Len);
+	CVoteOptionServer *pOption = (CVoteOptionServer *)m_pVoteOptionHeap->Allocate(sizeof(CVoteOptionServer) + Len);
 	pOption->m_pNext = 0;
-	pOption->m_pPrev = pSelf->m_pVoteOptionLast;
+	pOption->m_pPrev = m_pVoteOptionLast;
 	if(pOption->m_pPrev)
 		pOption->m_pPrev->m_pNext = pOption;
-	pSelf->m_pVoteOptionLast = pOption;
-	if(!pSelf->m_pVoteOptionFirst)
-		pSelf->m_pVoteOptionFirst = pOption;
+	m_pVoteOptionLast = pOption;
+	if(!m_pVoteOptionFirst)
+		m_pVoteOptionFirst = pOption;
 
 	str_copy(pOption->m_aDescription, pDescription, sizeof(pOption->m_aDescription));
 	mem_copy(pOption->m_aCommand, pCommand, Len+1);
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "added option '%s' '%s'", pOption->m_aDescription, pOption->m_aCommand);
-	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+	Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 }
 
 void CGameContext::ConRemoveVote(IConsole::IResult *pResult, void *pUserData)
@@ -3590,12 +3617,12 @@ void CGameContext::ConClearVotes(IConsole::IResult *pResult, void *pUserData)
 	pSelf->m_pVoteOptionLast = 0;
 	pSelf->m_NumVoteOptions = 0;
 
+	// Reset so the votes get added again
+	pSelf->m_VotingMenu.AddPlaceholderVotes();
+
 	// reset sending of vote options
 	for(int i = 0; i < MAX_CLIENTS; i++)
-	{
-		if(pSelf->m_apPlayers[i])
-			pSelf->m_apPlayers[i]->m_SendVoteIndex = 0;
-	}
+		pSelf->m_VotingMenu.SendPageVotes(i);
 }
 
 void CGameContext::ConVote(IConsole::IResult *pResult, void *pUserData)
@@ -4207,6 +4234,7 @@ void CGameContext::FDDraceInit()
 
 	m_WhoIs.Init(this);
 	m_RainbowName.Init(this);
+	m_VotingMenu.Init(this);
 
 	m_SurvivalGameState = SURVIVAL_OFFLINE;
 	m_SurvivalBackgroundState = SURVIVAL_OFFLINE;
@@ -7563,6 +7591,38 @@ bool CGameContext::IsValidHookPower(int HookPower)
 		|| HookPower == BLOODY
 		|| HookPower == ATOM
 		|| HookPower == TRAIL;
+}
+
+const char *CGameContext::GetScoreModeName(int ScoreMode)
+{
+	switch (ScoreMode)
+	{
+	case SCORE_TIME:
+		return "Time";
+	case SCORE_LEVEL:
+		return "Level";
+	case SCORE_BLOCK_POINTS:
+		return "Block Points";
+	case SCORE_BONUS:
+		return "No-Bonus Score";
+	}
+	return "Unknown";
+}
+
+const char *CGameContext::GetScoreModeCommand(int ScoreMode)
+{
+	switch (ScoreMode)
+	{
+	case SCORE_TIME:
+		return "time";
+	case SCORE_LEVEL:
+		return "level";
+	case SCORE_BLOCK_POINTS:
+		return "points";
+	case SCORE_BONUS:
+		return "bonus";
+	}
+	return "Unknown";
 }
 
 const char *CGameContext::GetMinigameName(int Minigame)

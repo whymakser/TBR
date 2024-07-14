@@ -75,6 +75,7 @@ public:
 	virtual void SetLanguage(int ClientID, const char *pLanguage) = 0;
 	virtual bool ChangeMapDesign(int ClientID, const char *pName) = 0;
 	virtual const char *GetMapDesign(int ClientID) = 0;
+	virtual const char *GetMapDesignName(int Design) = 0;
 	virtual void LoadMapDesigns() = 0;
 
 	virtual void PrintBotLookup() = 0;

@@ -1024,21 +1024,8 @@ void CGameContext::ConNinjaJetpack(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *) pUserData;
 	if (!CheckClientID(pResult->m_ClientID))
 		return;
-
 	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
-	if (!pPlayer)
-		return;
-
-	if (!pSelf->m_Accounts[pPlayer->GetAccID()].m_Ninjajetpack)
-	{
-		pSelf->SendChatTarget(pResult->m_ClientID, "You don't have ninjajetpack, buy it in the shop");
-		return;
-	}
-
-	if (pResult->NumArguments())
-		pPlayer->m_NinjaJetpack = pResult->GetInteger(0);
-	else
-		pPlayer->m_NinjaJetpack = !pPlayer->m_NinjaJetpack;
+	if (pPlayer) pPlayer->SetNinjaJetpack(pResult->NumArguments() ? pResult->GetInteger(0) : !pPlayer->m_NinjaJetpack);
 }
 
 void CGameContext::ConShowOthers(IConsole::IResult *pResult, void *pUserData)
@@ -1266,35 +1253,23 @@ void CGameContext::ConScore(IConsole::IResult* pResult, void* pUserData)
 		return;
 	char aFormat[32];
 	str_copy(aFormat, pResult->GetString(0), sizeof(aFormat));
-	bool Changed = true;
 
-	if (!str_comp_nocase(aFormat, "time"))
-		pPlayer->m_ScoreMode = SCORE_TIME;
-	else if (!str_comp_nocase(aFormat, "level"))
-		pPlayer->m_ScoreMode = SCORE_LEVEL;
-	else if (!str_comp_nocase(aFormat, "points"))
-		pPlayer->m_ScoreMode = SCORE_BLOCK_POINTS;
-	else if (!str_comp_nocase(aFormat, "bonus") && pSelf->Config()->m_SvAllowBonusScoreMode)
-		pPlayer->m_ScoreMode = SCORE_BONUS;
-	else
+	for (int i = 0; i < NUM_SCORE_MODES; i++)
 	{
-		pSelf->SendChatTarget(pResult->m_ClientID, "~~~ Score Format ~~~");
-		pSelf->SendChatTarget(pResult->m_ClientID, "Use '/score <format>' to change the displayed score.");
-		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "time, level, points%s", pSelf->Config()->m_SvAllowBonusScoreMode ? ", bonus" : "");
-		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-		Changed = false;
+		if (i == SCORE_BONUS && !pSelf->Config()->m_SvAllowBonusScoreMode)
+			continue;
+		if (!str_comp_nocase(aFormat, pSelf->GetScoreModeCommand(i)))
+		{
+			pPlayer->ChangeScoreMode(i);
+			return;
+		}
 	}
 
-	if (Changed)
-	{
-		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "Changed displayed score to '%s'", aFormat);
-		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-
-		// Update the gameinfo, add or remove GAMEFLAG_RACE as wanted (time score needs it, the others dont)
-		pSelf->m_pController->UpdateGameInfo(pResult->m_ClientID);
-	}
+	pSelf->SendChatTarget(pResult->m_ClientID, "~~~ Score Format ~~~");
+	pSelf->SendChatTarget(pResult->m_ClientID, "Use '/score <format>' to change the displayed score.");
+	char aBuf[64];
+	str_format(aBuf, sizeof(aBuf), "time, level, points%s", pSelf->Config()->m_SvAllowBonusScoreMode ? ", bonus" : "");
+	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 }
 
 void CGameContext::ConAccount(IConsole::IResult* pResult, void* pUserData)
@@ -1513,50 +1488,14 @@ void CGameContext::ConWeaponIndicator(IConsole::IResult * pResult, void * pUserD
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
-	if (!pPlayer)
-		return;
-
-	if (pResult->NumArguments())
-	{
-		if (pPlayer->m_WeaponIndicator == (bool)pResult->GetInteger(0))
-			return;
-
-		pPlayer->m_WeaponIndicator = pResult->GetInteger(0);
-	}
-	else
-	{
-		pPlayer->m_WeaponIndicator = !pPlayer->m_WeaponIndicator;
-	}
-
-	if (pPlayer->m_WeaponIndicator)
-		pSelf->SendChatTarget(pResult->m_ClientID, "Weapon indicator enabled");
-	else
-		pSelf->SendChatTarget(pResult->m_ClientID, "Weapon indicator disabled");
+	if (pPlayer) pPlayer->SetWeaponIndicator(pResult->NumArguments() ? pResult->GetInteger(0) : !pPlayer->m_WeaponIndicator);
 }
 
 void CGameContext::ConZoomCursor(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
-	if (!pPlayer)
-		return;
-
-	if (pResult->NumArguments())
-	{
-		if (pPlayer->m_ZoomCursor == (bool)pResult->GetInteger(0))
-			return;
-
-		pPlayer->m_ZoomCursor = pResult->GetInteger(0);
-	}
-	else
-	{
-		pPlayer->m_ZoomCursor = !pPlayer->m_ZoomCursor;
-	}
-
-	if (pPlayer->m_ZoomCursor)
-		pSelf->SendChatTarget(pResult->m_ClientID, "Your cursor will now zoom. WARNING: Does not work with dynamic camera if deadzone or follow factor are non-default.");
-	else
-		pSelf->SendChatTarget(pResult->m_ClientID, "You cursor will no longer be zoomed");
+	if (pPlayer) pPlayer->SetZoomCursor(pResult->NumArguments() ? pResult->GetInteger(0) : !pPlayer->m_ZoomCursor);
 }
 
 void CGameContext::ConRegister(IConsole::IResult * pResult, void * pUserData)
@@ -2423,16 +2362,11 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 	}
 	else if (!str_comp_nocase(pCommand, "clear"))
 	{
-		pSelf->ClearPlot(pSelf->GetPlotID(OwnAccID));
-		pSelf->SendChatTarget(pResult->m_ClientID, "All objects of your plot have been removed");
+		pPlayer->ClearPlot();
 	}
 	else if (!str_comp_nocase(pCommand, "spawn"))
 	{
-		pPlayer->m_PlotSpawn = !pPlayer->m_PlotSpawn;
-		if (pPlayer->m_PlotSpawn)
-			pSelf->SendChatTarget(pResult->m_ClientID, "You will now respawn at your plot (TAB+kill to join at normal spawn)");
-		else
-			pSelf->SendChatTarget(pResult->m_ClientID, "You will no longer respawn at your plot (TAB+kill to join at plot spawn)");
+		pPlayer->SetPlotSpawn(!pPlayer->m_PlotSpawn);
 	}
 	else if (!str_comp_nocase(pCommand, "swap"))
 	{
@@ -2508,30 +2442,7 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 	}
 	else if (!str_comp_nocase(pCommand, "edit"))
 	{
-		if (!pChr)
-		{
-			pSelf->SendChatTarget(pResult->m_ClientID, "You have to be alive to edit your plot");
-			return;
-		}
-		else if (pChr->GetCurrentTilePlotID() != OwnPlotID)
-		{
-			pSelf->SendChatTarget(pResult->m_ClientID, "You have to be inside your plot to edit your plot");
-			return;
-		}
-		else if (pSelf->PlotCanBeRaided(OwnPlotID))
-		{
-			pSelf->SendChatTarget(pResult->m_ClientID, "You can't edit your plot while living the life of a gangster.");
-			return;
-		}
-
-		if (pSelf->Arenas()->FightStarted(pResult->m_ClientID))
-			return;
-
-		pSelf->SendChatTarget(pResult->m_ClientID, "You are now editing your plot, switch to another weapon to exit the editor");
-		pChr->UnsetSpookyGhost();
-		pChr->GiveWeapon(WEAPON_DRAW_EDITOR);
-		pChr->SetActiveWeapon(WEAPON_DRAW_EDITOR);
-		pChr->Core()->m_Vel = vec2(0, 0);
+		pPlayer->StartPlotEdit();
 	}
 }
 
@@ -2539,25 +2450,7 @@ void CGameContext::ConHideDrawings(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
-	if (!pPlayer)
-		return;
-
-	if (pResult->NumArguments())
-	{
-		if (pPlayer->m_HideDrawings == (bool)pResult->GetInteger(0))
-			return;
-
-		pPlayer->m_HideDrawings = pResult->GetInteger(0);
-	}
-	else
-	{
-		pPlayer->m_HideDrawings = !pPlayer->m_HideDrawings;
-	}
-
-	if (pPlayer->m_HideDrawings)
-		pSelf->SendChatTarget(pResult->m_ClientID, "You will no longer see drawings");
-	else
-		pSelf->SendChatTarget(pResult->m_ClientID, "You will now see drawings again");
+	if (pPlayer) pPlayer->SetHideDrawings(pResult->NumArguments() ? pResult->GetInteger(0) : !pPlayer->m_HideDrawings);
 }
 
 void CGameContext::ConSilentFarm(IConsole::IResult *pResult, void *pUserData)
@@ -2565,20 +2458,8 @@ void CGameContext::ConSilentFarm(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *) pUserData;
 	if (!CheckClientID(pResult->m_ClientID))
 		return;
-
 	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
-	if (!pPlayer)
-		return;
-
-	if (pResult->NumArguments())
-		pPlayer->m_SilentFarm = pResult->GetInteger(0);
-	else
-		pPlayer->m_SilentFarm = !pPlayer->m_SilentFarm;
-
-	if (pPlayer->m_SilentFarm)
-		pSelf->SendChatTarget(pResult->m_ClientID, "You will not receive sounds from the server while farming on a moneytile");
-	else
-		pSelf->SendChatTarget(pResult->m_ClientID, "You will receive all sounds again");
+	if (pPlayer) pPlayer->SetSilentFarm(pResult->NumArguments() ? pResult->GetInteger(0) : !pPlayer->m_SilentFarm);
 }
 
 void CGameContext::ConPoliceInfo(IConsole::IResult *pResult, void *pUserData)
@@ -2651,25 +2532,7 @@ void CGameContext::ConResumeMoved(IConsole::IResult *pResult, void *pUserData)
 		return;
 
 	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
-	if (!pPlayer)
-		return;
-
-	if (pResult->NumArguments())
-	{
-		if (pPlayer->m_ResumeMoved == (bool)pResult->GetInteger(0))
-			return;
-
-		pPlayer->m_ResumeMoved = pResult->GetInteger(0);
-	}
-	else
-	{
-		pPlayer->m_ResumeMoved = !pPlayer->m_ResumeMoved;
-	}
-
-	if (pPlayer->m_ResumeMoved)
-		pSelf->SendChatTarget(pResult->m_ClientID, "You will now resume from pause if your tee gets moved");
-	else
-		pSelf->SendChatTarget(pResult->m_ClientID, "You will no longer resume from pause if your tee gets moved");
+	if (pPlayer) pPlayer->SetResumeMoved(pResult->NumArguments() ? pResult->GetInteger(0) : !pPlayer->m_ResumeMoved);
 }
 
 void CGameContext::ConMutePlayer(IConsole::IResult* pResult, void* pUserData)
@@ -3128,176 +2991,70 @@ void CGameContext::ConRainbowVIP(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CCharacter *pChr = pSelf->GetPlayerChar(pResult->m_ClientID);
-	if (!pChr)
-		return;
-
-	if (!pSelf->m_Accounts[pChr->GetPlayer()->GetAccID()].m_VIP)
-	{
-		pSelf->SendChatTarget(pResult->m_ClientID, "You are not VIP");
-		return;
-	}
-
-	pChr->Rainbow(!(pChr->m_Rainbow || pChr->GetPlayer()->m_InfRainbow), pResult->m_ClientID);
+	if (pChr) pChr->OnRainbowVIP();
 }
 
 void CGameContext::ConBloodyVIP(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CCharacter *pChr = pSelf->GetPlayerChar(pResult->m_ClientID);
-	if (!pChr)
-		return;
-
-	if (!pSelf->m_Accounts[pChr->GetPlayer()->GetAccID()].m_VIP)
-	{
-		pSelf->SendChatTarget(pResult->m_ClientID, "You are not VIP");
-		return;
-	}
-
-	pChr->Bloody(!(pChr->m_Bloody || pChr->m_StrongBloody), pResult->m_ClientID);
-	pChr->Atom(false, -1, true);
-	pChr->Trail(false, -1, true);
-	pChr->RotatingBall(false, -1, true);
-	pChr->EpicCircle(false, -1, true);
+	if (pChr) pChr->OnBloodyVIP();
 }
 
 void CGameContext::ConAtomVIP(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CCharacter *pChr = pSelf->GetPlayerChar(pResult->m_ClientID);
-	if (!pChr)
-		return;
-
-	if (!pSelf->m_Accounts[pChr->GetPlayer()->GetAccID()].m_VIP)
-	{
-		pSelf->SendChatTarget(pResult->m_ClientID, "You are not VIP");
-		return;
-	}
-
-	pChr->Atom(!pChr->m_Atom, pResult->m_ClientID);
-	pChr->Bloody(false, -1, true);
-	pChr->Trail(false, -1, true);
-	pChr->RotatingBall(false, -1, true);
-	pChr->EpicCircle(false, -1, true);
+	if (pChr) pChr->OnAtomVIP();
 }
 
 void CGameContext::ConTrailVIP(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CCharacter *pChr = pSelf->GetPlayerChar(pResult->m_ClientID);
-	if (!pChr)
-		return;
-
-	if (!pSelf->m_Accounts[pChr->GetPlayer()->GetAccID()].m_VIP)
-	{
-		pSelf->SendChatTarget(pResult->m_ClientID, "You are not VIP");
-		return;
-	}
-
-	pChr->Trail(!pChr->m_Trail, pResult->m_ClientID);
-	pChr->Atom(false, -1, true);
-	pChr->Bloody(false, -1, true);
-	pChr->EpicCircle(false, -1, true);
+	if (pChr) pChr->OnAtomVIP();
 }
 
 void CGameContext::ConSpreadGunVIP(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CCharacter *pChr = pSelf->GetPlayerChar(pResult->m_ClientID);
-	if (!pChr)
-		return;
-
-	if (!pSelf->m_Accounts[pChr->GetPlayer()->GetAccID()].m_VIP)
-	{
-		pSelf->SendChatTarget(pResult->m_ClientID, "You are not VIP");
-		return;
-	}
-
-	pChr->SpreadWeapon(WEAPON_GUN, !pChr->m_aSpreadWeapon[WEAPON_GUN], pResult->m_ClientID);
+	if (pChr) pChr->OnSpreadGunVIP();
 }
 
 void CGameContext::ConRotatingBallVIP(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CCharacter *pChr = pSelf->GetPlayerChar(pResult->m_ClientID);
-	if (!pChr)
-		return;
-
-	if (pSelf->m_Accounts[pChr->GetPlayer()->GetAccID()].m_VIP != VIP_PLUS)
-	{
-		pSelf->SendChatTarget(pResult->m_ClientID, "You are not VIP+");
-		return;
-	}
-
-	pChr->RotatingBall(!pChr->m_RotatingBall, pResult->m_ClientID);
-	pChr->Atom(false, -1, true);
-	pChr->Bloody(false, -1, true);
+	if (pChr) pChr->OnRotatingBallVIP();
 }
 
 void CGameContext::ConEpicCircleVIP(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CCharacter *pChr = pSelf->GetPlayerChar(pResult->m_ClientID);
-	if (!pChr)
-		return;
-
-	if (pSelf->m_Accounts[pChr->GetPlayer()->GetAccID()].m_VIP != VIP_PLUS)
-	{
-		pSelf->SendChatTarget(pResult->m_ClientID, "You are not VIP+");
-		return;
-	}
-
-	pChr->EpicCircle(!pChr->m_EpicCircle, pResult->m_ClientID);
-	pChr->Atom(false, -1, true);
-	pChr->Bloody(false, -1, true);
-	pChr->Trail(false, -1, true);
+	if (pChr) pChr->OnEpicCircleVIP();
 }
 
 void CGameContext::ConLovelyVIP(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CCharacter *pChr = pSelf->GetPlayerChar(pResult->m_ClientID);
-	if (!pChr)
-		return;
-
-	if (pSelf->m_Accounts[pChr->GetPlayer()->GetAccID()].m_VIP != VIP_PLUS)
-	{
-		pSelf->SendChatTarget(pResult->m_ClientID, "You are not VIP+");
-		return;
-	}
-
-	pChr->Lovely(!pChr->m_Lovely, pResult->m_ClientID);
+	if (pChr) pChr->OnLovelyVIP();
 }
 
 void CGameContext::ConRainbowHookVIP(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CCharacter *pChr = pSelf->GetPlayerChar(pResult->m_ClientID);
-	if (!pChr)
-		return;
-
-	if (pSelf->m_Accounts[pChr->GetPlayer()->GetAccID()].m_VIP != VIP_PLUS)
-	{
-		pSelf->SendChatTarget(pResult->m_ClientID, "You are not VIP+");
-		return;
-	}
-
-	pChr->HookPower(pChr->m_HookPower == RAINBOW ? HOOK_NORMAL : RAINBOW, pResult->m_ClientID);
+	if (pChr) pChr->OnRainbowHookVIP();
 }
 
 void CGameContext::ConRainbowNameVIP(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CCharacter *pChr = pSelf->GetPlayerChar(pResult->m_ClientID);
-	if (!pChr)
-		return;
-
-	if (pSelf->m_Accounts[pChr->GetPlayer()->GetAccID()].m_VIP != VIP_PLUS)
-	{
-		pSelf->SendChatTarget(pResult->m_ClientID, "You are not VIP+");
-		return;
-	}
-
-	pChr->RainbowName(!pChr->GetPlayer()->m_RainbowName, pResult->m_ClientID);
+	if (pChr) pChr->OnRainbowNameVIP();
 }
 
 void CGameContext::ConShrug(IConsole::IResult *pResult, void *pUserData)

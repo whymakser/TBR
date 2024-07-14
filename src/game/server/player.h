@@ -349,6 +349,7 @@ public:
 	//others
 	void SetPlaying();
 	bool m_ResumeMoved;
+	bool m_DoSeeOthersByVote;
 
 	bool m_SilentFarm;
 	bool SilentFarmActive();
@@ -362,6 +363,18 @@ public:
 	bool JoinChat(bool Local);
 	bool m_LocalChat;
 	int GetAuthedHighlighted();
+
+	// Voting Menu calls, used when executing the chat command aswell
+	void SetSilentFarm(bool Set);
+	void SetHideDrawings(bool Set);
+	void SetWeaponIndicator(bool Set);
+	void SetZoomCursor(bool Set);
+	void SetNinjaJetpack(bool Set);
+	void SetPlotSpawn(bool Set);
+	void SetResumeMoved(bool Set);
+	void ClearPlot();
+	void StartPlotEdit();
+	void ChangeScoreMode(int ScoreMode);
 
 	// zoom cursor
 	bool m_ZoomCursor;

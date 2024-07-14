@@ -4273,6 +4273,11 @@ void CCharacter::FDDraceTick()
 		m_HookExceededTick = 0;
 	}
 	
+	if (m_pPlayer->m_DoSeeOthersByVote && !IsIdle())
+	{
+		GameWorld()->ResetSeeOthers(m_pPlayer->GetCID());
+		m_pPlayer->m_DoSeeOthersByVote = false;
+	}
 
 	// update
 	m_DrawEditor.Tick();
@@ -5425,4 +5430,130 @@ void CCharacter::SetJumps(int NewJumps, bool Silent)
 	}
 
 	m_Core.m_Jumps = NewJumps;
+}
+
+void CCharacter::OnRainbowVIP()
+{
+	if (!GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP)
+	{
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP");
+		return;
+	}
+
+	Rainbow(!(m_Rainbow || m_pPlayer->m_InfRainbow), m_pPlayer->GetCID());
+}
+
+void CCharacter::OnBloodyVIP()
+{
+	if (!GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP)
+	{
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP");
+		return;
+	}
+
+	Bloody(!(m_Bloody || m_StrongBloody), m_pPlayer->GetCID());
+	Atom(false, -1, true);
+	Trail(false, -1, true);
+	RotatingBall(false, -1, true);
+	EpicCircle(false, -1, true);
+}
+
+void CCharacter::OnAtomVIP()
+{
+	if (!GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP)
+	{
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP");
+		return;
+	}
+
+	Atom(!m_Atom, m_pPlayer->GetCID());
+	Bloody(false, -1, true);
+	Trail(false, -1, true);
+	RotatingBall(false, -1, true);
+	EpicCircle(false, -1, true);
+}
+
+void CCharacter::OnTrailVIP()
+{
+	if (!GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP)
+	{
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP");
+		return;
+	}
+
+	Trail(!m_Trail, m_pPlayer->GetCID());
+	Atom(false, -1, true);
+	Bloody(false, -1, true);
+	EpicCircle(false, -1, true);
+}
+
+void CCharacter::OnSpreadGunVIP()
+{
+	if (!GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP)
+	{
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP");
+		return;
+	}
+
+	SpreadWeapon(WEAPON_GUN, !m_aSpreadWeapon[WEAPON_GUN], m_pPlayer->GetCID());
+}
+
+void CCharacter::OnRainbowHookVIP()
+{
+	if (GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP != VIP_PLUS)
+	{
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP+");
+		return;
+	}
+
+	HookPower(m_HookPower == RAINBOW ? HOOK_NORMAL : RAINBOW, m_pPlayer->GetCID());
+}
+
+void CCharacter::OnRotatingBallVIP()
+{
+	if (GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP != VIP_PLUS)
+	{
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP+");
+		return;
+	}
+
+	RotatingBall(!m_RotatingBall, m_pPlayer->GetCID());
+	Atom(false, -1, true);
+	Bloody(false, -1, true);
+}
+
+void CCharacter::OnEpicCircleVIP()
+{
+	if (GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP != VIP_PLUS)
+	{
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP+");
+		return;
+	}
+
+	EpicCircle(!m_EpicCircle, m_pPlayer->GetCID());
+	Atom(false, -1, true);
+	Bloody(false, -1, true);
+	Trail(false, -1, true);
+}
+
+void CCharacter::OnLovelyVIP()
+{
+	if (GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP != VIP_PLUS)
+	{
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP+");
+		return;
+	}
+
+	Lovely(!m_Lovely, m_pPlayer->GetCID());
+}
+
+void CCharacter::OnRainbowNameVIP()
+{
+	if (GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP != VIP_PLUS)
+	{
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP+");
+		return;
+	}
+
+	RainbowName(!m_pPlayer->m_RainbowName, m_pPlayer->GetCID());
 }

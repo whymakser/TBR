@@ -23,6 +23,7 @@
 #include "gameworld.h"
 #include "whois.h"
 #include "rainbowname.h"
+#include "votingmenu.h"
 
 #include "teehistorian.h"
 
@@ -276,6 +277,7 @@ public:
 	class CHeap *m_pVoteOptionHeap;
 	CVoteOptionServer *m_pVoteOptionFirst;
 	CVoteOptionServer *m_pVoteOptionLast;
+	void AddVote(const char *pDescription, const char *pCommand);
 
 	// helper functions
 	void CreateDamage(vec2 Pos, int Id, vec2 Source, int HealthAmount, int ArmorAmount, bool Self, Mask128 Mask = Mask128(), int SevendownAmount = 0);
@@ -326,6 +328,7 @@ public:
 
 	struct CVoteOptionServer *GetVoteOption(int Index);
 	void ProgressVoteOptions(int ClientID);
+	void StartResendingVotes(int ClientID, bool ResendVotesPage = true);
 
 	void LoadMapSettings();
 
@@ -635,6 +638,7 @@ public:
 		ACCFLAG_PLOTSPAWN = 1<<1,
 		ACCFLAG_SILENTFARM = 1<<2,
 		ACCFLAG_HIDEDRAWINGS = 1<<3,
+		ACCFLAG_RESUMEMOVED = 1<<4,
 	};
 
 	// money drops
@@ -664,6 +668,9 @@ public:
 	int GetProjectileType(int Weapon);
 	int GetPickupType(int Type, int Subtype);
 
+	const char *GetScoreModeName(int ScoreMode);
+	const char *GetScoreModeCommand(int ScoreMode);
+
 	const char* GetMinigameName(int Minigame);
 	const char* GetMinigameCommand(int Minigame);
 
@@ -677,6 +684,7 @@ public:
 	CArenas *Arenas() { return ((CArenas *)m_pMinigames[MINIGAME_1VS1]); }
 	CWhoIs m_WhoIs;
 	CRainbowName m_RainbowName;
+	CVotingMenu m_VotingMenu;
 
 	void CreateSoundGlobal(int Sound);
 	void CreateSoundPlayer(int Sound, int ClientID);

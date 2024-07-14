@@ -235,6 +235,7 @@ void CPlayer::Reset()
 	m_VoteQuestionEndTick = 0;
 	m_LastRedirectTryTick = 0;
 	m_LastMoneyPay = 0;
+	m_DoSeeOthersByVote = false;
 }
 
 void CPlayer::Tick()
@@ -846,7 +847,8 @@ void CPlayer::FakeSnap()
 	StrToInts(&pClientInfo[8], 6, "default");
 
 	// flags
-	if (!GameServer()->FlagsUsed())
+	// Don't send flags when 0.6 client is in menu, so they don't show up in friends tab or voting menu
+	if (!GameServer()->FlagsUsed() || (m_PlayerFlags&PLAYERFLAG_IN_MENU))
 		return;
 
 	for (int i = 0; i < 2; i++)
@@ -971,6 +973,8 @@ void CPlayer::OnDisconnect()
 	CGameControllerDDRace* Controller = (CGameControllerDDRace*)GameServer()->m_pController;
 	Controller->m_Teams.SetForceCharacterTeam(m_ClientID, 0);
 
+	GameServer()->m_VotingMenu.Reset(m_ClientID);
+
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
 		if (m_Team != TEAM_SPECTATORS)
@@ -1013,6 +1017,7 @@ void CPlayer::TranslatePlayerFlags(CNetObj_PlayerInput *NewInput)
 		return;
 
 	int PlayerFlags = 0;
+	if (NewInput->m_PlayerFlags&2) PlayerFlags |= PLAYERFLAG_IN_MENU;
 	if (NewInput->m_PlayerFlags&4) PlayerFlags |= PLAYERFLAG_CHATTING;
 	if (NewInput->m_PlayerFlags&8) PlayerFlags |= PLAYERFLAG_SCOREBOARD;
 	if (NewInput->m_PlayerFlags&16) PlayerFlags |= PLAYERFLAG_AIM;
@@ -1968,11 +1973,15 @@ void CPlayer::OnLogin(bool ForceDesignLoad)
 		m_SilentFarm = true;
 	if (pAccount->m_Flags&CGameContext::ACCFLAG_HIDEDRAWINGS)
 		m_HideDrawings = true;
+	if (pAccount->m_Flags&CGameContext::ACCFLAG_RESUMEMOVED)
+		m_ResumeMoved = true;
 
 	if (ForceDesignLoad)
 		Server()->ChangeMapDesign(m_ClientID, GameServer()->GetCurrentDesignFromList(AccID));
 	else
 		StartVoteQuestion(CPlayer::VOTE_QUESTION_DESIGN);
+
+	GameServer()->StartResendingVotes(m_ClientID, false);
 }
 
 void CPlayer::OnLogout()
@@ -2011,11 +2020,15 @@ void CPlayer::OnLogout()
 		pAccount->m_Flags |= CGameContext::ACCFLAG_SILENTFARM;
 	if (m_HideDrawings)
 		pAccount->m_Flags |= CGameContext::ACCFLAG_HIDEDRAWINGS;
+	if (m_ResumeMoved)
+		pAccount->m_Flags |= CGameContext::ACCFLAG_RESUMEMOVED;
 
 	GameServer()->UpdateDesignList(AccID, Server()->GetMapDesign(m_ClientID));
 
 	if (m_VoteQuestionType == CPlayer::VOTE_QUESTION_DESIGN)
 		OnEndVoteQuestion();
+
+	GameServer()->StartResendingVotes(m_ClientID, false);
 }
 
 void CPlayer::StartVoteQuestion(VoteQuestionType Type)
@@ -2503,4 +2516,146 @@ bool CPlayer::ShowDDraceHud()
 	if ((m_Team == TEAM_SPECTATORS || m_Paused) && m_SpectatorID >= 0 && GameServer()->m_apPlayers[m_SpectatorID])
 		pPlayer = GameServer()->m_apPlayers[m_SpectatorID];
 	return !pPlayer->IsMinigame() || pPlayer->m_Minigame == MINIGAME_BLOCK || pPlayer->m_Minigame == MINIGAME_1VS1;
+}
+
+void CPlayer::SetSilentFarm(bool Set)
+{
+	if (m_SilentFarm == Set)
+		return;
+	m_SilentFarm = Set;
+	if (Set)
+		GameServer()->SendChatTarget(m_ClientID, "You will not receive sounds from the server while farming on a moneytile");
+	else
+		GameServer()->SendChatTarget(m_ClientID, "You will receive all sounds again");
+}
+
+void CPlayer::SetHideDrawings(bool Set)
+{
+	if (m_HideDrawings == Set)
+		return;
+	m_HideDrawings = Set;
+	if (Set)
+		GameServer()->SendChatTarget(m_ClientID, "You will no longer see drawings");
+	else
+		GameServer()->SendChatTarget(m_ClientID, "You will now see drawings again");
+}
+
+void CPlayer::SetWeaponIndicator(bool Set)
+{
+	if (m_WeaponIndicator == Set)
+		return;
+	m_WeaponIndicator = Set;
+	if (Set)
+		GameServer()->SendChatTarget(m_ClientID, "Weapon indicator enabled");
+	else
+		GameServer()->SendChatTarget(m_ClientID, "Weapon indicator disabled");
+}
+
+void CPlayer::SetZoomCursor(bool Set)
+{
+	if (m_ZoomCursor == Set)
+		return;
+	m_ZoomCursor = Set;
+	if (Set)
+		GameServer()->SendChatTarget(m_ClientID, "Your cursor will now zoom. WARNING: Does not work with dynamic camera if deadzone or follow factor are non-default.");
+	else
+		GameServer()->SendChatTarget(m_ClientID, "You cursor will no longer be zoomed");
+}
+
+void CPlayer::SetNinjaJetpack(bool Set)
+{
+	if (!GameServer()->m_Accounts[GetAccID()].m_Ninjajetpack)
+	{
+		GameServer()->SendChatTarget(m_ClientID, "You don't have ninjajetpack, buy it in the shop");
+		return;
+	}
+	m_NinjaJetpack = Set;
+	if (Set)
+		GameServer()->SendChatTarget(m_ClientID, "Ninjajetpack enabled");
+	else
+		GameServer()->SendChatTarget(m_ClientID, "Ninjajetpack disabled");
+}
+
+void CPlayer::SetPlotSpawn(bool Set)
+{
+	if (m_PlotSpawn == Set)
+		return;
+	m_PlotSpawn = Set;
+	if (Set)
+		GameServer()->SendChatTarget(m_ClientID, "You will now respawn at your plot (TAB+kill to join at normal spawn)");
+	else
+		GameServer()->SendChatTarget(m_ClientID, "You will no longer respawn at your plot (TAB+kill to join at plot spawn)");
+}
+
+void CPlayer::SetResumeMoved(bool Set)
+{
+	if (m_ResumeMoved == Set)
+		return;
+	m_ResumeMoved = Set;
+	if (Set)
+		GameServer()->SendChatTarget(m_ClientID, "You will now resume from pause if your tee gets moved");
+	else
+		GameServer()->SendChatTarget(m_ClientID, "You will no longer resume from pause if your tee gets moved");
+}
+
+void CPlayer::ClearPlot()
+{
+	int PlotID = GameServer()->GetPlotID(GetAccID());
+	if (PlotID < PLOT_START)
+	{
+		GameServer()->SendChatTarget(m_ClientID, "You need a plot to use this command");
+		return;
+	}
+	GameServer()->ClearPlot(PlotID);
+	GameServer()->SendChatTarget(m_ClientID, "All objects of your plot have been removed");
+}
+
+void CPlayer::StartPlotEdit()
+{
+	CCharacter *pChr = GetCharacter();
+	int PlotID = GameServer()->GetPlotID(GetAccID());
+	if (PlotID < PLOT_START)
+	{
+		GameServer()->SendChatTarget(m_ClientID, "You need a plot to use this command");
+		return;
+	}
+	if (!pChr)
+	{
+		GameServer()->SendChatTarget(m_ClientID, "You have to be alive to edit your plot");
+		return;
+	}
+	else if (pChr->GetCurrentTilePlotID() != PlotID)
+	{
+		GameServer()->SendChatTarget(m_ClientID, "You have to be inside your plot to edit your plot");
+		return;
+	}
+	else if (GameServer()->PlotCanBeRaided(PlotID))
+	{
+		GameServer()->SendChatTarget(m_ClientID, "You can't edit your plot while living the life of a gangster.");
+		return;
+	}
+
+	if (GameServer()->Arenas()->FightStarted(m_ClientID))
+		return;
+
+	GameServer()->SendChatTarget(m_ClientID, "You are now editing your plot, switch to another weapon to exit the editor");
+	pChr->UnsetSpookyGhost();
+	pChr->GiveWeapon(WEAPON_DRAW_EDITOR);
+	pChr->SetActiveWeapon(WEAPON_DRAW_EDITOR);
+	pChr->Core()->m_Vel = vec2(0, 0);
+}
+
+void CPlayer::ChangeScoreMode(int ScoreMode)
+{
+	if (m_ScoreMode == ScoreMode)
+		return;
+
+	m_ScoreMode = ScoreMode;
+
+	char aBuf[128];
+	str_format(aBuf, sizeof(aBuf), "Changed displayed score to '%s'", GameServer()->GetScoreModeName(ScoreMode));
+	GameServer()->SendChatTarget(m_ClientID, aBuf);
+
+	// Update the gameinfo, add or remove GAMEFLAG_RACE as wanted (time score needs it, the others dont)
+	GameServer()->m_pController->UpdateGameInfo(m_ClientID);
 }

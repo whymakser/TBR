@@ -332,6 +332,7 @@ public:
 	bool ChangeMapDesign(int ClientID, const char *pName) override;
 	void SendMapDesign(int ClientID, int Design);
 	const char *GetMapDesign(int ClientID) override;
+	const char *GetMapDesignName(int Design) override;
 
 	// map https url
 	const char *GetHttpsMapURL(int Design = -1);

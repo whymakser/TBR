@@ -4503,7 +4503,11 @@ void CServer::SendMapDesign(int ClientID, int Design)
 
 const char *CServer::GetMapDesign(int ClientID)
 {
-	int Design = m_aClients[ClientID].m_CurrentMapDesign;
+	return GetMapDesignName(m_aClients[ClientID].m_CurrentMapDesign);
+}
+
+const char *CServer::GetMapDesignName(int Design)
+{
 	if (Design == -1)
 		return "default";
 	return m_aMapDesign[Design].m_aName;

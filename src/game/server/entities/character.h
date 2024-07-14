@@ -185,6 +185,19 @@ public:
 	void Confetti(bool Set = true, int FromID = -1, bool Silent = false);
 	void SetJumps(int NewJumps, bool Silent = false);
 
+	// vip classic
+	void OnRainbowVIP();
+	void OnBloodyVIP();
+	void OnAtomVIP();
+	void OnTrailVIP();
+	void OnSpreadGunVIP();
+	// vip plus
+	void OnRainbowHookVIP();
+	void OnRotatingBallVIP();
+	void OnEpicCircleVIP();
+	void OnLovelyVIP();
+	void OnRainbowNameVIP();
+
 private:
 	// player controlling this character
 	class CPlayer *m_pPlayer;
