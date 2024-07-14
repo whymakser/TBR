@@ -191,36 +191,13 @@ bool CVotingMenu::OnMessage(int ClientID, CNetMsg_Cl_CallVote *pMsg)
 	const char *pDesc = 0;
 	for (int i = 0; i < NUM_PAGE_MAX_OPTIONS; i++)
 	{
-		const char* pFullDesc = m_aPages[GetPage(ClientID)].m_aaTempDesc[i];
+		const char *pFullDesc = str_skip_voting_menu_prefixes(m_aPages[GetPage(ClientID)].m_aaTempDesc[i]);
 		if (!pFullDesc || !pFullDesc[0])
 			continue;
 
-		if (str_comp(pFullDesc, pMsg->m_Value) == 0)
+		if (str_comp(pFullDesc, str_skip_voting_menu_prefixes(pMsg->m_Value)) == 0)
 		{
-			const char *pPrefixes[] = { "•", "☒", "☐", "│", "╭", "─", ">", "⇨" };
-			const char *pTemp = pFullDesc;
-			while (1)
-			{
-				bool Break = true;
-				for (unsigned int p = 0; p < sizeof(pPrefixes)/sizeof(pPrefixes[0]); p++)
-				{
-					const char *pPrefix = str_utf8_find_nocase(pTemp, pPrefixes[p]);
-					if (pPrefix)
-					{
-						int NewCursor = str_utf8_forward(pPrefix, 0);
-						if (NewCursor != 0)
-						{
-							pTemp = pPrefix + NewCursor;
-							Break = false;
-							break;
-						}
-					}
-				}
-
-				if (Break)
-					break;
-			}
-			pDesc = str_skip_whitespaces_const(pTemp);
+			pDesc = pFullDesc;
 			break;
 		}
 	}
@@ -647,7 +624,6 @@ void CVotingMenu::Tick()
 		// Design doesn't have to be checked, because on design loading finish it will resend the votes anyways so it will be up to date
 		if (mem_comp(&Stats, &m_aClients[i].m_PrevStats, sizeof(Stats)) != 0)
 		{
-			dbg_msg("hi", "updating auto!");
 			SendPageVotes(i);
 			m_aClients[i].m_PrevStats = Stats;
 		}

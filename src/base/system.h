@@ -2100,6 +2100,7 @@ int str_utf8_check(const char *str);
 		- The strings are treated as zero-terminated strings.
 */
 int str_check_special_chars(const char *pStr);
+const char *str_skip_voting_menu_prefixes(const char *pStr);
 
 /*
 	Function: str_utf8_copy_num
