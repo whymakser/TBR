@@ -104,6 +104,7 @@ class CVotingMenu
 	void DoLineText(int Page, int *pNumOptions, const char *pDescription, int BulletPoint = BULLET_NONE);
 	void DoLineTextSubheader(int Page, int *pNumOptions, const char *pDescription);
 	bool DoLineCollapse(int Page, int *pNumOptions, const char *pDescription, bool ShowContent, int NumEntries);
+	int m_NumCollapseEntries;
 
 public:
 	CVotingMenu()

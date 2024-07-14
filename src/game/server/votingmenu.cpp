@@ -47,6 +47,7 @@ void CVotingMenu::Init(CGameContext *pGameServer)
 {
 	m_pGameServer = pGameServer;
 
+	m_NumCollapseEntries = 0;
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
 		Reset(i);
@@ -397,6 +398,7 @@ int CVotingMenu::PrepareTempDescriptions(int ClientID)
 	if (!GameServer()->m_apPlayers[ClientID])
 		return 0;
 
+	m_NumCollapseEntries = 0;
 	int NumOptions = 0;
 
 	if (m_aClients[ClientID].m_Page == PAGE_ACCOUNT)
@@ -477,6 +479,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 		DoLineSeperator(Page, pNumOptions);
 	}
 
+	int PlotID = GameServer()->GetPlotID(AccID);
 	if (DoLineCollapse(Page, pNumOptions, COLLAPSE_HEADER_ACC_STATS, m_aClients[ClientID].m_ShowAccountStats, 12))
 	{
 		str_format(aBuf, sizeof(aBuf), "Level [%d]", pAccount->m_Level);
@@ -504,11 +507,14 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 		str_format(aBuf, sizeof(aBuf), "Deaths: %d", pAccount->m_Deaths);
 		DoLineText(Page, pNumOptions, aBuf);
 
-		// This does not count to NumEntries anymore, s_NumCollapseEntries is 0 by now again. We wanna add a seperator only if this thing is opened
-		DoLineSeperator(Page, pNumOptions);
+		// only when we have the next category below
+		if (PlotID >= PLOT_START)
+		{
+			// This does not count to NumEntries anymore, s_NumCollapseEntries is 0 by now again. We wanna add a seperator only if this thing is opened
+			DoLineSeperator(Page, pNumOptions);
+		}
 	}
 
-	int PlotID = GameServer()->GetPlotID(AccID);
 	if (PlotID >= PLOT_START)
 	{
 		char aPlotHeader[32];
@@ -749,8 +755,6 @@ void CVotingMenu::SendPageVotes(int ClientID, bool ResendVotesPage)
 	Server()->SendPackMsg(&EndMsg, MSGFLAG_VITAL, ClientID);
 }
 
-static int s_NumCollapseEntries = 0;
-
 #define ADDLINE_IMPL(desc, prefix, collapseHeader) do \
 { \
 	if (!pNumOptions || *pNumOptions >= NUM_PAGE_MAX_OPTIONS) \
@@ -765,10 +769,10 @@ static int s_NumCollapseEntries = 0;
 		str_copy(aLine, (desc), sizeof(aLine)); \
 	} \
 	bool AddCollapseFooter = false; \
-	if (s_NumCollapseEntries > 0 && !(collapseHeader)) \
+	if (m_NumCollapseEntries > 0 && !(collapseHeader)) \
 	{ \
-		s_NumCollapseEntries--; \
-		if (s_NumCollapseEntries == 0) \
+		m_NumCollapseEntries--; \
+		if (m_NumCollapseEntries == 0) \
 		{ \
 			AddCollapseFooter = true; \
 		} \
@@ -827,7 +831,7 @@ bool CVotingMenu::DoLineCollapse(int Page, int *pNumOptions, const char *pDescri
 	if (ShowContent)
 	{
 		// Add one for the bottom line
-		s_NumCollapseEntries = NumEntries;
+		m_NumCollapseEntries = NumEntries;
 		str_format(aBuf, sizeof(aBuf), "╭─           %s     [‒]", pDescription);
 	}
 	else
