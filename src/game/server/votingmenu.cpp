@@ -73,11 +73,13 @@ void CVotingMenu::Reset(int ClientID)
 {
 	m_aClients[ClientID].m_Page = PAGE_VOTES;
 	m_aClients[ClientID].m_LastVoteMsg = 0;
+	m_aClients[ClientID].m_LastVotesSend = 0;
 	m_aClients[ClientID].m_ShowAccountInfo = false;
 	m_aClients[ClientID].m_ShowPlotInfo = false;
 	m_aClients[ClientID].m_ShowAccountStats = false;
 	m_aClients[ClientID].m_PrevStats.m_Flags = 0;
 	m_aClients[ClientID].m_PrevStats.m_Minigame = MINIGAME_NONE;
+	m_aClients[ClientID].m_PrevStats.m_ScoreMode = GameServer()->Config()->m_SvDefaultScoreMode;
 }
 
 void CVotingMenu::AddPlaceholderVotes()
@@ -91,13 +93,13 @@ void CVotingMenu::AddPlaceholderVotes()
 const char *CVotingMenu::GetPageDescription(int ClientID, int Page)
 {
 	static char aBuf[64];
-	str_format(aBuf, sizeof(aBuf), "%s %s", Page == m_aClients[ClientID].m_Page ? "☒" : "☐", m_aPages[Page].m_aName);
+	str_format(aBuf, sizeof(aBuf), "%s %s", Page == GetPage(ClientID) ? "☒" : "☐", m_aPages[Page].m_aName);
 	return aBuf;
 }
 
 bool CVotingMenu::SetPage(int ClientID, int Page)
 {
-	if (Page < 0 || Page >= NUM_PAGES || Page == m_aClients[ClientID].m_Page)
+	if (Page < 0 || Page >= NUM_PAGES || Page == GetPage(ClientID))
 		return false;
 
 	m_aClients[ClientID].m_Page = Page;
@@ -120,7 +122,7 @@ bool CVotingMenu::SetPage(int ClientID, int Page)
 void CVotingMenu::OnProgressVoteOptions(int ClientID, CMsgPacker *pPacker, int *pCurIndex, CVoteOptionServer **ppCurrent)
 {
 	// Just started sending votes, add the pages
-	bool IsPageVotes = m_aClients[ClientID].m_Page == PAGE_VOTES;
+	bool IsPageVotes = GetPage(ClientID) == PAGE_VOTES;
 	int Index = IsPageVotes ? GameServer()->m_apPlayers[ClientID]->m_SendVoteIndex : 0;
 	if (IsPageVotes && (Index < 0 || Index >= NUM_OPTION_START_OFFSET))
 		return;
@@ -175,7 +177,7 @@ bool CVotingMenu::OnMessage(int ClientID, CNetMsg_Cl_CallVote *pMsg)
 		SetPage(ClientID, WantedPage);
 		return true;
 	}
-	if (m_aClients[ClientID].m_Page == PAGE_VOTES)
+	if (GetPage(ClientID) == PAGE_VOTES)
 	{
 		// placeholder
 		if (!pMsg->m_Value[0])
@@ -189,7 +191,7 @@ bool CVotingMenu::OnMessage(int ClientID, CNetMsg_Cl_CallVote *pMsg)
 	const char *pDesc = 0;
 	for (int i = 0; i < NUM_PAGE_MAX_OPTIONS; i++)
 	{
-		const char* pFullDesc = m_aPages[m_aClients[ClientID].m_Page].m_aaTempDesc[i];
+		const char* pFullDesc = m_aPages[GetPage(ClientID)].m_aaTempDesc[i];
 		if (!pFullDesc || !pFullDesc[0])
 			continue;
 
@@ -228,137 +230,140 @@ bool CVotingMenu::OnMessage(int ClientID, CNetMsg_Cl_CallVote *pMsg)
 		return true;
 
 	// Process voting option
-	OnMessageSuccess(ClientID, pDesc);
+	if (OnMessageSuccess(ClientID, pDesc))
+	{
+		SendPageVotes(ClientID);
+	}
 	return true;
 }
 
-void CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc)
+bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc)
 {
 	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 	CCharacter *pChr = pPlayer->GetCharacter();
 
-	if (m_aClients[ClientID].m_Page == PAGE_ACCOUNT)
+	if (GetPage(ClientID) == PAGE_ACCOUNT)
 	{
 		// Acc info
 		if (IsCollapseHeader(pDesc, COLLAPSE_HEADER_ACC_INFO))
 		{
 			m_aClients[ClientID].m_ShowAccountInfo = !m_aClients[ClientID].m_ShowAccountInfo;
-			return;
+			return true;
 		}
 		if (IsCollapseHeader(pDesc, COLLAPSE_HEADER_ACC_STATS))
 		{
 			m_aClients[ClientID].m_ShowAccountStats = !m_aClients[ClientID].m_ShowAccountStats;
-			return;
+			return true;
 		}
 		if (IsCollapseHeader(pDesc, COLLAPSE_HEADER_PLOT_INFO))
 		{
 			m_aClients[ClientID].m_ShowPlotInfo = !m_aClients[ClientID].m_ShowPlotInfo;
-			return;
+			return true;
 		}
 
 		// Acc Misc
 		if (IsOption(pDesc, ACC_MISC_SILENTFARM))
 		{
 			pPlayer->SetSilentFarm(!pPlayer->m_SilentFarm);
-			return;
+			return true;
 		}
 		if (IsOption(pDesc, ACC_MISC_NINJAJETPACK))
 		{
 			pPlayer->SetNinjaJetpack(!pPlayer->m_NinjaJetpack);
-			return;
+			return true;
 		}
 
 		// Plot
 		if (IsOption(pDesc, ACC_PLOT_SPAWN))
 		{
 			pPlayer->SetPlotSpawn(!pPlayer->m_PlotSpawn);
-			return;
+			return true;
 		}
 		if (IsOption(pDesc, ACC_PLOT_EDIT))
 		{
 			pPlayer->StartPlotEdit();
-			return;
+			return true;
 		}
 		if (IsOption(pDesc, ACC_PLOT_CLEAR))
 		{
 			pPlayer->ClearPlot();
-			return;
+			return true;
 		}
 
 		// VIP
 		if (IsOption(pDesc, ACC_VIP_RAINBOW))
 		{
 			if (pChr) pChr->OnRainbowVIP();
-			return;
+			return true;
 		}
 		else if (IsOption(pDesc, ACC_VIP_BLOODY))
 		{
 			if (pChr) pChr->OnBloodyVIP();
-			return;
+			return true;
 		}
 		else if (IsOption(pDesc, ACC_VIP_ATOM))
 		{
 			if (pChr) pChr->OnAtomVIP();
-			return;
+			return true;
 		}
 		else if (IsOption(pDesc, ACC_VIP_TRAIL))
 		{
 			if (pChr) pChr->OnTrailVIP();
-			return;
+			return true;
 		}
 		else if (IsOption(pDesc, ACC_VIP_SPREADGUN))
 		{
 			if (pChr) pChr->OnSpreadGunVIP();
-			return;
+			return true;
 		}
 		// VIP Plus
 		else if (IsOption(pDesc, ACC_VIP_PLUS_RAINBOWHOOK))
 		{
 			if (pChr) pChr->OnRainbowHookVIP();
-			return;
+			return true;
 		}
 		else if (IsOption(pDesc, ACC_VIP_PLUS_ROTATINGBALL))
 		{
 			if (pChr) pChr->OnRotatingBallVIP();
-			return;
+			return true;
 		}
 		else if (IsOption(pDesc, ACC_VIP_PLUS_EPICCIRCLE))
 		{
 			if (pChr) pChr->OnEpicCircleVIP();
-			return;
+			return true;
 		}
 		else if (IsOption(pDesc, ACC_VIP_PLUS_LOVELY))
 		{
 			if (pChr) pChr->OnLovelyVIP();
-			return;
+			return true;
 		}
 		else if (IsOption(pDesc, ACC_VIP_PLUS_RAINBOWNAME))
 		{
 			if (pChr) pChr->OnRainbowNameVIP();
-			return;
+			return true;
 		}
 	}
-	else if (m_aClients[ClientID].m_Page == PAGE_MISCELLANEOUS)
+	else if (GetPage(ClientID) == PAGE_MISCELLANEOUS)
 	{
 		if (IsOption(pDesc, MISC_HIDEDRAWINGS))
 		{
 			pPlayer->SetHideDrawings(!pPlayer->m_HideDrawings);
-			return;
+			return true;
 		}
 		else if (IsOption(pDesc, MISC_WEAPONINDICATOR))
 		{
 			pPlayer->SetWeaponIndicator(!pPlayer->m_WeaponIndicator);
-			return;
+			return true;
 		}
 		else if (IsOption(pDesc, MISC_ZOOMCURSOR))
 		{
 			pPlayer->SetZoomCursor(!pPlayer->m_ZoomCursor);
-			return;
+			return true;
 		}
 		else if (IsOption(pDesc, MISC_RESUMEMOVED))
 		{
 			pPlayer->SetResumeMoved(!pPlayer->m_ResumeMoved);
-			return;
+			return true;
 		}
 		else
 		{
@@ -368,7 +373,7 @@ void CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc)
 				if (!pDesign[0] || str_comp(pDesc, pDesign) != 0)
 					continue;
 				Server()->ChangeMapDesign(ClientID, pDesign);
-				return;
+				return true;
 			}
 
 			for (int i = -1; i < NUM_MINIGAMES; i++)
@@ -377,7 +382,7 @@ void CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc)
 				if (str_comp(pDesc, pMinigame) != 0)
 					continue;
 				GameServer()->SetMinigame(ClientID, i);
-				return;
+				return true;
 			}
 
 			for (int i = 0; i < NUM_SCORE_MODES; i++)
@@ -387,10 +392,12 @@ void CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc)
 				if (str_comp(pDesc, GameServer()->GetScoreModeName(i)) != 0)
 					continue;
 				pPlayer->ChangeScoreMode(i);
-				return;
+				return true;
 			}
 		}
 	}
+
+	return false;
 }
 
 int CVotingMenu::PrepareTempDescriptions(int ClientID)
@@ -401,11 +408,11 @@ int CVotingMenu::PrepareTempDescriptions(int ClientID)
 	m_NumCollapseEntries = 0;
 	int NumOptions = 0;
 
-	if (m_aClients[ClientID].m_Page == PAGE_ACCOUNT)
+	if (GetPage(ClientID) == PAGE_ACCOUNT)
 	{
 		DoPageAccount(ClientID, &NumOptions);
 	}
-	else if (m_aClients[ClientID].m_Page == PAGE_MISCELLANEOUS)
+	else if (GetPage(ClientID) == PAGE_MISCELLANEOUS)
 	{
 		DoPageMiscellaneous(ClientID, &NumOptions);
 	}
@@ -417,7 +424,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 {
 	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 	CCharacter *pChr = pPlayer->GetCharacter();
-	int Page = m_aClients[ClientID].m_Page;
+	int Page = GetPage(ClientID);
 
 	char aBuf[128];
 	time_t tmp;
@@ -563,7 +570,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 {
 	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
-	int Page = m_aClients[ClientID].m_Page;
+	int Page = GetPage(ClientID);
 
 	DoLineTextSubheader(Page, pNumOptions, "Oᴘᴛɪᴏɴs");
 	DoLineToggleOption(Page, pNumOptions, MISC_HIDEDRAWINGS, pPlayer->m_HideDrawings);
@@ -619,75 +626,110 @@ void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 
 void CVotingMenu::Tick()
 {
+	// Check once per second if we have to auto update
+	if (Server()->Tick() % Server()->TickSpeed() != 0)
+		return;
+
+	CVotingMenu::SClientVoteInfo::SPrevStats Stats;
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
 		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
 		if (!pPlayer)
 			continue;
+		if (m_aClients[i].m_LastVotesSend + Server()->TickSpeed() * 3 > Server()->Tick())
+			continue;
 
-		CCharacter *pChr = pPlayer->GetCharacter();
-		SClientVoteInfo::SPrevStats PrevStats = m_aClients[i].m_PrevStats;
-		SClientVoteInfo::SPrevStats *pStats = &m_aClients[i].m_PrevStats;
-
-		// Update previous stats for next tick
-		int Flags = 0;
-		// Misc
-		if (pPlayer->m_HideDrawings)
-			Flags |= PREVFLAG_MISC_HIDEDRAWINGS;
-		if (pPlayer->m_WeaponIndicator)
-			Flags |= PREVFLAG_MISC_WEAPONINDICATOR;
-		if (pPlayer->m_ZoomCursor)
-			Flags |= PREVFLAG_MISC_ZOOMCURSOR;
-		if (pPlayer->m_ResumeMoved)
-			Flags |= PREVFLAG_MISC_RESUMEMOVED;
-		// VIP
-		if ((pChr && pChr->m_Rainbow) || pPlayer->m_InfRainbow)
-			Flags |= PREVFLAG_ACC_VIP_RAINBOW;
-		if (pChr && (pChr->m_Bloody || pChr->m_StrongBloody))
-			Flags |= PREVFLAG_ACC_VIP_BLOODY;
-		if (pChr && pChr->m_Atom)
-			Flags |= PREVFLAG_ACC_VIP_ATOM;
-		if (pChr && pChr->m_Trail)
-			Flags |= PREVFLAG_ACC_VIP_TRAIL;
-		if (pChr && pChr->m_aSpreadWeapon[WEAPON_GUN])
-			Flags |= PREVFLAG_ACC_VIP_SPREADGUN;
-		// VIP Plus
-		if (pChr && pChr->m_HookPower == RAINBOW)
-			Flags |= PREVFLAG_ACC_VIP_PLUS_RAINBOWHOOK;
-		if (pChr && pChr->m_RotatingBall)
-			Flags |= PREVFLAG_ACC_VIP_PLUS_ROTATINGBALL;
-		if (pChr && pChr->m_EpicCircle)
-			Flags |= PREVFLAG_ACC_VIP_PLUS_EPICCIRCLE;
-		if (pChr && pChr->m_Lovely)
-			Flags |= PREVFLAG_ACC_VIP_PLUS_LOVELY;
-		if (pPlayer->m_RainbowName)
-			Flags |= PREVFLAG_ACC_VIP_PLUS_RAINBOWNAME;
-		// Acc info
-		if (m_aClients[i].m_ShowAccountInfo)
-			Flags |= PREVFLAG_SHOW_ACC_INFO;
-		if (m_aClients[i].m_ShowAccountStats)
-			Flags |= PREVFLAG_SHOW_ACC_STATS;
-		if (m_aClients[i].m_ShowPlotInfo)
-			Flags |= PREVFLAG_SHOW_PLOT_INFO;
-		// Acc Misc
-		if (pPlayer->m_SilentFarm)
-			Flags |= PREVFLAG_ACC_MISC_SILENTFARM;
-		if (pPlayer->m_NinjaJetpack)
-			Flags |= PREVFLAG_ACC_NINJAJETPACK;
-		// Plot
-		if (pPlayer->m_PlotSpawn)
-			Flags |= PREVFLAG_PLOT_SPAWN;
-
-		pStats->m_Flags = Flags;
-		pStats->m_Minigame = pPlayer->m_Minigame;
-		pStats->m_ScoreMode = pPlayer->m_ScoreMode;
+		// 0.7 doesnt have playerflag_in_menu anymore, so we update them automatically every 3s if something changed, even when not in menu /shrug
+		bool Update = (pPlayer->m_PlayerFlags&PLAYERFLAG_IN_MENU) || !Server()->IsSevendown(i);
+		if (!Update || m_aClients[i].m_Page == PAGE_VOTES || !FillStats(i, &Stats))
+			continue;
 
 		// Design doesn't have to be checked, because on design loading finish it will resend the votes anyways so it will be up to date
-		if (mem_comp(pStats, &PrevStats, sizeof(PrevStats)) != 0)
+		if (mem_comp(&Stats, &m_aClients[i].m_PrevStats, sizeof(Stats)) != 0)
 		{
+			dbg_msg("hi", "updating auto!");
 			SendPageVotes(i);
+			m_aClients[i].m_PrevStats = Stats;
 		}
 	}
+}
+
+bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevStats *pStats)
+{
+	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
+	CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
+	if (!pPlayer || !pChr || !pStats)
+		return false;
+
+	int Flags = 0;
+
+	// Misc
+	if (pPlayer->m_HideDrawings)
+		Flags |= PREVFLAG_MISC_HIDEDRAWINGS;
+	if (pPlayer->m_WeaponIndicator)
+		Flags |= PREVFLAG_MISC_WEAPONINDICATOR;
+	if (pPlayer->m_ZoomCursor)
+		Flags |= PREVFLAG_MISC_ZOOMCURSOR;
+	if (pPlayer->m_ResumeMoved)
+		Flags |= PREVFLAG_MISC_RESUMEMOVED;
+	// VIP
+	if ((pChr && pChr->m_Rainbow) || pPlayer->m_InfRainbow)
+		Flags |= PREVFLAG_ACC_VIP_RAINBOW;
+	if (pChr && (pChr->m_Bloody || pChr->m_StrongBloody))
+		Flags |= PREVFLAG_ACC_VIP_BLOODY;
+	if (pChr && pChr->m_Atom)
+		Flags |= PREVFLAG_ACC_VIP_ATOM;
+	if (pChr && pChr->m_Trail)
+		Flags |= PREVFLAG_ACC_VIP_TRAIL;
+	if (pChr && pChr->m_aSpreadWeapon[WEAPON_GUN])
+		Flags |= PREVFLAG_ACC_VIP_SPREADGUN;
+	// VIP Plus
+	if (pChr && pChr->m_HookPower == RAINBOW)
+		Flags |= PREVFLAG_ACC_VIP_PLUS_RAINBOWHOOK;
+	if (pChr && pChr->m_RotatingBall)
+		Flags |= PREVFLAG_ACC_VIP_PLUS_ROTATINGBALL;
+	if (pChr && pChr->m_EpicCircle)
+		Flags |= PREVFLAG_ACC_VIP_PLUS_EPICCIRCLE;
+	if (pChr && pChr->m_Lovely)
+		Flags |= PREVFLAG_ACC_VIP_PLUS_LOVELY;
+	if (pPlayer->m_RainbowName)
+		Flags |= PREVFLAG_ACC_VIP_PLUS_RAINBOWNAME;
+	// Acc info
+	if (m_aClients[ClientID].m_ShowAccountInfo)
+		Flags |= PREVFLAG_SHOW_ACC_INFO;
+	if (m_aClients[ClientID].m_ShowAccountStats)
+		Flags |= PREVFLAG_SHOW_ACC_STATS;
+	if (m_aClients[ClientID].m_ShowPlotInfo)
+		Flags |= PREVFLAG_SHOW_PLOT_INFO;
+	// Acc Misc
+	if (pPlayer->m_SilentFarm)
+		Flags |= PREVFLAG_ACC_MISC_SILENTFARM;
+	if (pPlayer->m_NinjaJetpack)
+		Flags |= PREVFLAG_ACC_NINJAJETPACK;
+	// Plot
+	if (pPlayer->m_PlotSpawn)
+		Flags |= PREVFLAG_PLOT_SPAWN;
+
+	int AccID = pPlayer->GetAccID();
+	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[AccID];
+	CVotingMenu::SClientVoteInfo::SPrevStats Stats;
+	Stats.m_Flags = Flags;
+	Stats.m_Minigame = pPlayer->m_Minigame;
+	Stats.m_ScoreMode = pPlayer->m_ScoreMode;
+	Stats.m_Acc.m_XP = pAccount->m_XP;
+	Stats.m_Acc.m_Money = pAccount->m_Money;
+	Stats.m_Acc.m_WalletMoney = pPlayer->GetWalletMoney();
+	Stats.m_Acc.m_PoliceLevel = pAccount->m_PoliceLevel;
+	Stats.m_Acc.m_TaserBattery = pAccount->m_TaserBattery;
+	Stats.m_Acc.m_PortalBattery = pAccount->m_PortalBattery;
+	Stats.m_Acc.m_Points = pAccount->m_BlockPoints;
+	Stats.m_Acc.m_Kills = pAccount->m_Kills;
+	Stats.m_Acc.m_Deaths = pAccount->m_Deaths;
+	Stats.m_Acc.m_Euros = pAccount->m_Euros;
+	str_copy(Stats.m_Acc.m_aContact, pAccount->m_aContact, sizeof(Stats.m_Acc.m_aContact));
+	// fill
+	*pStats = Stats;
+	return true;
 }
 
 void CVotingMenu::SendPageVotes(int ClientID, bool ResendVotesPage)
@@ -695,7 +737,8 @@ void CVotingMenu::SendPageVotes(int ClientID, bool ResendVotesPage)
 	if (!GameServer()->m_apPlayers[ClientID])
 		return;
 
-	int Page = m_aClients[ClientID].m_Page;
+	m_aClients[ClientID].m_LastVotesSend = Server()->Tick();
+	int Page = GetPage(ClientID);
 	if (Page == PAGE_VOTES)
 	{
 		// No need to resend votes when we login, we only want to update the other pages with new values
@@ -708,6 +751,12 @@ void CVotingMenu::SendPageVotes(int ClientID, bool ResendVotesPage)
 			GameServer()->m_apPlayers[ClientID]->m_SendVoteIndex = 0;
 		}
 		return;
+	}
+
+	CVotingMenu::SClientVoteInfo::SPrevStats Stats;
+	if (FillStats(ClientID, &Stats))
+	{
+		m_aClients[ClientID].m_PrevStats = Stats;
 	}
 
 	CNetMsg_Sv_VoteClearOptions VoteClearOptionsMsg;

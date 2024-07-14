@@ -24,7 +24,7 @@ class CVotingMenu
 		NUM_PAGE_MAX_OPTIONS = 128 - NUM_OPTION_START_OFFSET,
 	};
 
-	enum PrevStats
+	enum
 	{
 		// Misc
 		PREVFLAG_MISC_HIDEDRAWINGS = 1 << 0,
@@ -63,6 +63,7 @@ class CVotingMenu
 	{
 		int m_Page;
 		int64 m_LastVoteMsg;
+		int64 m_LastVotesSend;
 		// Collapses
 		bool m_ShowAccountInfo;
 		bool m_ShowPlotInfo;
@@ -73,8 +74,25 @@ class CVotingMenu
 			int m_Flags;
 			int m_Minigame;
 			int m_ScoreMode;
-		} m_PrevStats;
+			struct
+			{
+				int64 m_XP;
+				int64 m_Money;
+				int64 m_WalletMoney;
+				int m_PoliceLevel;
+				int m_TaserBattery;
+				int m_PortalBattery;
+				int m_Points;
+				int m_Kills;
+				int m_Deaths;
+				int m_Euros;
+				char m_aContact[128];
+			} m_Acc;
+		};
+		SPrevStats m_PrevStats;
 	} m_aClients[MAX_CLIENTS];
+	bool FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevStats *pStats);
+	int GetPage(int ClientID) { return m_aClients[ClientID].m_Page; }
 
 	struct SPageInfo
 	{
@@ -87,7 +105,7 @@ class CVotingMenu
 
 	bool IsCollapseHeader(const char *pDesc, const char *pWantedHeader) { return str_startswith(pDesc, pWantedHeader) != 0; }
 	bool IsOption(const char *pDesc, const char *pWantedOption) { return str_comp(pDesc, pWantedOption) == 0; }
-	void OnMessageSuccess(int ClientID, const char *pDesc);
+	bool OnMessageSuccess(int ClientID, const char *pDesc);
 
 	int PrepareTempDescriptions(int ClientID);
 	void DoPageAccount(int ClientID, int *pNumOptions);
