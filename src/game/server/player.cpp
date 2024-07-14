@@ -2463,6 +2463,7 @@ bool CPlayer::MinigameRequestTick()
 	if (!m_LastMinigameRequest || m_RequestedMinigame == m_Minigame || !GetCharacter())
 		return false;
 
+	bool TeeMoved = GetCharacter()->GetPos() != GetCharacter()->m_PrevPos;
 	if (m_LastMinigameRequest < Server()->Tick() - Server()->TickSpeed() * 5)
 	{
 		GameServer()->SetMinigame(m_ClientID, m_RequestedMinigame);
@@ -2470,9 +2471,12 @@ bool CPlayer::MinigameRequestTick()
 		m_LastMinigameRequest = 0;
 		return true;
 	}
-	else if (GetCharacter()->GetPos() != GetCharacter()->m_PrevPos)
+	else if (TeeMoved || GetCharacter()->m_FreezeTime)
 	{
-		GameServer()->SendChatTarget(m_ClientID, "Your minigame request was cancelled because you moved");
+		if (TeeMoved)
+			GameServer()->SendChatTarget(m_ClientID, "Your minigame request was cancelled because you moved");
+		else
+			GameServer()->SendChatTarget(m_ClientID, "Your minigame request was cancelled because you are frozen");
 		m_RequestedMinigame = MINIGAME_NONE;
 		m_LastMinigameRequest = 0;
 	}
