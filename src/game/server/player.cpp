@@ -2025,6 +2025,8 @@ void CPlayer::OnLogout()
 		pAccount->m_Flags |= CGameContext::ACCFLAG_HIDEDRAWINGS;
 	if (m_ResumeMoved)
 		pAccount->m_Flags |= CGameContext::ACCFLAG_RESUMEMOVED;
+	if (m_HideBroadcasts)
+		pAccount->m_Flags |= CGameContext::ACCFLAG_HIDEBROADCASTS;
 
 	GameServer()->UpdateDesignList(AccID, Server()->GetMapDesign(m_ClientID));
 
