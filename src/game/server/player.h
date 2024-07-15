@@ -277,6 +277,7 @@ public:
 	void ForceSetSpectatorID(int SpectatorID) { m_SpectatorID = SpectatorID; }
 
 	//extras
+	void SetRainbowSpeedVIP(int Value);
 	int m_RainbowSpeed;
 	int m_RainbowColor;
 	void RainbowTick();

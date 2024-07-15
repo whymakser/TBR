@@ -1459,7 +1459,7 @@ void CGameContext::ConVIPInfo(IConsole::IResult* pResult, void* pUserData)
 	pSelf->SendChatTarget(pResult->m_ClientID, "~~~ VIP+ ~~~");
 	pSelf->SendChatTarget(pResult->m_ClientID, "VIP+ includes every feature of VIP Classic.");
 	pSelf->SendChatTarget(pResult->m_ClientID, "Additionally to that you can enter the VIP+ room to farm safely there, aswell as you gain access to the following commands:");
-	pSelf->SendChatTarget(pResult->m_ClientID, "rainbowhook, rotatingball, epiccircle, lovely, rainbowname");
+	pSelf->SendChatTarget(pResult->m_ClientID, "rainbowhook, rotatingball, epiccircle, lovely, rainbowname, rainbowspeed");
 }
 
 void CGameContext::ConSpawnWeaponsInfo(IConsole::IResult* pResult, void* pUserData)
@@ -3061,6 +3061,25 @@ void CGameContext::ConRainbowNameVIP(IConsole::IResult *pResult, void *pUserData
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CCharacter *pChr = pSelf->GetPlayerChar(pResult->m_ClientID);
 	if (pChr) pChr->OnRainbowNameVIP();
+}
+
+void CGameContext::ConRainbowSpeedVIP(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
+	if (!pPlayer)
+		return;
+
+	if (pResult->NumArguments())
+	{
+		pPlayer->SetRainbowSpeedVIP(pResult->GetInteger(0));
+	}
+	else
+	{
+		char aBuf[32];
+		str_format(aBuf, sizeof(aBuf), "Current rainbow speed: %d", pPlayer->m_RainbowSpeed);
+		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+	}
 }
 
 void CGameContext::ConShrug(IConsole::IResult *pResult, void *pUserData)

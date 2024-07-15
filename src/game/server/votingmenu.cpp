@@ -37,6 +37,7 @@ static const char *ACC_VIP_PLUS_ROTATINGBALL = "Rotating Ball";
 static const char *ACC_VIP_PLUS_EPICCIRCLE = "Epic Circle";
 static const char *ACC_VIP_PLUS_LOVELY = "Lovely";
 static const char *ACC_VIP_PLUS_RAINBOWNAME = "Rainbow Name";
+static const char *ACC_VIP_PLUS_RAINBOWSPEED = "Rainbow Speed";
 // Misc
 static const char *MISC_HIDEDRAWINGS = "Hide Drawings";
 static const char *MISC_WEAPONINDICATOR = "Weapon Indicator";
@@ -79,11 +80,6 @@ void CVotingMenu::Reset(int ClientID)
 	m_aClients[ClientID].m_ShowAccountInfo = false;
 	m_aClients[ClientID].m_ShowPlotInfo = false;
 	m_aClients[ClientID].m_ShowAccountStats = false;
-	m_aClients[ClientID].m_PrevStats.m_Flags = 0;
-	m_aClients[ClientID].m_PrevStats.m_Minigame = MINIGAME_NONE;
-	m_aClients[ClientID].m_PrevStats.m_ScoreMode = GameServer()->Config()->m_SvDefaultScoreMode;
-	m_aClients[ClientID].m_PrevStats.m_JailTime = 0;
-	m_aClients[ClientID].m_PrevStats.m_EscapeTime = 0;
 }
 
 void CVotingMenu::AddPlaceholderVotes()
@@ -212,14 +208,14 @@ bool CVotingMenu::OnMessage(int ClientID, CNetMsg_Cl_CallVote *pMsg)
 		return true;
 
 	// Process voting option
-	if (OnMessageSuccess(ClientID, pDesc))
+	if (OnMessageSuccess(ClientID, pDesc, pMsg->m_Reason))
 	{
 		SendPageVotes(ClientID);
 	}
 	return true;
 }
 
-bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc)
+bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc, const char *pReason)
 {
 	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 	CCharacter *pChr = pPlayer->GetCharacter();
@@ -227,17 +223,17 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc)
 	if (GetPage(ClientID) == PAGE_ACCOUNT)
 	{
 		// Acc info
-		if (IsCollapseHeader(pDesc, COLLAPSE_HEADER_ACC_INFO))
+		if (IsOptionWithSuffix(pDesc, COLLAPSE_HEADER_ACC_INFO))
 		{
 			m_aClients[ClientID].m_ShowAccountInfo = !m_aClients[ClientID].m_ShowAccountInfo;
 			return true;
 		}
-		if (IsCollapseHeader(pDesc, COLLAPSE_HEADER_ACC_STATS))
+		if (IsOptionWithSuffix(pDesc, COLLAPSE_HEADER_ACC_STATS))
 		{
 			m_aClients[ClientID].m_ShowAccountStats = !m_aClients[ClientID].m_ShowAccountStats;
 			return true;
 		}
-		if (IsCollapseHeader(pDesc, COLLAPSE_HEADER_PLOT_INFO))
+		if (IsOptionWithSuffix(pDesc, COLLAPSE_HEADER_PLOT_INFO))
 		{
 			m_aClients[ClientID].m_ShowPlotInfo = !m_aClients[ClientID].m_ShowPlotInfo;
 			return true;
@@ -322,6 +318,11 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc)
 		else if (IsOption(pDesc, ACC_VIP_PLUS_RAINBOWNAME))
 		{
 			if (pChr) pChr->OnRainbowNameVIP();
+			return true;
+		}
+		else if (IsOptionWithSuffix(pDesc, ACC_VIP_PLUS_RAINBOWSPEED))
+		{
+			if (pPlayer && pReason[0] && str_is_number(pReason) == 0) pPlayer->SetRainbowSpeedVIP(str_toint(pReason));
 			return true;
 		}
 	}
@@ -581,6 +582,11 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 		DoLineSeperator(Page, pNumOptions);
 		DoLineTextSubheader(Page, pNumOptions, pAccount->m_VIP == VIP_PLUS ? "ᴠɪᴘ+" : "ᴠɪᴘ");
 		DoLineToggleOption(Page, pNumOptions, ACC_VIP_RAINBOW, (pChr && pChr->m_Rainbow) || pPlayer->m_InfRainbow);
+		if (pAccount->m_VIP == VIP_PLUS)
+		{
+			// let's put it here, next to rainbow which is influenced by it, not somewhere close to rainbowname i guess
+			DoLineValueOption(Page, pNumOptions, ACC_VIP_PLUS_RAINBOWSPEED, pPlayer->m_RainbowSpeed, 20, BULLET_POINT);
+		}
 		DoLineToggleOption(Page, pNumOptions, ACC_VIP_BLOODY, pChr && (pChr->m_Bloody || pChr->m_StrongBloody));
 		DoLineToggleOption(Page, pNumOptions, ACC_VIP_ATOM, pChr && pChr->m_Atom);
 		DoLineToggleOption(Page, pNumOptions, ACC_VIP_TRAIL, pChr && pChr->m_Trail);
@@ -745,6 +751,7 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 					Flags |= PREVFLAG_ACC_VIP_PLUS_LOVELY;
 				if (pPlayer->m_RainbowName)
 					Flags |= PREVFLAG_ACC_VIP_PLUS_RAINBOWNAME;
+				pStats->m_RainbowSpeed = pPlayer->m_RainbowSpeed;
 			}
 		}
 		
@@ -951,11 +958,18 @@ void CVotingMenu::DoLineTextSubheader(int Page, int *pNumOptions, const char *pD
 	ADDLINE(aBuf);
 }
 
-void CVotingMenu::DoLineTextValue(int Page, int *pNumOptions, const char *pDescription, int Value)
+void CVotingMenu::DoLineValueOption(int Page, int *pNumOptions, const char *pDescription, int Value, int Max, int BulletPoint)
 {
 	char aBuf[VOTE_DESC_LENGTH];
-	str_format(aBuf, sizeof(aBuf), "%s: %d", pDescription, Value);
-	DoLineText(Page, pNumOptions, aBuf, true);
+	if (Max == -1)
+	{
+		str_format(aBuf, sizeof(aBuf), "%s: %d", pDescription, Value);
+	}
+	else
+	{
+		str_format(aBuf, sizeof(aBuf), "%s: %d/%d", pDescription, Value, Max);
+	}
+	DoLineText(Page, pNumOptions, aBuf, BulletPoint);
 }
 
 void CVotingMenu::DoLineText(int Page, int *pNumOptions, const char *pDescription, int BulletPoint)

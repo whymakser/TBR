@@ -86,6 +86,7 @@ class CVotingMenu
 			int m_ScoreMode = 0;
 			int64 m_JailTime = 0;
 			int64 m_EscapeTime = 0;
+			int m_RainbowSpeed = 0;
 			struct
 			{
 				int64 m_XP = 0;
@@ -115,16 +116,16 @@ class CVotingMenu
 	bool SetPage(int ClientID, int Page);
 	const char *GetPageDescription(int ClientID, int Page);
 
-	bool IsCollapseHeader(const char *pDesc, const char *pWantedHeader) { return str_startswith(pDesc, pWantedHeader) != 0; }
+	bool IsOptionWithSuffix(const char *pDesc, const char *pWantedOption) { return str_startswith(pDesc, pWantedOption) != 0; }
 	bool IsOption(const char *pDesc, const char *pWantedOption) { return str_comp(pDesc, pWantedOption) == 0; }
-	bool OnMessageSuccess(int ClientID, const char *pDesc);
+	bool OnMessageSuccess(int ClientID, const char *pDesc, const char *pReason);
 
 	int PrepareTempDescriptions(int ClientID);
 	void DoPageAccount(int ClientID, int *pNumOptions);
 	void DoPageMiscellaneous(int ClientID, int *pNumOptions);
 	void DoLineToggleOption(int Page, int *pNumOptions, const char *pDescription, bool Value);
-	void DoLineSeperator(int Page, int *pNumOptions);
-	void DoLineTextValue(int Page, int *pNumOptions, const char *pDescription, int Value);
+	void DoLineValueOption(int Page, int *pNumOptions, const char *pDescription, int Value, int Max = -1, int BulletPoint = BULLET_NONE);
+	void DoLineSeperator(int Page, int* pNumOptions);
 	enum
 	{
 		BULLET_NONE,

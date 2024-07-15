@@ -2685,3 +2685,23 @@ void CPlayer::ChangeScoreMode(int ScoreMode)
 	// Update the gameinfo, add or remove GAMEFLAG_RACE as wanted (time score needs it, the others dont)
 	GameServer()->m_pController->UpdateGameInfo(m_ClientID);
 }
+
+void CPlayer::SetRainbowSpeedVIP(int Value)
+{
+	if (GameServer()->m_Accounts[GetAccID()].m_VIP != VIP_PLUS)
+	{
+		GameServer()->SendChatTarget(m_ClientID, "You are not VIP+");
+		return;
+	}
+
+	Value = clamp(Value, 1, 20);
+
+	if (Value == m_RainbowSpeed)
+		return;
+
+	m_RainbowSpeed = Value;
+
+	char aBuf[64];
+	str_format(aBuf, sizeof(aBuf), "Rainbow speed has been updated to %d", Value);
+	GameServer()->SendChatTarget(m_ClientID, aBuf);
+}

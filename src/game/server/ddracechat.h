@@ -123,4 +123,5 @@ CHAT_COMMAND("epiccircle", "", CFGFLAG_CHAT, ConEpicCircleVIP, this, "Toggles ep
 CHAT_COMMAND("lovely", "", CFGFLAG_CHAT, ConLovelyVIP, this, "Toggles lovely for yourself", AUTHED_NO)
 CHAT_COMMAND("rainbowhook", "", CFGFLAG_CHAT, ConRainbowHookVIP, this, "Toggles rainbow hook for yourself", AUTHED_NO)
 CHAT_COMMAND("rainbowname", "", CFGFLAG_CHAT, ConRainbowNameVIP, this, "Toggles rainbow name for yourself", AUTHED_NO)
+CHAT_COMMAND("rainbowspeed", "?i[speed]", CFGFLAG_CHAT, ConRainbowSpeedVIP, this, "Sets rainbow speed for yourself", AUTHED_NO)
 #undef CHAT_COMMAND
