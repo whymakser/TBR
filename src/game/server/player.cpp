@@ -236,6 +236,7 @@ void CPlayer::Reset()
 	m_LastRedirectTryTick = 0;
 	m_LastMoneyPay = 0;
 	m_DoSeeOthersByVote = false;
+	m_HideBroadcasts = false;
 }
 
 void CPlayer::Tick()
@@ -402,7 +403,7 @@ void CPlayer::Tick()
 			GameServer()->SendChatTarget(m_ClientID, "You were released from jail");
 			KillCharacter(WEAPON_GAME);
 		}
-		else if (Server()->Tick() % 50 == 0 && (!m_pCharacter || !m_pCharacter->m_MoneyTile))
+		else if (Server()->Tick() % 50 == 0 && (!m_pCharacter || !m_pCharacter->m_MoneyTile) && !m_HideBroadcasts)
 		{
 			char aBuf[128];
 			str_format(aBuf, sizeof(aBuf), "You are arrested for %lld seconds", m_JailTime / Server()->TickSpeed());
@@ -417,7 +418,7 @@ void CPlayer::Tick()
 		{
 			GameServer()->SendChatTarget(m_ClientID, "Your life as a gangster is over, you are free now");
 		}
-		else if (Server()->Tick() % Server()->TickSpeed() * 60 == 0 && (!m_pCharacter || !m_pCharacter->m_MoneyTile))
+		else if (Server()->Tick() % Server()->TickSpeed() * 60 == 0 && (!m_pCharacter || !m_pCharacter->m_MoneyTile) && !m_HideBroadcasts)
 		{
 			char aBuf[128];
 			str_format(aBuf, sizeof(aBuf), "Avoid policehammers for the next %lld seconds", m_EscapeTime / Server()->TickSpeed());
@@ -1975,6 +1976,8 @@ void CPlayer::OnLogin(bool ForceDesignLoad)
 		m_HideDrawings = true;
 	if (pAccount->m_Flags&CGameContext::ACCFLAG_RESUMEMOVED)
 		m_ResumeMoved = true;
+	if (pAccount->m_Flags&CGameContext::ACCFLAG_HIDEBROADCASTS)
+		m_HideBroadcasts = true;
 
 	if (ForceDesignLoad)
 		Server()->ChangeMapDesign(m_ClientID, GameServer()->GetCurrentDesignFromList(AccID));
@@ -2541,6 +2544,20 @@ void CPlayer::SetHideDrawings(bool Set)
 		GameServer()->SendChatTarget(m_ClientID, "You will no longer see drawings");
 	else
 		GameServer()->SendChatTarget(m_ClientID, "You will now see drawings again");
+}
+
+void CPlayer::SetHideBroadcasts(bool Set)
+{
+	if (m_HideBroadcasts == Set)
+		return;
+	m_HideBroadcasts = Set;
+	if (Set)
+	{
+		GameServer()->SendChatTarget(m_ClientID, "You will no longer see money broadcasts, jail and escape timer will be shown in vote menu instead");
+		GameServer()->SendBroadcast("", m_ClientID);
+	}
+	else
+		GameServer()->SendChatTarget(m_ClientID, "You will now see all broadcasts again");
 }
 
 void CPlayer::SetWeaponIndicator(bool Set)

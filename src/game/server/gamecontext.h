@@ -639,6 +639,7 @@ public:
 		ACCFLAG_SILENTFARM = 1<<2,
 		ACCFLAG_HIDEDRAWINGS = 1<<3,
 		ACCFLAG_RESUMEMOVED = 1<<4,
+		ACCFLAG_HIDEBROADCASTS = 1<<5,
 	};
 
 	// money drops
@@ -940,6 +941,7 @@ private:
 
 	static void ConPlot(IConsole::IResult* pResult, void* pUserData);
 	static void ConHideDrawings(IConsole::IResult* pResult, void* pUserData);
+	static void ConHideBroadcasts(IConsole::IResult* pResult, void* pUserData);
 
 	//rcon
 	static void ConFreezeHammer(IConsole::IResult* pResult, void* pUserData);

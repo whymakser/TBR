@@ -351,6 +351,8 @@ public:
 	bool m_ResumeMoved;
 	bool m_DoSeeOthersByVote;
 
+	bool m_HideBroadcasts;
+
 	bool m_SilentFarm;
 	bool SilentFarmActive();
 
@@ -367,6 +369,7 @@ public:
 	// Voting Menu calls, used when executing the chat command aswell
 	void SetSilentFarm(bool Set);
 	void SetHideDrawings(bool Set);
+	void SetHideBroadcasts(bool Set);
 	void SetWeaponIndicator(bool Set);
 	void SetZoomCursor(bool Set);
 	void SetNinjaJetpack(bool Set);

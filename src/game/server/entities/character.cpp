@@ -2791,7 +2791,7 @@ void CCharacter::HandleTiles(int Index)
 				m_pPlayer->GiveXP(XP);
 
 				// broadcast
-				if (!IsWeaponIndicator())
+				if (!IsWeaponIndicator() && !m_pPlayer->m_HideBroadcasts)
 				{
 					char aMsg[512];
 					char aSurvival[32];
@@ -4187,7 +4187,7 @@ void CCharacter::FDDraceTick()
 
 		m_pPlayer->GiveXP(XP);
 
-		if (!IsWeaponIndicator())
+		if (!IsWeaponIndicator() && !m_pPlayer->m_HideBroadcasts)
 		{
 			char aSurvival[32];
 			char aMsg[128];

@@ -42,6 +42,7 @@ static const char *MISC_HIDEDRAWINGS = "Hide Drawings";
 static const char *MISC_WEAPONINDICATOR = "Weapon Indicator";
 static const char *MISC_ZOOMCURSOR = "Zoom Cursor";
 static const char *MISC_RESUMEMOVED = "Resume Moved";
+static const char *MISC_HIDEBROADCASTS = "Hide Broadcasts";
 
 void CVotingMenu::Init(CGameContext *pGameServer)
 {
@@ -195,7 +196,8 @@ bool CVotingMenu::OnMessage(int ClientID, CNetMsg_Cl_CallVote *pMsg)
 		if (!pFullDesc || !pFullDesc[0])
 			continue;
 
-		if (str_comp(pFullDesc, str_skip_voting_menu_prefixes(pMsg->m_Value)) == 0)
+		const char *pValue = str_skip_voting_menu_prefixes(pMsg->m_Value);
+		if (pValue && pValue[0] && str_comp(pFullDesc, pValue) == 0)
 		{
 			pDesc = pFullDesc;
 			break;
@@ -342,6 +344,11 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc)
 			pPlayer->SetResumeMoved(!pPlayer->m_ResumeMoved);
 			return true;
 		}
+		else if (IsOption(pDesc, MISC_HIDEBROADCASTS))
+		{
+			pPlayer->SetHideBroadcasts(!pPlayer->m_HideBroadcasts);
+			return true;
+		}
 		else
 		{
 			for (int i = -1; i < CServer::NUM_MAP_DESIGNS; i++)
@@ -379,11 +386,35 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc)
 
 int CVotingMenu::PrepareTempDescriptions(int ClientID)
 {
-	if (!GameServer()->m_apPlayers[ClientID])
+	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
+	if (!pPlayer)
 		return 0;
 
 	m_NumCollapseEntries = 0;
 	int NumOptions = 0;
+
+	if (pPlayer->m_HideBroadcasts)
+	{
+		char aBuf[VOTE_DESC_LENGTH];
+		bool DoAnnouncement = false;
+		if (pPlayer->m_JailTime)
+		{
+			DoAnnouncement = true;
+			str_format(aBuf, sizeof(aBuf), "You are arrested for %lld seconds", pPlayer->m_JailTime / Server()->TickSpeed());
+		}
+		else if (pPlayer->m_EscapeTime)
+		{
+			DoAnnouncement = true;
+			str_format(aBuf, sizeof(aBuf), "You are wanted by the police for %lld seconds", pPlayer->m_EscapeTime / Server()->TickSpeed());
+		}
+
+		if (DoAnnouncement)
+		{
+			const int Page = GetPage(ClientID);
+			DoLineText(Page, &NumOptions, aBuf, BULLET_POINT);
+			DoLineSeperator(Page, &NumOptions);
+		}
+	}
 
 	if (GetPage(ClientID) == PAGE_ACCOUNT)
 	{
@@ -554,6 +585,7 @@ void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 	DoLineToggleOption(Page, pNumOptions, MISC_WEAPONINDICATOR, pPlayer->m_WeaponIndicator);
 	DoLineToggleOption(Page, pNumOptions, MISC_ZOOMCURSOR, pPlayer->m_ZoomCursor);
 	DoLineToggleOption(Page, pNumOptions, MISC_RESUMEMOVED, pPlayer->m_ResumeMoved);
+	DoLineToggleOption(Page, pNumOptions, MISC_HIDEBROADCASTS, pPlayer->m_HideBroadcasts);
 
 	std::vector<const char *> vpDesigns;
 	for (int i = -1; i < CServer::NUM_MAP_DESIGNS; i++)
@@ -655,6 +687,8 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 			Flags |= PREVFLAG_MISC_ZOOMCURSOR;
 		if (pPlayer->m_ResumeMoved)
 			Flags |= PREVFLAG_MISC_RESUMEMOVED;
+		if (pPlayer->m_HideBroadcasts)
+			Flags |= PREVFLAG_MISC_HIDEBROADCASTS;
 		Stats.m_Minigame = pPlayer->m_Minigame;
 		Stats.m_ScoreMode = pPlayer->m_ScoreMode;
 	}
@@ -715,6 +749,12 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 			Stats.m_Acc.m_Euros = pAccount->m_Euros;
 			str_copy(Stats.m_Acc.m_aContact, pAccount->m_aContact, sizeof(Stats.m_Acc.m_aContact));
 		}
+	}
+
+	if (Page != PAGE_VOTES && pPlayer->m_HideBroadcasts)
+	{
+		Stats.m_JailTime = pPlayer->m_JailTime;
+		Stats.m_EscapeTime = pPlayer->m_EscapeTime;
 	}
 
 	Stats.m_Flags = Flags;

@@ -2452,6 +2452,13 @@ void CGameContext::ConHideDrawings(IConsole::IResult *pResult, void *pUserData)
 	if (pPlayer) pPlayer->SetHideDrawings(pResult->NumArguments() ? pResult->GetInteger(0) : !pPlayer->m_HideDrawings);
 }
 
+void CGameContext::ConHideBroadcasts(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
+	if (pPlayer) pPlayer->SetHideBroadcasts(pResult->NumArguments() ? pResult->GetInteger(0) : !pPlayer->m_HideBroadcasts);
+}
+
 void CGameContext::ConSilentFarm(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *) pUserData;
