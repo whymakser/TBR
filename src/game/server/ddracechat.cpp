@@ -3018,7 +3018,7 @@ void CGameContext::ConTrailVIP(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CCharacter *pChr = pSelf->GetPlayerChar(pResult->m_ClientID);
-	if (pChr) pChr->OnAtomVIP();
+	if (pChr) pChr->OnTrailVIP();
 }
 
 void CGameContext::ConSpreadGunVIP(IConsole::IResult *pResult, void *pUserData)
