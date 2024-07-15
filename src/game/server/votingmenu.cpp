@@ -84,7 +84,7 @@ void CVotingMenu::Reset(int ClientID)
 
 void CVotingMenu::AddPlaceholderVotes()
 {
-	for (int i = 0; i < NUM_PAGES + NUM_PAGE_SEPERATORS; i++)
+	for (int i = 0; i < NUM_OPTION_START_OFFSET; i++)
 	{
 		GameServer()->AddVote("placeholder_voting_menu", "info");
 	}
