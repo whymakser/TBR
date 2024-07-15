@@ -6355,12 +6355,6 @@ int CGameContext::SaveCharacter(int ClientID, int Flags, float Hours)
 	pChr->GetPlayer()->StopPlotEditing();
 	pChr->UnsetSpookyGhost();
 
-	// Remove wallet money so we dont automatically drop it on disconnect because it is saved already
-	if (Flags & SAVE_WALLET)
-	{
-		m_apPlayers[ClientID]->SetWalletMoney(0);
-	}
-
 	// Pretend we leave no bonus area so we can save the real values, and later override it by calling this function again
 	if (pChr->m_NoBonusContext.m_InArea)
 	{
@@ -6397,6 +6391,12 @@ int CGameContext::SaveCharacter(int ClientID, int Flags, float Hours)
 	}
 	CSaveTee SaveTee(Flags|SAVE_IDENTITY);
 	SaveTee.SaveFile(aFilename, pChr);
+
+	// Remove wallet money so we dont automatically drop it on disconnect because it is saved already
+	if (Flags & SAVE_WALLET)
+	{
+		m_apPlayers[ClientID]->SetWalletMoney(0);
+	}
 	
 	// return index of newly added identity
 	return m_vSavedIdentities.size() - 1;
