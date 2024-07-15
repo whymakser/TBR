@@ -49,6 +49,10 @@ In order to protect your account, you can set a security pin using `/pin` and a 
 * **Shop system** <br>
 Using money you have previously farmed you can buy things from the shop, such as cosmetics, upgrades and much more. The shop is integrated into the map.
 
+* **Custom votes menu** <br>
+The call vote menu has been adjusted to hold 3 categories: Votes, Account, Miscellaneous. You can switch between them effortlessly and interact with toggle options, value options via reason aswell as collapse elements.<br>
+It's also possible to combine those elements, or add other prefixes such as bullet points.
+
 * **Plots** <br>
 One of the biggest features is probably the plot editor and the plots themselves. You can rent a plot ingame and modify it as you like using the self-made and innovative ingame plot editor. <br>
 It allows you to place and do several things: <br>
@@ -77,11 +81,11 @@ They interact with explosions, shotgun, speedups, teleporters, doors and portals
 The flag has a special ability: It can be hooked by players once it's dropped. The flag hooking has been made as smooth as possible and shouldn't look buggy that much. <br>
 You can easily spectate the flags using the spectate menu (`bind x +spectate`).
 
-* **Extra weapons** <br>
-The inventory has been extended to support more than the regular weapons. If not placed in the map, most of the extra weapons are admin-only.
-
 * **Persistent gameplay after server restart or reload** <br>
 Things such as money drops and plots are saved and loaded upon server start so you don't lose important things. `sv_shutdown_save_tees 1` allows you to also save and load all players automatically, even upon restart everything is stored in files and later loaded and matched when you join.
+
+* **Extra weapons** <br>
+The inventory has been extended to support more than the regular weapons. If not placed in the map, most of the extra weapons are admin-only.
 
 * **Many settings and commands** <br>
 The list of [settings](https://github.com/fokkonaut/F-DDrace/blob/F-DDrace/src/game/variables.h) and [commands](https://github.com/fokkonaut/F-DDrace/blob/F-DDrace/src/game/ddracecommands.h) can be found in the source files when scrolling down a little bit.
