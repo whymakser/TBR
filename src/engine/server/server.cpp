@@ -1785,10 +1785,6 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 		}
 		else if(Msg == NETMSG_RCON_AUTH)
 		{
-			// Don't process auth try when authed already. that's bad for example in voting menu we send rcon off/on to hide authed vote options which would make us bannable
-			if (m_aClients[ClientID].m_Authed)
-				return;
-
 			const char *pName = "";
 			if (m_aClients[ClientID].m_Sevendown)
 				pName = Unpacker.GetString(CUnpacker::SANITIZE_CC);

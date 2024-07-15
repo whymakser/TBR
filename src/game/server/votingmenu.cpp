@@ -38,9 +38,6 @@ static const char *ACC_VIP_PLUS_EPICCIRCLE = "Epic Circle";
 static const char *ACC_VIP_PLUS_LOVELY = "Lovely";
 static const char *ACC_VIP_PLUS_RAINBOWNAME = "Rainbow Name";
 static const char *ACC_VIP_PLUS_RAINBOWSPEED = "Rainbow Speed";
-//Authed
-static const char *COLLAPSE_HEADER_AUTHED_OPTIONS = "Aᴜᴛʜᴇɴᴛɪᴄᴀᴛᴇᴅ";
-static const char *AUTHED_HIDE_VOTE_OPTIONS = "Hide authed vote options";
 // Misc
 static const char *MISC_HIDEDRAWINGS = "Hide Drawings";
 static const char *MISC_WEAPONINDICATOR = "Weapon Indicator";
@@ -83,9 +80,6 @@ void CVotingMenu::Reset(int ClientID)
 	m_aClients[ClientID].m_ShowAccountInfo = false;
 	m_aClients[ClientID].m_ShowPlotInfo = false;
 	m_aClients[ClientID].m_ShowAccountStats = false;
-	m_aClients[ClientID].m_ShowAuthedOptions = false;
-	m_aClients[ClientID].m_HideAuthedVoteOptions = false;
-	m_aClients[ClientID].m_AuthedOptionsHidden = false;
 }
 
 void CVotingMenu::AddPlaceholderVotes()
@@ -331,18 +325,6 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc, const char *
 			if (pPlayer && pReason[0] && str_is_number(pReason) == 0) pPlayer->SetRainbowSpeedVIP(str_toint(pReason));
 			return true;
 		}
-
-		// Authed
-		if (IsOptionWithSuffix(pDesc, COLLAPSE_HEADER_AUTHED_OPTIONS))
-		{
-			m_aClients[ClientID].m_ShowAuthedOptions = !m_aClients[ClientID].m_ShowAuthedOptions;
-			return true;
-		}
-		if (IsOption(pDesc, AUTHED_HIDE_VOTE_OPTIONS))
-		{
-			m_aClients[ClientID].m_HideAuthedVoteOptions = !m_aClients[ClientID].m_HideAuthedVoteOptions;
-			return true;
-		}
 	}
 	else if (GetPage(ClientID) == PAGE_MISCELLANEOUS)
 	{
@@ -461,7 +443,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 	CCharacter *pChr = pPlayer->GetCharacter();
 	const int Page = GetPage(ClientID);
 
-	char aBuf[VOTE_DESC_LENGTH];
+	char aBuf[128];
 	time_t tmp;
 	int AccID = pPlayer->GetAccID();
 	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[AccID];
@@ -619,19 +601,6 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 			DoLineToggleOption(Page, pNumOptions, ACC_VIP_PLUS_RAINBOWNAME, pPlayer->m_RainbowName);
 		}
 	}
-
-	if (Server()->GetAuthedState(ClientID))
-	{
-		DoLineSeperator(Page, pNumOptions);
-		if (DoLineCollapse(Page, pNumOptions, COLLAPSE_HEADER_AUTHED_OPTIONS, m_aClients[ClientID].m_ShowAuthedOptions, 1))
-		{
-			if (Server()->IsSevendown(ClientID))
-				str_copy(aBuf, AUTHED_HIDE_VOTE_OPTIONS, sizeof(aBuf));
-			else
-				str_format(aBuf, sizeof(aBuf), "%s (not supported on 0.7)", AUTHED_HIDE_VOTE_OPTIONS);
-			DoLineToggleOption(Page, pNumOptions, AUTHED_HIDE_VOTE_OPTIONS, m_aClients[ClientID].m_HideAuthedVoteOptions);
-		}
-	}
 }
 
 void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
@@ -699,46 +668,20 @@ void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 void CVotingMenu::Tick()
 {
 	// Check once per second if we have to auto update
-	bool CheckAutoUpdate = Server()->Tick() % Server()->TickSpeed() == 0;
+	if (Server()->Tick() % Server()->TickSpeed() != 0)
+		return;
+
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
 		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
 		if (!pPlayer)
 			continue;
-
-		// Process every tick
-		bool InMenu = pPlayer->m_PlayerFlags&PLAYERFLAG_IN_MENU;
-		if (Server()->GetAuthedState(i) && Server()->IsSevendown(i) && (m_aClients[i].m_HideAuthedVoteOptions || m_aClients[i].m_AuthedOptionsHidden))
-		{
-			if (InMenu != m_aClients[i].m_AuthedOptionsHidden || (!m_aClients[i].m_HideAuthedVoteOptions && m_aClients[i].m_AuthedOptionsHidden))
-			{
-				if (m_aClients[i].m_AuthedOptionsHidden)
-				{
-					CMsgPacker Msg(NETMSG_RCON_AUTH_ON, true);
-					Msg.AddInt(1);
-					Msg.AddInt(0);
-					Server()->SendMsg(&Msg, MSGFLAG_VITAL, i);
-				}
-				else
-				{
-					CMsgPacker Msg(NETMSG_RCON_AUTH_OFF, true);
-					Msg.AddInt(0);
-					Msg.AddInt(0);
-					Server()->SendMsg(&Msg, MSGFLAG_VITAL, i);
-				}
-				m_aClients[i].m_AuthedOptionsHidden = !m_aClients[i].m_AuthedOptionsHidden;
-			}
-		}
-
-		if (!CheckAutoUpdate)
-			continue;
-
 		if (m_aClients[i].m_NextVoteSendTick > Server()->Tick())
 			continue;
 
 		CVotingMenu::SClientVoteInfo::SPrevStats Stats;
 		// 0.7 doesnt have playerflag_in_menu anymore, so we update them automatically every 3s if something changed, even when not in menu /shrug
-		bool Update = InMenu || !Server()->IsSevendown(i);
+		bool Update = (pPlayer->m_PlayerFlags&PLAYERFLAG_IN_MENU) || !Server()->IsSevendown(i);
 		if (!Update || m_aClients[i].m_Page == PAGE_VOTES || !FillStats(i, &Stats))
 			continue;
 
@@ -939,10 +882,6 @@ void CVotingMenu::ApplyFlags(int ClientID, int Flags)
 		m_aClients[ClientID].m_ShowAccountStats = true;
 	if (Flags & VOTEFLAG_SHOW_PLOT_INFO)
 		m_aClients[ClientID].m_ShowPlotInfo = true;
-	if (Flags & VOTEFLAG_SHOW_AUTHED_OPTIONS)
-		m_aClients[ClientID].m_ShowAuthedOptions = true;
-	if (Flags & VOTEFLAG_HIDE_AUTHED_VOTE_OPTIONS)
-		m_aClients[ClientID].m_HideAuthedVoteOptions = true;
 }
 
 int CVotingMenu::GetFlags(int ClientID)
@@ -961,10 +900,6 @@ int CVotingMenu::GetFlags(int ClientID)
 		Flags |= VOTEFLAG_SHOW_ACC_STATS;
 	if (m_aClients[ClientID].m_ShowPlotInfo)
 		Flags |= VOTEFLAG_SHOW_PLOT_INFO;
-	if (m_aClients[ClientID].m_ShowAuthedOptions)
-		Flags |= VOTEFLAG_SHOW_AUTHED_OPTIONS;
-	if (m_aClients[ClientID].m_HideAuthedVoteOptions)
-		Flags |= VOTEFLAG_HIDE_AUTHED_VOTE_OPTIONS;
 	return Flags;
 }
 
