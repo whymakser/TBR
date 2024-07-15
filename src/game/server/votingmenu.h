@@ -80,11 +80,11 @@ class CVotingMenu
 
 		struct SPrevStats
 		{
-			int m_Flags;
-			int m_Minigame;
-			int m_ScoreMode;
-			int64 m_JailTime;
-			int64 m_EscapeTime;
+			int m_Flags = 0;
+			int m_Minigame = 0;
+			int m_ScoreMode = 0;
+			int64 m_JailTime = 0;
+			int64 m_EscapeTime = 0;
 			struct
 			{
 				int64 m_XP = 0;

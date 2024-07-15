@@ -688,7 +688,6 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 
 	int AccID = pPlayer->GetAccID();
 	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[AccID];
-	CVotingMenu::SClientVoteInfo::SPrevStats Stats = *pStats;
 	int Flags = 0;
 
 	// Misc
@@ -704,8 +703,8 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 			Flags |= PREVFLAG_MISC_RESUMEMOVED;
 		if (pPlayer->m_HideBroadcasts)
 			Flags |= PREVFLAG_MISC_HIDEBROADCASTS;
-		Stats.m_Minigame = pPlayer->m_Minigame;
-		Stats.m_ScoreMode = pPlayer->m_ScoreMode;
+		pStats->m_Minigame = pPlayer->m_Minigame;
+		pStats->m_ScoreMode = pPlayer->m_ScoreMode;
 	}
 	else if (Page == PAGE_ACCOUNT)
 	{
@@ -752,17 +751,17 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 
 		if (m_aClients[ClientID].m_ShowAccountStats)
 		{
-			Stats.m_Acc.m_XP = pAccount->m_XP;
-			Stats.m_Acc.m_Money = pAccount->m_Money;
-			Stats.m_Acc.m_WalletMoney = pPlayer->GetWalletMoney();
-			Stats.m_Acc.m_PoliceLevel = pAccount->m_PoliceLevel;
-			Stats.m_Acc.m_TaserBattery = pAccount->m_TaserBattery;
-			Stats.m_Acc.m_PortalBattery = pAccount->m_PortalBattery;
-			Stats.m_Acc.m_Points = pAccount->m_BlockPoints;
-			Stats.m_Acc.m_Kills = pAccount->m_Kills;
-			Stats.m_Acc.m_Deaths = pAccount->m_Deaths;
-			Stats.m_Acc.m_Euros = pAccount->m_Euros;
-			str_copy(Stats.m_Acc.m_aContact, pAccount->m_aContact, sizeof(Stats.m_Acc.m_aContact));
+			pStats->m_Acc.m_XP = pAccount->m_XP;
+			pStats->m_Acc.m_Money = pAccount->m_Money;
+			pStats->m_Acc.m_WalletMoney = pPlayer->GetWalletMoney();
+			pStats->m_Acc.m_PoliceLevel = pAccount->m_PoliceLevel;
+			pStats->m_Acc.m_TaserBattery = pAccount->m_TaserBattery;
+			pStats->m_Acc.m_PortalBattery = pAccount->m_PortalBattery;
+			pStats->m_Acc.m_Points = pAccount->m_BlockPoints;
+			pStats->m_Acc.m_Kills = pAccount->m_Kills;
+			pStats->m_Acc.m_Deaths = pAccount->m_Deaths;
+			pStats->m_Acc.m_Euros = pAccount->m_Euros;
+			str_copy(pStats->m_Acc.m_aContact, pAccount->m_aContact, sizeof(pStats->m_Acc.m_aContact));
 			if (pChr && pChr->m_aLineExp[0] != '\0')
 				Flags |= PREVFLAG_ISPLUSXP;
 		}
@@ -770,14 +769,11 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 
 	if (Page != PAGE_VOTES && pPlayer->m_HideBroadcasts)
 	{
-		Stats.m_JailTime = pPlayer->m_JailTime;
-		Stats.m_EscapeTime = pPlayer->m_EscapeTime;
+		pStats->m_JailTime = pPlayer->m_JailTime;
+		pStats->m_EscapeTime = pPlayer->m_EscapeTime;
 	}
 
-	Stats.m_Flags = Flags;
-	
-	// fill
-	*pStats = Stats;
+	pStats->m_Flags = Flags;
 	return true;
 }
 
