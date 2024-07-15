@@ -1979,6 +1979,8 @@ void CPlayer::OnLogin(bool ForceDesignLoad)
 	if (pAccount->m_Flags&CGameContext::ACCFLAG_HIDEBROADCASTS)
 		m_HideBroadcasts = true;
 
+	GameServer()->m_VotingMenu.ApplyFlags(m_ClientID, pAccount->m_VoteMenuFlags);
+
 	if (ForceDesignLoad)
 		Server()->ChangeMapDesign(m_ClientID, GameServer()->GetCurrentDesignFromList(AccID));
 	else
@@ -2027,6 +2029,8 @@ void CPlayer::OnLogout()
 		pAccount->m_Flags |= CGameContext::ACCFLAG_RESUMEMOVED;
 	if (m_HideBroadcasts)
 		pAccount->m_Flags |= CGameContext::ACCFLAG_HIDEBROADCASTS;
+
+	pAccount->m_VoteMenuFlags = GameServer()->m_VotingMenu.GetFlags(m_ClientID);
 
 	GameServer()->UpdateDesignList(AccID, Server()->GetMapDesign(m_ClientID));
 

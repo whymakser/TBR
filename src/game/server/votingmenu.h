@@ -12,6 +12,16 @@ class IServer;
 
 class CVotingMenu
 {
+	enum AccFlags
+	{
+		VOTEFLAG_PAGE_VOTES = 1 << 0,
+		VOTEFLAG_PAGE_ACCOUNT = 1 << 1,
+		VOTEFLAG_PAGE_MISCELLANEOUS = 1 << 2,
+		VOTEFLAG_SHOW_ACC_INFO = 1 << 3,
+		VOTEFLAG_SHOW_ACC_STATS = 1 << 4,
+		VOTEFLAG_SHOW_PLOT_INFO = 1 << 5,
+	};
+
 	enum EVotingPage
 	{
 		PAGE_VOTES = 0,
@@ -139,6 +149,8 @@ public:
 	void SendPageVotes(int ClientID, bool ResendVotesPage = true);
 
 	void Reset(int ClientID);
+	void ApplyFlags(int ClientID, int Flags);
+	int GetFlags(int ClientID);
 
 	enum
 	{

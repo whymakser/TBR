@@ -855,6 +855,41 @@ void CVotingMenu::SendPageVotes(int ClientID, bool ResendVotesPage)
 	Server()->SendPackMsg(&EndMsg, MSGFLAG_VITAL, ClientID);
 }
 
+void CVotingMenu::ApplyFlags(int ClientID, int Flags)
+{
+	if (Flags & VOTEFLAG_PAGE_VOTES)
+		m_aClients[ClientID].m_Page = PAGE_VOTES;
+	if (Flags & VOTEFLAG_PAGE_ACCOUNT)
+		m_aClients[ClientID].m_Page = PAGE_ACCOUNT;
+	if (Flags & VOTEFLAG_PAGE_MISCELLANEOUS)
+		m_aClients[ClientID].m_Page = PAGE_MISCELLANEOUS;
+	if (Flags & VOTEFLAG_SHOW_ACC_INFO)
+		m_aClients[ClientID].m_ShowAccountInfo = true;
+	if (Flags & VOTEFLAG_SHOW_ACC_STATS)
+		m_aClients[ClientID].m_ShowAccountStats = true;
+	if (Flags & VOTEFLAG_SHOW_PLOT_INFO)
+		m_aClients[ClientID].m_ShowPlotInfo = true;
+}
+
+int CVotingMenu::GetFlags(int ClientID)
+{
+	int Flags = 0;
+	int Page = GetPage(ClientID);
+	if (Page == PAGE_VOTES)
+		Flags |= VOTEFLAG_PAGE_VOTES;
+	else if (Page == PAGE_ACCOUNT)
+		Flags |= VOTEFLAG_PAGE_ACCOUNT;
+	else if (Page == PAGE_MISCELLANEOUS)
+		Flags |= VOTEFLAG_PAGE_MISCELLANEOUS;
+	if (m_aClients[ClientID].m_ShowAccountInfo)
+		Flags |= VOTEFLAG_SHOW_ACC_INFO;
+	if (m_aClients[ClientID].m_ShowAccountStats)
+		Flags |= VOTEFLAG_SHOW_ACC_STATS;
+	if (m_aClients[ClientID].m_ShowPlotInfo)
+		Flags |= VOTEFLAG_SHOW_PLOT_INFO;
+	return Flags;
+}
+
 #define ADDLINE_IMPL(desc, prefix, collapseHeader) do \
 { \
 	if (!pNumOptions || *pNumOptions >= NUM_PAGE_MAX_OPTIONS) \
