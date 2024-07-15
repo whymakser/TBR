@@ -43,6 +43,7 @@ static const char *MISC_WEAPONINDICATOR = "Weapon Indicator";
 static const char *MISC_ZOOMCURSOR = "Zoom Cursor";
 static const char *MISC_RESUMEMOVED = "Resume Moved";
 static const char *MISC_HIDEBROADCASTS = "Hide Broadcasts";
+static const char *MISC_LOCALCHAT = "Local Chat";
 
 void CVotingMenu::Init(CGameContext *pGameServer)
 {
@@ -351,6 +352,11 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc)
 			pPlayer->SetHideBroadcasts(!pPlayer->m_HideBroadcasts);
 			return true;
 		}
+		else if (IsOption(pDesc, MISC_LOCALCHAT))
+		{
+			pPlayer->JoinChat(!pPlayer->m_LocalChat);
+			return true;
+		}
 		else
 		{
 			for (int i = -1; i < CServer::NUM_MAP_DESIGNS; i++)
@@ -602,6 +608,10 @@ void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 	DoLineToggleOption(Page, pNumOptions, MISC_ZOOMCURSOR, pPlayer->m_ZoomCursor);
 	DoLineToggleOption(Page, pNumOptions, MISC_RESUMEMOVED, pPlayer->m_ResumeMoved);
 	DoLineToggleOption(Page, pNumOptions, MISC_HIDEBROADCASTS, pPlayer->m_HideBroadcasts);
+	if (GameServer()->Config()->m_SvLocalChat)
+	{
+		DoLineToggleOption(Page, pNumOptions, MISC_LOCALCHAT, pPlayer->m_LocalChat);
+	}
 
 	std::vector<const char *> vpDesigns;
 	for (int i = -1; i < CServer::NUM_MAP_DESIGNS; i++)
