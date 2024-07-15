@@ -363,7 +363,7 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc, const char *
 			for (int i = -1; i < CServer::NUM_MAP_DESIGNS; i++)
 			{
 				const char *pDesign = Server()->GetMapDesignName(i);
-				if (!pDesign[0] || str_comp(pDesc, pDesign) != 0)
+				if (!pDesign[0] || !IsOption(pDesc, pDesign))
 					continue;
 				Server()->ChangeMapDesign(ClientID, pDesign);
 				return true;
@@ -372,7 +372,7 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc, const char *
 			for (int i = -1; i < NUM_MINIGAMES; i++)
 			{
 				const char *pMinigame = i == -1 ? "No minigame" : GameServer()->GetMinigameName(i);
-				if (str_comp(pDesc, pMinigame) != 0)
+				if (!IsOption(pDesc, pMinigame))
 					continue;
 				GameServer()->SetMinigame(ClientID, i);
 				return true;
@@ -382,7 +382,7 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc, const char *
 			{
 				if (i == SCORE_BONUS && !GameServer()->Config()->m_SvAllowBonusScoreMode)
 					continue;
-				if (str_comp(pDesc, GameServer()->GetScoreModeName(i)) != 0)
+				if (!IsOption(pDesc, GameServer()->GetScoreModeName(i)))
 					continue;
 				pPlayer->ChangeScoreMode(i);
 				return true;
