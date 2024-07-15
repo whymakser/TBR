@@ -81,6 +81,8 @@ void CVotingMenu::Reset(int ClientID)
 	m_aClients[ClientID].m_PrevStats.m_Flags = 0;
 	m_aClients[ClientID].m_PrevStats.m_Minigame = MINIGAME_NONE;
 	m_aClients[ClientID].m_PrevStats.m_ScoreMode = GameServer()->Config()->m_SvDefaultScoreMode;
+	m_aClients[ClientID].m_PrevStats.m_JailTime = 0;
+	m_aClients[ClientID].m_PrevStats.m_EscapeTime = 0;
 }
 
 void CVotingMenu::AddPlaceholderVotes()
@@ -500,12 +502,26 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 	{
 		str_format(aBuf, sizeof(aBuf), "Level [%d]", pAccount->m_Level);
 		DoLineText(Page, pNumOptions, aBuf);
-		str_format(aBuf, sizeof(aBuf), "XP [%lld/%lld]", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level));
-		DoLineText(Page, pNumOptions, aBuf);
+		if (pChr && pChr->m_aLineExp[0] != '\0')
+		{
+			DoLineText(Page, pNumOptions, pChr->m_aLineExp);
+		}
+		else
+		{
+			str_format(aBuf, sizeof(aBuf), "XP [%lld/%lld]", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level));
+			DoLineText(Page, pNumOptions, aBuf);
+		}
 		str_format(aBuf, sizeof(aBuf), "Bank [%lld]", pAccount->m_Money);
 		DoLineText(Page, pNumOptions, aBuf);
-		str_format(aBuf, sizeof(aBuf), "Wallet [%lld]", pPlayer->GetWalletMoney());
-		DoLineText(Page, pNumOptions, aBuf);
+		if (pChr && pChr->m_aLineMoney[0] != '\0')
+		{
+			DoLineText(Page, pNumOptions, pChr->m_aLineMoney);
+		}
+		else
+		{
+			str_format(aBuf, sizeof(aBuf), "Wallet [%lld]", pPlayer->GetWalletMoney());
+			DoLineText(Page, pNumOptions, aBuf);
+		}
 		str_format(aBuf, sizeof(aBuf), "Police [%d]", pAccount->m_PoliceLevel);
 		DoLineText(Page, pNumOptions, aBuf);
 
@@ -748,6 +764,8 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 			Stats.m_Acc.m_Deaths = pAccount->m_Deaths;
 			Stats.m_Acc.m_Euros = pAccount->m_Euros;
 			str_copy(Stats.m_Acc.m_aContact, pAccount->m_aContact, sizeof(Stats.m_Acc.m_aContact));
+			if (pChr && pChr->m_aLineExp[0] != '\0')
+				Flags |= PREVFLAG_ISPLUSXP;
 		}
 	}
 

@@ -49,6 +49,8 @@ class CVotingMenu
 		PREVFLAG_ACC_NINJAJETPACK = 1 << 16,
 		// Acc Plot
 		PREVFLAG_PLOT_SPAWN = 1 << 17,
+		// Resend when no plus xp is found (means no flag and no moneytile)
+		PREVFLAG_ISPLUSXP = 1 << 18,
 	};
 
 	CGameContext *m_pGameServer;

@@ -2791,25 +2791,20 @@ void CCharacter::HandleTiles(int Index)
 				m_pPlayer->GiveXP(XP);
 
 				// broadcast
+				char aSurvival[32];
+				char aPolice[32];
+				char aPlusXP[64];
+
+				str_format(aSurvival, sizeof(aSurvival), " +%d survival", AliveState);
+				str_format(aPolice, sizeof(aPolice), " +%d police", pAccount->m_PoliceLevel);
+				str_format(aPlusXP, sizeof(aPlusXP), " +%d%s%s%s", TileXP, FlagBonus ? " +1 flag" : "", pAccount->m_VIP ? " +2 vip" : "", AliveState ? aSurvival : "");
+				str_format(m_aLineMoney, sizeof(m_aLineMoney), "Wallet [%lld] +%d%s%s", m_pPlayer->GetWalletMoney(), TileMoney, (PoliceMoneyTile && pAccount->m_PoliceLevel) ? aPolice : "", pAccount->m_VIP ? " +2 vip" : "");
+				str_format(m_aLineExp, sizeof(m_aLineExp), "XP [%lld/%lld]%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level), aPlusXP);
+
 				if (!IsWeaponIndicator() && !m_pPlayer->m_HideBroadcasts)
 				{
 					char aMsg[512];
-					char aSurvival[32];
-					char aPolice[32];
-					char aPlusXP[128];
-
-					str_format(aSurvival, sizeof(aSurvival), " +%d survival", AliveState);
-					str_format(aPolice, sizeof(aPolice), " +%d police", pAccount->m_PoliceLevel);
-					str_format(aPlusXP, sizeof(aPlusXP), " +%d%s%s%s", TileXP, FlagBonus ? " +1 flag" : "", pAccount->m_VIP ? " +2 vip" : "", AliveState ? aSurvival : "");
-					str_format(aMsg, sizeof(aMsg),
-							"Money [%lld] +%d%s%s\n"
-							"XP [%lld/%lld]%s\n"
-							"Level [%d]",
-							m_pPlayer->GetWalletMoney(), TileMoney, (PoliceMoneyTile && pAccount->m_PoliceLevel) ? aPolice : "", pAccount->m_VIP ? " +2 vip" : "",
-							pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level), aPlusXP,
-							pAccount->m_Level
-						);
-
+					str_format(aMsg, sizeof(aMsg), "%s\n%s\nLevel [%d]", m_aLineMoney, m_aLineExp, pAccount->m_Level);
 					SendBroadcastHud(GameServer()->FormatExperienceBroadcast(aMsg, m_pPlayer->GetCID()));
 				}
 			}
@@ -4034,6 +4029,8 @@ void CCharacter::FDDraceInit()
 	m_LastJumpedTotal = 0;
 	m_HookExceededTick = 0;
 	m_IsGrounded = false;
+	m_aLineExp[0] = '\0';
+	m_aLineMoney[0] = '\0';
 }
 
 void CCharacter::CreateDummyHandle(int Dummymode)
@@ -4173,6 +4170,9 @@ void CCharacter::FDDraceTick()
 	if (m_pLightsaber && (m_FreezeTime || GetActiveWeapon() != WEAPON_LIGHTSABER))
 		m_pLightsaber->Retract();
 
+	// reset them here, so that they are either null or the formatted line so votingmenu knows when to show this or simple
+	m_aLineExp[0] = '\0';
+	m_aLineMoney[0] = '\0';
 	// flag bonus
 	if (HasFlag() != -1 && m_pPlayer->GetAccID() >= ACC_START && !m_MoneyTile && Server()->Tick() % 50 == 0)
 	{
@@ -4187,13 +4187,12 @@ void CCharacter::FDDraceTick()
 
 		m_pPlayer->GiveXP(XP);
 
+		char aSurvival[32];
+		str_format(aSurvival, sizeof(aSurvival), " +%d survival", AliveState);
+		str_format(m_aLineExp, sizeof(m_aLineExp), "XP [%lld/%lld] +1 flag%s%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level), pAccount->m_VIP ? " +2 vip" : "", AliveState ? aSurvival : "");
 		if (!IsWeaponIndicator() && !m_pPlayer->m_HideBroadcasts)
 		{
-			char aSurvival[32];
-			char aMsg[128];
-			str_format(aSurvival, sizeof(aSurvival), " +%d survival", AliveState);
-			str_format(aMsg, sizeof(aMsg), "XP [%lld/%lld] +1 flag%s%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level), pAccount->m_VIP ? " +2 vip" : "", AliveState ? aSurvival : "");
-			SendBroadcastHud(GameServer()->FormatExperienceBroadcast(aMsg, m_pPlayer->GetCID()));
+			SendBroadcastHud(GameServer()->FormatExperienceBroadcast(m_aLineExp, m_pPlayer->GetCID()));
 		}
 	}
 

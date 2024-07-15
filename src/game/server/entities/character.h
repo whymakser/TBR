@@ -573,6 +573,10 @@ public:
 	int GetDDNetCharacterNinjaActivationTick();
 	void SendBroadcastHud(const char *pMessage);
 
+	// Experience broadcast
+	char m_aLineExp[64];
+	char m_aLineMoney[64];
+
 	// ResetNumInputs() gets called when player is paused or when (un)setting teecontrol. its to prevent weird shooting and weapon switching after unpause/(un)setting teecontrol
 	void ResetNumInputs() { m_NumInputs = 0; };
 
