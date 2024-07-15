@@ -655,7 +655,6 @@ void CVotingMenu::Tick()
 	if (Server()->Tick() % Server()->TickSpeed() != 0)
 		return;
 
-	CVotingMenu::SClientVoteInfo::SPrevStats Stats;
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
 		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
@@ -664,6 +663,7 @@ void CVotingMenu::Tick()
 		if (m_aClients[i].m_NextVoteSendTick > Server()->Tick())
 			continue;
 
+		CVotingMenu::SClientVoteInfo::SPrevStats Stats;
 		// 0.7 doesnt have playerflag_in_menu anymore, so we update them automatically every 3s if something changed, even when not in menu /shrug
 		bool Update = (pPlayer->m_PlayerFlags&PLAYERFLAG_IN_MENU) || !Server()->IsSevendown(i);
 		if (!Update || m_aClients[i].m_Page == PAGE_VOTES || !FillStats(i, &Stats))
@@ -672,6 +672,7 @@ void CVotingMenu::Tick()
 		// Design doesn't have to be checked, because on design loading finish it will resend the votes anyways so it will be up to date
 		if (mem_comp(&Stats, &m_aClients[i].m_PrevStats, sizeof(Stats)) != 0)
 		{
+			dbg_msg("hi", "updating???");
 			SendPageVotes(i);
 		}
 	}

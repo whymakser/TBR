@@ -87,17 +87,17 @@ class CVotingMenu
 			int64 m_EscapeTime;
 			struct
 			{
-				int64 m_XP;
-				int64 m_Money;
-				int64 m_WalletMoney;
-				int m_PoliceLevel;
-				int m_TaserBattery;
-				int m_PortalBattery;
-				int m_Points;
-				int m_Kills;
-				int m_Deaths;
-				int m_Euros;
-				char m_aContact[128];
+				int64 m_XP = 0;
+				int64 m_Money = 0;
+				int64 m_WalletMoney = 0;
+				int m_PoliceLevel = 0;
+				int m_TaserBattery = 0;
+				int m_PortalBattery = 0;
+				int m_Points = 0;
+				int m_Kills = 0;
+				int m_Deaths = 0;
+				int m_Euros = 0;
+				char m_aContact[128] = { 0 };
 			} m_Acc;
 		};
 		SPrevStats m_PrevStats;
