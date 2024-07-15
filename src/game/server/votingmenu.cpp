@@ -673,8 +673,6 @@ void CVotingMenu::Tick()
 		if (mem_comp(&Stats, &m_aClients[i].m_PrevStats, sizeof(Stats)) != 0)
 		{
 			SendPageVotes(i);
-			dbg_msg("hi", "copy1");
-			m_aClients[i].m_PrevStats = Stats;
 		}
 	}
 }
@@ -809,7 +807,6 @@ void CVotingMenu::SendPageVotes(int ClientID, bool ResendVotesPage)
 	if (FillStats(ClientID, &Stats))
 	{
 		m_aClients[ClientID].m_PrevStats = Stats;
-		dbg_msg("hi", "copy2222");
 	}
 
 	CNetMsg_Sv_VoteClearOptions VoteClearOptionsMsg;

@@ -4169,13 +4169,13 @@ void CCharacter::FDDraceTick()
 	// retract lightsaber
 	if (m_pLightsaber && (m_FreezeTime || GetActiveWeapon() != WEAPON_LIGHTSABER))
 		m_pLightsaber->Retract();
-
+	
 	// flag bonus
-	if (HasFlag() != -1 && m_pPlayer->GetAccID() >= ACC_START && !m_MoneyTile)
+	if (HasFlag() != -1 && m_pPlayer->GetAccID() >= ACC_START)
 	{
-		if (Server()->Tick() % 50 == 0)
+		if (!m_MoneyTile && Server()->Tick() % 50 == 0)
 		{
-			CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[m_pPlayer->GetAccID()];
+			CGameContext::AccountInfo* pAccount = &GameServer()->m_Accounts[m_pPlayer->GetAccID()];
 
 			int AliveState = GetAliveState();
 			int XP = 0;
@@ -4195,7 +4195,7 @@ void CCharacter::FDDraceTick()
 			}
 		}
 	}
-	else
+	else if (!m_MoneyTile)
 	{
 		// reset them here, so that they are either null or the formatted line so votingmenu knows when to show this or simple
 		m_aLineExp[0] = '\0';
