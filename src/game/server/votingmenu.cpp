@@ -672,7 +672,6 @@ void CVotingMenu::Tick()
 		// Design doesn't have to be checked, because on design loading finish it will resend the votes anyways so it will be up to date
 		if (mem_comp(&Stats, &m_aClients[i].m_PrevStats, sizeof(Stats)) != 0)
 		{
-			dbg_msg("hi", "updating???");
 			SendPageVotes(i);
 		}
 	}
