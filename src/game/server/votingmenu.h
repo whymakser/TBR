@@ -20,6 +20,8 @@ class CVotingMenu
 		VOTEFLAG_SHOW_ACC_INFO = 1 << 3,
 		VOTEFLAG_SHOW_ACC_STATS = 1 << 4,
 		VOTEFLAG_SHOW_PLOT_INFO = 1 << 5,
+		VOTEFLAG_SHOW_AUTHED_OPTIONS = 1 << 6,
+		VOTEFLAG_HIDE_AUTHED_VOTE_OPTIONS = 1 << 7,
 	};
 
 	enum EVotingPage
@@ -78,6 +80,10 @@ class CVotingMenu
 		bool m_ShowAccountInfo;
 		bool m_ShowPlotInfo;
 		bool m_ShowAccountStats;
+		bool m_ShowAuthedOptions;
+		// Authed
+		bool m_HideAuthedVoteOptions;
+		bool m_AuthedOptionsHidden;
 
 		struct SPrevStats
 		{
