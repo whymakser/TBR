@@ -465,11 +465,11 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 		if (pAccount->m_RegisterDate != 0)
 		{
 			tmp = pAccount->m_RegisterDate;
-			str_format(aBuf, sizeof(aBuf), "Registered on: %s", GameServer()->GetDate(tmp, false));
+			str_format(aBuf, sizeof(aBuf), "Registered: %s", GameServer()->GetDate(tmp, false));
 			DoLineText(Page, pNumOptions, aBuf);
 		}
 		else
-			DoLineText(Page, pNumOptions, "Registered on: before April 9th 2021");
+			DoLineText(Page, pNumOptions, "Registered: before April 9th 2021");
 
 		if (ShowEuros)
 		{

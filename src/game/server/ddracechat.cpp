@@ -1301,11 +1301,11 @@ void CGameContext::ConAccount(IConsole::IResult* pResult, void* pUserData)
 	if (pAccount->m_RegisterDate != 0)
 	{
 		tmp = pAccount->m_RegisterDate;
-		str_format(aBuf, sizeof(aBuf), "Registered on: %s", pSelf->GetDate(tmp, false));
+		str_format(aBuf, sizeof(aBuf), "Registered: %s", pSelf->GetDate(tmp, false));
 		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	}
 	else
-		pSelf->SendChatTarget(pResult->m_ClientID, "Registered on: before April 9th 2021");
+		pSelf->SendChatTarget(pResult->m_ClientID, "Registered: before April 9th 2021");
 
 	if (pSelf->Config()->m_SvEuroMode || pAccount->m_Euros > 0)
 	{
