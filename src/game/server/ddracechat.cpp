@@ -1305,7 +1305,7 @@ void CGameContext::ConAccount(IConsole::IResult* pResult, void* pUserData)
 		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	}
 	else
-		pSelf->SendChatTarget(pResult->m_ClientID, "Registered on: unknown");
+		pSelf->SendChatTarget(pResult->m_ClientID, "Registered on: before April 9th 2021");
 
 	if (pSelf->Config()->m_SvEuroMode || pAccount->m_Euros > 0)
 	{

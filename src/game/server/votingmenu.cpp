@@ -469,7 +469,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 			DoLineText(Page, pNumOptions, aBuf);
 		}
 		else
-			DoLineText(Page, pNumOptions, "Registered on: unknown");
+			DoLineText(Page, pNumOptions, "Registered on: before April 9th 2021");
 
 		if (ShowEuros)
 		{
