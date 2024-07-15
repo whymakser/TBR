@@ -402,7 +402,6 @@ int CVotingMenu::PrepareTempDescriptions(int ClientID)
 	m_NumCollapseEntries = 0;
 	int NumOptions = 0;
 
-	if (pPlayer->m_HideBroadcasts)
 	{
 		char aBuf[VOTE_DESC_LENGTH];
 		bool DoAnnouncement = false;
@@ -784,7 +783,7 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 		}
 	}
 
-	if (Page != PAGE_VOTES && pPlayer->m_HideBroadcasts)
+	if (Page != PAGE_VOTES)
 	{
 		pStats->m_JailTime = pPlayer->m_JailTime;
 		pStats->m_EscapeTime = pPlayer->m_EscapeTime;
