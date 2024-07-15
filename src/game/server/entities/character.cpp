@@ -4170,30 +4170,36 @@ void CCharacter::FDDraceTick()
 	if (m_pLightsaber && (m_FreezeTime || GetActiveWeapon() != WEAPON_LIGHTSABER))
 		m_pLightsaber->Retract();
 
-	// reset them here, so that they are either null or the formatted line so votingmenu knows when to show this or simple
-	m_aLineExp[0] = '\0';
-	m_aLineMoney[0] = '\0';
 	// flag bonus
-	if (HasFlag() != -1 && m_pPlayer->GetAccID() >= ACC_START && !m_MoneyTile && Server()->Tick() % 50 == 0)
+	if (HasFlag() != -1 && m_pPlayer->GetAccID() >= ACC_START && !m_MoneyTile)
 	{
-		CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[m_pPlayer->GetAccID()];
-
-		int AliveState = GetAliveState();
-		int XP = 0;
-		XP += AliveState + 1;
-
-		if (pAccount->m_VIP)
-			XP += 2;
-
-		m_pPlayer->GiveXP(XP);
-
-		char aSurvival[32];
-		str_format(aSurvival, sizeof(aSurvival), " +%d survival", AliveState);
-		str_format(m_aLineExp, sizeof(m_aLineExp), "XP [%lld/%lld] +1 flag%s%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level), pAccount->m_VIP ? " +2 vip" : "", AliveState ? aSurvival : "");
-		if (!IsWeaponIndicator() && !m_pPlayer->m_HideBroadcasts)
+		if (Server()->Tick() % 50 == 0)
 		{
-			SendBroadcastHud(GameServer()->FormatExperienceBroadcast(m_aLineExp, m_pPlayer->GetCID()));
+			CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[m_pPlayer->GetAccID()];
+
+			int AliveState = GetAliveState();
+			int XP = 0;
+			XP += AliveState + 1;
+
+			if (pAccount->m_VIP)
+				XP += 2;
+
+			m_pPlayer->GiveXP(XP);
+
+			char aSurvival[32];
+			str_format(aSurvival, sizeof(aSurvival), " +%d survival", AliveState);
+			str_format(m_aLineExp, sizeof(m_aLineExp), "XP [%lld/%lld] +1 flag%s%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level), pAccount->m_VIP ? " +2 vip" : "", AliveState ? aSurvival : "");
+			if (!IsWeaponIndicator() && !m_pPlayer->m_HideBroadcasts)
+			{
+				SendBroadcastHud(GameServer()->FormatExperienceBroadcast(m_aLineExp, m_pPlayer->GetCID()));
+			}
 		}
+	}
+	else
+	{
+		// reset them here, so that they are either null or the formatted line so votingmenu knows when to show this or simple
+		m_aLineExp[0] = '\0';
+		m_aLineMoney[0] = '\0';
 	}
 
 	// set cursor pos when controlling another tee
