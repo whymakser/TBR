@@ -413,6 +413,11 @@ void CPlayer::Tick()
 
 	if (m_EscapeTime > 0)
 	{
+		GameServer()->m_VotingMenu.SetWantedPlayer(m_ClientID);
+		GameServer()->m_VotingMenu.SetWantedPlayer(m_ClientID);
+		GameServer()->m_VotingMenu.SetWantedPlayer(m_ClientID);
+		GameServer()->m_VotingMenu.SetWantedPlayer(m_ClientID);
+		GameServer()->m_VotingMenu.SetWantedPlayer(m_ClientID);
 		m_EscapeTime--;
 		if (m_EscapeTime == 1)
 		{

@@ -15,9 +15,12 @@ IServer *CVotingMenu::Server() const { return GameServer()->Server(); }
 // Not a normal space: https://www.cogsci.ed.ac.uk/~richard/utf-8.cgi?input=%E2%80%8A&mode=char
 static const char *PLACEHOLDER_DESC = " ";
 // Acc
+static const char *COLLAPSE_HEADER_WANTED_PLAYERS = "Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs";
 static const char *COLLAPSE_HEADER_ACC_INFO = "Aᴄᴄᴏᴜɴᴛ Iɴғᴏ";
 static const char *COLLAPSE_HEADER_ACC_STATS = "Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs";
 static const char *COLLAPSE_HEADER_PLOT_INFO = "Pʟᴏᴛ";
+// Wanted // careful when adding another "Page", it has to differ somehow
+static const char *ACC_WANTED_PLAYERS_PAGE = "Page";
 // Acc Misc
 static const char *ACC_MISC_SILENTFARM = "Silent Farm";
 static const char *ACC_MISC_NINJAJETPACK = "Ninjajetpack";
@@ -51,6 +54,8 @@ void CVotingMenu::Init(CGameContext *pGameServer)
 	m_pGameServer = pGameServer;
 
 	m_NumCollapseEntries = 0;
+	m_vWantedPlayers.clear();
+
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
 		Reset(i);
@@ -61,7 +66,7 @@ void CVotingMenu::Init(CGameContext *pGameServer)
 	str_copy(m_aPages[PAGE_MISCELLANEOUS].m_aName, "Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs", sizeof(m_aPages[PAGE_MISCELLANEOUS].m_aName));
 
 	for (int i = 0; i < NUM_PAGES; i++)
-		for (int j = 0; j < NUM_PAGE_MAX_OPTIONS; j++)
+		for (int j = 0; j < NUM_PAGE_MAX_VOTES; j++)
 			m_aPages[i].m_aaTempDesc[j][0] = 0;
 
 	// Don't add the placeholders again when the map changes. The voteOptionHeap in CGameContext is not destroyed, so we do not have to add placeholders another time
@@ -80,6 +85,8 @@ void CVotingMenu::Reset(int ClientID)
 	m_aClients[ClientID].m_ShowAccountInfo = false;
 	m_aClients[ClientID].m_ShowPlotInfo = false;
 	m_aClients[ClientID].m_ShowAccountStats = false;
+	m_aClients[ClientID].m_ShowWantedPlayers = false;
+	m_aClients[ClientID].m_WantedPlayersPage = 0;
 }
 
 void CVotingMenu::AddPlaceholderVotes()
@@ -189,7 +196,7 @@ bool CVotingMenu::OnMessage(int ClientID, CNetMsg_Cl_CallVote *pMsg)
 	PrepareTempDescriptions(ClientID);
 
 	const char *pDesc = 0;
-	for (int i = 0; i < NUM_PAGE_MAX_OPTIONS; i++)
+	for (int i = 0; i < NUM_PAGE_MAX_VOTES; i++)
 	{
 		const char *pFullDesc = str_skip_voting_menu_prefixes(m_aPages[GetPage(ClientID)].m_aaTempDesc[i]);
 		if (!pFullDesc || !pFullDesc[0])
@@ -220,8 +227,24 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc, const char *
 	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 	CCharacter *pChr = pPlayer->GetCharacter();
 
+	// For now set it to -1, if not a number
+	int Reason = (pReason[0] && str_is_number(pReason) == 0) ? str_toint(pReason) : -1;
+
 	if (GetPage(ClientID) == PAGE_ACCOUNT)
 	{
+		if (IsOptionWithSuffix(pDesc, COLLAPSE_HEADER_WANTED_PLAYERS))
+		{
+			m_aClients[ClientID].m_ShowWantedPlayers = !m_aClients[ClientID].m_ShowWantedPlayers;
+			return true;
+		}
+		if (IsOptionWithSuffix(pDesc, ACC_WANTED_PLAYERS_PAGE))
+		{
+			if (Reason > 0 && Reason <= GetNumWantedPages())
+			{
+				m_aClients[ClientID].m_WantedPlayersPage = Reason - 1;
+			}
+			return true;
+		}
 		// Acc info
 		if (IsOptionWithSuffix(pDesc, COLLAPSE_HEADER_ACC_INFO))
 		{
@@ -274,56 +297,73 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc, const char *
 			if (pChr) pChr->OnRainbowVIP();
 			return true;
 		}
-		else if (IsOption(pDesc, ACC_VIP_BLOODY))
+		if (IsOption(pDesc, ACC_VIP_BLOODY))
 		{
 			if (pChr) pChr->OnBloodyVIP();
 			return true;
 		}
-		else if (IsOption(pDesc, ACC_VIP_ATOM))
+		if (IsOption(pDesc, ACC_VIP_ATOM))
 		{
 			if (pChr) pChr->OnAtomVIP();
 			return true;
 		}
-		else if (IsOption(pDesc, ACC_VIP_TRAIL))
+		if (IsOption(pDesc, ACC_VIP_TRAIL))
 		{
 			if (pChr) pChr->OnTrailVIP();
 			return true;
 		}
-		else if (IsOption(pDesc, ACC_VIP_SPREADGUN))
+		if (IsOption(pDesc, ACC_VIP_SPREADGUN))
 		{
 			if (pChr) pChr->OnSpreadGunVIP();
 			return true;
 		}
 		// VIP Plus
-		else if (IsOption(pDesc, ACC_VIP_PLUS_RAINBOWHOOK))
+		if (IsOption(pDesc, ACC_VIP_PLUS_RAINBOWHOOK))
 		{
 			if (pChr) pChr->OnRainbowHookVIP();
 			return true;
 		}
-		else if (IsOption(pDesc, ACC_VIP_PLUS_ROTATINGBALL))
+		if (IsOption(pDesc, ACC_VIP_PLUS_ROTATINGBALL))
 		{
 			if (pChr) pChr->OnRotatingBallVIP();
 			return true;
 		}
-		else if (IsOption(pDesc, ACC_VIP_PLUS_EPICCIRCLE))
+		if (IsOption(pDesc, ACC_VIP_PLUS_EPICCIRCLE))
 		{
 			if (pChr) pChr->OnEpicCircleVIP();
 			return true;
 		}
-		else if (IsOption(pDesc, ACC_VIP_PLUS_LOVELY))
+		if (IsOption(pDesc, ACC_VIP_PLUS_LOVELY))
 		{
 			if (pChr) pChr->OnLovelyVIP();
 			return true;
 		}
-		else if (IsOption(pDesc, ACC_VIP_PLUS_RAINBOWNAME))
+		if (IsOption(pDesc, ACC_VIP_PLUS_RAINBOWNAME))
 		{
 			if (pChr) pChr->OnRainbowNameVIP();
 			return true;
 		}
-		else if (IsOptionWithSuffix(pDesc, ACC_VIP_PLUS_RAINBOWSPEED))
+		if (IsOptionWithSuffix(pDesc, ACC_VIP_PLUS_RAINBOWSPEED))
 		{
-			if (pPlayer && pReason[0] && str_is_number(pReason) == 0) pPlayer->SetRainbowSpeedVIP(str_toint(pReason));
+			if (pPlayer && Reason != -1) pPlayer->SetRainbowSpeedVIP(Reason);
 			return true;
+		}
+
+		for (unsigned int i = 0; i < m_vWantedPlayers.size(); i++)
+		{
+			int ID = m_vWantedPlayers[i];
+			char aNameWithSpace[VOTE_DESC_LENGTH];
+			str_format(aNameWithSpace, sizeof(aNameWithSpace), "%s%s", Server()->ClientName(ID), PLACEHOLDER_DESC);
+			if (IsOption(pDesc, aNameWithSpace))
+			{
+				// spec wanted player
+				if (ID != ClientID)
+				{
+					pPlayer->Pause(CPlayer::PAUSE_PAUSED, false);
+					pPlayer->SetSpectatorID(SPEC_PLAYER, ID);
+				}
+				return true;
+			}
 		}
 	}
 	else if (GetPage(ClientID) == PAGE_MISCELLANEOUS)
@@ -333,60 +373,58 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc, const char *
 			pPlayer->SetHideDrawings(!pPlayer->m_HideDrawings);
 			return true;
 		}
-		else if (IsOption(pDesc, MISC_WEAPONINDICATOR))
+		if (IsOption(pDesc, MISC_WEAPONINDICATOR))
 		{
 			pPlayer->SetWeaponIndicator(!pPlayer->m_WeaponIndicator);
 			return true;
 		}
-		else if (IsOption(pDesc, MISC_ZOOMCURSOR))
+		if (IsOption(pDesc, MISC_ZOOMCURSOR))
 		{
 			pPlayer->SetZoomCursor(!pPlayer->m_ZoomCursor);
 			return true;
 		}
-		else if (IsOption(pDesc, MISC_RESUMEMOVED))
+		if (IsOption(pDesc, MISC_RESUMEMOVED))
 		{
 			pPlayer->SetResumeMoved(!pPlayer->m_ResumeMoved);
 			return true;
 		}
-		else if (IsOption(pDesc, MISC_HIDEBROADCASTS))
+		if (IsOption(pDesc, MISC_HIDEBROADCASTS))
 		{
 			pPlayer->SetHideBroadcasts(!pPlayer->m_HideBroadcasts);
 			return true;
 		}
-		else if (IsOption(pDesc, MISC_LOCALCHAT))
+		if (IsOption(pDesc, MISC_LOCALCHAT))
 		{
 			pPlayer->JoinChat(!pPlayer->m_LocalChat);
 			return true;
 		}
-		else
+
+		for (int i = -1; i < CServer::NUM_MAP_DESIGNS; i++)
 		{
-			for (int i = -1; i < CServer::NUM_MAP_DESIGNS; i++)
-			{
-				const char *pDesign = Server()->GetMapDesignName(i);
-				if (!pDesign[0] || !IsOption(pDesc, pDesign))
-					continue;
-				Server()->ChangeMapDesign(ClientID, pDesign);
-				return true;
-			}
+			const char *pDesign = Server()->GetMapDesignName(i);
+			if (!pDesign[0] || !IsOption(pDesc, pDesign))
+				continue;
+			Server()->ChangeMapDesign(ClientID, pDesign);
+			return true;
+		}
 
-			for (int i = -1; i < NUM_MINIGAMES; i++)
-			{
-				const char *pMinigame = i == -1 ? "No minigame" : GameServer()->GetMinigameName(i);
-				if (!IsOption(pDesc, pMinigame))
-					continue;
-				GameServer()->SetMinigame(ClientID, i);
-				return true;
-			}
+		for (int i = -1; i < NUM_MINIGAMES; i++)
+		{
+			const char *pMinigame = i == -1 ? "No minigame" : GameServer()->GetMinigameName(i);
+			if (!IsOption(pDesc, pMinigame))
+				continue;
+			GameServer()->SetMinigame(ClientID, i);
+			return true;
+		}
 
-			for (int i = 0; i < NUM_SCORE_MODES; i++)
-			{
-				if (i == SCORE_BONUS && !GameServer()->Config()->m_SvAllowBonusScoreMode)
-					continue;
-				if (!IsOption(pDesc, GameServer()->GetScoreModeName(i)))
-					continue;
-				pPlayer->ChangeScoreMode(i);
-				return true;
-			}
+		for (int i = 0; i < NUM_SCORE_MODES; i++)
+		{
+			if (i == SCORE_BONUS && !GameServer()->Config()->m_SvAllowBonusScoreMode)
+				continue;
+			if (!IsOption(pDesc, GameServer()->GetScoreModeName(i)))
+				continue;
+			pPlayer->ChangeScoreMode(i);
+			return true;
 		}
 	}
 
@@ -452,6 +490,43 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 		DoLineText(Page, pNumOptions, "You're not logged in.");
 		DoLineText(Page, pNumOptions, "Use '/login' to see more information about your account.");
 		return;
+	}
+
+	if (pAccount->m_PoliceLevel && m_vWantedPlayers.size())
+	{
+		if (m_vWantedPlayers.size() <= NUM_WANTEDS_PER_PAGE)
+		{
+			m_aClients[ClientID].m_WantedPlayersPage = 0;
+		}
+		int StartIndex = m_aClients[ClientID].m_WantedPlayersPage * NUM_WANTEDS_PER_PAGE;
+		int NumWantedPlayers = clamp((int)m_vWantedPlayers.size() - StartIndex, 0, (int)NUM_WANTEDS_PER_PAGE);
+		int NumPages = GetNumWantedPages();
+		int NumEntriesCollapse = NumPages > 1 ? NUM_WANTEDS_PER_PAGE + 1 : NumWantedPlayers;
+		if (DoLineCollapse(Page, pNumOptions, COLLAPSE_HEADER_WANTED_PLAYERS, m_aClients[ClientID].m_ShowWantedPlayers, NumEntriesCollapse))
+		{
+			int PlayersLeft = NumWantedPlayers;
+			for (unsigned int i = StartIndex; i < m_vWantedPlayers.size() && PlayersLeft; i++)
+			{
+				int ID = m_vWantedPlayers[i];
+				// We add the placeholder string to the end, so we can check if the name has this "space" added.
+				// Otherwise a wanted player with the name of another vote option would cause interferences... This should be safe
+				str_format(aBuf, sizeof(aBuf), "%s%s", Server()->ClientName(ID), PLACEHOLDER_DESC);
+				DoLineText(Page, pNumOptions, aBuf, BULLET_POINT);
+				PlayersLeft--;
+			}
+
+			if (NumPages > 1)
+			{
+				for (int i = 0; i < NUM_WANTEDS_PER_PAGE - NumWantedPlayers; i++)
+				{
+					DoLineSeperator(Page, pNumOptions);
+				}
+				DoLineValueOption(Page, pNumOptions, ACC_WANTED_PLAYERS_PAGE, m_aClients[ClientID].m_WantedPlayersPage + 1, NumPages, BULLET_ARROW);
+			}
+
+			// This does not count to NumEntries anymore, s_NumCollapseEntries is 0 by now again. We wanna add a seperator only if this thing is opened
+			DoLineSeperator(Page, pNumOptions);
+		}
 	}
 
 	bool ShowEuros = GameServer()->Config()->m_SvEuroMode || pAccount->m_Euros > 0;
@@ -584,7 +659,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 		if (pAccount->m_VIP == VIP_PLUS)
 		{
 			// let's put it here, next to rainbow which is influenced by it, not somewhere close to rainbowname i guess
-			DoLineValueOption(Page, pNumOptions, ACC_VIP_PLUS_RAINBOWSPEED, pPlayer->m_RainbowSpeed, 20, BULLET_POINT);
+			DoLineValueOption(Page, pNumOptions, ACC_VIP_PLUS_RAINBOWSPEED, pPlayer->m_RainbowSpeed, 20, BULLET_ARROW);
 		}
 		DoLineToggleOption(Page, pNumOptions, ACC_VIP_BLOODY, pChr && (pChr->m_Bloody || pChr->m_StrongBloody));
 		DoLineToggleOption(Page, pNumOptions, ACC_VIP_ATOM, pChr && pChr->m_Atom);
@@ -667,29 +742,31 @@ void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 void CVotingMenu::Tick()
 {
 	// Check once per second if we have to auto update
-	if (Server()->Tick() % Server()->TickSpeed() != 0)
-		return;
-
-	for (int i = 0; i < MAX_CLIENTS; i++)
+	if (Server()->Tick() % Server()->TickSpeed() == 0)
 	{
-		CPlayer *pPlayer = GameServer()->m_apPlayers[i];
-		if (!pPlayer)
-			continue;
-		if (m_aClients[i].m_NextVoteSendTick > Server()->Tick())
-			continue;
-
-		CVotingMenu::SClientVoteInfo::SPrevStats Stats;
-		// 0.7 doesnt have playerflag_in_menu anymore, so we update them automatically every 3s if something changed, even when not in menu /shrug
-		bool Update = (pPlayer->m_PlayerFlags&PLAYERFLAG_IN_MENU) || !Server()->IsSevendown(i);
-		if (!Update || m_aClients[i].m_Page == PAGE_VOTES || !FillStats(i, &Stats))
-			continue;
-
-		// Design doesn't have to be checked, because on design loading finish it will resend the votes anyways so it will be up to date
-		if (mem_comp(&Stats, &m_aClients[i].m_PrevStats, sizeof(Stats)) != 0)
+		for (int i = 0; i < MAX_CLIENTS; i++)
 		{
-			SendPageVotes(i);
+			CPlayer *pPlayer = GameServer()->m_apPlayers[i];
+			if (!pPlayer)
+				continue;
+			if (m_aClients[i].m_NextVoteSendTick > Server()->Tick())
+				continue;
+
+			CVotingMenu::SClientVoteInfo::SPrevStats Stats;
+			// 0.7 doesnt have playerflag_in_menu anymore, so we update them automatically every 3s if something changed, even when not in menu /shrug
+			bool Update = (pPlayer->m_PlayerFlags&PLAYERFLAG_IN_MENU) || !Server()->IsSevendown(i);
+			if (!Update || m_aClients[i].m_Page == PAGE_VOTES || !FillStats(i, &Stats))
+				continue;
+
+			// Design doesn't have to be checked, because on design loading finish it will resend the votes anyways so it will be up to date
+			if (mem_comp(&Stats, &m_aClients[i].m_PrevStats, sizeof(Stats)) != 0)
+			{
+				SendPageVotes(i);
+			}
 		}
 	}
+	// Clear for next tick, we wanna keep wantedplayers up-to-date at all time
+	m_vWantedPlayers.clear();
 }
 
 bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevStats *pStats)
@@ -723,6 +800,12 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 	}
 	else if (Page == PAGE_ACCOUNT)
 	{
+		// Wanted list
+		if (m_aClients[ClientID].m_ShowWantedPlayers && pAccount->m_PoliceLevel)
+		{
+			pStats->m_NumWanted = m_vWantedPlayers.size();
+		}
+
 		// VIP
 		if (pAccount->m_VIP)
 		{
@@ -824,9 +907,6 @@ void CVotingMenu::SendPageVotes(int ClientID, bool ResendVotesPage)
 	CNetMsg_Sv_VoteClearOptions VoteClearOptionsMsg;
 	Server()->SendPackMsg(&VoteClearOptionsMsg, MSGFLAG_VITAL, ClientID);
 
-	CNetMsg_Sv_VoteOptionGroupStart StartMsg;
-	Server()->SendPackMsg(&StartMsg, MSGFLAG_VITAL, ClientID);
-
 	const int NumVotesPage = PrepareTempDescriptions(ClientID);
 	const int NumVotesToSend = NUM_OPTION_START_OFFSET + NumVotesPage;
 	int TotalVotesSent = 0;
@@ -862,9 +942,6 @@ void CVotingMenu::SendPageVotes(int ClientID, bool ResendVotesPage)
 		// Reset for next potentional run
 		Msg.Reset();
 	}
-
-	CNetMsg_Sv_VoteOptionGroupEnd EndMsg;
-	Server()->SendPackMsg(&EndMsg, MSGFLAG_VITAL, ClientID);
 }
 
 void CVotingMenu::ApplyFlags(int ClientID, int Flags)
@@ -875,12 +952,12 @@ void CVotingMenu::ApplyFlags(int ClientID, int Flags)
 		m_aClients[ClientID].m_Page = PAGE_ACCOUNT;
 	if (Flags & VOTEFLAG_PAGE_MISCELLANEOUS)
 		m_aClients[ClientID].m_Page = PAGE_MISCELLANEOUS;
-	if (Flags & VOTEFLAG_SHOW_ACC_INFO)
-		m_aClients[ClientID].m_ShowAccountInfo = true;
 	if (Flags & VOTEFLAG_SHOW_ACC_STATS)
 		m_aClients[ClientID].m_ShowAccountStats = true;
 	if (Flags & VOTEFLAG_SHOW_PLOT_INFO)
 		m_aClients[ClientID].m_ShowPlotInfo = true;
+	if (Flags & VOTEFLAG_SHOW_WANTED_PLAYERS)
+		m_aClients[ClientID].m_ShowWantedPlayers = true;
 }
 
 int CVotingMenu::GetFlags(int ClientID)
@@ -899,13 +976,14 @@ int CVotingMenu::GetFlags(int ClientID)
 		Flags |= VOTEFLAG_SHOW_ACC_STATS;
 	if (m_aClients[ClientID].m_ShowPlotInfo)
 		Flags |= VOTEFLAG_SHOW_PLOT_INFO;
+	if (m_aClients[ClientID].m_ShowWantedPlayers)
+		Flags |= VOTEFLAG_SHOW_WANTED_PLAYERS;
 	return Flags;
 }
 
 #define ADDLINE_IMPL(desc, prefix, collapseHeader) do \
 { \
-	if (!pNumOptions || *pNumOptions >= NUM_PAGE_MAX_OPTIONS) \
-		break; \
+	dbg_assert((NUM_OPTION_START_OFFSET + *pNumOptions < NUM_PAGE_MAX_VOTES), "added too many votes options per page"); \
 	char aLine[VOTE_DESC_LENGTH]; \
 	if ((prefix)[0]) \
 	{ \
@@ -931,6 +1009,7 @@ int CVotingMenu::GetFlags(int ClientID)
 	(*pNumOptions)++; \
 	if (AddCollapseFooter) \
 	{ \
+		dbg_assert((NUM_OPTION_START_OFFSET + *pNumOptions < NUM_PAGE_MAX_VOTES), "added too many votes options per page"); \
 		str_copy(m_aPages[Page].m_aaTempDesc[NUM_OPTION_START_OFFSET + *pNumOptions], "╰───────────────────────", VOTE_DESC_LENGTH); \
 		(*pNumOptions)++; \
 	} \
@@ -997,3 +1076,5 @@ bool CVotingMenu::DoLineCollapse(int Page, int *pNumOptions, const char *pDescri
 }
 
 #undef ADDLINE
+#undef ADDLINE_PREFIX
+#undef ADDLINE_COLLAPSE

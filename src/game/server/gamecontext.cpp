@@ -1206,6 +1206,7 @@ void CGameContext::OnTick()
 		m_pMinigames[i]->Tick();
 
 	m_RainbowName.Tick();
+	// has to happen before playerticks, as the wanted players get added there and are resetted after CVotingMenu::Tick
 	m_VotingMenu.Tick();
 
 	if(m_TeeHistorianActive)

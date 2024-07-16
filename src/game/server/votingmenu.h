@@ -6,6 +6,8 @@
 #include <engine/shared/protocol.h>
 #include <generated/protocol.h>
 #include <game/voting.h>
+#include <base/math.h>
+#include <vector>
 
 class CGameContext;
 class IServer;
@@ -20,6 +22,7 @@ class CVotingMenu
 		VOTEFLAG_SHOW_ACC_INFO = 1 << 3,
 		VOTEFLAG_SHOW_ACC_STATS = 1 << 4,
 		VOTEFLAG_SHOW_PLOT_INFO = 1 << 5,
+		VOTEFLAG_SHOW_WANTED_PLAYERS = 1 << 6,
 	};
 
 	enum EVotingPage
@@ -31,7 +34,10 @@ class CVotingMenu
 
 		NUM_PAGE_SEPERATORS = 2,
 		NUM_OPTION_START_OFFSET = NUM_PAGES + NUM_PAGE_SEPERATORS,
-		NUM_PAGE_MAX_OPTIONS = 128 - NUM_OPTION_START_OFFSET,
+		// When more than 47 the client will bug the scrollheight to somewhere in the middle or something when updating. let's just
+		//NUM_PAGE_MAX_VOTES = 47,
+		NUM_PAGE_MAX_VOTES = 128 - NUM_OPTION_START_OFFSET,
+		NUM_WANTEDS_PER_PAGE = 4,
 	};
 
 	enum
@@ -68,6 +74,7 @@ class CVotingMenu
 	CGameContext *GameServer() const;
 	IServer *Server() const;
 	bool m_Initialized;
+	std::vector<int> m_vWantedPlayers;
 
 	struct SClientVoteInfo
 	{
@@ -78,6 +85,8 @@ class CVotingMenu
 		bool m_ShowAccountInfo;
 		bool m_ShowPlotInfo;
 		bool m_ShowAccountStats;
+		bool m_ShowWantedPlayers;
+		int m_WantedPlayersPage;
 
 		struct SPrevStats
 		{
@@ -87,6 +96,7 @@ class CVotingMenu
 			int64 m_JailTime = 0;
 			int64 m_EscapeTime = 0;
 			int m_RainbowSpeed = 0;
+			int m_NumWanted = 0;
 			struct
 			{
 				int64 m_XP = 0;
@@ -110,9 +120,11 @@ class CVotingMenu
 	struct SPageInfo
 	{
 		char m_aName[64];
-		char m_aaTempDesc[NUM_PAGE_MAX_OPTIONS][VOTE_DESC_LENGTH];
+		char m_aaTempDesc[NUM_PAGE_MAX_VOTES][VOTE_DESC_LENGTH];
 	} m_aPages[NUM_PAGES];
 
+	int GetNumWantedPages() { float f = (float)m_vWantedPlayers.size() / (float)NUM_WANTEDS_PER_PAGE; return round_to_int(f + 0.5f); }
+	
 	bool SetPage(int ClientID, int Page);
 	const char *GetPageDescription(int ClientID, int Page);
 
@@ -151,6 +163,7 @@ public:
 	void SendPageVotes(int ClientID, bool ResendVotesPage = true);
 
 	void Reset(int ClientID);
+	void SetWantedPlayer(int ClientID) { m_vWantedPlayers.push_back(ClientID); }
 	void ApplyFlags(int ClientID, int Flags);
 	int GetFlags(int ClientID);
 
