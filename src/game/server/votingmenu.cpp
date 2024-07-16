@@ -257,9 +257,9 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc, const char *
 		if (IsOptionWithSuffix(pDesc, ACC_WANTED_PLAYERS_PAGE))
 		{
 			if (Reason > 0 && Reason <= GetNumWantedPages())
-			{
 				m_aClients[ClientID].m_WantedPlayersPage = Reason - 1;
-			}
+			else
+				GameServer()->SendChatTarget(ClientID, "Please specify the page using the reason field");
 			return true;
 		}
 		// Acc info
@@ -362,7 +362,10 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc, const char *
 		}
 		if (IsOptionWithSuffix(pDesc, ACC_VIP_PLUS_RAINBOWSPEED))
 		{
-			if (pPlayer && Reason != -1) pPlayer->SetRainbowSpeedVIP(Reason);
+			if (Reason != -1)
+				pPlayer->SetRainbowSpeedVIP(Reason);
+			else
+				GameServer()->SendChatTarget(ClientID, "Please specify the rainbow speed using the reason field");
 			return true;
 		}
 
