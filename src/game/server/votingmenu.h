@@ -163,6 +163,8 @@ public:
 	void SendPageVotes(int ClientID, bool ResendVotesPage = true);
 
 	void Reset(int ClientID);
+	void InitPlayer(int ClientID);
+
 	void SetWantedPlayer(int ClientID) { m_vWantedPlayers.push_back(ClientID); }
 	void ApplyFlags(int ClientID, int Flags);
 	int GetFlags(int ClientID);

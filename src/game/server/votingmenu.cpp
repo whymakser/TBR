@@ -89,6 +89,18 @@ void CVotingMenu::Reset(int ClientID)
 	m_aClients[ClientID].m_WantedPlayersPage = 0;
 }
 
+void CVotingMenu::InitPlayer(int ClientID)
+{
+	if (!Server()->IsMain(ClientID))
+	{
+		int DummyID = Server()->GetDummy(ClientID);
+		if (DummyID != -1)
+		{
+			m_aClients[ClientID].m_Page = m_aClients[DummyID].m_Page;
+		}
+	}
+}
+
 void CVotingMenu::AddPlaceholderVotes()
 {
 	for (int i = 0; i < NUM_OPTION_START_OFFSET; i++)
@@ -118,9 +130,14 @@ bool CVotingMenu::SetPage(int ClientID, int Page)
 	// Don't process normal votes, e.g. when another vote get's added
 	if (Page != PAGE_VOTES)
 	{
-		GameServer()->m_apPlayers[ClientID]->m_SendVoteIndex = -1;
-		if (DummyID != -1)
-			GameServer()->m_apPlayers[DummyID]->m_SendVoteIndex = -1;
+		if (GameServer()->m_apPlayers[ClientID]->m_SendVoteIndex != -1)
+		{
+			CNetMsg_Sv_VoteOptionGroupEnd EndMsg;
+			Server()->SendPackMsg(&EndMsg, MSGFLAG_VITAL, ClientID);
+			GameServer()->m_apPlayers[ClientID]->m_SendVoteIndex = -1;
+			if (DummyID != -1)
+				GameServer()->m_apPlayers[DummyID]->m_SendVoteIndex = -1;
+		}
 	}
 	SendPageVotes(ClientID);
 	return true;

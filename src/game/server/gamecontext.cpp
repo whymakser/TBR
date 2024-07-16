@@ -3070,6 +3070,9 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			CNetMsg_Sv_VoteClearOptions ClearMsg;
 			Server()->SendPackMsg(&ClearMsg, MSGFLAG_VITAL, ClientID);
 
+			// Init before sending votes
+			m_VotingMenu.InitPlayer(ClientID);
+
 			// begin sending vote options
 			StartResendingVotes(ClientID);
 
