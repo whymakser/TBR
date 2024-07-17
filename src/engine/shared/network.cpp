@@ -271,7 +271,9 @@ void CNetBase::SendPacket(const NETADDR *pAddr, CNetPacketConstruct *pPacket, bo
 		}
 	}
 }
-int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketConstruct *pPacket, bool *pSixup, int Socket, int *pSize)
+
+// TODO: rename this function
+int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketConstruct *pPacket, bool *pSevendown, int Socket, CNetServer *pNetServer)
 {
 	// Don't do it for now, cuz it causes delay unpacking this socket aswell...
 	//if (Socket == SOCKET_TWO)
@@ -282,16 +284,6 @@ int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketCon
 	if(Size <= 0)
 		return 1;
 
-	int Result = UnpackPacket(pBuffer, Size, pPacket, pSixup);
-	if(pSize)
-		*pSize = Size;
-	return Result;
-}
-
-
-// TODO: rename this function
-int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct *pPacket, bool *pSixup)
-{
 	// log the data
 	if(m_DataLogRecv)
 	{
@@ -303,7 +295,7 @@ int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct
 	}
 
 	// check the size
-	if(Size < 3 || Size > NET_MAX_PACKETSIZE)
+	if(Size < NET_PACKETHEADERSIZE || Size > NET_MAX_PACKETSIZE)
 	{
 		if(m_pConfig->m_Debug)
 			dbg_msg("network", "packet too small, size=%d", Size);
@@ -315,8 +307,8 @@ int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct
 
 	if(pPacket->m_Flags&NET_PACKETFLAG_CONNLESS)
 	{
-		*pSixup = (pBuffer[0] & 0x3) == 1;
-		int HeaderSize = *pSixup ? NET_PACKETHEADERSIZE_CONNLESS : 6;
+		*pSevendown = (pBuffer[0] & 0x3) != 1;
+		int HeaderSize = *pSevendown ? 6 : NET_PACKETHEADERSIZE_CONNLESS;
 		if(Size < HeaderSize)
 		{
 			if(m_pConfig->m_Debug)
@@ -330,7 +322,12 @@ int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct
 		pPacket->m_Token = NET_TOKEN_NONE;
 		pPacket->m_ResponseToken = NET_TOKEN_NONE;
 
-		if (*pSixup)
+		if (*pSevendown)
+		{
+			//static const unsigned char NET_HEADER_EXTENDED[] = {'x', 'e'};
+			mem_copy(pPacket->m_aExtraData, pBuffer + 2/*sizeof(NET_HEADER_EXTENDED)*/, sizeof(pPacket->m_aExtraData));
+		}
+		else
 		{
 			int Version = pBuffer[0]&0x3;
 				// xxxxxxVV
@@ -343,53 +340,53 @@ int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct
 			pPacket->m_ResponseToken = (pBuffer[5]<<24) | (pBuffer[6]<<16) | (pBuffer[7]<<8) | pBuffer[8];
 				// RRRRRRRR RRRRRRRR RRRRRRRR RRRRRRRR
 		}
-		else
-		{
-			//static const unsigned char NET_HEADER_EXTENDED[] = {'x', 'e'};
-			mem_copy(pPacket->m_aExtraData, pBuffer + 2/*sizeof(NET_HEADER_EXTENDED)*/, sizeof(pPacket->m_aExtraData));
-		}
 
 		pPacket->m_DataSize = Size - HeaderSize;
 		mem_copy(pPacket->m_aChunkData, &pBuffer[HeaderSize], pPacket->m_DataSize);
 	}
 	else
 	{
-		if (pPacket->m_Flags & NET_PACKETFLAG_SEVENDOWN_UNUSED)
-			*pSixup = true;
-		
-		int HeaderSize = *pSixup ? NET_PACKETHEADERSIZE : 3;
-		if(Size - HeaderSize > NET_MAX_PAYLOAD)
+		if (pNetServer)
+			*pSevendown = pNetServer->GetSevendown(pAddr, pPacket, pBuffer);
+
+		if(Size - NET_PACKETHEADERSIZE > NET_MAX_PAYLOAD)
 		{
 			if(m_pConfig->m_Debug)
 				dbg_msg("network", "packet payload too big, size=%d", Size);
 			return -1;
 		}
 
-		pPacket->m_Ack = ((pBuffer[0] & 0x3) << 8) | pBuffer[1];
-		pPacket->m_NumChunks = pBuffer[2];
-		pPacket->m_DataSize = Size - HeaderSize;
-
-		if (*pSixup)
+		int HeaderSize;
+		if (*pSevendown)
 		{
-			unsigned Flags = 0;
-			if(pPacket->m_Flags & NET_PACKETFLAG_CONTROL)
-				Flags |= NET_PACKETFLAG_SEVENDOWN_CONTROL;
-			if(pPacket->m_Flags & NET_PACKETFLAG_RESEND)
-				Flags |= NET_PACKETFLAG_SEVENDOWN_RESEND;
-			if(pPacket->m_Flags & NET_PACKETFLAG_COMPRESSION)
-				Flags |= NET_PACKETFLAG_SEVENDOWN_COMPRESSION;
-			pPacket->m_Flags = Flags;
+			HeaderSize = 3;
+			pPacket->m_Flags = pBuffer[0]>>4;
+			pPacket->m_Ack = ((pBuffer[0]&0xf)<<8) | pBuffer[1];
+			pPacket->m_Token = NET_TOKEN_NONE;
 
-			pPacket->m_Token = (pBuffer[3] << 24) | (pBuffer[4] << 16) | (pBuffer[5] << 8) | pBuffer[6];
+			int Flags = 0;
+			if (pPacket->m_Flags&1) Flags |= NET_PACKETFLAG_CONTROL;
+			if (pPacket->m_Flags&2) Flags |= NET_PACKETFLAG_CONNLESS;
+			if (pPacket->m_Flags&4) Flags |= NET_PACKETFLAG_RESEND;
+			if (pPacket->m_Flags&8) Flags |= NET_PACKETFLAG_COMPRESSION;
+			pPacket->m_Flags = Flags;
 		}
 		else
 		{
-			pPacket->m_Token = NET_TOKEN_NONE;
+			HeaderSize = NET_PACKETHEADERSIZE;
+			pPacket->m_Ack = ((pBuffer[0]&0x3)<<8) | pBuffer[1];
+				// xxxxxxAA AAAAAAAA
+
+			pPacket->m_Token = (pBuffer[3] << 24) | (pBuffer[4] << 16) | (pBuffer[5] << 8) | pBuffer[6];
+				// TTTTTTTT TTTTTTTT TTTTTTTT TTTTTTTT
 		}
 
+		pPacket->m_NumChunks = pBuffer[2];
+				// NNNNNNNN
+		pPacket->m_DataSize = Size - HeaderSize;
 		pPacket->m_ResponseToken = NET_TOKEN_NONE;
 
-		if(pPacket->m_Flags&NET_PACKETFLAG_SEVENDOWN_COMPRESSION)
+		if(pPacket->m_Flags&NET_PACKETFLAG_COMPRESSION)
 			pPacket->m_DataSize = m_Huffman.Decompress(&pBuffer[HeaderSize], pPacket->m_DataSize, pPacket->m_aChunkData, sizeof(pPacket->m_aChunkData));
 		else
 			mem_copy(pPacket->m_aChunkData, &pBuffer[HeaderSize], pPacket->m_DataSize);
@@ -404,7 +401,7 @@ int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct
 	}
 
 	// set the response token (a bit hacky because this function shouldn't know about control packets)
-	if(pPacket->m_Flags&NET_PACKETFLAG_SEVENDOWN_CONTROL && *pSixup)
+	if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL && !*pSevendown)
 	{
 		if(pPacket->m_DataSize >= 5) // control byte + token
 		{

@@ -78,19 +78,10 @@ enum
 
 	NET_PACKETVERSION=1,
 
-	// 0.7
 	NET_PACKETFLAG_CONTROL=1,
 	NET_PACKETFLAG_RESEND=2,
 	NET_PACKETFLAG_COMPRESSION=4,
 	NET_PACKETFLAG_CONNLESS=8,
-
-	// 0.6
-	NET_PACKETFLAG_SEVENDOWN_UNUSED = 1 << 0,
-	NET_PACKETFLAG_SEVENDOWN_TOKEN = 1 << 1,
-	NET_PACKETFLAG_SEVENDOWN_CONTROL = 1 << 2,
-	NET_PACKETFLAG_SEVENDOWN_CONNLESS = 1 << 3,
-	NET_PACKETFLAG_SEVENDOWN_RESEND = 1 << 4,
-	NET_PACKETFLAG_SEVENDOWN_COMPRESSION = 1 << 5,
 
 	NET_MAX_PACKET_CHUNKS=256,
 
@@ -257,8 +248,7 @@ public:
 	void SendControlMsgWithToken(const NETADDR *pAddr, TOKEN Token, int Ack, int ControlMsg, TOKEN MyToken, bool Extended, int Socket);
 	void SendPacketConnless(const NETADDR *pAddr, TOKEN Token, TOKEN ResponseToken, const void *pData, int DataSize, bool Sevendown, int Socket);
 	void SendPacket(const NETADDR *pAddr, CNetPacketConstruct *pPacket, bool Sevendown, int Socket, SECURITY_TOKEN SecurityToken = NET_SECURITY_TOKEN_UNSUPPORTED);
-	int UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketConstruct *pPacket, bool *pSixup, int Socket, int *pSize);
-	int UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct *pPacket, bool *pSixup);
+	int UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketConstruct *pPacket, bool *pSevendown, int Socket, class CNetServer *pNetServer = 0);
 };
 
 class CNetTokenManager
@@ -565,6 +555,7 @@ public:
 	int NumClients() { return m_NumClients; }
 	SECURITY_TOKEN GetGlobalToken();
 	SECURITY_TOKEN GetSecurityToken(const NETADDR& Addr);
+	bool GetSevendown(const NETADDR *pAddr, CNetPacketConstruct *pPacket, unsigned char *pBuffer);
 
 	int ResetErrorString(int ClientID);
 	const char *ErrorString(int ClientID);
