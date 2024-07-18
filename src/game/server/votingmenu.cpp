@@ -183,16 +183,19 @@ bool CVotingMenu::OnMessage(int ClientID, CNetMsg_Cl_CallVote *pMsg)
 	//bool VoteKick = str_comp_nocase(pMsg->m_Type, "kick") == 0;
 	//bool VoteSpectate = str_comp_nocase(pMsg->m_Type, "spectate") == 0;
 
-	int WantedPage = -1;
-	if (VoteOption)
+	if (!VoteOption)
 	{
-		for (int i = 0; i < NUM_PAGES; i++)
+		// Process normal voting, we don't use kick/spec player votes currently
+		return false;
+	}
+
+	int WantedPage = -1;
+	for (int i = 0; i < NUM_PAGES; i++)
+	{
+		if (str_comp(pMsg->m_Value, GetPageDescription(ClientID, i)) == 0)
 		{
-			if (str_comp(pMsg->m_Value, GetPageDescription(ClientID, i)) == 0)
-			{
-				WantedPage = i;
-				break;
-			}
+			WantedPage = i;
+			break;
 		}
 	}
 

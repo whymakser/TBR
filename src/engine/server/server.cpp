@@ -594,27 +594,6 @@ int CServer::Init()
 	return 0;
 }
 
-void CServer::SetRconCID(int ClientID)
-{
-	m_RconClientID = ClientID;
-}
-
-int CServer::GetAuthedState(int ClientID) const
-{
-	return m_aClients[ClientID].m_Authed;
-}
-
-const char *CServer::AuthName(int ClientID) const
-{
-	switch(m_aClients[ClientID].m_Authed)
-	{
-	case AUTHED_ADMIN: return "default_admin";
-	case AUTHED_MOD: return "default_mod";
-	case AUTHED_HELPER: return "default_helper";
-	}
-	return 0;
-}
-
 bool CServer::IsBanned(int ClientID)
 {
 	return m_ServerBan.IsBanned(m_NetServer.ClientAddr(ClientID), 0, 0, 0);
@@ -718,6 +697,29 @@ int CServer::ClientCountry(int ClientID) const
 bool CServer::ClientIngame(int ClientID) const
 {
 	return ClientID >= 0 && ClientID < MAX_CLIENTS && (m_aClients[ClientID].m_State == CServer::CClient::STATE_INGAME || m_aClients[ClientID].m_State == CClient::STATE_DUMMY);
+}
+
+void CServer::SetRconCID(int ClientID)
+{
+	m_RconClientID = ClientID;
+}
+
+int CServer::GetAuthedState(int ClientID) const
+{
+	if (m_aClients[ClientID].m_Authed >= AUTHED_NO && m_aClients[ClientID].m_Authed <= AUTHED_ADMIN)
+		return m_aClients[ClientID].m_Authed;
+	return AUTHED_NO;
+}
+
+const char *CServer::AuthName(int ClientID) const
+{
+	switch(m_aClients[ClientID].m_Authed)
+	{
+	case AUTHED_ADMIN: return "default_admin";
+	case AUTHED_MOD: return "default_mod";
+	case AUTHED_HELPER: return "default_helper";
+	}
+	return 0;
 }
 
 static inline bool RepackMsg(const CMsgPacker *pMsg, CPacker &Packer, bool Sevendown)
