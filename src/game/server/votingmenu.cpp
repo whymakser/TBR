@@ -1086,7 +1086,6 @@ bool CVotingMenu::DoLineCollapse(int Page, int *pNumOptions, const char *pDescri
 	char aBuf[VOTE_DESC_LENGTH];
 	if (ShowContent)
 	{
-		// Add one for the bottom line
 		m_NumCollapseEntries = NumEntries;
 		str_format(aBuf, sizeof(aBuf), "╭─           %s     [‒]", pDescription);
 	}
