@@ -5,6 +5,10 @@
 #include <game/server/gamemodes/DDRace.h>
 #include "teleporter.h"
 
+static float s_CurrentDist = 0.f;
+static bool s_Vertical = false;
+static int64 s_LastProcessTick = 0;
+
 CTeleporter::CTeleporter(CGameWorld *pGameWorld, vec2 Pos, int Type, int Number, bool Collision)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_TELEPORTER, Pos, 14, Collision)
 {
@@ -69,6 +73,26 @@ void CTeleporter::ResetCollision(bool Remove)
 	GameServer()->Collision()->SetTeleporter(m_Pos, Type, Number);
 }
 
+void CTeleporter::Tick()
+{
+	if (!s_LastProcessTick || s_LastProcessTick != Server()->Tick())
+	{
+		if (Config()->m_SvLightTeleporters && Server()->Tick() % 2 == 0)
+		{
+			if (s_CurrentDist < 32.f)
+			{
+				s_CurrentDist = clamp(s_CurrentDist+3.75f, 0.f, 32.f);
+			}
+			else
+			{
+				s_CurrentDist = 0.f;
+				s_Vertical = !s_Vertical;
+			}
+		}
+		s_LastProcessTick = Server()->Tick();
+	}
+}
+
 void CTeleporter::Snap(int SnappingClient)
 {
 	if (NetworkClipped(SnappingClient))
@@ -78,26 +102,59 @@ void CTeleporter::Snap(int SnappingClient)
 	if (pChr && pChr->m_DrawEditor.OnSnapPreview(this))
 		return;
 
-	float AngleStep = 2.0f * pi / NUM_CIRCLE;
-	m_Snap.m_Time += (Server()->Tick() - m_Snap.m_LastTime) / Server()->TickSpeed();
-	m_Snap.m_LastTime = Server()->Tick();
-
-	for (int i = 0; i < NUM_CIRCLE; i++)
+	if (Config()->m_SvLightTeleporters && m_BrushCID == -1) // preview should always be the old circular teleporter to see better
 	{
-		vec2 Pos = m_Pos;
-		Pos.x += TELE_RADIUS * cosf(m_Snap.m_Time * 2.5f + AngleStep * i);
-		Pos.y += TELE_RADIUS * sinf(m_Snap.m_Time * 2.5f + AngleStep * i);
+		vec2 aCorners[4] = {
+			vec2(-12, -12),
+			vec2(12, -12),
+			vec2(12, 12),
+			vec2(-12, 12),
+		};
 
-		CNetObj_Projectile *pObj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, m_aID[i], sizeof(CNetObj_Projectile)));
-		if(!pObj)
-			return;
+		for (int i = 0; i < 2; i++)
+		{
+			int From = (i * 2) + (int)s_Vertical;
+			int To = From == 3 ? 0 : From+1;
+			float Diff = s_CurrentDist / 32.f;
+			vec2 Pos;
+			Pos.x = mix(aCorners[From].x, aCorners[To].x, Diff);
+			Pos.y = mix(aCorners[From].y, aCorners[To].y, Diff);
 
-		pObj->m_X = (int)Pos.x;
-		pObj->m_Y = (int)Pos.y;
-		pObj->m_VelX = 0;
-		pObj->m_VelY = 0;
-		pObj->m_StartTick = 0;
-		pObj->m_Type = WEAPON_HAMMER;
+			CNetObj_Projectile *pObj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, m_aID[i], sizeof(CNetObj_Projectile)));
+			if(!pObj)
+				return;
+
+			pObj->m_X = round_to_int(m_Pos.x + Pos.x);
+			pObj->m_Y = round_to_int(m_Pos.y + Pos.y);
+			pObj->m_VelX = 0;
+			pObj->m_VelY = 0;
+			pObj->m_StartTick = 0;
+			pObj->m_Type = WEAPON_HAMMER;
+		}
+	}
+	else
+	{
+		float AngleStep = 2.0f * pi / NUM_CIRCLE;
+		m_Snap.m_Time += (Server()->Tick() - m_Snap.m_LastTime) / Server()->TickSpeed();
+		m_Snap.m_LastTime = Server()->Tick();
+
+		for (int i = 0; i < NUM_CIRCLE; i++)
+		{
+			vec2 Pos = m_Pos;
+			Pos.x += TELE_RADIUS * cosf(m_Snap.m_Time * 2.5f + AngleStep * i);
+			Pos.y += TELE_RADIUS * sinf(m_Snap.m_Time * 2.5f + AngleStep * i);
+
+			CNetObj_Projectile *pObj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, m_aID[i], sizeof(CNetObj_Projectile)));
+			if(!pObj)
+				return;
+
+			pObj->m_X = (int)Pos.x;
+			pObj->m_Y = (int)Pos.y;
+			pObj->m_VelX = 0;
+			pObj->m_VelY = 0;
+			pObj->m_StartTick = 0;
+			pObj->m_Type = WEAPON_HAMMER;
+		}
 	}
 
 	if (m_Type == TILE_TELEINWEAPON)
