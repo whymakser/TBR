@@ -3959,13 +3959,18 @@ void CCharacter::FDDraceInit()
 	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[m_pPlayer->GetAccID()];
 	if (!m_pPlayer->IsMinigame() && !m_pPlayer->m_JailTime)
 	{
-		for (int i = 0; i < 3; i++)
-			if (pAccount->m_SpawnWeapon[i])
+		if (Config()->m_SvSpawnWeapons)
+		{
+			for (int i = 0; i < 3; i++)
 			{
-				m_aSpawnWeaponActive[i] = true;
-				GiveWeapon(i == 0 ? WEAPON_SHOTGUN : i == 1 ? WEAPON_GRENADE : WEAPON_LASER, false, pAccount->m_SpawnWeapon[i]);
+				if (pAccount->m_SpawnWeapon[i])
+				{
+					m_aSpawnWeaponActive[i] = true;
+					GiveWeapon(i == 0 ? WEAPON_SHOTGUN : i == 1 ? WEAPON_GRENADE : WEAPON_LASER, false, pAccount->m_SpawnWeapon[i]);
+				}
 			}
-		m_InitializedSpawnWeapons = true;
+			m_InitializedSpawnWeapons = true;
+		}
 
 		if (pAccount->m_PortalRifle)
 			GiveWeapon(WEAPON_PORTAL_RIFLE, false, -1, true);
