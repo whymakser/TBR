@@ -5191,6 +5191,11 @@ void CCharacter::Meteor(bool Set, int FromID, bool Infinite, bool Silent)
 
 void CCharacter::Passive(bool Set, int FromID, bool Silent)
 {
+	if (Set && m_RedirectPassiveEndTick)
+	{
+		m_RedirectPassiveEndTick = 0;
+	}
+
 	m_Passive = Set;
 	Teams()->m_Core.SetPassive(m_pPlayer->GetCID(), Set);
 	GameServer()->SendTuningParams(m_pPlayer->GetCID(), m_TuneZone);
