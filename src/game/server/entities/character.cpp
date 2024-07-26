@@ -2977,7 +2977,7 @@ void CCharacter::HandleTiles(int Index)
 	if ((m_TileIndex == TILE_PASSIVE) || (m_TileFIndex == TILE_PASSIVE))
 	{
 		if ((m_LastIndexTile != TILE_PASSIVE) && (m_LastIndexFrontTile != TILE_PASSIVE))
-			Passive(!m_Passive);
+			Passive(!m_Passive || m_RedirectPassiveEndTick);
 	}
 
 	//vanilla mode
