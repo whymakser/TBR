@@ -5169,7 +5169,7 @@ void CCharacter::SpookyGhost(bool Set, int FromID, bool Silent)
 	m_pPlayer->m_HasSpookyGhost = Set;
 	GameServer()->SendExtraMessage(SPOOKY_GHOST, m_pPlayer->GetCID(), Set, FromID, Silent);
 	if (!Silent && Set)
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "For more info, say '/spookyghost'");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "For more info, say '/helptoggle'");
 }
 
 void CCharacter::Meteor(bool Set, int FromID, bool Infinite, bool Silent)
