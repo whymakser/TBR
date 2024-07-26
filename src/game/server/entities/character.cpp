@@ -2977,7 +2977,17 @@ void CCharacter::HandleTiles(int Index)
 	if ((m_TileIndex == TILE_PASSIVE) || (m_TileFIndex == TILE_PASSIVE))
 	{
 		if ((m_LastIndexTile != TILE_PASSIVE) && (m_LastIndexFrontTile != TILE_PASSIVE))
-			Passive(!m_Passive || m_RedirectPassiveEndTick);
+		{
+			if (m_RedirectPassiveEndTick)
+			{
+				// simply don't deactivate passive when we hit a tile after being redirected
+				m_RedirectPassiveEndTick = 0;
+			}
+			else
+			{
+				Passive(!m_Passive);
+			}
+		}
 	}
 
 	//vanilla mode
@@ -5191,11 +5201,6 @@ void CCharacter::Meteor(bool Set, int FromID, bool Infinite, bool Silent)
 
 void CCharacter::Passive(bool Set, int FromID, bool Silent)
 {
-	if (Set && m_RedirectPassiveEndTick)
-	{
-		m_RedirectPassiveEndTick = 0;
-	}
-
 	m_Passive = Set;
 	Teams()->m_Core.SetPassive(m_pPlayer->GetCID(), Set);
 	GameServer()->SendTuningParams(m_pPlayer->GetCID(), m_TuneZone);
