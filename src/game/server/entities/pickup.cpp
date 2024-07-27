@@ -362,8 +362,6 @@ void CPickup::Snap(int SnappingClient)
 	if (pChr && pChr->m_DrawEditor.OnSnapPreview(this))
 		return;
 
-	CCharacter* pOwner = GameServer()->GetPlayerChar(m_Owner);
-
 	if(SnappingClient > -1 && (GameServer()->m_apPlayers[SnappingClient]->GetTeam() == -1
 				|| GameServer()->m_apPlayers[SnappingClient]->IsPaused())
 			&& GameServer()->m_apPlayers[SnappingClient]->GetSpectatorID() != -1)
