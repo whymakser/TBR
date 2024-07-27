@@ -2088,6 +2088,12 @@ void CGameContext::ConSpawn(IConsole::IResult* pResult, void* pUserData)
 		return;
 	}
 
+	if (!pSelf->Config()->m_SvSlashSpawn)
+	{
+		pSelf->SendChatTarget(pResult->m_ClientID, "Teleporting to spawn is disabled");
+		return;
+	}
+
 	if (pPlayer->IsMinigame())
 	{
 		pSelf->SendChatTarget(pResult->m_ClientID, "You can't use this command in minigames");

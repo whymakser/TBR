@@ -255,6 +255,7 @@ MACRO_CONFIG_INT(SvTaserStrengthDefault, sv_taser_strength_default, 0, 0, 10, CF
 
 // spawn weapons
 MACRO_CONFIG_INT(SvSpawnWeapons, sv_spawn_weapons, 1, 0, 1, CFGFLAG_SERVER|CFGFLAG_GAME, "Whether account spawn weapons will be given on spawn", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvSlashSpawn, sv_slash_spawn, 0, 0, 1, CFGFLAG_SERVER|CFGFLAG_GAME, "Whether /spawn is activated (WARNING: can be abused to dodge specific tiles)", AUTHED_ADMIN)
 
 // snake
 MACRO_CONFIG_INT(SvSnakeAutoMove, sv_snake_auto_move, 1, 0, 1, CFGFLAG_SERVER, "Whether snake keeps last input or can stand still if no inputs applied", AUTHED_ADMIN)
