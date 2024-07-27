@@ -2803,6 +2803,83 @@ int CServer::Run()
 				}
 			}
 
+			// remove after 24 hours because iphub.info has 1000 free requests within 24 hours
+			// actually lets use 48 hours just to be safe
+			if (Tick() % (TickSpeed() * 60 * 60 * 48))
+			{
+				m_DnsblCache.m_vBlacklist.clear();
+				m_DnsblCache.m_vWhitelist.clear();
+			}
+
+			for (int i = 0; i < MAX_CLIENTS; i++)
+			{
+				if (m_aClients[i].m_State != CClient::STATE_INGAME)
+					continue;
+
+				// vpn/proxy detection
+				if (Config()->m_SvIPHubXKey[0])
+				{
+					if(m_aClients[i].m_DnsblState == CClient::DNSBL_STATE_NONE)
+					{
+						// initiate dnsbl lookup
+						InitDnsbl(i);
+					}
+					else if(m_aClients[i].m_DnsblState == CClient::DNSBL_STATE_PENDING && m_aClients[i].m_pDnsblLookup->Status() == IJob::STATE_DONE)
+					{
+						if(m_aClients[i].m_pDnsblLookup->m_Result == 1) // only return on 1, not on 2 as that might be a false positive
+						{
+							// bad ip -> blacklisted
+							m_aClients[i].m_DnsblState = CClient::DNSBL_STATE_BLACKLISTED;
+							m_DnsblCache.m_vBlacklist.push_back(*m_NetServer.ClientAddr(i));
+
+							// console output
+							char aAddrStr[NETADDR_MAXSTRSIZE];
+							net_addr_str(m_NetServer.ClientAddr(i), aAddrStr, sizeof(aAddrStr), true);
+
+							char aBuf[256];
+							str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> blacklisted", i, aAddrStr);
+							Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "dnsbl", aBuf);
+						}
+						else
+						{
+							// good ip -> whitelisted
+							m_aClients[i].m_DnsblState = CClient::DNSBL_STATE_WHITELISTED;
+							m_DnsblCache.m_vWhitelist.push_back(*m_NetServer.ClientAddr(i));
+						}
+					}
+
+					if (m_aClients[i].m_DnsblState == CClient::DNSBL_STATE_BLACKLISTED)
+						m_NetServer.NetBan()->BanAddr(m_NetServer.ClientAddr(i), 60 * 10, "VPN detected, try connecting without. Contact admin if mistaken");
+				}
+
+				// proxy game server detection
+				if (Config()->m_SvPgsc)
+				{
+					if(m_aClients[i].m_PgscState == CClient::PGSC_STATE_NONE)
+					{
+						// initiate proxy game server check lookup
+						InitProxyGameServerCheck(i);
+					}
+					else if(m_aClients[i].m_PgscState == CClient::PGSC_STATE_PENDING && m_aClients[i].m_pPgscLookup->Status() == IJob::STATE_DONE)
+					{
+						m_aClients[i].m_PgscState = CClient::PGSC_STATE_DONE;
+
+						if(m_aClients[i].m_pPgscLookup->m_Result == 1)
+						{
+							// console output
+							char aAddrStr[NETADDR_MAXSTRSIZE];
+							net_addr_str(m_NetServer.ClientAddr(i), aAddrStr, sizeof(aAddrStr), true);
+
+							char aBuf[256];
+							str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> broadcasts a proxy game server", i, aAddrStr);
+							Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "proxy", aBuf);
+
+							m_NetServer.NetBan()->BanAddr(m_NetServer.ClientAddr(i), 60*60*6, "Proxy server, try connecting to the real server. Contact admin if mistaken");
+						}
+					}
+				}
+			}
+
 			int64 Now = time_get();
 			bool NewTicks = false;
 			bool ShouldSnap = false;
@@ -2835,83 +2912,6 @@ int CServer::Run()
 				}
 
 				GameServer()->OnTick();
-
-				// remove after 24 hours because iphub.info has 1000 free requests within 24 hours
-				// actually lets use 48 hours just to be safe
-				if (Tick() % (TickSpeed() * 60 * 60 * 48))
-				{
-					m_DnsblCache.m_vBlacklist.clear();
-					m_DnsblCache.m_vWhitelist.clear();
-				}
-
-				for (int i = 0; i < MAX_CLIENTS; i++)
-				{
-					if (m_aClients[i].m_State != CClient::STATE_INGAME)
-						continue;
-
-					// vpn/proxy detection
-					if (Config()->m_SvIPHubXKey[0])
-					{
-						if(m_aClients[i].m_DnsblState == CClient::DNSBL_STATE_NONE)
-						{
-							// initiate dnsbl lookup
-							InitDnsbl(i);
-						}
-						else if(m_aClients[i].m_DnsblState == CClient::DNSBL_STATE_PENDING && m_aClients[i].m_pDnsblLookup->Status() == IJob::STATE_DONE)
-						{
-							if(m_aClients[i].m_pDnsblLookup->m_Result == 1) // only return on 1, not on 2 as that might be a false positive
-							{
-								// bad ip -> blacklisted
-								m_aClients[i].m_DnsblState = CClient::DNSBL_STATE_BLACKLISTED;
-								m_DnsblCache.m_vBlacklist.push_back(*m_NetServer.ClientAddr(i));
-
-								// console output
-								char aAddrStr[NETADDR_MAXSTRSIZE];
-								net_addr_str(m_NetServer.ClientAddr(i), aAddrStr, sizeof(aAddrStr), true);
-
-								char aBuf[256];
-								str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> blacklisted", i, aAddrStr);
-								Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "dnsbl", aBuf);
-							}
-							else
-							{
-								// good ip -> whitelisted
-								m_aClients[i].m_DnsblState = CClient::DNSBL_STATE_WHITELISTED;
-								m_DnsblCache.m_vWhitelist.push_back(*m_NetServer.ClientAddr(i));
-							}
-						}
-
-						if (m_aClients[i].m_DnsblState == CClient::DNSBL_STATE_BLACKLISTED)
-							m_NetServer.NetBan()->BanAddr(m_NetServer.ClientAddr(i), 60 * 10, "VPN detected, try connecting without. Contact admin if mistaken");
-					}
-
-					// proxy game server detection
-					if (Config()->m_SvPgsc)
-					{
-						if(m_aClients[i].m_PgscState == CClient::PGSC_STATE_NONE)
-						{
-							// initiate proxy game server check lookup
-							InitProxyGameServerCheck(i);
-						}
-						else if(m_aClients[i].m_PgscState == CClient::PGSC_STATE_PENDING && m_aClients[i].m_pPgscLookup->Status() == IJob::STATE_DONE)
-						{
-							m_aClients[i].m_PgscState = CClient::PGSC_STATE_DONE;
-
-							if(m_aClients[i].m_pPgscLookup->m_Result == 1)
-							{
-								// console output
-								char aAddrStr[NETADDR_MAXSTRSIZE];
-								net_addr_str(m_NetServer.ClientAddr(i), aAddrStr, sizeof(aAddrStr), true);
-
-								char aBuf[256];
-								str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> broadcasts a proxy game server", i, aAddrStr);
-								Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "proxy", aBuf);
-
-								m_NetServer.NetBan()->BanAddr(m_NetServer.ClientAddr(i), 60*60*6, "Proxy server, try connecting to the real server. Contact admin if mistaken");
-							}
-						}
-					}
-				}
 			}
 
 			// snap game
