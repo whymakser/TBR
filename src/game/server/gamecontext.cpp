@@ -4419,7 +4419,7 @@ void CGameContext::OnPreShutdown()
 		{
 			Server()->DummyLeave(i);
 		}
-		else if (Config()->m_SvShutdownAutoReconnect && Server()->IsSevendown(i))
+		else if (Config()->m_SvShutdownAutoReconnect && Server()->IsSevendown(i) && ((CServer*)Server())->m_RunServer == CServer::STOPPING)
 		{
 			// 0.7 is not supported, they would just time out, cl_reconnect_timeout is a ddnet feature.
 			const char *pMsg = ((CServer *)Server())->m_NetServer.m_ShutdownMessage;
