@@ -79,7 +79,7 @@ void CVotingMenu::Init(CGameContext *pGameServer)
 
 void CVotingMenu::Reset(int ClientID)
 {
-	m_aClients[ClientID].m_Page = PAGE_VOTES;
+	m_aClients[ClientID].m_Page = PAGE_MISCELLANEOUS;
 	m_aClients[ClientID].m_LastVoteMsg = 0;
 	m_aClients[ClientID].m_NextVoteSendTick = 0;
 	m_aClients[ClientID].m_ShowAccountInfo = false;
