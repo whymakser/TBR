@@ -1026,7 +1026,10 @@ int CServer::ClientRejoinCallback(int ClientID, bool Sevendown, int Socket, void
 	pThis->m_aClients[ClientID].m_DesignChange = false;
 	pThis->m_aClients[ClientID].m_CurrentMapDesign = PrevDesign;
 
-	pThis->SendMap(ClientID);
+	if (pThis->m_aClients[ClientID].m_Main)
+	{
+		pThis->SendMapDesign(ClientID, PrevDesign);
+	}
 
 	return 0;
 }
@@ -1509,25 +1512,20 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 				SendRconType(ClientID, m_AuthManager.NumNonDefaultKeys() > 0);
 				SendCapabilities(ClientID);
 
-				if (m_aClients[ClientID].m_Rejoining)
+				if (!m_aClients[ClientID].m_Rejoining)
 				{
-					// get back correct map design after rejoin
-					if (m_aClients[ClientID].m_Main)
+					if (m_aClients[ClientID].m_Sevendown && m_FakeMapSize && Config()->m_FakeMapName[0] && Config()->m_FakeMapCrc[0] && GetDummy(ClientID) == -1)
 					{
-						SendMapDesign(ClientID, m_aClients[ClientID].m_CurrentMapDesign);
+						m_aClients[ClientID].m_State = CClient::STATE_FAKE_MAP;
+						SendFakeMap(ClientID);
 					}
-				}
-				else if (m_aClients[ClientID].m_Sevendown && m_FakeMapSize && Config()->m_FakeMapName[0] && Config()->m_FakeMapCrc[0] && GetDummy(ClientID) == -1)
-				{
-					m_aClients[ClientID].m_State = CClient::STATE_FAKE_MAP;
-					SendFakeMap(ClientID);
-				}
-				else
-				{
-					m_aClients[ClientID].m_State = CClient::STATE_CONNECTING;
-					if (GetDummy(ClientID) != -1 || !ChangeMapDesign(ClientID, Config()->m_SvDefaultMapDesign))
+					else
 					{
-						SendMap(ClientID);
+						m_aClients[ClientID].m_State = CClient::STATE_CONNECTING;
+						if (GetDummy(ClientID) != -1 || !ChangeMapDesign(ClientID, Config()->m_SvDefaultMapDesign))
+						{
+							SendMap(ClientID);
+						}
 					}
 				}
 			}
@@ -1644,26 +1642,29 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 					SendServerInfo(ClientID);
 					GameServer()->OnClientEnter(ClientID);
 				}
-				else if (m_aClients[ClientID].m_DesignChange)
+				else
 				{
-					m_aClients[ClientID].m_DesignChange = false;
-
-					// When default map design is specified and we just joined, don't call this function
-					if (m_aClients[ClientID].m_State == CClient::STATE_INGAME)
+					if (m_aClients[ClientID].m_DesignChange)
 					{
-						GameServer()->MapDesignChangeDone(ClientID);
-						// Reset so the server doesnt need to resend big snapshot deltas or smth, we can connect quicker
-						m_aClients[ClientID].m_LastAckedSnapshot = -1;
-					}
+						m_aClients[ClientID].m_DesignChange = false;
 
-					int Dummy = GetDummy(ClientID);
-					if (Dummy != -1)
-						m_aClients[Dummy].m_DesignChange = false;
-				}
-				else if (m_aClients[ClientID].m_Rejoining)
-				{
-					m_aClients[ClientID].m_Rejoining = false;
-					GameServer()->OnClientRejoin(ClientID);
+						// When default map design is specified and we just joined, don't call this function
+						if (m_aClients[ClientID].m_State == CClient::STATE_INGAME)
+						{
+							GameServer()->MapDesignChangeDone(ClientID);
+							// Reset so the server doesnt need to resend big snapshot deltas or smth, we can connect quicker
+							m_aClients[ClientID].m_LastAckedSnapshot = -1;
+						}
+
+						int Dummy = GetDummy(ClientID);
+						if (Dummy != -1)
+							m_aClients[Dummy].m_DesignChange = false;
+					}
+					if (m_aClients[ClientID].m_Rejoining)
+					{
+						m_aClients[ClientID].m_Rejoining = false;
+						GameServer()->OnClientRejoin(ClientID);
+					}
 				}
 			}
 		}
