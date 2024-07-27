@@ -1023,17 +1023,8 @@ int CServer::ClientRejoinCallback(int ClientID, bool Sevendown, int Socket, void
 	pThis->m_aClients[ClientID].m_Sevendown = Sevendown;
 	pThis->m_aClients[ClientID].m_Socket = Socket;
 
-	if (pThis->m_aClients[ClientID].m_Main)
-	{
-		pThis->m_aClients[ClientID].m_DesignChange = false;
-		pThis->m_aClients[ClientID].m_CurrentMapDesign = PrevDesign;
-	}
-	else
-	{
-		int Dummy = pThis->GetDummy(ClientID);
-		if (Dummy != -1)
-			pThis->m_aClients[ClientID].m_CurrentMapDesign = pThis->m_aClients[Dummy].m_CurrentMapDesign;
-	}
+	pThis->m_aClients[ClientID].m_DesignChange = false;
+	pThis->m_aClients[ClientID].m_CurrentMapDesign = PrevDesign;
 
 	pThis->SendMap(ClientID);
 
@@ -1482,7 +1473,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 		}
 		else if(Msg == NETMSG_INFO)
 		{
-			if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && (m_aClients[ClientID].m_State == CClient::STATE_PREAUTH || m_aClients[ClientID].m_State == CClient::STATE_AUTH))
+			if((pPacket->m_Flags&NET_CHUNKFLAG_VITAL) != 0 && (m_aClients[ClientID].m_State == CClient::STATE_PREAUTH || m_aClients[ClientID].m_State == CClient::STATE_AUTH || m_aClients[ClientID].m_Rejoining))
 			{
 				const char *pVersion = Unpacker.GetString(CUnpacker::SANITIZE_CC);
 				if((!m_aClients[ClientID].m_Sevendown && str_comp(pVersion, GameServer()->NetVersion()) != 0) || (m_aClients[ClientID].m_Sevendown && str_comp(pVersion, GameServer()->NetVersionSevendown()) != 0))
@@ -1517,7 +1508,16 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 
 				SendRconType(ClientID, m_AuthManager.NumNonDefaultKeys() > 0);
 				SendCapabilities(ClientID);
-				if (m_aClients[ClientID].m_Sevendown && m_FakeMapSize && Config()->m_FakeMapName[0] && Config()->m_FakeMapCrc[0] && GetDummy(ClientID) == -1)
+
+				if (m_aClients[ClientID].m_Rejoining)
+				{
+					// get back correct map design after rejoin
+					if (m_aClients[ClientID].m_Main)
+					{
+						SendMapDesign(ClientID, m_aClients[ClientID].m_CurrentMapDesign);
+					}
+				}
+				else if (m_aClients[ClientID].m_Sevendown && m_FakeMapSize && Config()->m_FakeMapName[0] && Config()->m_FakeMapCrc[0] && GetDummy(ClientID) == -1)
 				{
 					m_aClients[ClientID].m_State = CClient::STATE_FAKE_MAP;
 					SendFakeMap(ClientID);
