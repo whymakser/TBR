@@ -14,6 +14,7 @@ CStableProjectile::CStableProjectile(CGameWorld *pGameWorld, int Type, int Owner
 	m_HideOnSpec = HideOnSpec;
 	m_LastResetTick = Server()->Tick();
 	m_CalculatedVel = false;
+	m_TeamMask = Mask128();
 	m_OnlyShowOwner = OnlyShowOwner;
 
 	GameWorld()->InsertEntity(this);
@@ -32,6 +33,7 @@ void CStableProjectile::TickDeferred()
 		m_LastResetTick = Server()->Tick();
 	}
 	m_CalculatedVel = false;
+	m_TeamMask = GameServer()->GetPlayerChar(m_Owner) ? GameServer()->GetPlayerChar(m_Owner)->TeamMask() : Mask128();
 }
 
 void CStableProjectile::CalculateVel()
@@ -78,10 +80,10 @@ void CStableProjectile::Snap(int SnappingClient)
 	if (m_OnlyShowOwner && SnappingClient != m_Owner)
 		return;
 
-	CCharacter *pOwner = GameServer()->GetPlayerChar(m_Owner);
-	if (pOwner && !CmaskIsSet(pOwner->TeamMask(), SnappingClient))
+	if (!CmaskIsSet(m_TeamMask, SnappingClient))
 		return;
 
+	CCharacter *pOwner = GameServer()->GetPlayerChar(m_Owner);
 	if (m_HideOnSpec && pOwner && pOwner->IsPaused())
 		return;
 

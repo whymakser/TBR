@@ -12,6 +12,7 @@ CPortalBlocker::CPortalBlocker(CGameWorld *pGameWorld, vec2 Pos, int Owner)
 
 	m_HasStartPos = false;
 	m_HasEndPos = false;
+	m_TeamMask = Mask128();
 
 	// We always want the single ball to be on top of the laser edge
 	for (int i = 0; i < 2; i++)
@@ -30,6 +31,8 @@ CPortalBlocker::~CPortalBlocker()
 void CPortalBlocker::Tick()
 {
 	CCharacter *pOwner = GameServer()->GetPlayerChar(m_Owner);
+	m_TeamMask = pOwner ? pOwner->TeamMask() : Mask128();
+
 	if (!m_HasEndPos)
 	{
 		if (!pOwner || !pOwner->m_IsPortalBlocker)
@@ -63,9 +66,8 @@ void CPortalBlocker::Tick()
 
 	if (--m_Lifetime <= 0 || (m_Owner != -1 && !GameServer()->m_apPlayers[m_Owner]))
 	{
-		Mask128 TeamMask = pOwner ? pOwner->TeamMask() : Mask128();
-		GameServer()->CreateDeath(m_StartPos, m_Owner, TeamMask);
-		GameServer()->CreateDeath(m_Pos, m_Owner, TeamMask);
+		GameServer()->CreateDeath(m_StartPos, m_Owner, m_TeamMask);
+		GameServer()->CreateDeath(m_Pos, m_Owner, m_TeamMask);
 
 		MarkForDestroy();
 		return;
@@ -109,7 +111,7 @@ bool CPortalBlocker::OnPlace()
 		m_HasEndPos = true;
 		
 		vec2 CenterPos = (m_Pos + m_StartPos) / 2;
-		GameServer()->CreateSound(CenterPos, SOUND_WEAPON_SPAWN, pOwner->TeamMask());
+		GameServer()->CreateSound(CenterPos, SOUND_WEAPON_SPAWN, m_TeamMask);
 
 		int AccID = pOwner->GetPlayer()->GetAccID();
 		if (AccID >= ACC_START)
@@ -136,8 +138,7 @@ void CPortalBlocker::Snap(int SnappingClient)
 	if (NetworkClipped(SnappingClient, m_Pos) && NetworkClipped(SnappingClient, m_StartPos))
 		return;
 
-	CCharacter *pOwner = GameServer()->GetPlayerChar(m_Owner);
-	if (pOwner && !CmaskIsSet(pOwner->TeamMask(), SnappingClient))
+	if (!CmaskIsSet(m_TeamMask, SnappingClient))
 		return;
 
 	for (int i = 0; i < 2; i++)

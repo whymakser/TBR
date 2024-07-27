@@ -8,6 +8,7 @@ CStaffInd::CStaffInd(CGameWorld *pGameWorld, vec2 Pos, int Owner)
 
 	m_Dist = 0.f;
 	m_BallFirst = true;
+	m_TeamMask = Mask128();
 
 	for (int i = 0; i < NUM_IDS; i++)
 		m_aID[i] = Server()->SnapNewID();
@@ -31,6 +32,7 @@ void CStaffInd::Tick()
 		return;
 	}
 
+	m_TeamMask = pOwner->TeamMask();
 	m_Pos = pOwner->GetPos();
 	m_aPos[ARMOR] = vec2(m_Pos.x, m_Pos.y - 70.f);
 
@@ -56,7 +58,7 @@ void CStaffInd::Snap(int SnappingClient)
 		return;
 
 	CCharacter *pOwner = GameServer()->GetPlayerChar(m_Owner);
-	if (pOwner && (!CmaskIsSet(pOwner->TeamMask(), SnappingClient) || pOwner->IsPaused()))
+	if (!CmaskIsSet(m_TeamMask, SnappingClient) || (pOwner && pOwner->IsPaused()))
 		return;
 
 	int Size = Server()->IsSevendown(SnappingClient) ? 4*4 : sizeof(CNetObj_Pickup);

@@ -8,6 +8,7 @@ CLovely::CLovely(CGameWorld *pGameWorld, vec2 Pos, int Owner)
 {
 	m_Owner = Owner;
 	m_SpawnDelay = 0;
+	m_TeamMask = Mask128();
 	for (int i = 0; i < MAX_HEARTS; i++)
 		m_aLovelyData[i].m_ID = Server()->SnapNewID();
 	GameWorld()->InsertEntity(this);
@@ -30,6 +31,7 @@ void CLovely::Tick()
 	}
 
 	m_Pos = pOwner->GetPos();
+	m_TeamMask = pOwner->TeamMask();
 
 	m_SpawnDelay--;
 	if (m_SpawnDelay <= 0)
@@ -73,7 +75,7 @@ void CLovely::Snap(int SnappingClient)
 		return;
 
 	CCharacter *pOwner = GameServer()->GetPlayerChar(m_Owner);
-	if (pOwner && (!CmaskIsSet(pOwner->TeamMask(), SnappingClient) || pOwner->IsPaused()))
+	if (!CmaskIsSet(m_TeamMask, SnappingClient) || (pOwner && pOwner->IsPaused()))
 		return;
 
 	for (int i = 0; i < MAX_HEARTS; i++)

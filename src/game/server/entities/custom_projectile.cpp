@@ -158,11 +158,8 @@ void CCustomProjectile::Snap(int SnappingClient)
 	if (NetworkClipped(SnappingClient))
 		return;
 
-	if (GameServer()->GetPlayerChar(SnappingClient))
-	{
-		if (!CmaskIsSet(m_TeamMask, SnappingClient))
-			return;
-	}
+	if (!CmaskIsSet(m_TeamMask, SnappingClient))
+		return;
 
 	if (m_Type == WEAPON_PLASMA_RIFLE || m_Type == WEAPON_GUN)
 	{

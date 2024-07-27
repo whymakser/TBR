@@ -5,6 +5,7 @@
 
 class CRotatingBall : public CEntity
 {
+	Mask128 m_TeamMask;
 	int m_Owner;
 	int m_ID2;
 

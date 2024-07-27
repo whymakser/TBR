@@ -58,6 +58,7 @@ CProjectile::CProjectile
 	DetermineTuning();
 	m_DefaultTuning = IsDefaultTuning() && m_DDrace;
 
+	m_TeamMask = Mask128();
 	m_LastResetPos = Pos;
 	m_LastResetTick = Server()->Tick();
 	m_CalculatedVel = false;
@@ -99,7 +100,6 @@ void CProjectile::Tick()
 	if (m_LifeSpan > -1)
 		m_LifeSpan--;
 
-	Mask128 TeamMask = Mask128();
 	bool IsWeaponCollide = false;
 	if
 		(
@@ -112,9 +112,10 @@ void CProjectile::Tick()
 	{
 		IsWeaponCollide = true;
 	}
+	m_TeamMask = Mask128();
 	if (pOwnerChar && pOwnerChar->IsAlive())
 	{
-		TeamMask = pOwnerChar->TeamMask();
+		m_TeamMask = pOwnerChar->TeamMask();
 	}
 	else if (m_Owner >= 0 && (GameServer()->GetProjectileType(m_Type) != WEAPON_GRENADE || Config()->m_SvDestroyBulletsOnDeath || GameServer()->Arenas()->FightStarted(m_Owner)))
 	{
@@ -126,10 +127,8 @@ void CProjectile::Tick()
 	{
 		if (m_Explosive/*??*/ && (!pTargetChr || (pTargetChr && (!m_Freeze || (m_Type == WEAPON_SHOTGUN && Collide)))))
 		{
-			GameServer()->CreateExplosion(ColPos, m_Owner, m_Type, m_Owner == -1, (!pTargetChr ? -1 : pTargetChr->Team()),
-				(m_Owner != -1) ? TeamMask : Mask128());
-			GameServer()->CreateSound(ColPos, m_SoundImpact,
-				(m_Owner != -1) ? TeamMask : Mask128());
+			GameServer()->CreateExplosion(ColPos, m_Owner, m_Type, m_Owner == -1, (!pTargetChr ? -1 : pTargetChr->Team()), m_TeamMask);
+			GameServer()->CreateSound(ColPos, m_SoundImpact, m_TeamMask);
 		}
 		else if (m_Freeze)
 		{
@@ -214,7 +213,7 @@ void CProjectile::Tick()
 		else if (GameServer()->GetProjectileType(m_Type) == WEAPON_GUN)
 		{
 			if (pOwnerChar && (pOwnerChar->GetPlayer()->m_Gamemode == GAMEMODE_DDRACE || m_Type != WEAPON_GUN))
-				GameServer()->CreateDamage(m_CurPos, m_Owner, m_Direction, 1, 0, (pTargetChr && m_Owner == pTargetChr->GetPlayer()->GetCID()), m_Owner != -1 ? TeamMask : CmaskAll(), 10);
+				GameServer()->CreateDamage(m_CurPos, m_Owner, m_Direction, 1, 0, (pTargetChr && m_Owner == pTargetChr->GetPlayer()->GetCID()), m_TeamMask, 10);
 			GameWorld()->DestroyEntity(this);
 			return;
 		}
@@ -231,19 +230,8 @@ void CProjectile::Tick()
 	{
 		if (m_Explosive)
 		{
-			if (m_Owner >= 0)
-				pOwnerChar = GameServer()->GetPlayerChar(m_Owner);
-
-			Mask128 TeamMask = Mask128();
-			if (pOwnerChar && pOwnerChar->IsAlive())
-			{
-				TeamMask = pOwnerChar->TeamMask();
-			}
-
-			GameServer()->CreateExplosion(ColPos, m_Owner, m_Type, m_Owner == -1, (!pOwnerChar ? -1 : pOwnerChar->Team()),
-				(m_Owner != -1) ? TeamMask : Mask128());
-			GameServer()->CreateSound(ColPos, m_SoundImpact,
-				(m_Owner != -1) ? TeamMask : Mask128());
+			GameServer()->CreateExplosion(ColPos, m_Owner, m_Type, m_Owner == -1, (!pOwnerChar ? -1 : pOwnerChar->Team()), m_TeamMask);
+			GameServer()->CreateSound(ColPos, m_SoundImpact, m_TeamMask);
 		}
 		GameWorld()->DestroyEntity(this);
 		return;
@@ -322,16 +310,7 @@ void CProjectile::Snap(int SnappingClient)
 			return;
 	}
 
-	CCharacter* pOwnerChar = 0;
-	Mask128 TeamMask = Mask128();
-
-	if (m_Owner >= 0)
-		pOwnerChar = GameServer()->GetPlayerChar(m_Owner);
-
-	if (pOwnerChar && pOwnerChar->IsAlive())
-		TeamMask = pOwnerChar->TeamMask();
-
-	if (m_Owner != -1 && !CmaskIsSet(TeamMask, SnappingClient))
+	if (!CmaskIsSet(m_TeamMask, SnappingClient))
 		return;
 
 	CNetObj_DDNetProjectile DDNetProjectile;

@@ -5,6 +5,7 @@ CEpicCircle::CEpicCircle(CGameWorld *pGameWorld, vec2 Pos, int Owner)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_PROJECTILE, Pos)
 {
 	m_Owner = Owner;
+	m_TeamMask = Mask128();
 
 	for(int i = 0; i < MAX_PARTICLES; i ++)
 		m_aIDs[i] = Server()->SnapNewID();
@@ -28,6 +29,7 @@ void CEpicCircle::Tick()
 	}
 
 	m_Pos = pOwner->GetPos();
+	m_TeamMask = pOwner->TeamMask();
 
 	for(int i = 0; i < MAX_PARTICLES; i++)
 	{
@@ -44,7 +46,7 @@ void CEpicCircle::Snap(int SnappingClient)
 		return;
 
 	CCharacter *pOwner = GameServer()->GetPlayerChar(m_Owner);
-	if (pOwner && (!CmaskIsSet(pOwner->TeamMask(), SnappingClient) || pOwner->IsPaused()))
+	if (!CmaskIsSet(m_TeamMask, SnappingClient) || (pOwner && pOwner->IsPaused()))
 		return;
 
 	CNetObj_Projectile *pParticle[MAX_PARTICLES];

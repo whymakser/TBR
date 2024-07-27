@@ -164,11 +164,8 @@ void CHelicopter::Snap(int SnappingClient)
 	if (NetworkClipped(SnappingClient))
 		return;
 
-	if (GameServer()->GetPlayerChar(SnappingClient))
-	{
-		if (GetOwner() && !CmaskIsSet(GetOwner()->TeamMask(), SnappingClient))
-			return;
-	}
+	if (!CmaskIsSet(m_TeamMask, SnappingClient))
+		return;
 
 	for (int i = 0; i < NUM_BONES; i++)
 		SnapBone(m_aBones[i]);

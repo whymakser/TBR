@@ -7,6 +7,7 @@
 
 class CPortalBlocker : public CEntity
 {
+	Mask128 m_TeamMask;
 	int m_Owner;
 	int m_Lifetime;
 	int m_aID[2];

@@ -41,6 +41,7 @@ void CFlag::Reset(bool Init)
 	m_TeleCheckpoint = 0;
 	m_SoundTick = 0;
 	m_CanPlaySound = true;
+	m_TeamMask = Mask128();
 }
 
 void CFlag::SetAtStand(bool AtStand)
@@ -223,6 +224,7 @@ void CFlag::Tick()
 		}
 	}
 
+	m_TeamMask = GetCarrier() ? GetCarrier()->TeamMask() : Mask128();
 	m_PrevPos = m_Pos;
 
 	if (m_SoundTick && Server()->Tick() % Server()->TickSpeed() == 0)
@@ -238,11 +240,8 @@ void CFlag::Snap(int SnappingClient)
 	if (pPlayer && pPlayer->GetTeam() != TEAM_SPECTATORS && !pPlayer->IsPaused() && GameServer()->Arenas()->FightStarted(SnappingClient))
 		return;
 
-	if (GameServer()->GetPlayerChar(SnappingClient))
-	{
-		if (GetCarrier() && (GetCarrier()->IsPaused() || !CmaskIsSet(GetCarrier()->TeamMask(), SnappingClient)))
-			return;
-	}
+	if (!CmaskIsSet(m_TeamMask, SnappingClient) || (GetCarrier() && GetCarrier()->IsPaused()))
+		return;
 
 	CNetObj_Flag *pFlag = (CNetObj_Flag *)Server()->SnapNewItem(NETOBJTYPE_FLAG, m_Team, sizeof(CNetObj_Flag));
 	if (!pFlag)

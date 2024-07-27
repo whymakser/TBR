@@ -12,6 +12,7 @@ CFlyingPoint::CFlyingPoint(CGameWorld *pGameWorld, vec2 Pos, int To, int Owner, 
 	m_To = To;
 	m_ToPos = ToPos;
 	m_InitialAmount = 1.0f;
+	m_TeamMask = Mask128();
 	GameWorld()->InsertEntity(this);
 }
 
@@ -37,6 +38,16 @@ void CFlyingPoint::Tick()
 		}
 
 		ToPos = pChr->GetPos();
+		m_TeamMask = pChr->TeamMask();
+	}
+	else if (m_Owner != -1)
+	{
+		CCharacter *pChr = GameServer()->GetPlayerChar(m_Owner);
+		m_TeamMask = pChr->TeamMask();
+	}
+	else
+	{
+		m_TeamMask = Mask128();
 	}
 
 	float Dist = distance(m_Pos, ToPos);
@@ -65,8 +76,7 @@ void CFlyingPoint::Snap(int SnappingClient)
 	if (NetworkClipped(SnappingClient))
 		return;
 
-	CCharacter *pOwner = GameServer()->GetPlayerChar(m_Owner);
-	if (pOwner && !CmaskIsSet(pOwner->TeamMask(), SnappingClient))
+	if (!CmaskIsSet(m_TeamMask, SnappingClient))
 		return;
 
 	CNetObj_Projectile *pObj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, GetID(), sizeof(CNetObj_Projectile)));

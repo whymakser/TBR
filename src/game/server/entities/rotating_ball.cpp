@@ -8,6 +8,7 @@ CRotatingBall::CRotatingBall(CGameWorld *pGameWorld, vec2 Pos, int Owner)
 	m_Pos = Pos;
 
 	m_IsRotating = true;
+	m_TeamMask = Mask128();
 
 	m_RotateDelay = Server()->TickSpeed() + 10;
 	m_LaserDirAngle = 0;
@@ -38,6 +39,7 @@ void CRotatingBall::Tick()
 	}
 
 	m_Pos = pOwner->GetPos();
+	m_TeamMask = pOwner->TeamMask();
 
 	m_RotateDelay--;
 	if(m_RotateDelay <= 0)
@@ -66,7 +68,7 @@ void CRotatingBall::Snap(int SnappingClient)
 		return;
 
 	CCharacter *pOwner = GameServer()->GetPlayerChar(m_Owner);
-	if (pOwner && (!CmaskIsSet(pOwner->TeamMask(), SnappingClient) || pOwner->IsPaused()))
+	if (!CmaskIsSet(m_TeamMask, SnappingClient) || (pOwner && pOwner->IsPaused()))
 		return;
 
 	CNetObj_Laser *pLaser = static_cast<CNetObj_Laser *>(Server()->SnapNewItem(NETOBJTYPE_LASER, GetID(), sizeof(CNetObj_Laser)));

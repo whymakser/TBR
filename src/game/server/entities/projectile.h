@@ -34,6 +34,7 @@ public:
 private:
 	vec2 m_Direction;
 	int m_LifeSpan;
+	Mask128 m_TeamMask;
 	int m_Owner;
 	int m_Type;
 	int m_SoundImpact;

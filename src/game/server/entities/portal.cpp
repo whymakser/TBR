@@ -20,6 +20,7 @@ CPortal::CPortal(CGameWorld *pGameWorld, vec2 Pos, int Owner, int ThroughPlotDoo
 	m_StartTick = Server()->Tick();
 	m_pLinkedPortal = 0;
 	m_LinkedTick = 0;
+	m_TeamMask = Mask128();
 
 	for (int i = 0; i < NUM_PORTAL_IDS; i++)
 		m_aID[i] = Server()->SnapNewID();
@@ -42,9 +43,7 @@ void CPortal::Reset()
 		for (int i = 0; i < NUM_PORTALS; i++)
 			GameServer()->m_apPlayers[m_Owner]->m_pPortal[i] = 0;
 
-	CCharacter *pOwner = GameServer()->GetPlayerChar(m_Owner);
-	Mask128 TeamMask = pOwner ? pOwner->TeamMask() : Mask128();
-	GameServer()->CreateDeath(m_Pos, m_Owner, TeamMask);
+	GameServer()->CreateDeath(m_Pos, m_Owner, m_TeamMask);
 	GameWorld()->DestroyEntity(this);
 }
 
@@ -73,6 +72,8 @@ void CPortal::Tick()
 		Reset();
 		return;
 	}
+
+	m_TeamMask = GameServer()->GetPlayerChar(m_Owner) ? GameServer()->GetPlayerChar(m_Owner)->TeamMask() : Mask128();
 	 
 	if ((m_LinkedTick == 0 && m_StartTick < Server()->Tick() - Server()->TickSpeed() * Config()->m_SvPortalDetonation)
 		|| (m_LinkedTick != 0 && m_LinkedTick < Server()->Tick() - Server()->TickSpeed() * Config()->m_SvPortalDetonationLinked))
@@ -234,16 +235,8 @@ void CPortal::Snap(int SnappingClient)
 	if (NetworkClipped(SnappingClient))
 		return;
 
-	if (GameServer()->GetPlayerChar(SnappingClient) && m_Owner != -1)
-	{
-		CCharacter *pOwner = GameServer()->GetPlayerChar(m_Owner);
-		if (pOwner)
-		{
-			Mask128 TeamMask = pOwner->TeamMask();
-			if (!CmaskIsSet(TeamMask, SnappingClient))
-				return;
-		}
-	}
+	if (!CmaskIsSet(m_TeamMask, SnappingClient))
+		return;
 
 	int Radius = Config()->m_SvPortalRadius;
 	float AngleStep = 2.0f * pi / NUM_SIDE;

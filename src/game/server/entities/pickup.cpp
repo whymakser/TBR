@@ -30,6 +30,7 @@ CPickup::CPickup(CGameWorld* pGameWorld, vec2 Pos, int Type, int SubType, int La
 		m_aLastRespawnMsg[i] = 0;
 
 	m_PickupTick = 0;
+	m_TeamMask = Mask128();
 
 	Reset();
 
@@ -100,6 +101,7 @@ void CPickup::Tick()
 		{
 			m_Pos.x = pChr->GetPos().x;
 			m_Pos.y = pChr->GetPos().y - 50;
+			m_TeamMask = pChr->TeamMask();
 		}
 		else
 			Reset(true);
@@ -367,11 +369,8 @@ void CPickup::Snap(int SnappingClient)
 			&& GameServer()->m_apPlayers[SnappingClient]->GetSpectatorID() != -1)
 		pChr = GameServer()->GetPlayerChar(GameServer()->m_apPlayers[SnappingClient]->GetSpectatorID());
 
-	if (pOwner && pChr)
-	{
-		if (!CmaskIsSet(pOwner->TeamMask(), SnappingClient))
-			return;
-	}
+	if (!CmaskIsSet(m_TeamMask, SnappingClient))
+		return;
 
 	CNetObj_EntityEx *pEntData = 0;
 	if (m_Layer == LAYER_SWITCH || length(m_Core) > 0)
