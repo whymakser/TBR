@@ -875,9 +875,12 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 		if (pAccount->m_Ninjajetpack && pPlayer->m_NinjaJetpack)
 			Flags |= PREVFLAG_ACC_NINJAJETPACK;
 		// Plot
-		if (m_aClients[ClientID].m_ShowPlotInfo && pPlayer->m_PlotSpawn && GameServer()->GetPlotID(AccID) >= PLOT_START)
+		int PlotID = GameServer()->GetPlotID(AccID);
+		if (m_aClients[ClientID].m_ShowPlotInfo && PlotID >= PLOT_START)
 		{
-			Flags |= PREVFLAG_PLOT_SPAWN;
+			if (pPlayer->m_PlotSpawn)
+				Flags |= PREVFLAG_PLOT_SPAWN;
+			pStats->m_DestroyEndTick = GameServer()->m_aPlots[PlotID].m_DestroyEndTick;
 		}
 
 		if (m_aClients[ClientID].m_ShowAccountStats)
