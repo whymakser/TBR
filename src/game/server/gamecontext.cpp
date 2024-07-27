@@ -4416,7 +4416,25 @@ void CGameContext::OnPreShutdown()
 
 		// properly disconnect dummies on reload/shutdown
 		if (pPlayer->m_IsDummy)
+		{
 			Server()->DummyLeave(i);
+		}
+		else if (Config()->m_SvShutdownAutoReconnect && Server()->IsSevendown(i))
+		{
+			// 0.7 is not supported, they would just time out, cl_reconnect_timeout is a ddnet feature.
+			const char *pMsg = ((CServer *)Server())->m_NetServer.m_ShutdownMessage;
+			CMsgPacker Msg(NETMSG_MAP_CHANGE, true);
+			Msg.AddString(pMsg[0] != '\0' ? pMsg : "Server is restarting...", 0);
+			Msg.AddInt(0);
+			Msg.AddInt(1);
+			/*if (!Server()->IsSevendown(i))
+			{
+				Msg.AddInt(0);
+				Msg.AddInt(0);
+				Msg.AddRaw(&SHA256_ZEROED, sizeof(SHA256_ZEROED));
+			}*/
+			Server()->SendMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH, i);
+		}
 	}
 
 	LogoutAllAccounts();
