@@ -6386,6 +6386,12 @@ int CGameContext::SaveCharacter(int ClientID, int Flags, float Hours)
 		}
 	}
 
+	if (Flags & SAVE_REDIRECT)
+	{
+		// reset solo so it cant be taken to another map
+		pChr->SetSolo(false);
+	}
+
 	// save identity to cache
 	SSavedIdentity Info;
 	Server()->GetClientAddr(ClientID, &Info.m_Addr);
