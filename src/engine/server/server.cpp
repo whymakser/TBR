@@ -1614,7 +1614,8 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 					m_aClients[ClientID].m_State = CClient::STATE_READY;
 					GameServer()->OnClientConnected(ClientID, ConnectAsSpec);
 				}
-				else if (m_aClients[ClientID].m_DesignChange || m_aClients[ClientID].m_Rejoining)
+				
+				if (m_aClients[ClientID].m_DesignChange || m_aClients[ClientID].m_Rejoining)
 				{
 					CNetMsg_Sv_ReadyToEnter m;
 					SendPackMsg(&m, MSGFLAG_VITAL|MSGFLAG_FLUSH, ClientID);
@@ -1642,29 +1643,27 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 					SendServerInfo(ClientID);
 					GameServer()->OnClientEnter(ClientID);
 				}
-				else
+
+				if (m_aClients[ClientID].m_DesignChange)
 				{
-					if (m_aClients[ClientID].m_DesignChange)
-					{
-						m_aClients[ClientID].m_DesignChange = false;
+					m_aClients[ClientID].m_DesignChange = false;
 
-						// When default map design is specified and we just joined, don't call this function
-						if (m_aClients[ClientID].m_State == CClient::STATE_INGAME)
-						{
-							GameServer()->MapDesignChangeDone(ClientID);
-							// Reset so the server doesnt need to resend big snapshot deltas or smth, we can connect quicker
-							m_aClients[ClientID].m_LastAckedSnapshot = -1;
-						}
-
-						int Dummy = GetDummy(ClientID);
-						if (Dummy != -1)
-							m_aClients[Dummy].m_DesignChange = false;
-					}
-					if (m_aClients[ClientID].m_Rejoining)
+					// When default map design is specified and we just joined, don't call this function
+					if (m_aClients[ClientID].m_State == CClient::STATE_INGAME)
 					{
-						m_aClients[ClientID].m_Rejoining = false;
-						GameServer()->OnClientRejoin(ClientID);
+						GameServer()->MapDesignChangeDone(ClientID);
+						// Reset so the server doesnt need to resend big snapshot deltas or smth, we can connect quicker
+						m_aClients[ClientID].m_LastAckedSnapshot = -1;
 					}
+
+					int Dummy = GetDummy(ClientID);
+					if (Dummy != -1)
+						m_aClients[Dummy].m_DesignChange = false;
+				}
+				else if (m_aClients[ClientID].m_Rejoining)
+				{
+					m_aClients[ClientID].m_Rejoining = false;
+					GameServer()->OnClientRejoin(ClientID);
 				}
 			}
 		}
