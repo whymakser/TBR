@@ -386,7 +386,7 @@ public:
 	void Reset();
 	void Init(CNetBase *pNetBase, bool BlockCloseMsg);
 	int Connect(NETADDR *pAddr);
-	void Disconnect(const char *pReason);
+	void Disconnect(const char *pReason, bool Shutdown = false);
 
 	void SetToken(TOKEN Token);
 
@@ -534,7 +534,7 @@ public:
 	void AddToken(const NETADDR *pAddr, TOKEN Token, int Socket) { m_TokenCache.AddToken(pAddr, Token, 0, Socket); };
 
 	//
-	void Drop(int ClientID, const char *pReason, bool Banned = false);
+	void Drop(int ClientID, const char *pReason, bool Banned = false, bool Shutdown = false);
 
 	// status requests
 	const NETADDR *ClientAddr(int ClientID) const { return m_aSlots[ClientID].m_Connection.PeerAddress(); }

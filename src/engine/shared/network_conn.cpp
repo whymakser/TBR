@@ -223,7 +223,7 @@ int CNetConnection::Connect(NETADDR *pAddr)
 	return 0;
 }
 
-void CNetConnection::Disconnect(const char *pReason)
+void CNetConnection::Disconnect(const char *pReason, bool Shutdown)
 {
 	if(State() == NET_CONNSTATE_OFFLINE)
 		return;
@@ -234,7 +234,7 @@ void CNetConnection::Disconnect(const char *pReason)
 		{
 			// Don't send conn close on auto reconnect, let client time out and come back. we sent a map change ahead
 			// 0.7 is not supported, they would just time out, cl_reconnect_timeout is a ddnet feature.
-			if (!Config()->m_SvShutdownAutoReconnect || !m_Sevendown)
+			if (!Shutdown || !Config()->m_SvShutdownAutoReconnect || !m_Sevendown)
 			{
 				if (pReason)
 					SendControl(NET_CTRLMSG_CLOSE, pReason, str_length(pReason) + 1);

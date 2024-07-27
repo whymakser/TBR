@@ -65,12 +65,12 @@ bool CNetServer::Open(NETADDR BindAddr, CConfig *pConfig, IConsole *pConsole, IE
 void CNetServer::Close()
 {
 	for(int i = 0; i < NET_MAX_CLIENTS; i++)
-		Drop(i, m_ShutdownMessage[0] != '\0' ? m_ShutdownMessage : "Server shutdown");
+		Drop(i, m_ShutdownMessage[0] != '\0' ? m_ShutdownMessage : "Server shutdown", false, true);
 
 	Shutdown();
 }
 
-void CNetServer::Drop(int ClientID, const char *pReason, bool Banned)
+void CNetServer::Drop(int ClientID, const char *pReason, bool Banned, bool Shutdown)
 {
 	if(ClientID < 0 || ClientID >= NET_MAX_CLIENTS)
 		return;
@@ -83,7 +83,7 @@ void CNetServer::Drop(int ClientID, const char *pReason, bool Banned)
 	if (Banned && Config()->m_SvDiscordURL[0])
 		str_format(aBuf, sizeof(aBuf), "%s - Appeal: %s", pReason, Config()->m_SvDiscordURL);
 
-	m_aSlots[ClientID].m_Connection.Disconnect(aBuf);
+	m_aSlots[ClientID].m_Connection.Disconnect(aBuf, Shutdown);
 	m_NumClients--;
 }
 
