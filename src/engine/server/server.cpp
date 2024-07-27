@@ -1616,15 +1616,15 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 					m_aClients[ClientID].m_State = CClient::STATE_READY;
 					GameServer()->OnClientConnected(ClientID, ConnectAsSpec);
 				}
-				else if (m_aClients[ClientID].m_State == CClient::STATE_FAKE_MAP)
-				{
-					m_aClients[ClientID].m_State = CClient::STATE_CONNECTING;
-					SendMap(ClientID);
-				}
 				else if (m_aClients[ClientID].m_DesignChange || m_aClients[ClientID].m_Rejoining)
 				{
 					CNetMsg_Sv_ReadyToEnter m;
 					SendPackMsg(&m, MSGFLAG_VITAL|MSGFLAG_FLUSH, ClientID);
+				}
+				else if (m_aClients[ClientID].m_State == CClient::STATE_FAKE_MAP)
+				{
+					m_aClients[ClientID].m_State = CClient::STATE_CONNECTING;
+					SendMap(ClientID);
 				}
 			}
 		}
