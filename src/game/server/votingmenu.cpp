@@ -655,10 +655,19 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 	{
 		char aPlotHeader[32];
 		str_format(aPlotHeader, sizeof(aPlotHeader), "%s %d", COLLAPSE_HEADER_PLOT_INFO, PlotID);
-		if (DoLineCollapse(Page, pNumOptions, aPlotHeader, m_aClients[ClientID].m_ShowPlotInfo, 4))
+		bool IsPlotDestroy = GameServer()->m_aPlots[PlotID].m_DestroyEndTick;
+		if (DoLineCollapse(Page, pNumOptions, aPlotHeader, m_aClients[ClientID].m_ShowPlotInfo, 4 + (int)IsPlotDestroy*2))
 		{
 			str_format(aBuf, sizeof(aBuf), "Rented until: %s", GameServer()->GetDate(GameServer()->m_aPlots[PlotID].m_ExpireDate));
 			DoLineText(Page, pNumOptions, aBuf, BULLET_POINT);
+
+			if (IsPlotDestroy)
+			{
+				str_format(aBuf, sizeof(aBuf), "Door Health: %d/%d", GameServer()->m_aPlots[PlotID].m_DoorHealth, GameServer()->Config()->m_SvPlotDoorHealth);
+				DoLineText(Page, pNumOptions, aBuf, BULLET_POINT);
+				str_format(aBuf, sizeof(aBuf), "Destroy Seconds: %lld", (GameServer()->m_aPlots[PlotID].m_DestroyEndTick - Server()->Tick()) / Server()->TickSpeed());
+				DoLineText(Page, pNumOptions, aBuf, BULLET_POINT);
+			}
 
 			DoLineToggleOption(Page, pNumOptions, ACC_PLOT_SPAWN, pPlayer->m_PlotSpawn);
 			DoLineText(Page, pNumOptions, ACC_PLOT_EDIT, BULLET_ARROW);
