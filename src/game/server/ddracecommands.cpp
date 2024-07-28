@@ -1025,7 +1025,16 @@ void CGameContext::ConPassive(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	int Victim = pResult->NumArguments() ? pResult->GetVictim() : pResult->m_ClientID;
 	CCharacter *pChr = pSelf->GetPlayerChar(Victim);
-	if (pChr) pChr->Passive(!pChr->m_Passive, pResult->m_ClientID);
+	if (pChr)
+	{
+		if (pChr->m_PassiveEndTick)
+		{
+			pChr->m_PassiveEndTick = 0;
+			pChr->m_Passive = false;
+		}
+
+		pChr->Passive(!pChr->m_Passive, pResult->m_ClientID);
+	}
 }
 
 void CGameContext::ConItem(IConsole::IResult *pResult, void *pUserData)

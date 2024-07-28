@@ -8,6 +8,10 @@
 CDummyHouse::CDummyHouse(CCharacter *pChr, int Mode)
 : CDummyBase(pChr, Mode)
 {
+	if (Mode == DUMMYMODE_TAVERN_DUMMY)
+	{
+		m_pCharacter->Passive(true, -1, true);
+	}
 }
 
 void CDummyHouse::OnTick()

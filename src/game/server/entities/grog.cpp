@@ -66,6 +66,7 @@ void CGrog::OnSip()
 {
 	m_NumSips++;
 	GameServer()->CreateSound(m_Pos, SOUND_WEAPON_SPAWN, m_TeamMask);
+	GetOwner()->SetEmote(EMOTE_HAPPY, Server()->Tick() + Server()->TickSpeed() * 2);
 
 	if (m_NumSips >= NUM_GROG_SIPS)
 	{

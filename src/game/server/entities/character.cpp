@@ -3997,9 +3997,6 @@ void CCharacter::FDDraceInit()
 	for (int i = 0; i < NUM_WEAPONS; i++)
 		m_aHadWeapon[i] = false;
 
-	m_pDummyHandle = 0;
-	CreateDummyHandle(m_pPlayer->GetDummyMode());
-
 	m_LastTaserUse = Now;
 	m_FirstFreezeTick = 0;
 
@@ -4039,6 +4036,9 @@ void CCharacter::FDDraceInit()
 	m_Permille = 0;
 	m_FirstPermilleTick = 0;
 	m_GrogSpirit = 0;
+
+	m_pDummyHandle = 0;
+	CreateDummyHandle(m_pPlayer->GetDummyMode());
 }
 
 void CCharacter::CreateDummyHandle(int Dummymode)
@@ -4483,14 +4483,20 @@ void CCharacter::IncreasePermille(int Permille)
 	if (m_Permille <= Config()->m_SvGrogMinPermilleLimit)
 	{
 		// 10 minutes passive, if you dont drink in this time, ur gonna have a ratio of 2/3, cuz 1 drink = passive + 0.3, so 15 min to decrease 0.3, but 10 min passive
-		m_PassiveEndTick = Server()->Tick() + Server()->TickSpeed() * 60 * 10;
-		Passive(true, -1, true);
+		if (!m_Passive)
+		{
+			m_PassiveEndTick = Server()->Tick() + Server()->TickSpeed() * 60 * 10;
+			Passive(true, -1, true);
+		}
 	}
 	else
 	{
 		// Disable when we drank more than allowed
-		m_PassiveEndTick = 0;
-		Passive(false, -1, true);
+		if (m_PassiveEndTick)
+		{
+			m_PassiveEndTick = 0;
+			Passive(false, -1, true);
+		}
 	}
 }
 

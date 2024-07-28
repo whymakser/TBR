@@ -166,6 +166,7 @@ private:
 	int m_InNoBonusArea;
 	int m_NumGrogsHolding;
 	int m_Permille;
+	int m_TicksSinceFirstPermille;
 
 	// core
 	int m_MoveRestrictionExtraRoomKey;
