@@ -359,6 +359,10 @@ MACRO_CONFIG_INT(SvNoBonusMaxJumps, sv_no_bonus_max_jumps, 2, 2, 9999, CFGFLAG_S
 MACRO_CONFIG_INT(SvNoBonusScoreTreshold, sv_bonus_score_treshold, 10, 0, 100, CFGFLAG_SERVER, "Treshold value for bonus score in no-bonus area (0=bonus removal)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvNoBonusScoreDecrease, sv_bonus_score_decrease, 10, 0, 60, CFGFLAG_SERVER, "Time in seconds between bonus score decrease", AUTHED_ADMIN)
 
+// grog
+MACRO_CONFIG_INT(SvGrogPrice, sv_grog_price, 5000, 1, 50000, CFGFLAG_SERVER, "Price per grog", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvGrogHoldLimit, sv_grog_hold_limit, 3, 1, 10, CFGFLAG_SERVER, "Amount of grogs a player can carry", AUTHED_ADMIN)
+
 // other
 MACRO_CONFIG_INT(SvHideMinigamePlayers, sv_hide_minigame_players, 1, 0, 1, CFGFLAG_SERVER, "Whether players in different minigames are shown in the scoreboard", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvRainbowSpeedDefault, sv_rainbow_speed_default, 5, 1, 50, CFGFLAG_SERVER, "Default speed for rainbow", AUTHED_ADMIN)

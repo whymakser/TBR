@@ -16,6 +16,7 @@ CHouse::CHouse(CGameContext *pGameServer, int Type)
 	case HOUSE_SHOP: m_pHeadline = "~ S H O P ~"; break;
 	case HOUSE_PLOT_SHOP: m_pHeadline = "~ P L O T - S H O P ~"; break;
 	case HOUSE_BANK: m_pHeadline = "~ B A N K ~"; break;
+	case HOUSE_TAVERN: m_pHeadline = "~ T A V E R N ~"; break;
 	default: m_pHeadline = "~ I N V A L I D ~";
 	}
 
@@ -38,7 +39,7 @@ void CHouse::SendWindow(int ClientID, const char *pMsg, const char *pFooterMsg, 
 	const char *pCut = "*************************************\n";
 
 	char aPage[8] = "";
-	if (m_aClients[ClientID].m_Page > PAGE_MAIN && m_Type != HOUSE_BANK)
+	if (m_aClients[ClientID].m_Page > PAGE_MAIN && m_Type != HOUSE_BANK && m_Type != HOUSE_TAVERN)
 	{
 		if (Page == -1)
 			Page = m_aClients[ClientID].m_Page;
@@ -130,7 +131,7 @@ void CHouse::OnKeyPress(int ClientID, int Dir)
 		int NeedConfirmState = m_Type == HOUSE_BANK ? STATE_CHOSE_ASSIGNMENT : STATE_OPENED_WINDOW;
 		if (m_aClients[ClientID].m_State == NeedConfirmState)
 		{
-			if (m_aClients[ClientID].m_Page > PAGE_MAIN)
+			if (m_Type == HOUSE_TAVERN || m_aClients[ClientID].m_Page > PAGE_MAIN)
 				ConfirmAssignment(ClientID);
 		}
 		else if (m_aClients[ClientID].m_State == STATE_CONFIRM)
@@ -190,7 +191,7 @@ void CHouse::DoPageChange(int ClientID, int Dir)
 {
 	m_aClients[ClientID].m_LastMotd = Server()->Tick();
 
-	if (m_Type != HOUSE_BANK || m_aClients[ClientID].m_Page > PAGE_MAIN)
+	if (m_Type != HOUSE_TAVERN && (m_Type != HOUSE_BANK || m_aClients[ClientID].m_Page > PAGE_MAIN))
 	{
 		do
 		{

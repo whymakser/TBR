@@ -121,11 +121,8 @@ void CLightsaber::Snap(int SnappingClient)
 	if (NetworkClipped(SnappingClient, m_Pos) && NetworkClipped(SnappingClient, m_To))
 		return;
 
-	if (GameServer()->GetPlayerChar(SnappingClient))
-	{
-		if (!CmaskIsSet(m_TeamMask, SnappingClient))
-			return;
-	}
+	if (!CmaskIsSet(m_TeamMask, SnappingClient))
+		return;
 
 	if (m_pOwner && m_pOwner->IsPaused())
 		return;

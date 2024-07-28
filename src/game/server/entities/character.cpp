@@ -328,7 +328,7 @@ void CCharacter::HandleNinja()
 void CCharacter::DoWeaponSwitch()
 {
 	// make sure we can switch
-	if (m_ReloadTimer != 0 || m_QueuedWeapon == -1 || (m_aWeapons[WEAPON_NINJA].m_Got && !m_ScrollNinja) || (m_QueuedWeapon != -2 && !m_aWeapons[m_QueuedWeapon].m_Got) || m_DrawEditor.Selecting())
+	if (m_ReloadTimer != 0 || m_QueuedWeapon == -1 || (m_aWeapons[WEAPON_NINJA].m_Got && !m_ScrollNinja) || (m_QueuedWeapon != -2 && !m_aWeapons[m_QueuedWeapon].m_Got) || m_DrawEditor.Selecting() || m_NumGrogsHolding)
 		return;
 
 	if (m_QueuedWeapon == -2)
@@ -531,7 +531,15 @@ void CCharacter::FireWeapon()
 		{
 			case WEAPON_HAMMER:
 			{
-				if (m_IsPortalBlocker)
+				if (m_NumGrogsHolding)
+				{
+					if (m_pGrog)
+					{
+						m_pGrog->OnSip();
+					}
+					break;
+				}
+				else if (m_IsPortalBlocker)
 				{
 					// Only process portal blocker when scoreboard is closed, as it is used for toggling so we dont place accidentally
 					if (!(m_pPlayer->m_PlayerFlags&PLAYERFLAG_SCOREBOARD) && (!pAccount->m_PortalBlocker || !m_pPortalBlocker || !m_pPortalBlocker->OnPlace()))
@@ -2716,6 +2724,7 @@ void CCharacter::HandleTiles(int Index)
 			case HOUSE_SHOP: Index = TILE_SHOP; break;
 			case HOUSE_PLOT_SHOP: Index = TILE_PLOT_SHOP; break;
 			case HOUSE_BANK: Index = TILE_BANK; break;
+			case HOUSE_TAVERN: Index = TILE_TAVERN; break;
 			}
 
 			if (m_TileIndex == Index || m_TileFIndex == Index)
@@ -4046,6 +4055,7 @@ void CCharacter::FDDraceInit()
 	m_IsGrounded = false;
 	m_aLineExp[0] = '\0';
 	m_aLineMoney[0] = '\0';
+	m_pGrog = 0;
 }
 
 void CCharacter::CreateDummyHandle(int Dummymode)
@@ -4060,6 +4070,7 @@ void CCharacter::CreateDummyHandle(int Dummymode)
 	case DUMMYMODE_BLMAPCHILL_POLICE: m_pDummyHandle = new CDummyBlmapChillPolice(this); break;
 	case DUMMYMODE_SHOP_DUMMY: // fallthrough
 	case DUMMYMODE_PLOT_SHOP_DUMMY: // fallthrough
+	case DUMMYMODE_TAVERN_DUMMY: // fallthrough
 	case DUMMYMODE_BANK_DUMMY: m_pDummyHandle = new CDummyHouse(this, Dummymode); break;
 	case DUMMYMODE_V3_BLOCKER: m_pDummyHandle = new CDummyV3Blocker(this); break;
 	case DUMMYMODE_CHILLBLOCK5_POLICE: m_pDummyHandle = new CDummyChillBlock5Police(this); break;
@@ -4315,6 +4326,7 @@ void CCharacter::HandleLastIndexTiles()
 		case HOUSE_SHOP: Index = TILE_SHOP; break;
 		case HOUSE_PLOT_SHOP: Index = TILE_PLOT_SHOP; break;
 		case HOUSE_BANK: Index = TILE_BANK; break;
+		case HOUSE_TAVERN: Index = TILE_TAVERN; break;
 		}
 
 		if (m_TileIndex != Index && m_TileFIndex != Index)
@@ -4460,6 +4472,27 @@ void CCharacter::SetLastTouchedSwitcher(int Number)
 	}
 }
 
+bool CCharacter::AddGrog()
+{
+	if (m_NumGrogsHolding >= Config()->m_SvGrogHoldLimit)
+	{
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "You can not hold more than %d grogs at once", Config()->m_SvGrogHoldLimit);
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
+		return false;
+	}
+
+	m_NumGrogsHolding++;
+	UpdateWeaponIndicator();
+	if (!m_pGrog)
+		m_pGrog = new CGrog(GameWorld(), m_Pos, m_pPlayer->GetCID());
+	
+	// Force hammer while holding grog
+	GiveWeapon(WEAPON_HAMMER);
+	SetWeapon(WEAPON_HAMMER);
+	return true;
+}
+
 void CCharacter::DropMoney(int64 Amount, int Dir)
 {
 	if (Amount <= 0 || Amount > m_pPlayer->GetWalletMoney())
@@ -4495,7 +4528,7 @@ void CCharacter::DropWeapon(int WeaponID, bool OnDeath, float Dir)
 	if (W != -1 && m_aSpawnWeaponActive[W])
 		return;
 
-	if (Config()->m_SvMaxWeaponDrops == 0 || (!OnDeath && (m_FreezeTime || !Config()->m_SvDropWeapons)) || !m_aWeapons[WeaponID].m_Got || m_pPlayer->m_Minigame == MINIGAME_1VS1)
+	if (Config()->m_SvMaxWeaponDrops == 0 || (!OnDeath && (m_FreezeTime || !Config()->m_SvDropWeapons)) || !m_aWeapons[WeaponID].m_Got || m_pPlayer->m_Minigame == MINIGAME_1VS1 || m_NumGrogsHolding)
 		return;
 	if (WeaponID == WEAPON_DRAW_EDITOR || (WeaponID == WEAPON_NINJA && !m_ScrollNinja) || (WeaponID == WEAPON_PORTAL_RIFLE && !m_CollectedPortalRifle) || (WeaponID == WEAPON_TASER && m_pPlayer->GetAccID() < ACC_START))
 		return;
@@ -4581,6 +4614,11 @@ void CCharacter::DropBattery(int WeaponID, int Amount, bool OnDeath, float Dir)
 	GameServer()->CreateSound(m_Pos, SOUND_WEAPON_NOAMMO, TeamMask());
 	new CPickupDrop(GameWorld(), m_Pos, POWERUP_BATTERY, m_pPlayer->GetCID(), Dir == -3 ? GetAimDir() : Dir, 300, WeaponID, Amount);
 	m_LastBatteryDrop = Server()->Tick();
+}
+
+bool CCharacter::DropGrog(int Dir)
+{
+	return m_NumGrogsHolding && m_pGrog && m_pGrog->Drop();
 }
 
 void CCharacter::DropLoot(int Weapon)
@@ -4800,6 +4838,7 @@ void CCharacter::UpdateWeaponIndicator()
 	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[m_pPlayer->GetAccID()];
 
 	char aAmmo[32] = "";
+	const char *pName = GameServer()->GetWeaponName(GetActiveWeapon());
 	if (GetActiveWeapon() == WEAPON_TASER && pAccount->m_TaserLevel)
 	{
 		str_format(aAmmo, sizeof(aAmmo), " [%d]", pAccount->m_TaserBattery);
@@ -4813,11 +4852,16 @@ void CCharacter::UpdateWeaponIndicator()
 	}
 	else if (m_IsPortalBlocker)
 	{
+		pName = "Portal Blocker";
 		str_format(aAmmo, sizeof(aAmmo), " [%d]", pAccount->m_PortalBlocker);
+	}
+	else if (m_NumGrogsHolding)
+	{
+		pName = "Grog";
+		str_format(aAmmo, sizeof(aAmmo), " [%d]", m_NumGrogsHolding);
 	}
 
 	char aBuf[256] = "";
-	const char *pName = m_IsPortalBlocker ? "Portal Blocker" : GameServer()->GetWeaponName(GetActiveWeapon());
 	if (Server()->IsSevendown(m_pPlayer->GetCID()))
 	{
 		if (GameServer()->GetClientDDNetVersion(m_pPlayer->GetCID()) < VERSION_DDNET_NEW_HUD)
@@ -4826,7 +4870,7 @@ void CCharacter::UpdateWeaponIndicator()
 		}
 		else
 		{
-			if (GetActiveWeapon() >= NUM_VANILLA_WEAPONS || m_IsPortalBlocker)
+			if (GetActiveWeapon() >= NUM_VANILLA_WEAPONS || m_IsPortalBlocker || m_NumGrogsHolding)
 				str_format(aBuf, sizeof(aBuf), "> %s%s", pName, aAmmo);
 		}
 	}

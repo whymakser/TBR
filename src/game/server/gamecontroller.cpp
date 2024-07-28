@@ -397,18 +397,6 @@ bool IGameController::OnEntity(int Index, vec2 Pos, int Layer, int Flags, int Nu
 	{
 		new CClock(&GameServer()->m_World, Pos);
 	}
-	else if (Index == ENTITY_SHOP_DUMMY_SPAWN)
-	{
-		GameServer()->ConnectDummy(DUMMYMODE_SHOP_DUMMY, Pos);
-	}
-	else if (Index == ENTITY_PLOT_SHOP_DUMMY_SPAWN)
-	{
-		GameServer()->ConnectDummy(DUMMYMODE_PLOT_SHOP_DUMMY, Pos);
-	}
-	else if (Index == ENTITY_BANK_DUMMY_SPAWN)
-	{
-		GameServer()->ConnectDummy(DUMMYMODE_BANK_DUMMY, Pos);
-	}
 	else if(Index >= ENTITY_LASER_FAST_CCW && Index <= ENTITY_LASER_FAST_CW)
 	{
 		int sides2[8];

@@ -105,7 +105,7 @@ void CPortal::EntitiesEnter()
 			m_vTeleported.erase(m_vTeleported.begin() + i);
 	}
 
-	int Types = (1<<CGameWorld::ENTTYPE_CHARACTER) | (1<<CGameWorld::ENTTYPE_FLAG) | (1<<CGameWorld::ENTTYPE_PICKUP_DROP) | (1<<CGameWorld::ENTTYPE_MONEY);
+	int Types = (1<<CGameWorld::ENTTYPE_CHARACTER) | (1<<CGameWorld::ENTTYPE_FLAG) | (1<<CGameWorld::ENTTYPE_PICKUP_DROP) | (1<<CGameWorld::ENTTYPE_MONEY) | (1<<CGameWorld::ENTTYPE_GROG);
 	CEntity *apEnts[128];
 	int Num = GameWorld()->FindEntitiesTypes(m_Pos, Config()->m_SvPortalRadius, (CEntity**)apEnts, 128, Types);
 
@@ -150,6 +150,13 @@ void CPortal::EntitiesEnter()
 				CMoney *pMoney = (CMoney *)apEnts[i];
 				if (pMoney->GetOwner())
 					pAffectedChr = pMoney->GetOwner();
+				break;
+			}
+		case CGameWorld::ENTTYPE_GROG:
+			{
+				CGrog *pGrog = (CGrog *)apEnts[i];
+				if (pGrog->GetOwner())
+					pAffectedChr = pGrog->GetOwner();
 				break;
 			}
 		}
@@ -214,6 +221,13 @@ void CPortal::EntitiesEnter()
 				CMoney *pMoney = (CMoney *)apEnts[i];
 				pMoney->SetPos(m_pLinkedPortal->m_Pos);
 				pMoney->SetPrevPos(m_pLinkedPortal->m_Pos);
+				break;
+			}
+		case CGameWorld::ENTTYPE_GROG:
+			{
+				CGrog *pGrog = (CGrog *)apEnts[i];
+				pGrog->SetPos(m_pLinkedPortal->m_Pos);
+				pGrog->SetPrevPos(m_pLinkedPortal->m_Pos);
 				break;
 			}
 		}

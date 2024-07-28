@@ -150,6 +150,9 @@ CONSOLE_COMMAND("preset_list", "", CFGFLAG_SERVER, ConPresetList, this, "Shows a
 //designs
 CONSOLE_COMMAND("reload_designs", "", CFGFLAG_SERVER, ConReloadDesigns, this, "Reloads map designs", AUTHED_ADMIN)
 
+//grog
+CONSOLE_COMMAND("add_grog", "?v[id]", CFGFLAG_SERVER|CMDFLAG_TEST, ConAddGrog, this, "Gives a grog to player v", AUTHED_ADMIN)
+
 //fun
 CONSOLE_COMMAND("sound", "i[sound]", CFGFLAG_SERVER, ConSound, this, "Plays the sound with id i", AUTHED_ADMIN)
 CONSOLE_COMMAND("lasertext", "v[id] r[text]", CFGFLAG_SERVER, ConLaserText, this, "Sends a laser text", AUTHED_ADMIN)

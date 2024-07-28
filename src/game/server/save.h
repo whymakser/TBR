@@ -163,6 +163,7 @@ private:
 	int m_StaffInd;
 	int m_Confetti;
 	int m_InNoBonusArea;
+	int m_NumGrogsHolding;
 
 	// core
 	int m_MoveRestrictionExtraRoomKey;

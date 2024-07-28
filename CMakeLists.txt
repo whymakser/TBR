@@ -1517,6 +1517,8 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   entities/flag.h
   entities/flyingpoint.cpp
   entities/flyingpoint.h
+  entities/grog.cpp
+  entities/grog.h
   entities/gun.cpp
   entities/gun.h
   entities/helicopter.cpp
@@ -1580,6 +1582,8 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   houses/house.h
   houses/shop.cpp
   houses/shop.h
+  houses/tavern.cpp
+  houses/tavern.h
   mask128.h
   minigames/arenas.cpp
   minigames/arenas.h

@@ -57,8 +57,7 @@ void CPickupDrop::Reset(bool Picked)
 	if (!Picked)
 		GameServer()->CreateDeath(m_Pos, m_Owner, m_TeamMask);
 
-	GameServer()->UnsetTelekinesis(this);
-	GameWorld()->DestroyEntity(this);
+	CAdvancedEntity::Reset();
 }
 
 void CPickupDrop::Tick()

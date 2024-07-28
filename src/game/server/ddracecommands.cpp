@@ -1432,6 +1432,7 @@ void CGameContext::ConDummymode(IConsole::IResult *pResult, void *pUserData)
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", "[99] Shop Bot");
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", "[98] Plot Shop Bot");
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", "[97] Bank Bot");
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", "[96] Tavern Bot");
 	}
 }
 
@@ -1518,6 +1519,19 @@ void CGameContext::ConSound(IConsole::IResult* pResult, void* pUserData)
 {
 	CGameContext* pSelf = (CGameContext*)pUserData;
 	pSelf->CreateSoundGlobal(pResult->GetInteger(0));
+}
+
+void CGameContext::ConAddGrog(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int Victim = pResult->NumArguments() ? pResult->GetVictim() : pResult->m_ClientID;
+	CCharacter *pChr = pSelf->GetPlayerChar(Victim);
+	if (pChr && pChr->AddGrog())
+	{
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "Added a grog to '%s'", pSelf->Server()->ClientName(Victim));
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
+	}
 }
 
 void CGameContext::ConPlayerName(IConsole::IResult* pResult, void* pUserData)

@@ -17,6 +17,7 @@
 #include "stable_projectile.h"
 #include "helicopter.h"
 #include "portalblocker.h"
+#include "grog.h"
 
 #include "dummy/dummybase.h"
 
@@ -148,6 +149,7 @@ public:
 	void DropPickup(int Type, int Amount = 1);
 	void DropLoot(int Weapon);
 	void DropBattery(int WeaponID, int Amount, bool OnDeath = false, float Dir = -3);
+	bool DropGrog(int Dir = -3);
 
 	void SetAvailableWeapon(int PreferedWeapon = WEAPON_GUN);
 	int GetAimDir() { return m_Input.m_TargetX < 0 ? -1 : 1; };
@@ -548,6 +550,11 @@ public:
 	bool LoadRedirectTile(int Port);
 	int m_RedirectTilePort;
 	int64 m_RedirectPassiveEndTick;
+
+	// Grog
+	bool AddGrog();
+	int m_NumGrogsHolding;
+	CGrog *m_pGrog;
 
 	//others
 	int HasFlag();

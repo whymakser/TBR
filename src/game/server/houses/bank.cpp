@@ -34,7 +34,7 @@ const char *CBank::GetConfirmMessage(int ClientID)
 const char *CBank::GetEndMessage(int ClientID)
 {
 	if (m_aClients[ClientID].m_State == STATE_CHOSE_ASSIGNMENT)
-		return "You can't use the bank without an account. Check '/accountinfo'.";
+		return "You can't use the bank without an account. Check '/account'.";
 	return "You cancelled the assignment.";
 }
 

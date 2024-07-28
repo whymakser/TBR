@@ -30,6 +30,7 @@
 #include "player.h"
 #include "houses/shop.h"
 #include "houses/bank.h"
+#include "houses/tavern.h"
 #include "minigames/arenas.h"
 
 #include "entities/flag.h"
@@ -335,7 +336,7 @@ void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamag
 
 	int Types = (1<<CGameWorld::ENTTYPE_CHARACTER);
 	if (Config()->m_SvInteractiveDrops)
-		Types |= (1<<CGameWorld::ENTTYPE_FLAG) | (1<<CGameWorld::ENTTYPE_PICKUP_DROP) | (1<<CGameWorld::ENTTYPE_MONEY);
+		Types |= (1<<CGameWorld::ENTTYPE_FLAG) | (1<<CGameWorld::ENTTYPE_PICKUP_DROP) | (1<<CGameWorld::ENTTYPE_MONEY) | (1<<CGameWorld::ENTTYPE_GROG);
 	int Num = m_World.FindEntitiesTypes(Pos, Radius, (CEntity * *)apEnts, MAX_CLIENTS, Types);
 	Mask128 TeamMask = Mask128();
 	for (int i = 0; i < Num; i++)
@@ -1183,6 +1184,7 @@ void CGameContext::SendTuningParams(int ClientID, int Zone)
 
 void CGameContext::OnTick()
 {
+	Config()->m_SvTestingCommands = 1;
 	if(m_TeeHistorianActive)
 	{
 		if(!m_TeeHistorian.Starting())
@@ -2708,7 +2710,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 						{
 							pChr->m_pHelicopter->Dismount();
 						}
-						else if (!pChr->TryMountHelicopter())
+						else if (!pChr->TryMountHelicopter() && !pChr->DropGrog())
 						{
 							pChr->DropWeapon(pChr->GetActiveWeapon(), false);
 						}
@@ -4222,6 +4224,7 @@ void CGameContext::FDDraceInit()
 	m_pHouses[HOUSE_SHOP] = new CShop(this, HOUSE_SHOP);
 	m_pHouses[HOUSE_PLOT_SHOP] = new CShop(this, HOUSE_PLOT_SHOP);
 	m_pHouses[HOUSE_BANK] = new CBank(this);
+	m_pHouses[HOUSE_TAVERN] = new CTavern(this);
 
 	for (int i = 0; i < NUM_MINIGAMES; i++)
 		if (m_pMinigames[i])
@@ -4249,7 +4252,14 @@ void CGameContext::FDDraceInit()
 
 	SetMapSpecificOptions();
 	if (Config()->m_SvDefaultDummies)
+	{
 		ConnectDefaultDummies();
+	}
+	else
+	{
+		for (int i = 0; i < NUM_HOUSES; i++)
+			ConnectHouseDummy(i, true);
+	}
 
 	char aPath[IO_MAX_PATH_LENGTH];
 	str_format(aPath, sizeof(aPath), "%s/presets", Config()->m_SvPlotFilePath);
@@ -7121,10 +7131,20 @@ void CGameContext::ConnectDummy(int DummyMode, vec2 Pos)
 	if (DummyMode == DUMMYMODE_V3_BLOCKER && Collision()->TileUsed(TILE_MINIGAME_BLOCK))
 		pDummy->m_Minigame = MINIGAME_BLOCK;
 	else if ((DummyMode == DUMMYMODE_SHOP_DUMMY && Collision()->TileUsed(ENTITY_SHOP_DUMMY_SPAWN))
-		|| (DummyMode == DUMMYMODE_PLOT_SHOP_DUMMY && Collision()->TileUsed(ENTITY_PLOT_SHOP_DUMMY_SPAWN)))
-		pDummy->m_Minigame = -1;
+		|| (DummyMode == DUMMYMODE_PLOT_SHOP_DUMMY && Collision()->TileUsed(ENTITY_PLOT_SHOP_DUMMY_SPAWN))
+		|| (DummyMode == DUMMYMODE_BANK_DUMMY && Collision()->TileUsed(ENTITY_BANK_DUMMY_SPAWN))
+		|| (DummyMode == DUMMYMODE_TAVERN_DUMMY && Collision()->TileUsed(ENTITY_TAVERN_DUMMY_SPAWN))
+		)
+		pDummy->m_Minigame = MINIGAME_NONE;
 
-	pDummy->m_TeeInfos = CTeeInfo(SKIN_DUMMY);
+	if (DummyMode == DUMMYMODE_TAVERN_DUMMY)
+	{
+		pDummy->m_TeeInfos = CTeeInfo(SKIN_TWINBOP);
+	}
+	else
+	{
+		pDummy->m_TeeInfos = CTeeInfo(SKIN_DUMMY);
+	}
 
 	dbg_msg("dummy", "Dummy connected: %d, Dummymode: %d", DummyID, DummyMode);
 	OnClientEnter(DummyID);
@@ -7146,6 +7166,7 @@ bool CGameContext::IsHouseDummy(int ClientID, int Type)
 	case HOUSE_SHOP: Mode = DUMMYMODE_SHOP_DUMMY; break;
 	case HOUSE_PLOT_SHOP: Mode = DUMMYMODE_PLOT_SHOP_DUMMY; break;
 	case HOUSE_BANK: Mode = DUMMYMODE_BANK_DUMMY; break;
+	case HOUSE_TAVERN: Mode = DUMMYMODE_TAVERN_DUMMY; break;
 	}
 	return m_apPlayers[ClientID] && m_apPlayers[ClientID]->GetDummyMode() == Mode;
 }
@@ -7158,7 +7179,7 @@ int CGameContext::GetHouseDummy(int Type)
 	return -1;
 }
 
-void CGameContext::ConnectHouseDummy(int Type)
+void CGameContext::ConnectHouseDummy(int Type, bool SpawnTileOnly)
 {
 	int Index, SpawnTile, Dummymode;
 	switch (Type)
@@ -7166,6 +7187,7 @@ void CGameContext::ConnectHouseDummy(int Type)
 	case HOUSE_SHOP: Index = TILE_SHOP; SpawnTile = ENTITY_SHOP_DUMMY_SPAWN; Dummymode = DUMMYMODE_SHOP_DUMMY; break;
 	case HOUSE_PLOT_SHOP: Index = TILE_PLOT_SHOP; SpawnTile = ENTITY_PLOT_SHOP_DUMMY_SPAWN; Dummymode = DUMMYMODE_PLOT_SHOP_DUMMY; break;
 	case HOUSE_BANK: Index = TILE_BANK; SpawnTile = ENTITY_BANK_DUMMY_SPAWN; Dummymode = DUMMYMODE_BANK_DUMMY; break;
+	case HOUSE_TAVERN: Index = TILE_TAVERN; SpawnTile = ENTITY_TAVERN_DUMMY_SPAWN; Dummymode = DUMMYMODE_TAVERN_DUMMY; break;
 	default: return;
 	}
 
@@ -7173,7 +7195,14 @@ void CGameContext::ConnectHouseDummy(int Type)
 	{
 		vec2 Pos = vec2(-1, -1);
 		if (Collision()->TileUsed(SpawnTile))
+		{
 			Pos = Collision()->GetRandomTile(SpawnTile);
+		}
+		else if (SpawnTileOnly)
+		{
+			// Don't automatically connect house bots if no spawn tile has been found, only with sv_default_dummies enabled
+			return;
+		}
 		ConnectDummy(Dummymode, Pos);
 	}
 }

@@ -1359,6 +1359,10 @@ void CPlayer::TryRespawn()
 	{
 		Index = TILE_BANK;
 	}
+	else if (m_DummyMode == DUMMYMODE_TAVERN_DUMMY)
+	{
+		Index = TILE_TAVERN;
+	}
 	else if (m_Minigame == MINIGAME_BLOCK || m_DummyMode == DUMMYMODE_V3_BLOCKER)
 	{
 		Index = TILE_MINIGAME_BLOCK;

@@ -397,7 +397,7 @@ public:
 
 	bool IsHouseDummy(int ClientID, int Type = -1);
 	int GetHouseDummy(int Type = -1);
-	void ConnectHouseDummy(int Type);
+	void ConnectHouseDummy(int Type, bool SpawnTileOnly = false);
 
 	int GetNextClientID();
 
@@ -1096,6 +1096,7 @@ private:
 	static void ConPresetList(IConsole::IResult* pResult, void* pUserData);
 
 	static void ConReloadDesigns(IConsole::IResult* pResult, void* pUserData);
+	static void ConAddGrog(IConsole::IResult* pResult, void* pUserData);
 
 	enum
 	{
