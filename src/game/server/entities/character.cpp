@@ -3756,14 +3756,7 @@ bool CCharacter::Freeze(float Seconds)
 	if (m_FreezeTick < Server()->Tick() - Server()->TickSpeed() || Seconds == -1)
 	{
 		if (m_FreezeTick == 0 || m_FirstFreezeTick == 0)
-		{
 			m_FirstFreezeTick = Server()->Tick();
-			if (m_Permille && m_PassiveEndTick)
-			{
-				m_PassiveEndTick = 0;
-				Passive(false, -1, true);
-			}
-		}
 		m_FreezeTime = Seconds == -1 ? Seconds : Seconds * Server()->TickSpeed();
 		m_FreezeTick = Server()->Tick();
 
@@ -5215,6 +5208,13 @@ void CCharacter::GrogTick()
 		m_GrogSpirit++;
 	if (m_Permille > 30) // 3.0
 		m_GrogSpirit++;
+
+	// After 3 seconds of freeze, disable passive
+	if (m_Permille && m_PassiveEndTick && m_FirstFreezeTick && m_FirstFreezeTick + Server()->TickSpeed() * 3 < Server()->Tick())
+	{
+		m_PassiveEndTick = 0;
+		Passive(false, -1, true);
+	}
 }
 
 int CCharacter::GetCorruptionScore()
