@@ -4500,7 +4500,7 @@ void CCharacter::IncreasePermille(int Permille)
 	if (m_Permille <= Config()->m_SvGrogMinPermilleLimit)
 	{
 		// 10 minutes passive, if you dont drink in this time, ur gonna have a ratio of 2/3, cuz 1 drink = passive + 0.3, so 15 min to decrease 0.3, but 10 min passive
-		if (!m_Passive)
+		if (!m_Passive || m_PassiveEndTick)
 		{
 			m_PassiveEndTick = Server()->Tick() + Server()->TickSpeed() * 60 * 10;
 			Passive(true, -1, true);
