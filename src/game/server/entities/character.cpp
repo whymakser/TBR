@@ -5200,13 +5200,13 @@ void CCharacter::GrogTick()
 
 	// Grog spirit xp boost for wise men
 	m_GrogSpirit = 0;
-	if (m_Permille > 5) // 0.5
+	if (m_Permille >= 5) // 0.5
 		m_GrogSpirit++;
-	if (m_Permille > 10) // 1.0
+	if (m_Permille >= 10) // 1.0
 		m_GrogSpirit++;
-	if (m_Permille > 20) // 2.0
+	if (m_Permille >= 20) // 2.0
 		m_GrogSpirit++;
-	if (m_Permille > 30) // 3.0
+	if (m_Permille >= 30) // 3.0
 		m_GrogSpirit++;
 
 	// After 3 seconds of freeze, disable passive
