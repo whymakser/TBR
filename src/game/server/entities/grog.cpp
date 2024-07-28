@@ -74,16 +74,25 @@ void CGrog::OnSip()
 	}
 }
 
-bool CGrog::Drop()
+bool CGrog::Drop(int Dir, bool OnDeath)
 {
 	// Can't drop a grog which you started drinking. don't spread viruses. Drink it up first. If you drank before sharing with your friends, you're a donkey!
 	if (m_NumSips)
+	{
+		// Still remove the grog from being held and remove it
+		if (OnDeath)
+		{
+			DecreaseNumGrogsHolding();
+			Reset();
+		}
 		return false;
+	}
 
 	// Remove after 5 min of being dropped
 	m_Lifetime = Server()->TickSpeed() * 300;
 	m_PickupDelay = Server()->TickSpeed() * 2;
-	m_Vel = vec2(2*GetOwner()->GetAimDir(), -5);
+	Dir = Dir == -3 ? 2*GetOwner()->GetAimDir() : Dir;
+	m_Vel = vec2(Dir, -5);
 	DecreaseNumGrogsHolding();
 	return true;
 }

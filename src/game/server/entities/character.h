@@ -149,7 +149,7 @@ public:
 	void DropPickup(int Type, int Amount = 1);
 	void DropLoot(int Weapon);
 	void DropBattery(int WeaponID, int Amount, bool OnDeath = false, float Dir = -3);
-	bool DropGrog(int Dir = -3);
+	bool DropGrog(int Dir = -3, bool OnDeath = false);
 
 	void SetAvailableWeapon(int PreferedWeapon = WEAPON_GUN);
 	int GetAimDir() { return m_Input.m_TargetX < 0 ? -1 : 1; };

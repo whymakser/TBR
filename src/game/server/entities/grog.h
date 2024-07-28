@@ -46,7 +46,7 @@ public:
 	virtual void Snap(int SnappingClient);
 
 	void OnSip();
-	bool Drop();
+	bool Drop(int Dir = -3, bool OnDeath = false);
 };
 
 #endif // GAME_SERVER_ENTITIES_GROG_H

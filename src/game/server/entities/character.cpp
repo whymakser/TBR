@@ -4616,9 +4616,9 @@ void CCharacter::DropBattery(int WeaponID, int Amount, bool OnDeath, float Dir)
 	m_LastBatteryDrop = Server()->Tick();
 }
 
-bool CCharacter::DropGrog(int Dir)
+bool CCharacter::DropGrog(int Dir, bool OnDeath)
 {
-	return m_NumGrogsHolding && m_pGrog && m_pGrog->Drop();
+	return m_NumGrogsHolding && m_pGrog && m_pGrog->Drop(Dir == -3 ? GetAimDir() : Dir, OnDeath);
 }
 
 void CCharacter::DropLoot(int Weapon)
@@ -4679,6 +4679,14 @@ void CCharacter::DropLoot(int Weapon)
 				if (Weapon == WEAPON_TASER)
 					DropBattery(WEAPON_TASER, 0, true, Dir);
 			}
+		}
+
+		// m_NumGrogsHolding will update when grog got dropped
+		int NumGrogs = m_NumGrogsHolding;
+		for (int i = 0; i < NumGrogs; i++)
+		{
+			float Dir = ((rand() % 50 - 25 + 1) * 0.1); // in a range of -2.5 to +2.5
+			DropGrog(Dir, true);
 		}
 	}
 }
