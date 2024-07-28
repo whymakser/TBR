@@ -3760,7 +3760,10 @@ bool CCharacter::Freeze(float Seconds)
 		m_FreezeTime = Seconds == -1 ? Seconds : Seconds * Server()->TickSpeed();
 		m_FreezeTick = Server()->Tick();
 
-		GameServer()->SendTuningParams(m_pPlayer->GetCID(), m_TuneZone);
+		if (!Server()->IsSevendown(m_pPlayer->GetCID()) && Config()->m_SvFreezePrediction)
+		{
+			GameServer()->SendTuningParams(m_pPlayer->GetCID(), m_TuneZone);
+		}
 		return true;
 	}
 	return false;
