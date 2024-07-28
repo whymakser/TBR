@@ -32,7 +32,7 @@ class CGrog : public CAdvancedEntity
 
 	int m_PickupDelay;
 	void Pickup();
-	void Reset(bool Picked = false);
+	void Reset(bool CreateDeath = true);
 	void DecreaseNumGrogsHolding();
 
 public:

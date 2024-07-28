@@ -4484,6 +4484,8 @@ void CCharacter::IncreasePermille(int Permille)
 	}
 
 	m_Permille += Permille;
+	GameServer()->CreateDeath(m_Pos, m_pPlayer->GetCID(), TeamMask());
+
 	if (m_Permille > GetPermilleLimit())
 	{
 		// +5 minutes escape time initially, add 2 minutes for each extra drink over

@@ -45,9 +45,9 @@ CGrog::~CGrog()
 		Server()->SnapFreeID(m_aLines[i].m_ID);
 }
 
-void CGrog::Reset(bool Picked)
+void CGrog::Reset(bool CreateDeath)
 {
-	if (!Picked)
+	if (CreateDeath)
 		GameServer()->CreateDeath(m_Pos, m_Owner, m_TeamMask);
 	CAdvancedEntity::Reset();
 }
@@ -72,7 +72,7 @@ void CGrog::OnSip()
 	{
 		GetOwner()->IncreasePermille(3);
 		DecreaseNumGrogsHolding();
-		Reset();
+		Reset(false);
 		return;
 	}
 }
@@ -157,7 +157,7 @@ void CGrog::Pickup()
 
 		if (pChr->AddGrog())
 		{
-			Reset(true);
+			Reset(false);
 			break;
 		}
 	}
