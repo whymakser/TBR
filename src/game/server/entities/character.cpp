@@ -5220,12 +5220,12 @@ void CCharacter::GrogTick()
 int CCharacter::GetCorruptionScore()
 {
 	int Score = m_pPlayer->m_SpawnBlockScore + m_NoBonusContext.m_Score;
-	// add 1 score per 0.3 permille
+	// add 1 score per 0.2 permille
 	int PermilleLimit = GetPermilleLimit();
 	if (m_Permille > PermilleLimit)
 	{
 		int Diff = m_Permille - PermilleLimit;
-		Score += Diff / 3;
+		Score += Diff / 2;
 	}
 	return Score;
 }
