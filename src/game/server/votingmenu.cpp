@@ -463,9 +463,10 @@ int CVotingMenu::PrepareTempDescriptions(int ClientID)
 	m_NumCollapseEntries = 0;
 	int NumOptions = 0;
 
+	const int Page = GetPage(ClientID);
+	bool DoAnnouncement = false;
+	char aBuf[VOTE_DESC_LENGTH];
 	{
-		char aBuf[VOTE_DESC_LENGTH];
-		bool DoAnnouncement = false;
 		if (pPlayer->m_JailTime)
 		{
 			DoAnnouncement = true;
@@ -479,10 +480,20 @@ int CVotingMenu::PrepareTempDescriptions(int ClientID)
 
 		if (DoAnnouncement)
 		{
-			const int Page = GetPage(ClientID);
 			DoLineText(Page, &NumOptions, aBuf, BULLET_POINT);
-			DoLineSeperator(Page, &NumOptions);
 		}
+	}
+
+	if (pPlayer->GetCharacter() && pPlayer->GetCharacter()->m_Permille)
+	{
+		DoAnnouncement = true;
+		str_format(aBuf, sizeof(aBuf), "Grog permille: %.1f‰ / %.1f‰", pPlayer->GetCharacter()->m_Permille / 10.f, pPlayer->GetCharacter()->GetPermilleLimit() / 10.f);
+		DoLineText(Page, &NumOptions, aBuf, BULLET_POINT);
+	}
+
+	if (DoAnnouncement)
+	{
+		DoLineSeperator(Page, &NumOptions);
 	}
 
 	if (GetPage(ClientID) == PAGE_ACCOUNT)
@@ -805,7 +816,7 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 {
 	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 	CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
-	if (!pPlayer || !pChr || !pStats)
+	if (!pPlayer || !pStats)
 		return false;
 
 	const int Page = GetPage(ClientID);
@@ -905,6 +916,7 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 	{
 		pStats->m_JailTime = pPlayer->m_JailTime;
 		pStats->m_EscapeTime = pPlayer->m_EscapeTime;
+		pStats->m_Permille = pChr ? pChr->m_Permille : 0;
 	}
 
 	pStats->m_Flags = Flags;

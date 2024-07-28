@@ -144,6 +144,7 @@ private:
 	int m_FakeTuneCollision;
 	int m_OldFakeTuneCollision;
 	int m_Passive;
+	int m_PassiveTicksLeft;
 	int m_PoliceHelper;
 	int m_Item;
 	int m_DoorHammer;
@@ -164,6 +165,7 @@ private:
 	int m_Confetti;
 	int m_InNoBonusArea;
 	int m_NumGrogsHolding;
+	int m_Permille;
 
 	// core
 	int m_MoveRestrictionExtraRoomKey;

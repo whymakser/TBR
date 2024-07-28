@@ -424,6 +424,7 @@ public:
 	void SetExpireDateDays(time_t *pDate, float Days);
 	void SetExpireDate(time_t *pDate, float Hours, bool SetMinutesZero = false);
 	bool IsExpired(time_t Date);
+	float MonthsPassedSinceRegister(int AccID);
 
 	struct SPlot
 	{

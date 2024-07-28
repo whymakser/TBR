@@ -617,35 +617,7 @@ void CCharacter::FireWeapon()
 					GameServer()->CreateHammerHit(EffectPos, TeamMask());
 
 					int TargetCID = pTarget->GetPlayer()->GetCID();
-
-					// police catch gangster // disallow catching while being wanted yourself
-					if (pTarget->GetPlayer()->m_EscapeTime && !pTarget->GetPlayer()->IsMinigame() && pTarget->m_FreezeTime && pAccount->m_PoliceLevel && !m_pPlayer->m_EscapeTime)
-					{
-						char aBuf[256];
-						int Minutes = clamp((int)(pTarget->GetPlayer()->m_EscapeTime / Server()->TickSpeed()) / 100, 10, 20);
-						int Corrupt = clamp(pTarget->GetPlayer()->m_SpawnBlockScore * 500, 500, 10000);
-						if (pTarget->GetPlayer()->GetAccID() >= ACC_START && GameServer()->m_Accounts[pTarget->GetPlayer()->GetAccID()].m_Money >= Corrupt)
-						{
-							str_format(aBuf, sizeof(aBuf), "corrupted officer '%s'", Server()->ClientName(m_pPlayer->GetCID()));
-							pTarget->GetPlayer()->BankTransaction(-Corrupt, aBuf);
-							str_format(aBuf, sizeof(aBuf), "corrupted by gangster '%s'", Server()->ClientName(TargetCID));
-							m_pPlayer->BankTransaction(Corrupt, aBuf);
-							str_format(aBuf, sizeof(aBuf), "You paid %d money to '%s' to reduce your jailtime by 5 minutes", Corrupt, Server()->ClientName(m_pPlayer->GetCID()));
-							GameServer()->SendChatTarget(TargetCID, aBuf);
-							str_format(aBuf, sizeof(aBuf), "You got %d money from '%s' to reduce his jailtime by 5 minutes", Corrupt, Server()->ClientName(TargetCID));
-							GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
-							Minutes -= 5;
-						}
-
-						str_format(aBuf, sizeof(aBuf), "'%s' has been caught by '%s' (%d minutes arrest)", Server()->ClientName(TargetCID), Server()->ClientName(m_pPlayer->GetCID()), Minutes);
-						GameServer()->SendChatPolice(aBuf);
-
-						str_format(aBuf, sizeof(aBuf), "You were arrested for %d minutes by '%s'", Minutes, Server()->ClientName(m_pPlayer->GetCID()));
-						GameServer()->SendChatTarget(TargetCID, aBuf);
-						GameServer()->CreateFinishConfetti(EffectPos, TeamMask());
-						GameServer()->JailPlayer(TargetCID, Minutes * 60); // minimum 5 maximum 20 minutes jail
-					}
-					else
+					if (!TryCatchingWanted(TargetCID, EffectPos))
 					{
 						vec2 Dir;
 						if (length(pTarget->m_Pos - m_Pos) > 0.0f)
@@ -2801,14 +2773,21 @@ void CCharacter::HandleTiles(int Index)
 
 				// broadcast
 				char aSurvival[32];
+				char aSpirit[32];
 				char aPolice[32];
 				char aPlusXP[64];
 
 				str_format(aSurvival, sizeof(aSurvival), " +%d survival", AliveState);
-				str_format(aPolice, sizeof(aPolice), " +%d police", pAccount->m_PoliceLevel);
-				str_format(aPlusXP, sizeof(aPlusXP), " +%d%s%s%s", TileXP, FlagBonus ? " +1 flag" : "", pAccount->m_VIP ? " +2 vip" : "", AliveState ? aSurvival : "");
-				str_format(m_aLineMoney, sizeof(m_aLineMoney), "Wallet [%lld] +%d%s%s", m_pPlayer->GetWalletMoney(), TileMoney, (PoliceMoneyTile && pAccount->m_PoliceLevel) ? aPolice : "", pAccount->m_VIP ? " +2 vip" : "");
+				str_format(aSpirit, sizeof(aSpirit), " +%d spirit", m_GrogSpirit);
+				str_format(aPlusXP, sizeof(aPlusXP), " +%d%s%s%s%s", TileXP,
+					FlagBonus ? " +1 flag" : "",
+					pAccount->m_VIP ? " +2 vip" : "",
+					AliveState ? aSurvival : "",
+					m_GrogSpirit ? aSpirit : "");
 				str_format(m_aLineExp, sizeof(m_aLineExp), "XP [%lld/%lld]%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level), aPlusXP);
+
+				str_format(aPolice, sizeof(aPolice), " +%d police", pAccount->m_PoliceLevel);
+				str_format(m_aLineMoney, sizeof(m_aLineMoney), "Wallet [%lld] +%d%s%s", m_pPlayer->GetWalletMoney(), TileMoney, (PoliceMoneyTile && pAccount->m_PoliceLevel) ? aPolice : "", pAccount->m_VIP ? " +2 vip" : "");
 
 				if (!IsWeaponIndicator() && !m_pPlayer->m_HideBroadcasts)
 				{
@@ -2987,10 +2966,10 @@ void CCharacter::HandleTiles(int Index)
 	{
 		if ((m_LastIndexTile != TILE_PASSIVE) && (m_LastIndexFrontTile != TILE_PASSIVE))
 		{
-			if (m_RedirectPassiveEndTick)
+			if (m_PassiveEndTick)
 			{
 				// simply don't deactivate passive when we hit a tile after being redirected
-				m_RedirectPassiveEndTick = 0;
+				m_PassiveEndTick = 0;
 			}
 			else
 			{
@@ -4049,13 +4028,17 @@ void CCharacter::FDDraceInit()
 	m_pPortalBlocker = 0;
 	m_LastNoBonusTick = 0;
 	m_RedirectTilePort = 0;
-	m_RedirectPassiveEndTick = 0;
+	m_PassiveEndTick = 0;
 	m_LastJumpedTotal = 0;
 	m_HookExceededTick = 0;
 	m_IsGrounded = false;
 	m_aLineExp[0] = '\0';
 	m_aLineMoney[0] = '\0';
 	m_pGrog = 0;
+	m_NumGrogsHolding = 0;
+	m_Permille = 0;
+	m_FirstPermilleTick = 0;
+	m_GrogSpirit = 0;
 }
 
 void CCharacter::CreateDummyHandle(int Dummymode)
@@ -4258,9 +4241,9 @@ void CCharacter::FDDraceTick()
 			GameServer()->CreateFinishConfetti(m_Pos, TeamMask());
 	}
 
-	if (m_RedirectPassiveEndTick && m_RedirectPassiveEndTick < Server()->Tick())
+	if (m_PassiveEndTick && m_PassiveEndTick < Server()->Tick())
 	{
-		m_RedirectPassiveEndTick = 0;
+		m_PassiveEndTick = 0;
 		Passive(false, -1, true);
 	}
 
@@ -4309,6 +4292,9 @@ void CCharacter::FDDraceTick()
 		GameWorld()->ResetSeeOthers(m_pPlayer->GetCID());
 		m_pPlayer->m_DoSeeOthersByVote = false;
 	}
+
+	// process grog and permille
+	GrogTick();
 
 	// update
 	m_DrawEditor.Tick();
@@ -4470,6 +4456,49 @@ void CCharacter::SetLastTouchedSwitcher(int Number)
 		Core()->m_Killer.m_Weapon = -1;
 		m_LastTouchedSwitcher = Number;
 	}
+}
+
+void CCharacter::IncreasePermille(int Permille)
+{
+	if (Permille <= 0)
+		return;
+
+	if (!m_FirstPermilleTick)
+	{
+		m_FirstPermilleTick = Server()->Tick();
+	}
+
+	m_Permille += Permille;
+	if (m_Permille > GetPermilleLimit())
+	{
+		// +5 minutes escape time initially, add 2 minutes for each extra drink over
+		m_pPlayer->m_EscapeTime += Server()->TickSpeed() * (m_pPlayer->m_EscapeTime ? 120 : 300);
+
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "'%s' has exceeded his legal drinking limit. Catch him!", Server()->ClientName(m_pPlayer->GetCID()));
+		GameServer()->SendChatPolice(aBuf);
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Police is searching you because you have exceeded your legal drinking limit");
+	}
+
+	if (m_Permille <= Config()->m_SvGrogMinPermilleLimit)
+	{
+		// 10 minutes passive, if you dont drink in this time, ur gonna have a ratio of 2/3, cuz 1 drink = passive + 0.3, so 15 min to decrease 0.3, but 10 min passive
+		m_PassiveEndTick = Server()->Tick() + Server()->TickSpeed() * 60 * 10;
+		Passive(true, -1, true);
+	}
+	else
+	{
+		// Disable when we drank more than allowed
+		m_PassiveEndTick = 0;
+		Passive(false, -1, true);
+	}
+}
+
+int CCharacter::GetPermilleLimit()
+{
+	// 3.9 permille at most. As soon as reaching 4.0 ur wanted. 3.9/0.3 per grog = 13 grogs, if acc is older than 4 months
+	float MonthsSinceReg = GameServer()->MonthsPassedSinceRegister(m_pPlayer->GetAccID());
+	return clamp((int)(MonthsSinceReg * 10), Config()->m_SvGrogMinPermilleLimit, 39);
 }
 
 bool CCharacter::AddGrog()
@@ -5093,9 +5122,11 @@ bool CCharacter::LoadRedirectTile(int Port)
 			if (Pos != vec2(-1, -1))
 			{
 				ForceSetPos(Pos);
-				if (!m_Passive)
+
+				int64 NewEndTick = Server()->Tick() + Server()->TickSpeed() * 3;
+				if (!m_Passive || (m_PassiveEndTick && m_PassiveEndTick < NewEndTick))
 				{
-					m_RedirectPassiveEndTick = Server()->Tick() + Server()->TickSpeed() * 3;
+					m_PassiveEndTick = NewEndTick;
 					Passive(true, -1, true);
 				}
 				return true;
@@ -5129,6 +5160,86 @@ int CCharacter::GetAliveState()
 			return i;
 	}
 	return 0;
+}
+
+void CCharacter::GrogTick()
+{
+	if (m_FirstPermilleTick)
+	{
+		// Decrease by 0.1 permille every 5 minutes
+		if ((Server()->Tick() - m_FirstPermilleTick) % (Server()->TickSpeed() * 60 * 5) == 0)
+		{
+			m_Permille--;
+			if (m_Permille <= 0)
+			{
+				m_FirstPermilleTick = 0;
+			}
+		}
+	}
+
+	// Grog spirit xp boost for wise men
+	m_GrogSpirit = 0;
+	if (m_Permille > 5) // 0.5
+		m_GrogSpirit++;
+	if (m_Permille > 10) // 1.0
+		m_GrogSpirit++;
+	if (m_Permille > 20) // 2.0
+		m_GrogSpirit++;
+	if (m_Permille > 30) // 3.0
+		m_GrogSpirit++;
+}
+
+int CCharacter::GetCorruptionScore()
+{
+	int Score = m_pPlayer->m_SpawnBlockScore + m_NoBonusContext.m_Score;
+	// add 1 score per 0.3 permille
+	int PermilleLimit = GetPermilleLimit();
+	if (m_Permille > PermilleLimit)
+	{
+		int Diff = m_Permille - PermilleLimit;
+		Score += Diff / 3;
+	}
+	return Score;
+}
+
+bool CCharacter::TryCatchingWanted(int TargetCID, vec2 EffectPos)
+{
+	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[m_pPlayer->GetAccID()];
+	CCharacter *pTarget = GameServer()->GetPlayerChar(TargetCID);
+	// police catch gangster // disallow catching while being wanted yourself
+	if (!pTarget->GetPlayer()->m_EscapeTime || pTarget->GetPlayer()->IsMinigame() || !pTarget->m_FreezeTime || !pAccount->m_PoliceLevel || m_pPlayer->m_EscapeTime)
+		return false;
+
+	char aBuf[256];
+	int Minutes = clamp((int)(pTarget->GetPlayer()->m_EscapeTime / Server()->TickSpeed()) / 100, 10, 20);
+	int Corrupt = clamp(pTarget->GetCorruptionScore() * 500, 500, 10000);
+
+	if (pTarget->GetPlayer()->GetAccID() >= ACC_START && GameServer()->m_Accounts[pTarget->GetPlayer()->GetAccID()].m_Money >= Corrupt)
+	{
+		str_format(aBuf, sizeof(aBuf), "corrupted officer '%s'", Server()->ClientName(m_pPlayer->GetCID()));
+		pTarget->GetPlayer()->BankTransaction(-Corrupt, aBuf);
+		str_format(aBuf, sizeof(aBuf), "corrupted by gangster '%s'", Server()->ClientName(TargetCID));
+		m_pPlayer->BankTransaction(Corrupt, aBuf);
+		str_format(aBuf, sizeof(aBuf), "You paid %d money to '%s' to reduce your jailtime by 5 minutes", Corrupt, Server()->ClientName(m_pPlayer->GetCID()));
+		GameServer()->SendChatTarget(TargetCID, aBuf);
+		str_format(aBuf, sizeof(aBuf), "You got %d money from '%s' to reduce his jailtime by 5 minutes", Corrupt, Server()->ClientName(TargetCID));
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
+		Minutes -= 5;
+	}
+
+	str_format(aBuf, sizeof(aBuf), "'%s' has been caught by '%s' (%d minutes arrest)", Server()->ClientName(TargetCID), Server()->ClientName(m_pPlayer->GetCID()), Minutes);
+	GameServer()->SendChatPolice(aBuf);
+	if (pTarget->m_Permille)
+	{
+		str_format(aBuf, sizeof(aBuf), "Grog permille testing results: %.1f‰ / %.1f‰", pTarget->m_Permille / 10.f, pTarget->GetPermilleLimit() / 10.f);
+		GameServer()->SendChatPolice(aBuf);
+	}
+
+	str_format(aBuf, sizeof(aBuf), "You were arrested for %d minutes by '%s'", Minutes, Server()->ClientName(m_pPlayer->GetCID()));
+	GameServer()->SendChatTarget(TargetCID, aBuf);
+	GameServer()->CreateFinishConfetti(EffectPos, TeamMask());
+	GameServer()->JailPlayer(TargetCID, Minutes * 60); // minimum 5 maximum 20 minutes jail
+	return true;
 }
 
 void CCharacter::SetTeeControlCursor()

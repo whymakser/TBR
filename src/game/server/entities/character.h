@@ -295,6 +295,7 @@ private:
 	void DummyTick();
 	void FDDraceInit();
 	void HandleLastIndexTiles();
+	void GrogTick();
 
 public:
 	CGameTeams* Teams();
@@ -549,12 +550,17 @@ public:
 	bool TrySafelyRedirectClientImpl(int Port);
 	bool LoadRedirectTile(int Port);
 	int m_RedirectTilePort;
-	int64 m_RedirectPassiveEndTick;
+	int64 m_PassiveEndTick;
 
 	// Grog
 	bool AddGrog();
 	int m_NumGrogsHolding;
 	CGrog *m_pGrog;
+	int m_Permille;
+	int64 m_FirstPermilleTick;
+	int m_GrogSpirit;
+	void IncreasePermille(int Permille);
+	int GetPermilleLimit();
 
 	//others
 	int HasFlag();
@@ -572,6 +578,9 @@ public:
 
 	int64 m_LastTaserUse;
 	int GetTaserStrength();
+
+	bool TryCatchingWanted(int TargetCID, vec2 EffectPos);
+	int GetCorruptionScore();
 
 	// broadcast and ddrace hud
 	bool ShowAmmoHud();

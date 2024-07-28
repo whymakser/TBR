@@ -5561,6 +5561,25 @@ bool CGameContext::IsExpired(time_t Date)
 	return Minutes >= 0;
 }
 
+float CGameContext::MonthsPassedSinceRegister(int AccID)
+{
+	if (AccID < ACC_START)
+		return 0;
+
+	time_t Date = m_Accounts[AccID].m_RegisterDate;
+	if (!Date)
+	{
+		// Register date unknown, registered before records started, set register date to 9th april 2021 when it got added for comparison
+		Date = (time_t)1617919200;
+	}
+
+	time_t Now;
+	time(&Now);
+	double Seconds = difftime(Now, Date);
+	int Days = Seconds / 60 / 60 / 24;
+	return Days / 30.f;
+}
+
 void CGameContext::UpdateTopAccounts(int Type)
 {
 	// update top accounts with all currently online accs so we get correct and up-to-date information

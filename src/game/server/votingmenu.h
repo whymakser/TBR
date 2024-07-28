@@ -98,6 +98,7 @@ class CVotingMenu
 			int m_RainbowSpeed = 0;
 			int m_NumWanted = 0;
 			int64 m_DestroyEndTick = 0;
+			int m_Permille = 0;
 			struct
 			{
 				int64 m_XP = 0;

@@ -11,12 +11,13 @@ CGrog::CGrog(CGameWorld *pGameWorld, vec2 Pos, int Owner)
 : CAdvancedEntity(pGameWorld, CGameWorld::ENTTYPE_GROG, Pos, vec2(8, 20), Owner)
 {
 	m_Owner = Owner;
-	m_LastAimDir = 1;
+	m_LastAimDir = -1;
 	m_NumSips = 0;
 	m_Lifetime = -1;
 
 	vec2 aOffsets[NUM_GROG_LINES][2] = {
 		{ vec2(0, 0), vec2(0, -40) },
+		{ vec2(8, -20), vec2(16, -20) },
 		{ vec2(8, 0), vec2(-8, 0) },
 		{ vec2(-8, -40), vec2(-8, 0), },
 		{ vec2(8, -40), vec2(8, 0) }
@@ -68,6 +69,7 @@ void CGrog::OnSip()
 
 	if (m_NumSips >= NUM_GROG_SIPS)
 	{
+		GetOwner()->IncreasePermille(3);
 		DecreaseNumGrogsHolding();
 		Reset();
 		return;
@@ -116,8 +118,8 @@ void CGrog::Tick()
 		{
 			for (int i = 0; i < NUM_GROG_LINES; i++)
 			{
-				m_aLines[i].m_From.x *= Dir;
-				m_aLines[i].m_To.x *= Dir;
+				m_aLines[i].m_From.x *= -1;
+				m_aLines[i].m_To.x *= -1;
 			}
 		}
 		m_LastAimDir = Dir;

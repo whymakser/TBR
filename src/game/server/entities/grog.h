@@ -10,6 +10,7 @@ class CGrog : public CAdvancedEntity
 	enum
 	{
 		GROG_LINE_LIQUID,
+		GROG_LINE_HANDLE,
 		GROG_LINE_BOTTOM,
 		GROG_LINE_LEFT,
 		GROG_LINE_RIGHT,
@@ -27,11 +28,6 @@ class CGrog : public CAdvancedEntity
 		int m_ID;
 		vec2 m_From;
 		vec2 m_To;
-		void Rotate(int Angle)
-		{
-			m_From = rotate(m_From, Angle);
-			m_To = rotate(m_To, Angle);
-		}
 	} m_aLines[NUM_GROG_LINES];
 
 	int m_PickupDelay;
