@@ -2214,7 +2214,14 @@ void CCharacter::SnapCharacter(int SnappingClient, int ID)
 			pCharacter->m_HookTick = 0;
 	}
 
-	pCharacter->m_Emote = m_pPlayer->m_SpookyGhost ? EMOTE_SURPRISE : m_EmoteType;
+	if (m_pPlayer->GetDummyMode() == DUMMYMODE_TAVERN_DUMMY)
+	{
+		pCharacter->m_Emote = EMOTE_HAPPY;
+	}
+	else
+	{
+		pCharacter->m_Emote = m_pPlayer->m_SpookyGhost ? EMOTE_SURPRISE : m_EmoteType;
+	}
 
 	pCharacter->m_AmmoCount = 0;
 	pCharacter->m_Health = 0;
@@ -2745,7 +2752,7 @@ void CCharacter::HandleTiles(int Index)
 				}
 
 				int AliveState = Plot ? 0 : GetAliveState(); // disallow survival bonus on plot money tile
-				int XP = AliveState + TileXP;
+				int XP = AliveState + TileXP + m_GrogSpirit;
 				int Money = TileMoney;
 
 				// police bonus
@@ -4188,7 +4195,7 @@ void CCharacter::FDDraceTick()
 
 			int AliveState = GetAliveState();
 			int XP = 0;
-			XP += AliveState + 1;
+			XP += AliveState + 1 + m_GrogSpirit;
 
 			if (pAccount->m_VIP)
 				XP += 2;
@@ -4196,8 +4203,13 @@ void CCharacter::FDDraceTick()
 			m_pPlayer->GiveXP(XP);
 
 			char aSurvival[32];
+			char aSpirit[32];
 			str_format(aSurvival, sizeof(aSurvival), " +%d survival", AliveState);
-			str_format(m_aLineExp, sizeof(m_aLineExp), "XP [%lld/%lld] +1 flag%s%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level), pAccount->m_VIP ? " +2 vip" : "", AliveState ? aSurvival : "");
+			str_format(aSpirit, sizeof(aSpirit), " +%d spirit", m_GrogSpirit);
+			str_format(m_aLineExp, sizeof(m_aLineExp), "XP [%lld/%lld] +1 flag%s%s%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level),
+				pAccount->m_VIP ? " +2 vip" : "",
+				AliveState ? aSurvival : "",
+				m_GrogSpirit ? aSpirit : "");
 			if (!IsWeaponIndicator() && !m_pPlayer->m_HideBroadcasts)
 			{
 				SendBroadcastHud(GameServer()->FormatExperienceBroadcast(m_aLineExp, m_pPlayer->GetCID()));
