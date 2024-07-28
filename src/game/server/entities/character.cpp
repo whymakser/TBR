@@ -5259,7 +5259,7 @@ bool CCharacter::TryCatchingWanted(int TargetCID, vec2 EffectPos)
 	GameServer()->SendChatPolice(aBuf);
 	if (pTarget->m_Permille)
 	{
-		str_format(aBuf, sizeof(aBuf), "Grog permille testing results: %.1f‰ / %.1f‰", pTarget->m_Permille / 10.f, pTarget->GetPermilleLimit() / 10.f);
+		str_format(aBuf, sizeof(aBuf), "Grog testing results: %.1f‰ / %.1f‰", pTarget->m_Permille / 10.f, pTarget->GetPermilleLimit() / 10.f);
 		GameServer()->SendChatPolice(aBuf);
 	}
 
