@@ -330,7 +330,8 @@ void CCharacter::HandleNinja()
 void CCharacter::DoWeaponSwitch()
 {
 	// make sure we can switch
-	if (m_ReloadTimer != 0 || m_QueuedWeapon == -1 || (m_aWeapons[WEAPON_NINJA].m_Got && !m_ScrollNinja) || (m_QueuedWeapon != -2 && !m_aWeapons[m_QueuedWeapon].m_Got) || m_DrawEditor.Selecting() || m_NumGrogsHolding)
+	if (m_ReloadTimer != 0 || m_QueuedWeapon == -1 || (m_QueuedWeapon != -2 && !m_aWeapons[m_QueuedWeapon].m_Got) || (m_aWeapons[WEAPON_NINJA].m_Got && !m_ScrollNinja)
+		|| m_DrawEditor.Selecting() || (m_NumGrogsHolding && m_DrawEditor.Active()))
 		return;
 
 	if (m_QueuedWeapon == -2)
