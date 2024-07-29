@@ -2798,17 +2798,17 @@ void CCharacter::HandleTiles(int Index)
 				char aPolice[32];
 				char aPlusXP[64];
 
-				str_format(aSurvival, sizeof(aSurvival), " +%d survival", AliveState);
-				str_format(aSpirit, sizeof(aSpirit), " +%d spirit", m_GrogSpirit);
+				str_format(aSurvival, sizeof(aSurvival), " +%dsurvival", AliveState);
+				str_format(aSpirit, sizeof(aSpirit), " +%dspirit", m_GrogSpirit);
 				str_format(aPlusXP, sizeof(aPlusXP), " +%d%s%s%s%s", TileXP,
-					FlagBonus ? " +1 flag" : "",
-					pAccount->m_VIP ? " +2 vip" : "",
+					FlagBonus ? " +1flag" : "",
+					pAccount->m_VIP ? " +2vip" : "",
 					AliveState ? aSurvival : "",
 					m_GrogSpirit ? aSpirit : "");
 				str_format(m_aLineExp, sizeof(m_aLineExp), "XP [%lld/%lld]%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level), aPlusXP);
 
-				str_format(aPolice, sizeof(aPolice), " +%d police", pAccount->m_PoliceLevel);
-				str_format(m_aLineMoney, sizeof(m_aLineMoney), "Wallet [%lld] +%d%s%s", m_pPlayer->GetWalletMoney(), TileMoney, (PoliceMoneyTile && pAccount->m_PoliceLevel) ? aPolice : "", pAccount->m_VIP ? " +2 vip" : "");
+				str_format(aPolice, sizeof(aPolice), " +%dpolice", pAccount->m_PoliceLevel);
+				str_format(m_aLineMoney, sizeof(m_aLineMoney), "Wallet [%lld] +%d%s%s", m_pPlayer->GetWalletMoney(), TileMoney, (PoliceMoneyTile && pAccount->m_PoliceLevel) ? aPolice : "", pAccount->m_VIP ? " +2vip" : "");
 
 				if (!IsWeaponIndicator() && !m_pPlayer->m_HideBroadcasts)
 				{
@@ -4230,10 +4230,10 @@ void CCharacter::FDDraceTick()
 
 			char aSurvival[32];
 			char aSpirit[32];
-			str_format(aSurvival, sizeof(aSurvival), " +%d survival", AliveState);
-			str_format(aSpirit, sizeof(aSpirit), " +%d spirit", m_GrogSpirit);
-			str_format(m_aLineExp, sizeof(m_aLineExp), "XP [%lld/%lld] +1 flag%s%s%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level),
-				pAccount->m_VIP ? " +2 vip" : "",
+			str_format(aSurvival, sizeof(aSurvival), " +%dsurvival", AliveState);
+			str_format(aSpirit, sizeof(aSpirit), " +%dspirit", m_GrogSpirit);
+			str_format(m_aLineExp, sizeof(m_aLineExp), "XP [%lld/%lld] +1flag%s%s%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level),
+				pAccount->m_VIP ? " +2vip" : "",
 				AliveState ? aSurvival : "",
 				m_GrogSpirit ? aSpirit : "");
 			if (!IsWeaponIndicator() && !m_pPlayer->m_HideBroadcasts)
