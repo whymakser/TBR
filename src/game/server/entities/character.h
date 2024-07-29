@@ -144,7 +144,7 @@ public:
 
 	//drops
 	void DropMoney(int64 Amount, int Dir = -3);
-	void DropFlag();
+	void DropFlag(int Dir = -3);
 	void DropWeapon(int WeaponID, bool OnDeath, float Dir = -3);
 	void DropPickup(int Type, int Amount = 1);
 	void DropLoot(int Weapon);

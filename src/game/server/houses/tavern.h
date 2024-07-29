@@ -8,9 +8,6 @@
 
 class CTavern : public CHouse
 {
-private:
-
-
 public:
 	CTavern(CGameContext *pGameServer);
 	virtual ~CTavern() {};

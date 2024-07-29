@@ -172,18 +172,23 @@ void CFlag::Tick()
 		int Num = GameWorld()->FindEntities(m_Pos, GetProximityRadius(), (CEntity**)apCloseCCharacters, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
 		for (int i = 0; i < Num; i++)
 		{
-			if (!apCloseCCharacters[i] || apCloseCCharacters[i]->GetPlayer()->GetTeam() == TEAM_SPECTATORS || GameServer()->Collision()->IntersectLineFlagPickup(m_Pos, apCloseCCharacters[i]->GetPos(), NULL, NULL))
+			CCharacter *pChr = apCloseCCharacters[i];
+			if (!pChr || pChr->GetPlayer()->GetTeam() == TEAM_SPECTATORS || GameServer()->Collision()->IntersectLineFlagPickup(m_Pos, pChr->GetPos(), NULL, NULL))
 				continue;
 
-			if (GetLastCarrier() == apCloseCCharacters[i] && (m_DropTick + Server()->TickSpeed() * 2) > Server()->Tick())
+			if (GetLastCarrier() == pChr && (m_DropTick + Server()->TickSpeed() * 2) > Server()->Tick())
+				continue;
+
+			if (pChr->HasFlag() != -1 || GameServer()->Arenas()->FightStarted(pChr->GetPlayer()->GetCID()))
+				continue;
+
+			// Disallow taking flag with passive or solo, also drop it when one of this gets activated while holding a flag
+			if (pChr->m_Passive || pChr->IsSolo())
 				continue;
 
 			// take the flag
-			if (apCloseCCharacters[i]->HasFlag() == -1 && !GameServer()->Arenas()->FightStarted(apCloseCCharacters[i]->GetPlayer()->GetCID()))
-			{
-				Grab(apCloseCCharacters[i]->GetPlayer()->GetCID());
-				break;
-			}
+			Grab(pChr->GetPlayer()->GetCID());
+			break;
 		}
 	}
 

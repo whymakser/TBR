@@ -173,6 +173,8 @@ void CCharacter::SetSolo(bool Solo)
 {
 	m_Solo = Solo;
 	Teams()->m_Core.SetSolo(m_pPlayer->GetCID(), Solo);
+	if (m_Solo)
+		DropFlag(0);
 }
 
 bool CCharacter::IsGrounded(bool CheckDoor)
@@ -4563,13 +4565,13 @@ void CCharacter::DropMoney(int64 Amount, int Dir)
 	GameServer()->CreateSound(m_Pos, SOUND_WEAPON_SPAWN, TeamMask());
 }
 
-void CCharacter::DropFlag()
+void CCharacter::DropFlag(int Dir)
 {
 	for (int i = 0; i < 2; i++)
 	{
 		CFlag *F = ((CGameControllerDDRace*)GameServer()->m_pController)->m_apFlags[i];
 		if (F && F->GetCarrier() == this)
-			F->Drop(GetAimDir());
+			F->Drop(Dir == -3 ? GetAimDir() : Dir);
 	}
 }
 
@@ -5402,6 +5404,8 @@ void CCharacter::Passive(bool Set, int FromID, bool Silent)
 	m_Passive = Set;
 	Teams()->m_Core.SetPassive(m_pPlayer->GetCID(), Set);
 	GameServer()->SendTuningParams(m_pPlayer->GetCID(), m_TuneZone);
+	if (m_Passive)
+		DropFlag(0);
 
 	m_pPassiveShield = !Set ? 0 : new CPickup(GameWorld(), m_Pos, POWERUP_ARMOR, 0, 0, 0, m_pPlayer->GetCID());
 	GameServer()->SendExtraMessage(PASSIVE, m_pPlayer->GetCID(), Set, FromID, Silent);
