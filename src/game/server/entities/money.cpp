@@ -50,7 +50,7 @@ void CMoney::Tick()
 
 	m_Gravity = true;
 
-	CCharacter *pClosest = GameWorld()->ClosestCharacter(m_Pos, RADIUS_FIND_PLAYERS, SecondsPassed(2) ? 0 : GetOwner(), m_Owner, true, true);
+	CCharacter *pClosest = GameWorld()->ClosestCharacter(m_Pos, RADIUS_FIND_PLAYERS, SecondsPassed(2) ? 0 : GetOwner(), m_Owner, false, true);
 	if (pClosest)
 	{
 		if (distance(m_Pos, pClosest->GetPos()) < GetRadius() + pClosest->GetProximityRadius())
