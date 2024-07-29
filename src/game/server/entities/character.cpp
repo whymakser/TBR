@@ -5333,8 +5333,8 @@ bool CCharacter::GrogTick()
 			{
 				m_FirstDeadlyPermilleTick = 0;
 				Die(WEAPON_SELF);
-				char aBuf[64];
-				str_format(aBuf, sizeof(aBuf), "'%s' died as a result of excessive grog consumption", Server()->ClientName(m_pPlayer->GetCID()));
+				char aBuf[128];
+				str_format(aBuf, sizeof(aBuf), "'%s' died as a result of excessive grog consumption (%.1f‰ / %.1f‰)", Server()->ClientName(m_pPlayer->GetCID()), m_Permille / 10.f, GetPermilleLimit() / 10.f);
 				GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
 				return true;
 			}
