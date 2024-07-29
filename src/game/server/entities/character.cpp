@@ -5256,7 +5256,8 @@ bool CCharacter::GrogTick()
 						if (m_GrogBalancePosX == GROG_BALANCE_POS_UNSET && m_Input.m_Direction == 0 && m_IsGrounded)
 						{
 							m_GrogBalancePosX = m_Pos.x;
-							GameServer()->SendEmoticon(m_pPlayer->GetCID(), EMOTICON_DEVILTEE);
+							int Emoticon = EMOTICON_SPLATTEE + random(0, 2); // one of the three angry emotes
+							GameServer()->SendEmoticon(m_pPlayer->GetCID(), Emoticon);
 							SetEmote(EMOTE_ANGRY, Now + Server()->TickSpeed() * 2);
 						}
 
