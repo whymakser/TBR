@@ -1286,6 +1286,14 @@ void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 		m_pHelicopter->OnInput(pNewInput);
 		ResetInput |= 1;
 	}
+	else if (m_GrogBalancePosX != GROG_BALANCE_POS_UNSET)
+	{
+		pNewInput->m_Direction = m_GrogDirection;
+	}
+	else if (m_GrogDirDelayEnd && m_GrogDirDelayEnd >= Server()->Tick())
+	{
+		pNewInput->m_Direction = m_SavedInput.m_Direction;
+	}
 
 	if (ResetInput)
 	{
@@ -4050,7 +4058,9 @@ void CCharacter::FDDraceInit()
 	m_GrogSpirit = 0;
 	m_NextGrogEmote = 0;
 	m_NextGrogBalance = 0;
-	m_GrogBalancePosX = 0.f;
+	m_NextGrogDirDelay = 0;
+	m_GrogDirDelayEnd = 0;
+	m_GrogBalancePosX = GROG_BALANCE_POS_UNSET;
 	m_GrogDirection = -1;
 
 	m_pDummyHandle = 0;
@@ -5219,12 +5229,9 @@ void CCharacter::GrogTick()
 			// Balance impaired
 			if (m_Permille >= 8) // 0.8
 			{
-				if (!m_NextGrogBalance && m_SavedInput.m_Direction == 0)
+				if (!m_NextGrogBalance)
 				{
-					int Seconds = random(20, 60);
-					float Multiplier = random(5, 10) / 10.f;
-					int DecreaseSeconds = min((int)(m_Permille * 3 * Multiplier), Seconds-1);
-					m_NextGrogBalance = Now + Server()->TickSpeed() * (Seconds - DecreaseSeconds);
+					m_NextGrogBalance = GetNextGrogActionTick();
 				}
 
 				if (m_NextGrogBalance && m_NextGrogBalance - Now < 0)
@@ -5233,12 +5240,16 @@ void CCharacter::GrogTick()
 					if (Now - m_NextGrogBalance > Server()->TickSpeed() / 4*3)
 					{
 						m_NextGrogBalance = 0;
-						m_GrogBalancePosX = 0.f;
-						m_SavedInput.m_Direction = 0;
+						if (m_GrogBalancePosX != GROG_BALANCE_POS_UNSET)
+						{
+							// Reset, so GrogDirDelay below is not triggered
+							m_SavedInput.m_Direction = m_PrevInput.m_Direction = m_Input.m_Direction = 0;
+						}
+						m_GrogBalancePosX = GROG_BALANCE_POS_UNSET;
 					}
 					else
 					{
-						if (m_GrogBalancePosX <= 0.f)
+						if (m_GrogBalancePosX == GROG_BALANCE_POS_UNSET && m_Input.m_Direction == 0 && m_IsGrounded)
 						{
 							m_GrogBalancePosX = m_Pos.x;
 							GameServer()->SendEmoticon(m_pPlayer->GetCID(), EMOTICON_DEVILTEE);
@@ -5248,14 +5259,37 @@ void CCharacter::GrogTick()
 						int Dir = m_Pos.x > m_GrogBalancePosX+1 ? -1 : m_Pos.x < m_GrogBalancePosX-1 ? 1 : 0;
 						if (Dir != m_GrogDirection && Dir != 0)
 							m_GrogDirection = Dir;
-						m_SavedInput.m_Direction = m_GrogDirection;
 					}
 				}
-			}
-
-			if (m_Permille >= 15) // 1.5
-			{
-
+				else if (m_Permille >= 15) // 1.5
+				{
+					if (!m_NextGrogDirDelay)
+					{
+						m_NextGrogDirDelay = GetNextGrogActionTick();
+					}
+					
+					if (m_NextGrogDirDelay && m_NextGrogDirDelay - Now < 0)
+					{
+						if (m_GrogDirDelayEnd && m_GrogDirDelayEnd < Server()->Tick())
+						{
+							m_NextGrogDirDelay = 0;
+							m_GrogDirDelayEnd = 0;
+						}
+						else if (m_SavedInput.m_Direction != m_PrevInput.m_Direction)
+						{
+							// Don't set yet when we're stil balancing
+							if (!m_GrogDirDelayEnd && m_GrogBalancePosX == GROG_BALANCE_POS_UNSET)
+							{
+								GameServer()->SendEmoticon(m_pPlayer->GetCID(), EMOTICON_DEVILTEE);
+								SetEmote(EMOTE_ANGRY, Now + Server()->TickSpeed() * 2);
+								// 1/3 second delayed
+								m_GrogDirDelayEnd = Now + Server()->TickSpeed() / 3;
+								// keep previous input for now
+								m_SavedInput.m_Direction = m_PrevInput.m_Direction;
+							}
+						}
+					}
+				}
 			}
 		}
 	}
@@ -5277,6 +5311,14 @@ void CCharacter::GrogTick()
 		m_PassiveEndTick = 0;
 		Passive(false, -1, true);
 	}
+}
+
+int64 CCharacter::GetNextGrogActionTick()
+{
+	int Seconds = random(20, 60);
+	float Multiplier = random(5, 10) / 10.f;
+	int DecreaseSeconds = min((int)(m_Permille * 3 * Multiplier), Seconds - 1);
+	return Server()->Tick() + Server()->TickSpeed() * (Seconds - DecreaseSeconds);
 }
 
 int CCharacter::GetCorruptionScore()
