@@ -4215,6 +4215,8 @@ void CCharacter::FDDraceTick()
 	{
 		if (!m_MoneyTile && Server()->Tick() % 50 == 0)
 		{
+			// Reset here for voting menu
+			m_aLineMoney[0] = '\0';
 			CGameContext::AccountInfo* pAccount = &GameServer()->m_Accounts[m_pPlayer->GetAccID()];
 
 			int AliveState = GetAliveState();
