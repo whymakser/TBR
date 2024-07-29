@@ -1660,7 +1660,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 					if (Dummy != -1)
 						m_aClients[Dummy].m_DesignChange = false;
 				}
-				else if (m_aClients[ClientID].m_Rejoining)
+				if (m_aClients[ClientID].m_Rejoining)
 				{
 					m_aClients[ClientID].m_Rejoining = false;
 					GameServer()->OnClientRejoin(ClientID);
