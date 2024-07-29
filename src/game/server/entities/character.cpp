@@ -5225,7 +5225,8 @@ bool CCharacter::GrogTick()
 			// Random grog actions
 			if (!m_NextGrogEmote || m_NextGrogEmote - Now < 0)
 			{
-				GameServer()->SendEmoticon(m_pPlayer->GetCID(), random(0, 1) ? EMOTICON_HEARTS : EMOTICON_EYES);
+				int Random = random(0, 2);
+				GameServer()->SendEmoticon(m_pPlayer->GetCID(), Random == 0 ? EMOTICON_HEARTS : Random == 1 ? EMOTICON_EYES : EMOTICON_MUSIC);
 				SetEmote(EMOTE_HAPPY, Now + Server()->TickSpeed() * 2);
 				m_NextGrogEmote = Now + Server()->TickSpeed() * random(5, 60);
 			}
