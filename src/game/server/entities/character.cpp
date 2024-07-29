@@ -4048,6 +4048,10 @@ void CCharacter::FDDraceInit()
 	m_Permille = 0;
 	m_FirstPermilleTick = 0;
 	m_GrogSpirit = 0;
+	m_NextGrogEmote = 0;
+	m_NextGrogBalance = 0;
+	m_GrogBalancePosX = 0.f;
+	m_GrogDirection = -1;
 
 	m_pDummyHandle = 0;
 	CreateDummyHandle(m_pPlayer->GetDummyMode());
@@ -5191,13 +5195,67 @@ void CCharacter::GrogTick()
 {
 	if (m_FirstPermilleTick)
 	{
+		int64 Now = Server()->Tick();
 		// Decrease by 0.1 permille every 5 minutes
-		if ((Server()->Tick() - m_FirstPermilleTick) % (Server()->TickSpeed() * 60 * 5) == 0)
+		int64 StartTickDiff = Now - m_FirstPermilleTick;
+		if (StartTickDiff % (Server()->TickSpeed() * 60 * 5) == 0)
 		{
 			m_Permille--;
 			if (m_Permille <= 0)
 			{
 				m_FirstPermilleTick = 0;
+			}
+		}
+		else
+		{
+			// Random grog actions
+			if (!m_NextGrogEmote || m_NextGrogEmote - Now < 0)
+			{
+				GameServer()->SendEmoticon(m_pPlayer->GetCID(), EMOTICON_HEARTS);
+				SetEmote(EMOTE_HAPPY, Now + Server()->TickSpeed() * 2);
+				m_NextGrogEmote = Now + Server()->TickSpeed() * random(5, 60);
+			}
+
+			// Balance impaired
+			if (m_Permille >= 8) // 0.8
+			{
+				if (!m_NextGrogBalance && m_SavedInput.m_Direction == 0)
+				{
+					int Seconds = random(20, 60);
+					float Multiplier = random(5, 10) / 10.f;
+					int DecreaseSeconds = min((int)(m_Permille * 3 * Multiplier), Seconds-1);
+					m_NextGrogBalance = Now + Server()->TickSpeed() * (Seconds - DecreaseSeconds);
+				}
+
+				if (m_NextGrogBalance && m_NextGrogBalance - Now < 0)
+				{
+					// 3/4 second
+					if (Now - m_NextGrogBalance > Server()->TickSpeed() / 4*3)
+					{
+						m_NextGrogBalance = 0;
+						m_GrogBalancePosX = 0.f;
+						m_SavedInput.m_Direction = 0;
+					}
+					else
+					{
+						if (m_GrogBalancePosX <= 0.f)
+						{
+							m_GrogBalancePosX = m_Pos.x;
+							GameServer()->SendEmoticon(m_pPlayer->GetCID(), EMOTICON_DEVILTEE);
+							SetEmote(EMOTE_ANGRY, Now + Server()->TickSpeed() * 2);
+						}
+
+						int Dir = m_Pos.x > m_GrogBalancePosX+1 ? -1 : m_Pos.x < m_GrogBalancePosX-1 ? 1 : 0;
+						if (Dir != m_GrogDirection && Dir != 0)
+							m_GrogDirection = Dir;
+						m_SavedInput.m_Direction = m_GrogDirection;
+					}
+				}
+			}
+
+			if (m_Permille >= 15) // 1.5
+			{
+
 			}
 		}
 	}

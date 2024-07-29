@@ -561,6 +561,10 @@ public:
 	int m_GrogSpirit;
 	void IncreasePermille(int Permille);
 	int GetPermilleLimit();
+	int64 m_NextGrogEmote;
+	int64 m_NextGrogBalance;
+	float m_GrogBalancePosX;
+	int m_GrogDirection;
 
 	//others
 	int HasFlag();
