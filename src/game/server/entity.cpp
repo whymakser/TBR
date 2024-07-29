@@ -44,7 +44,7 @@ int CEntity::NetworkClipped(int SnappingClient, vec2 CheckPos, bool CheckShowAll
 		return 0;
 
 	// Border to also receive objects a bit off the screen so they dont pop up, 10 blocks should be okay
-	float Border = 32.f * 10.f;
+	float Border = 32.f * (m_PlotID >= PLOT_START ? 6.f : 10.f);
 	vec2 ShowDistance = GameServer()->m_apPlayers[SnappingClient]->m_ShowDistance;
 	if (m_PlotID >= PLOT_START || DefaultRange)
 		ShowDistance = GameServer()->m_apPlayers[SnappingClient]->m_StandardShowDistance;
@@ -79,7 +79,7 @@ bool CEntity::NetworkClippedLine(int SnappingClient, vec2 StartPos, vec2 EndPos,
 		DistanceToLine = ViewPos - StartPos;
 	}
 	// Border to also receive objects a bit off the screen so they dont pop up, 10 blocks should be okay
-	float Border = 32.f * 10.f;
+	float Border = 32.f * (m_PlotID >= PLOT_START ? 6.f : 10.f);
 	float ClippDistance = max(ShowDistance.x, ShowDistance.y) / 2.f + Border;
 	return (absolute(DistanceToLine.x) > ClippDistance || absolute(DistanceToLine.y) > ClippDistance);
 }
