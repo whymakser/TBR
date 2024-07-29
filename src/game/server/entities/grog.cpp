@@ -97,6 +97,7 @@ bool CGrog::Drop(int Dir, bool OnDeath)
 	Dir = Dir == -3 ? 2*GetOwner()->GetAimDir() : Dir;
 	m_Vel = vec2(Dir, -5);
 	DecreaseNumGrogsHolding();
+	GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH, m_TeamMask);
 	return true;
 }
 
@@ -157,6 +158,7 @@ void CGrog::Pickup()
 
 		if (pChr->AddGrog())
 		{
+			GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH, m_TeamMask);
 			Reset(false);
 			break;
 		}
