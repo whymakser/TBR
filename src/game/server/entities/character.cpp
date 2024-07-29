@@ -5285,7 +5285,8 @@ bool CCharacter::GrogTick()
 							// Don't set yet when we're stil balancing
 							if (!m_GrogDirDelayEnd && m_GrogBalancePosX == GROG_BALANCE_POS_UNSET)
 							{
-								GameServer()->SendEmoticon(m_pPlayer->GetCID(), EMOTICON_DEVILTEE);
+								int Emoticon = EMOTICON_SPLATTEE + random(0, 2); // one of the three angry emotes
+								GameServer()->SendEmoticon(m_pPlayer->GetCID(), Emoticon);
 								SetEmote(EMOTE_ANGRY, Now + Server()->TickSpeed() * 2);
 								// 1/3 second delayed
 								m_GrogDirDelayEnd = Now + Server()->TickSpeed() / 3;
