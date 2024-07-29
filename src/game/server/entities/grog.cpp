@@ -65,7 +65,7 @@ void CGrog::DecreaseNumGrogsHolding()
 void CGrog::OnSip()
 {
 	m_NumSips++;
-	GameServer()->CreateSound(m_Pos, SOUND_WEAPON_SPAWN, m_TeamMask);
+	GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH, m_TeamMask);
 	GetOwner()->SetEmote(EMOTE_HAPPY, Server()->Tick() + Server()->TickSpeed() * 2);
 
 	if (m_NumSips >= NUM_GROG_SIPS)
@@ -97,7 +97,7 @@ bool CGrog::Drop(int Dir, bool OnDeath)
 	Dir = Dir == -3 ? 2*GetOwner()->GetAimDir() : Dir;
 	m_Vel = vec2(Dir, -5);
 	DecreaseNumGrogsHolding();
-	GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH, m_TeamMask);
+	GameServer()->CreateSound(m_Pos, SOUND_WEAPON_SPAWN, m_TeamMask);
 	return true;
 }
 
@@ -158,7 +158,7 @@ void CGrog::Pickup()
 
 		if (pChr->AddGrog())
 		{
-			GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH, m_TeamMask);
+			GameServer()->CreateSound(m_Pos, SOUND_WEAPON_NOAMMO, m_TeamMask);
 			Reset(false);
 			break;
 		}
