@@ -1387,6 +1387,9 @@ void CCharacter::Tick()
 
 	DummyTick();
 	FDDraceTick();
+	// process grog and permille, return if player got killed due to excessive drinking
+	if (GrogTick())
+		return;
 	HandleLastIndexTiles();
 
 	DDraceTick();
@@ -4055,6 +4058,7 @@ void CCharacter::FDDraceInit()
 	m_NumGrogsHolding = 0;
 	m_Permille = 0;
 	m_FirstPermilleTick = 0;
+	m_FirstDeadlyPermilleTick = 0;
 	m_GrogSpirit = 0;
 	m_NextGrogEmote = 0;
 	m_NextGrogBalance = 0;
@@ -4323,9 +4327,6 @@ void CCharacter::FDDraceTick()
 		GameWorld()->ResetSeeOthers(m_pPlayer->GetCID());
 		m_pPlayer->m_DoSeeOthersByVote = false;
 	}
-
-	// process grog and permille
-	GrogTick();
 
 	// update
 	m_DrawEditor.Tick();
@@ -5201,11 +5202,11 @@ int CCharacter::GetAliveState()
 	return 0;
 }
 
-void CCharacter::GrogTick()
+bool CCharacter::GrogTick()
 {
+	int64 Now = Server()->Tick();
 	if (m_FirstPermilleTick)
 	{
-		int64 Now = Server()->Tick();
 		// Decrease by 0.1 permille every 5 minutes
 		int64 StartTickDiff = Now - m_FirstPermilleTick;
 		if (StartTickDiff % (Server()->TickSpeed() * 60 * 5) == 0)
@@ -5234,7 +5235,7 @@ void CCharacter::GrogTick()
 					m_NextGrogBalance = GetNextGrogActionTick();
 				}
 
-				if (m_NextGrogBalance && m_NextGrogBalance - Now < 0)
+				if (m_NextGrogBalance - Now < 0)
 				{
 					// 3/4 second
 					if (Now - m_NextGrogBalance > Server()->TickSpeed() / 4*3)
@@ -5268,7 +5269,7 @@ void CCharacter::GrogTick()
 						m_NextGrogDirDelay = GetNextGrogActionTick();
 					}
 					
-					if (m_NextGrogDirDelay && m_NextGrogDirDelay - Now < 0)
+					if (m_NextGrogDirDelay - Now < 0)
 					{
 						if (m_GrogDirDelayEnd && m_GrogDirDelayEnd < Server()->Tick())
 						{
@@ -5311,6 +5312,39 @@ void CCharacter::GrogTick()
 		m_PassiveEndTick = 0;
 		Passive(false, -1, true);
 	}
+
+	// Very deadly alcohol!!! stupid alcohol!! dont drink, smoke weed instead 420
+	if (m_Permille >= 35) // 3.5
+	{
+		// long term alcoholics can handle it better
+		// let's add 0.5 permille on top, so 4.4permille is the ABSOLUTE maximum without dying, depending on register date
+		// for other people, 3.5 will be deadly limit
+		int DeadlyLimit = max(GetPermilleLimit() + 5, 35);
+		if (m_Permille > DeadlyLimit)
+		{
+			if (!m_FirstDeadlyPermilleTick)
+			{
+				m_FirstDeadlyPermilleTick = Now;
+			}
+
+			// 5 minutes above the deadly limit will kill you
+			if (m_FirstDeadlyPermilleTick + Server()->TickSpeed() * 60 * 5 < Server()->Tick())
+			{
+				m_FirstDeadlyPermilleTick = 0;
+				Die(WEAPON_SELF);
+				char aBuf[64];
+				str_format(aBuf, sizeof(aBuf), "'%s' died as a result of excessive grog consumption", Server()->ClientName(m_pPlayer->GetCID()));
+				GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+				return true;
+			}
+		}
+		else
+		{
+			// If we're under this limit again, we're fine.
+			m_FirstDeadlyPermilleTick = 0;
+		}
+	}
+	return false;
 }
 
 int64 CCharacter::GetNextGrogActionTick()

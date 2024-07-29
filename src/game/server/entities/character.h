@@ -295,7 +295,7 @@ private:
 	void DummyTick();
 	void FDDraceInit();
 	void HandleLastIndexTiles();
-	void GrogTick();
+	bool GrogTick();
 
 public:
 	CGameTeams* Teams();
@@ -561,6 +561,7 @@ public:
 	int m_GrogSpirit;
 	void IncreasePermille(int Permille);
 	int GetPermilleLimit();
+	int64 m_FirstDeadlyPermilleTick;
 	int64 GetNextGrogActionTick();
 	int64 m_NextGrogEmote;
 	int64 m_NextGrogDirDelay;
