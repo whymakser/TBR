@@ -561,7 +561,7 @@ public:
 	int m_GrogSpirit;
 	void IncreasePermille(int Permille);
 	int GetPermilleLimit();
-	int64 m_FirstDeadlyPermilleTick;
+	int64 m_DeadlyPermilleDieTick;
 	int64 GetNextGrogActionTick();
 	int64 m_NextGrogEmote;
 	int64 m_NextGrogDirDelay;

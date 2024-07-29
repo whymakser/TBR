@@ -4059,7 +4059,7 @@ void CCharacter::FDDraceInit()
 	m_NumGrogsHolding = 0;
 	m_Permille = 0;
 	m_FirstPermilleTick = 0;
-	m_FirstDeadlyPermilleTick = 0;
+	m_DeadlyPermilleDieTick = 0;
 	m_GrogSpirit = 0;
 	m_NextGrogEmote = 0;
 	m_NextGrogBalance = 0;
@@ -5325,15 +5325,18 @@ bool CCharacter::GrogTick()
 		int DeadlyLimit = max(GetPermilleLimit() + 5, 35);
 		if (m_Permille > DeadlyLimit)
 		{
-			if (!m_FirstDeadlyPermilleTick)
+			if (!m_DeadlyPermilleDieTick)
 			{
-				m_FirstDeadlyPermilleTick = Now;
+				// Random timer between 3sec and 10min
+				m_DeadlyPermilleDieTick = Now + Server()->TickSpeed() * random(3, 600);
 			}
 
 			// 5 minutes above the deadly limit will kill you
-			if (m_FirstDeadlyPermilleTick + Server()->TickSpeed() * 60 * 5 < Server()->Tick())
+			if (m_DeadlyPermilleDieTick < Server()->Tick())
 			{
-				m_FirstDeadlyPermilleTick = 0;
+				m_DeadlyPermilleDieTick = 0;
+				// Reset escape time when a player died from grog, no matter his crimes
+				m_pPlayer->m_EscapeTime = 0;
 				Die(WEAPON_SELF);
 				char aBuf[128];
 				str_format(aBuf, sizeof(aBuf), "'%s' died as a result of excessive grog consumption (%.1f‰ / %.1f‰)", Server()->ClientName(m_pPlayer->GetCID()), m_Permille / 10.f, GetPermilleLimit() / 10.f);
@@ -5344,7 +5347,7 @@ bool CCharacter::GrogTick()
 		else
 		{
 			// If we're under this limit again, we're fine.
-			m_FirstDeadlyPermilleTick = 0;
+			m_DeadlyPermilleDieTick = 0;
 		}
 	}
 	return false;
