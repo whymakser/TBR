@@ -135,18 +135,18 @@ void CGrog::Tick()
 			// Nudging
 			m_Nudged = false;
 			CGrog *apEnts[4];
-			int Num = GameWorld()->FindEntities(m_Pos, 35.f, (CEntity * *)apEnts, 4, CGameWorld::ENTTYPE_GROG);
+			int Num = GameWorld()->FindEntities(m_Pos, 40.f, (CEntity * *)apEnts, 4, CGameWorld::ENTTYPE_GROG);
 			for (int i = 0; i < Num; ++i)
 			{
 				CGrog *pGrog = apEnts[i];
-				if (pGrog == this || pGrog->m_Nudged || pGrog->m_LastDirChange + Server()->TickSpeed() / 4 < Server()->Tick())
+				if (pGrog == this || pGrog->m_Nudged || pGrog->m_LastDirChange + Server()->TickSpeed() / 3 < Server()->Tick())
 					continue;
 				if (m_Lifetime != -1 || pGrog->m_Lifetime != -1 || !GetOwner()->CanCollide(pGrog->m_Owner, false))
 					continue;
 				if (m_Direction == pGrog->m_Direction || (m_Direction == -1 && m_Pos.x < pGrog->GetPos().x) || (m_Direction == 1 && m_Pos.x > pGrog->GetPos().x))
 					continue;
 				vec2 Diff = m_Pos - pGrog->GetPos();
-				if (abs(Diff.x) > 30.f || abs(Diff.x) < 18.f || abs(Diff.y) > 20.f)
+				if (abs(Diff.x) > 30.f || abs(Diff.x) < 14.f || abs(Diff.y) > 25.f)
 					continue;
 
 				vec2 CenterPos = (m_Pos + pGrog->GetPos()) / 2;
