@@ -32,7 +32,7 @@ class CGrog : public CAdvancedEntity
 
 	int m_PickupDelay;
 	void Pickup();
-	void Reset(bool CreateDeath = true);
+	void Reset(bool CreateDeath);
 	void DecreaseNumGrogsHolding();
 
 public:
@@ -40,6 +40,7 @@ public:
 	virtual ~CGrog();
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);
+	virtual void Reset() { Reset(true); }
 
 	void OnSip();
 	bool Drop(int Dir = -3, bool OnDeath = false);

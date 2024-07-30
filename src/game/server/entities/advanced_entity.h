@@ -40,6 +40,7 @@ protected:
 	int m_TuneZone;
 
 	bool m_CheckDeath;
+	bool m_CheckGameLayerClipped;
 	Mask128 m_TeamMask;
 
 	bool m_Gravity;

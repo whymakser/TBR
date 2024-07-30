@@ -14,6 +14,8 @@ CGrog::CGrog(CGameWorld *pGameWorld, vec2 Pos, int Owner)
 	m_LastAimDir = -1;
 	m_NumSips = 0;
 	m_Lifetime = -1;
+	m_CheckDeath = false;
+	m_CheckGameLayerClipped = false;
 
 	vec2 aOffsets[NUM_GROG_LINES][2] = {
 		{ vec2(0, 0), vec2(0, -40) },
@@ -98,6 +100,8 @@ bool CGrog::Drop(int Dir, bool OnDeath)
 	m_Vel = vec2(Dir, -5);
 	DecreaseNumGrogsHolding();
 	GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH, m_TeamMask);
+	m_CheckDeath = true;
+	m_CheckGameLayerClipped = true;
 	return true;
 }
 
