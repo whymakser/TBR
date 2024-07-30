@@ -95,6 +95,10 @@ bool CGrog::Drop(int Dir, bool OnDeath)
 		return false;
 	}
 
+	// Dont allow dropping in wall
+	if (GameServer()->Collision()->IsSolid(round_to_int(m_Pos.x), round_to_int(m_Pos.y)))
+		m_Pos = GetOwner()->GetPos();
+
 	// Remove after 5 min of being dropped
 	m_Lifetime = Server()->TickSpeed() * 300;
 	m_PickupDelay = Server()->TickSpeed() * 2;
