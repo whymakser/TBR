@@ -5330,15 +5330,19 @@ bool CCharacter::GrogTick()
 	}
 
 	// Grog spirit xp boost for wise men
-	m_GrogSpirit = 0;
+	int GrogSpirit = 0;
 	if (m_Permille >= 5) // 0.5
-		m_GrogSpirit++;
+		GrogSpirit++;
 	if (m_Permille >= 10) // 1.0
-		m_GrogSpirit++;
+		GrogSpirit++;
 	if (m_Permille >= 20) // 2.0
-		m_GrogSpirit++;
+		GrogSpirit++;
 	if (m_Permille >= 30) // 3.0
-		m_GrogSpirit++;
+		GrogSpirit++;
+	// little confetti when we reached a higher grogspirit lvl :)
+	if (GrogSpirit > m_GrogSpirit)
+		GameServer()->CreateFinishConfetti(m_Pos, TeamMask());
+	m_GrogSpirit = GrogSpirit;
 
 	// After 3 seconds of freeze, disable passive
 	if (m_Permille && m_PassiveEndTick && m_FirstFreezeTick && m_FirstFreezeTick + Server()->TickSpeed() * 3 < Server()->Tick())
