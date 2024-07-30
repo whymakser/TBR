@@ -5218,6 +5218,7 @@ bool CCharacter::GrogTick()
 			if (m_Permille <= 0)
 			{
 				m_FirstPermilleTick = 0;
+				m_NextGrogEmote = 0;
 			}
 		}
 		else
@@ -5267,36 +5268,55 @@ bool CCharacter::GrogTick()
 							m_GrogDirection = Dir;
 					}
 				}
-				else if (m_Permille >= 15) // 1.5
+			}
+			else
+			{
+				// Reset so we don't take weird values and keep an input or smth
+				m_NextGrogBalance = 0;
+				if (m_GrogBalancePosX != GROG_BALANCE_POS_UNSET)
 				{
-					if (!m_NextGrogDirDelay)
-					{
-						m_NextGrogDirDelay = GetNextGrogActionTick();
-					}
+					// Reset, so GrogDirDelay below is not triggered
+					m_SavedInput.m_Direction = m_PrevInput.m_Direction = m_Input.m_Direction = 0;
+				}
+				m_GrogBalancePosX = GROG_BALANCE_POS_UNSET;
+			}
+
+			// Input delayed
+			if (m_Permille >= 15) // 1.5
+			{
+				if (!m_NextGrogDirDelay)
+				{
+					m_NextGrogDirDelay = GetNextGrogActionTick();
+				}
 					
-					if (m_NextGrogDirDelay - Now < 0)
+				if (m_NextGrogDirDelay - Now < 0)
+				{
+					if (m_GrogDirDelayEnd && m_GrogDirDelayEnd < Server()->Tick())
 					{
-						if (m_GrogDirDelayEnd && m_GrogDirDelayEnd < Server()->Tick())
+						m_NextGrogDirDelay = 0;
+						m_GrogDirDelayEnd = 0;
+					}
+					else if (m_SavedInput.m_Direction != m_PrevInput.m_Direction)
+					{
+						// Don't set yet when we're stil balancing
+						if (!m_GrogDirDelayEnd && m_GrogBalancePosX == GROG_BALANCE_POS_UNSET)
 						{
-							m_NextGrogDirDelay = 0;
-							m_GrogDirDelayEnd = 0;
-						}
-						else if (m_SavedInput.m_Direction != m_PrevInput.m_Direction)
-						{
-							// Don't set yet when we're stil balancing
-							if (!m_GrogDirDelayEnd && m_GrogBalancePosX == GROG_BALANCE_POS_UNSET)
-							{
-								int Emoticon = EMOTICON_SPLATTEE + random(0, 2); // one of the three angry emotes
-								GameServer()->SendEmoticon(m_pPlayer->GetCID(), Emoticon);
-								SetEmote(EMOTE_ANGRY, Now + Server()->TickSpeed() * 2);
-								// 1/3 second delayed
-								m_GrogDirDelayEnd = Now + Server()->TickSpeed() / 3;
-								// keep previous input for now
-								m_SavedInput.m_Direction = m_PrevInput.m_Direction;
-							}
+							int Emoticon = EMOTICON_SPLATTEE + random(0, 2); // one of the three angry emotes
+							GameServer()->SendEmoticon(m_pPlayer->GetCID(), Emoticon);
+							SetEmote(EMOTE_ANGRY, Now + Server()->TickSpeed() * 2);
+							// 1/3 second delayed
+							m_GrogDirDelayEnd = Now + Server()->TickSpeed() / 3;
+							// keep previous input for now
+							m_SavedInput.m_Direction = m_PrevInput.m_Direction;
 						}
 					}
 				}
+			}
+			else
+			{
+				// Reset so we don't take weird values and keep an input or smth
+				m_NextGrogDirDelay = 0;
+				m_GrogDirDelayEnd = 0;
 			}
 		}
 	}
