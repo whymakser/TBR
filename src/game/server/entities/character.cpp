@@ -2788,6 +2788,12 @@ void CCharacter::HandleTiles(int Index)
 					FlagBonus = true;
 				}
 
+				//grog permille
+				if (m_Permille)
+				{
+					Money += 1;
+				}
+
 				// give money and xp
 				m_pPlayer->WalletTransaction(Money);
 				m_pPlayer->GiveXP(XP);
@@ -2808,7 +2814,7 @@ void CCharacter::HandleTiles(int Index)
 				str_format(m_aLineExp, sizeof(m_aLineExp), "XP [%lld/%lld]%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level), aPlusXP);
 
 				str_format(aPolice, sizeof(aPolice), " +%dpolice", pAccount->m_PoliceLevel);
-				str_format(m_aLineMoney, sizeof(m_aLineMoney), "Wallet [%lld] +%d%s%s", m_pPlayer->GetWalletMoney(), TileMoney, (PoliceMoneyTile && pAccount->m_PoliceLevel) ? aPolice : "", pAccount->m_VIP ? " +2vip" : "");
+				str_format(m_aLineMoney, sizeof(m_aLineMoney), "Wallet [%lld] +%d%s%s%s", m_pPlayer->GetWalletMoney(), TileMoney, (PoliceMoneyTile && pAccount->m_PoliceLevel) ? aPolice : "", pAccount->m_VIP ? " +2vip" : "", m_Permille ? " +1grog" : "");
 
 				if (!IsWeaponIndicator() && !m_pPlayer->m_HideBroadcasts)
 				{
