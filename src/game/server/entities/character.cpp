@@ -4806,6 +4806,14 @@ void CCharacter::UnsetSpookyGhost()
 
 void CCharacter::SetActiveWeapon(int Weapon)
 {
+	if (m_NumGrogsHolding && Weapon != WEAPON_HAMMER && Weapon != WEAPON_DRAW_EDITOR)
+	{
+		if (!GetWeaponGot(WEAPON_HAMMER))
+			GiveWeapon(WEAPON_HAMMER);
+		SetActiveWeapon(WEAPON_HAMMER);
+		return;
+	}
+
 	if (!GetWeaponGot(Weapon))
 		return;
 
