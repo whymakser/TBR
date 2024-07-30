@@ -146,7 +146,7 @@ void CGrog::Tick()
 				if (m_Direction == pGrog->m_Direction || (m_Direction == -1 && m_Pos.x < pGrog->GetPos().x) || (m_Direction == 1 && m_Pos.x > pGrog->GetPos().x))
 					continue;
 				vec2 Diff = m_Pos - pGrog->GetPos();
-				if (abs(Diff.x) > 30.f || abs(Diff.x) < 14.f || abs(Diff.y) > 25.f)
+				if (abs(Diff.x) > 30.f || abs(Diff.x) < 14.f || abs(Diff.y) > 32.f)
 					continue;
 
 				vec2 CenterPos = (m_Pos + pGrog->GetPos()) / 2;
