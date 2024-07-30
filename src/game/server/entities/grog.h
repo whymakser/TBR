@@ -19,7 +19,9 @@ class CGrog : public CAdvancedEntity
 		NUM_GROG_SIPS = 5,
 	};
 
-	int m_LastAimDir;
+	int m_Direction;
+	int64 m_LastDirChange;
+	bool m_Nudged;
 	int m_NumSips;
 	int m_Lifetime;
 

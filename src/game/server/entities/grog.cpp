@@ -11,9 +11,11 @@ CGrog::CGrog(CGameWorld *pGameWorld, vec2 Pos, int Owner)
 : CAdvancedEntity(pGameWorld, CGameWorld::ENTTYPE_GROG, Pos, vec2(8, 20), Owner)
 {
 	m_Owner = Owner;
-	m_LastAimDir = -1;
+	m_Direction = -1;
+	m_LastDirChange = 0;
 	m_NumSips = 0;
 	m_Lifetime = -1;
+	m_Nudged = false;
 	m_CheckDeath = false;
 	m_CheckGameLayerClipped = false;
 
@@ -120,15 +122,38 @@ void CGrog::Tick()
 		int Dir = GetOwner()->GetAimDir();
 		m_Pos = GetOwner()->GetPos();
 		m_Pos.x += 32.f * Dir;
-		if (Dir != m_LastAimDir)
+		if (Dir != m_Direction)
 		{
 			for (int i = 0; i < NUM_GROG_LINES; i++)
 			{
 				m_aLines[i].m_From.x *= -1;
 				m_aLines[i].m_To.x *= -1;
 			}
+			m_Direction = Dir;
+			m_LastDirChange = Server()->Tick();
+
+			// Nudging
+			m_Nudged = false;
+			CGrog *apEnts[4];
+			int Num = GameWorld()->FindEntities(m_Pos, 35.f, (CEntity * *)apEnts, 4, CGameWorld::ENTTYPE_GROG);
+			for (int i = 0; i < Num; ++i)
+			{
+				CGrog *pGrog = apEnts[i];
+				if (pGrog == this || pGrog->m_Nudged || pGrog->m_LastDirChange + Server()->TickSpeed() / 4 < Server()->Tick())
+					continue;
+				if (m_Lifetime != -1 || pGrog->m_Lifetime != -1 || !GetOwner()->CanCollide(pGrog->m_Owner, false))
+					continue;
+				if (m_Direction == pGrog->m_Direction || (m_Direction == -1 && m_Pos.x < pGrog->GetPos().x) || (m_Direction == 1 && m_Pos.x > pGrog->GetPos().x))
+					continue;
+				vec2 Diff = m_Pos - pGrog->GetPos();
+				if (abs(Diff.x) > 30.f || abs(Diff.x) < 18.f || abs(Diff.y) > 20.f)
+					continue;
+
+				vec2 CenterPos = (m_Pos + pGrog->GetPos()) / 2;
+				GameServer()->CreateHammerHit(CenterPos, m_TeamMask);
+				m_Nudged = true;
+			}
 		}
-		m_LastAimDir = Dir;
 	}
 	else
 	{
