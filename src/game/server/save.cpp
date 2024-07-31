@@ -398,7 +398,11 @@ void CSaveTee::Load(CCharacter *pChr, int Team)
 			pChr->AddGrog();
 		pChr->m_Permille = m_Permille;
 		if (m_TicksSinceFirstPermille)
+		{
 			pChr->m_FirstPermilleTick = pChr->Server()->Tick() - m_TicksSinceFirstPermille;
+			// Don't trigger confetti effect on loading. We could save m_GrogSpirit, but it's useless so we just determine it here before already.
+			pChr->m_GrogSpirit = pChr->DetermineGrogSpirit();
+		}
 
 		// core
 		pChr->Core()->m_MoveRestrictionExtra.m_RoomKey = m_MoveRestrictionExtraRoomKey;

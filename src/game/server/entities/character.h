@@ -559,6 +559,7 @@ public:
 	int m_Permille;
 	int64 m_FirstPermilleTick;
 	int m_GrogSpirit;
+	int DetermineGrogSpirit();
 	void IncreasePermille(int Permille);
 	int GetPermilleLimit();
 	int64 m_DeadlyPermilleDieTick;

@@ -4550,6 +4550,20 @@ int CCharacter::GetPermilleLimit()
 	return clamp((int)(MonthsSinceReg * 10), Config()->m_SvGrogMinPermilleLimit, 39);
 }
 
+int CCharacter::DetermineGrogSpirit()
+{
+	int GrogSpirit = 0;
+	if (m_Permille >= 5) // 0.5
+		GrogSpirit++;
+	if (m_Permille >= 10) // 1.0
+		GrogSpirit++;
+	if (m_Permille >= 20) // 2.0
+		GrogSpirit++;
+	if (m_Permille >= 30) // 3.0
+		GrogSpirit++;
+	return GrogSpirit;
+}
+
 bool CCharacter::AddGrog()
 {
 	if (m_NumGrogsHolding >= Config()->m_SvGrogHoldLimit)
@@ -5336,15 +5350,7 @@ bool CCharacter::GrogTick()
 	}
 
 	// Grog spirit xp boost for wise men
-	int GrogSpirit = 0;
-	if (m_Permille >= 5) // 0.5
-		GrogSpirit++;
-	if (m_Permille >= 10) // 1.0
-		GrogSpirit++;
-	if (m_Permille >= 20) // 2.0
-		GrogSpirit++;
-	if (m_Permille >= 30) // 3.0
-		GrogSpirit++;
+	int GrogSpirit = DetermineGrogSpirit();
 	// little confetti when we reached a higher grogspirit lvl :)
 	if (GrogSpirit > m_GrogSpirit)
 		GameServer()->CreateFinishConfetti(m_Pos, TeamMask());
