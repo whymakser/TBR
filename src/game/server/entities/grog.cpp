@@ -15,7 +15,8 @@ CGrog::CGrog(CGameWorld *pGameWorld, vec2 Pos, int Owner)
 	m_LastDirChange = 0;
 	m_NumSips = 0;
 	m_Lifetime = -1;
-	m_Nudged = false;
+	m_ProcessedNudge = false;
+	m_LastNudgePos = vec2(-1, -1);
 	m_CheckDeath = false;
 	m_CheckGameLayerClipped = false;
 
@@ -137,13 +138,13 @@ void CGrog::Tick()
 			m_LastDirChange = Server()->Tick();
 
 			// Nudging
-			m_Nudged = false;
+			m_ProcessedNudge = false;
 			CGrog *apEnts[4];
 			int Num = GameWorld()->FindEntities(m_Pos, 40.f, (CEntity * *)apEnts, 4, CGameWorld::ENTTYPE_GROG);
 			for (int i = 0; i < Num; ++i)
 			{
 				CGrog *pGrog = apEnts[i];
-				if (pGrog == this || pGrog->m_Nudged || pGrog->m_Lifetime != -1)
+				if (pGrog == this || pGrog->m_ProcessedNudge || pGrog->m_Lifetime != -1)
 					continue;
 				if (pGrog->m_LastDirChange + Server()->TickSpeed() / 3 < Server()->Tick() || (pGrog->m_Owner >= 0 && !GetOwner()->CanCollide(pGrog->m_Owner, false)))
 					continue;
@@ -154,8 +155,12 @@ void CGrog::Tick()
 					continue;
 
 				vec2 CenterPos = (m_Pos + pGrog->GetPos()) / 2;
+				// For snapping own hammerhit effect in silentfarm, round position so it can be matched flawlessly later in eventhandler snap
+				CenterPos = vec2(round_to_int(CenterPos.x), round_to_int(CenterPos.y));
+				m_LastNudgePos = pGrog->m_LastNudgePos = CenterPos;
+
 				GameServer()->CreateHammerHit(CenterPos, m_TeamMask);
-				m_Nudged = true;
+				m_ProcessedNudge = true;
 			}
 		}
 	}

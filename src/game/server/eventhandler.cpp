@@ -49,13 +49,21 @@ void CEventHandler::Snap(int SnappingClient)
 		if(SnappingClient == -1 || CmaskIsSet(m_aClientMasks[i], SnappingClient))
 		{
 			CNetEvent_Common *ev = (CNetEvent_Common *)&m_aData[m_aOffsets[i]];
-			if(SnappingClient == -1 || distance(GameServer()->m_apPlayers[SnappingClient]->m_ViewPos, vec2(ev->m_X, ev->m_Y)) < 1500.0f)
+			vec2 EventPos = vec2(ev->m_X, ev->m_Y);
+			if(SnappingClient == -1 || distance(GameServer()->m_apPlayers[SnappingClient]->m_ViewPos, EventPos) < 1500.0f)
 			{
 				if (m_aTypes[i] == NETEVENTTYPE_SOUNDWORLD || m_aTypes[i] == NETEVENTTYPE_HAMMERHIT || m_aTypes[i] == NETEVENTTYPE_SPAWN)
 				{
 					CPlayer *pSnap = SnappingClient >= 0 ? GameServer()->m_apPlayers[SnappingClient] : 0;
-					if (pSnap && pSnap->SilentFarmActive())
+					CCharacter *pChr = pSnap->GetCharacter();
+					if (m_aTypes[i] == NETEVENTTYPE_HAMMERHIT && pChr && pChr->m_pGrog && pChr->m_pGrog->m_LastNudgePos == EventPos)
+					{
+						pChr->m_pGrog->m_LastNudgePos = vec2(-1, -1);
+					}
+					else if (pSnap && pSnap->SilentFarmActive())
+					{
 						continue;
+					}
 				}
 
 				if (m_aTypes[i] == NETEVENTTYPE_DEATH)

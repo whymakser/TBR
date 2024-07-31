@@ -21,7 +21,7 @@ class CGrog : public CAdvancedEntity
 
 	int m_Direction;
 	int64 m_LastDirChange;
-	bool m_Nudged;
+	bool m_ProcessedNudge;
 	int m_NumSips;
 	int m_Lifetime;
 
@@ -46,6 +46,9 @@ public:
 
 	void OnSip();
 	bool Drop(int Dir = -3, bool OnDeath = false);
+
+	// For snapping own hammerhit effect in silentfarm, public so eventhandler can reset it
+	vec2 m_LastNudgePos;
 };
 
 #endif // GAME_SERVER_ENTITIES_GROG_H
