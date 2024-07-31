@@ -6809,7 +6809,7 @@ void CGameContext::ProcessSpawnBlockProtection(int ClientID)
 		pKiller->m_SpawnBlockScore++;
 		if (Config()->m_SvSpawnBlockProtection)
 		{
-			if (pKiller->m_SpawnBlockScore > 2)
+			if (pKiller->m_SpawnBlockScore > 5)
 			{
 				char aBuf[128];
 				str_format(aBuf, sizeof(aBuf), "'%s' is spawnblocking. Catch him!", Server()->ClientName(Killer));
