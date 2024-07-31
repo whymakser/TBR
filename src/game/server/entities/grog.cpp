@@ -143,9 +143,9 @@ void CGrog::Tick()
 			for (int i = 0; i < Num; ++i)
 			{
 				CGrog *pGrog = apEnts[i];
-				if (pGrog == this || pGrog->m_Nudged || pGrog->m_LastDirChange + Server()->TickSpeed() / 3 < Server()->Tick())
+				if (pGrog == this || pGrog->m_Nudged || pGrog->m_Lifetime != -1)
 					continue;
-				if (m_Lifetime != -1 || pGrog->m_Lifetime != -1 || !GetOwner()->CanCollide(pGrog->m_Owner, false))
+				if (pGrog->m_LastDirChange + Server()->TickSpeed() / 3 < Server()->Tick() || (pGrog->m_Owner >= 0 && !GetOwner()->CanCollide(pGrog->m_Owner, false)))
 					continue;
 				if (m_Direction == pGrog->m_Direction || (m_Direction == -1 && m_Pos.x < pGrog->GetPos().x) || (m_Direction == 1 && m_Pos.x > pGrog->GetPos().x))
 					continue;
