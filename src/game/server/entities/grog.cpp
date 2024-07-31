@@ -82,7 +82,7 @@ void CGrog::OnSip()
 	}
 }
 
-bool CGrog::Drop(int Dir, bool OnDeath)
+bool CGrog::Drop(float Dir, bool OnDeath)
 {
 	// Can't drop a grog which you started drinking. don't spread viruses. Drink it up first. If you drank before sharing with your friends, you're a donkey!
 	if (m_NumSips)
@@ -104,7 +104,7 @@ bool CGrog::Drop(int Dir, bool OnDeath)
 	m_Lifetime = Server()->TickSpeed() * 300;
 	m_PickupDelay = Server()->TickSpeed() * 2;
 	Dir = Dir == -3 ? 2*GetOwner()->GetAimDir() : Dir;
-	m_Vel = vec2(Dir, -5);
+	m_Vel = vec2(Dir, -3);
 	DecreaseNumGrogsHolding();
 	GameServer()->CreateSound(m_Pos, SOUND_PICKUP_HEALTH, m_TeamMask);
 	m_CheckDeath = true;

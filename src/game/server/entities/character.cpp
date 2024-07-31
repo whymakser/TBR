@@ -4694,9 +4694,9 @@ void CCharacter::DropBattery(int WeaponID, int Amount, bool OnDeath, float Dir)
 	m_LastBatteryDrop = Server()->Tick();
 }
 
-bool CCharacter::DropGrog(int Dir, bool OnDeath)
+bool CCharacter::DropGrog(float Dir, bool OnDeath)
 {
-	return m_NumGrogsHolding && m_pGrog && m_pGrog->Drop(Dir == -3 ? GetAimDir() : Dir, OnDeath);
+	return m_NumGrogsHolding && m_pGrog && m_pGrog->Drop(Dir, OnDeath);
 }
 
 void CCharacter::DropLoot(int Weapon)

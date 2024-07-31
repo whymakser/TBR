@@ -45,7 +45,7 @@ public:
 	virtual void Reset() { Reset(true); }
 
 	void OnSip();
-	bool Drop(int Dir = -3, bool OnDeath = false);
+	bool Drop(float Dir = -3, bool OnDeath = false);
 
 	// For snapping own hammerhit effect in silentfarm, public so eventhandler can reset it
 	vec2 m_LastNudgePos;
