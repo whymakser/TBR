@@ -55,7 +55,7 @@ void CEventHandler::Snap(int SnappingClient)
 				if (m_aTypes[i] == NETEVENTTYPE_SOUNDWORLD || m_aTypes[i] == NETEVENTTYPE_HAMMERHIT || m_aTypes[i] == NETEVENTTYPE_SPAWN)
 				{
 					CPlayer *pSnap = SnappingClient >= 0 ? GameServer()->m_apPlayers[SnappingClient] : 0;
-					CCharacter *pChr = pSnap->GetCharacter();
+					CCharacter *pChr = pSnap ? pSnap->GetCharacter() : 0;
 					if (m_aTypes[i] == NETEVENTTYPE_HAMMERHIT && pChr && pChr->m_pGrog && pChr->m_pGrog->m_LastNudgePos == EventPos)
 					{
 						pChr->m_pGrog->m_LastNudgePos = vec2(-1, -1);
