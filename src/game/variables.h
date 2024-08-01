@@ -342,7 +342,7 @@ MACRO_CONFIG_INT(SvAntibotReportsLevel, sv_antibot_reports_level, AUTHED_ADMIN, 
 MACRO_CONFIG_INT(SvAntibotReportsFilter, sv_antibot_reports_filter, 1, 0, 1, CFGFLAG_SERVER, "Whether antibot reports are filtered if they are legit", AUTHED_ADMIN)
 
 // whois
-MACRO_CONFIG_INT(SvWhoIsIPEntries, sv_whois_ip_entries, 120000, 0, 999999, CFGFLAG_SERVER, "WhoIs IP entries", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvWhoIsIPEntries, sv_whois_ip_entries, 120000, 0, 1999999, CFGFLAG_SERVER, "WhoIs IP entries", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvWhoIs, sv_whois, 0, 0, 1, CFGFLAG_SERVER, "Whether WhoIs is enabled", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvWhoIsFile, sv_whois_file, 128, "data", CFGFLAG_SERVER, "WhoIs file", AUTHED_ADMIN)
 
