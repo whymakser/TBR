@@ -92,7 +92,7 @@ void CCollision::Init(class CLayers* pLayers, class CConfig *pConfig)
 	{
 		// For draweditor
 		m_pSpeedup = new CSpeedupTile[m_Width * m_Height];
-		mem_zero(m_pSpeedup, sizeof(m_Width * m_Height * sizeof(CSpeedupTile)));
+		//mem_zero(m_pSpeedup, sizeof(m_Width * m_Height * sizeof(CSpeedupTile))); // constructor filled, mem zeroing seems to break it
 	}
 
 	if (m_pLayers->SwitchLayer())
