@@ -475,6 +475,12 @@ struct CMapItemEnvelope : public CMapItemEnvelope_v2
 class CTeleTile
 {
 public:
+	CTeleTile() :
+		m_Number(0),
+		m_Type(0)
+	{
+	}
+
 	unsigned char m_Number;
 	unsigned char m_Type;
 };
@@ -499,6 +505,14 @@ public:
 class CSwitchTile
 {
 public:
+	CSwitchTile() :
+		m_Number(0),
+		m_Type(0),
+		m_Flags(0),
+		m_Delay(0)
+	{
+	}
+
 	unsigned char m_Number;
 	unsigned char m_Type;
 	unsigned char m_Flags;
