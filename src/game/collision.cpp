@@ -79,7 +79,6 @@ void CCollision::Init(class CLayers* pLayers, class CConfig *pConfig)
 	{
 		// For draweditor
 		m_pTele = new CTeleTile[m_Width * m_Height];
-		mem_zero(m_pTele, sizeof(m_Width * m_Height * sizeof(CTeleTile)));
 	}
 
 	if (m_pLayers->SpeedupLayer())
@@ -92,7 +91,6 @@ void CCollision::Init(class CLayers* pLayers, class CConfig *pConfig)
 	{
 		// For draweditor
 		m_pSpeedup = new CSpeedupTile[m_Width * m_Height];
-		mem_zero(m_pSpeedup, sizeof(m_Width * m_Height * sizeof(CSpeedupTile)));
 	}
 
 	if (m_pLayers->SwitchLayer())
@@ -108,8 +106,6 @@ void CCollision::Init(class CLayers* pLayers, class CConfig *pConfig)
 	{
 		// For draweditor
 		m_pSwitch = new CSwitchTile[m_Width * m_Height];
-		mem_zero(m_pSwitch, m_Width * m_Height * sizeof(CSwitchTile));
-
 		m_pDoor = new CDoorTile[m_Width * m_Height];
 		m_pSwitchers = 0;
 		//m_pDoor = 0;
