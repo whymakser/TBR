@@ -748,6 +748,7 @@ public:
 
 	//isdummy callback for console victim dummy
 	static void ConsoleIsDummyCallback(int ClientID, bool *pIsDummy, void *pUser);
+	static void ConsoleIsInViewCallback(int ClientID, int CallerID, bool *pIsInView, void *pUser);
 
 	//
 	void OnSetTimedOut(int ClientID, int OrigID) override;

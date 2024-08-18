@@ -3866,6 +3866,7 @@ void CGameContext::OnInit()
 	m_GameUuid = RandomUuid();
 	Console()->SetTeeHistorianCommandCallback(CommandCallback, this);
 	Console()->SetIsDummyCallback(ConsoleIsDummyCallback, this);
+	Console()->SetIsInViewCallback(ConsoleIsInViewCallback, this);
 
 	DeleteTempfile();
 
@@ -7259,6 +7260,28 @@ void CGameContext::ConsoleIsDummyCallback(int ClientID, bool *pIsDummy, void *pU
 {
 	CGameContext* pSelf = (CGameContext*)pUser;
 	*pIsDummy = pSelf->m_apPlayers[ClientID] && pSelf->m_apPlayers[ClientID]->m_IsDummy;
+}
+
+void CGameContext::ConsoleIsInViewCallback(int ClientID, int CallerID, bool *pIsInView, void *pUser)
+{
+	CGameContext* pSelf = (CGameContext*)pUser;
+	*pIsInView = false;
+	if (CallerID < 0 || !pSelf->m_apPlayers[CallerID] || !pSelf->GetPlayerChar(ClientID))
+		return;
+
+	vec2 CheckPos = pSelf->GetPlayerChar(ClientID)->GetPos();
+	vec2 ShowDistance = pSelf->m_apPlayers[CallerID]->m_ShowDistance;
+	float dx = pSelf->m_apPlayers[CallerID]->m_ViewPos.x-CheckPos.x;
+	if (absolute(dx) > ShowDistance.x / 2.f)
+	{
+		return;
+	}
+	float dy = pSelf->m_apPlayers[CallerID]->m_ViewPos.y-CheckPos.y;
+	if (absolute(dy) > ShowDistance.y / 2.f)
+	{
+		return;
+	}
+	*pIsInView = true;
 }
 
 void CGameContext::SetMapSpecificOptions()

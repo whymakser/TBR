@@ -328,6 +328,12 @@ void CConsole::SetIsDummyCallback(FIsDummyCallback pfnCallback, void* pUser)
 	m_pIsDummyUserdata = pUser;
 }
 
+void CConsole::SetIsInViewCallback(FIsInViewCallback pfnCallback, void* pUser)
+{
+	m_pfnIsInViewCallback = pfnCallback;
+	m_pIsInViewUserdata = pUser;
+}
+
 bool CConsole::LineIsValid(const char *pStr)
 {
 	if(!pStr)
@@ -499,9 +505,10 @@ void CConsole::ExecuteLineStroked(int Stroke, const char* pStr, int ClientID, bo
 						if (Result.GetVictim() == CResult::VICTIM_ME)
 							Result.SetVictim(ClientID);
 
-						if (Result.HasVictim() && (Result.GetVictim() == CResult::VICTIM_ALL || Result.GetVictim() == CResult::VICTIM_DUMMY))
+						bool DummyVictim = Result.GetVictim() == CResult::VICTIM_DUMMY;
+						bool ViewVictim = Result.GetVictim() == CResult::VICTIM_VIEW;
+						if (Result.HasVictim() && (Result.GetVictim() == CResult::VICTIM_ALL || DummyVictim || ViewVictim))
 						{
-							bool DummyVictim = Result.GetVictim() == CResult::VICTIM_DUMMY;
 							for (int i = 0; i < MAX_CLIENTS; i++)
 							{
 								if (DummyVictim)
@@ -510,6 +517,14 @@ void CConsole::ExecuteLineStroked(int Stroke, const char* pStr, int ClientID, bo
 									if (m_pfnIsDummyCallback)
 										m_pfnIsDummyCallback(i, &IsDummy, m_pIsDummyUserdata);
 									if (!IsDummy)
+										continue;
+								}
+								else if (ViewVictim)
+								{
+									bool IsInView = false;
+									if (m_pfnIsInViewCallback)
+										m_pfnIsInViewCallback(i, ClientID, &IsInView, m_pIsInViewUserdata);
+									if (!IsInView)
 										continue;
 								}
 
@@ -954,6 +969,8 @@ CConsole::CConsole(int FlagMask)
 	m_pTeeHistorianCommandUserdata = 0;
 	m_pfnIsDummyCallback = 0;
 	m_pIsDummyUserdata = 0;
+	m_pfnIsInViewCallback= 0;
+	m_pIsInViewUserdata = 0;
 
 	m_pConfig = 0;
 	m_pStorage = 0;
@@ -1400,7 +1417,7 @@ bool CConsole::CResult::HasVictim()
 
 void CConsole::CResult::SetVictim(int Victim)
 {
-	m_Victim = clamp<int>(Victim, VICTIM_DUMMY, MAX_CLIENTS - 1);
+	m_Victim = clamp<int>(Victim, VICTIM_VIEW, MAX_CLIENTS - 1);
 }
 
 void CConsole::CResult::SetVictim(const char* pVictim)
@@ -1411,6 +1428,8 @@ void CConsole::CResult::SetVictim(const char* pVictim)
 		m_Victim = VICTIM_ALL;
 	else if (!str_comp(pVictim, "dummy"))
 		m_Victim = VICTIM_DUMMY;
+	else if (!str_comp(pVictim, "view"))
+		m_Victim = VICTIM_VIEW;
 	else
 		m_Victim = clamp<int>(str_toint(pVictim), 0, MAX_CLIENTS - 1);
 }

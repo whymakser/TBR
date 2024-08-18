@@ -80,6 +80,8 @@ class CConsole : public IConsole
 
 	FIsDummyCallback m_pfnIsDummyCallback;
 	void *m_pIsDummyUserdata;
+	FIsInViewCallback m_pfnIsInViewCallback;
+	void *m_pIsInViewUserdata;
 
 	enum
 	{
@@ -129,6 +131,7 @@ class CConsole : public IConsole
 
 		enum
 		{
+			VICTIM_VIEW = -5,
 			VICTIM_DUMMY = -4,
 			VICTIM_NONE = -3,
 			VICTIM_ME = -2,
@@ -234,6 +237,7 @@ public:
 	virtual char *Format(char *pBuf, int Size, const char *pFrom, const char *pStr);
 	virtual void SetTeeHistorianCommandCallback(FTeeHistorianCommandCallback pfnCallback, void *pUser);
 	virtual void SetIsDummyCallback(FIsDummyCallback pfnCallback, void *pUser);
+	virtual void SetIsInViewCallback(FIsInViewCallback pfnCallback, void *pUser);
 
 	void SetAccessLevel(int AccessLevel) { m_AccessLevel = clamp(AccessLevel, (int)(ACCESS_LEVEL_ADMIN), (int)(ACCESS_LEVEL_USER)); }
 	void ResetServerGameSettings();
