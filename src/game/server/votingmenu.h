@@ -170,6 +170,7 @@ public:
 	void SetWantedPlayer(int ClientID) { m_vWantedPlayers.push_back(ClientID); }
 	void ApplyFlags(int ClientID, int Flags);
 	int GetFlags(int ClientID);
+	bool IsInitialized() { return m_Initialized; }
 
 	enum
 	{
