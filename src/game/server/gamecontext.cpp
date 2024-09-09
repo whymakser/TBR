@@ -3618,6 +3618,9 @@ void CGameContext::ConClearVotes(IConsole::IResult *pResult, void *pUserData)
 	pSelf->m_pVoteOptionLast = 0;
 	pSelf->m_NumVoteOptions = 0;
 
+	if(!pSelf->m_VotingMenu.IsInitialized())
+		return;
+
 	// Reset so the votes get added again
 	pSelf->m_VotingMenu.AddPlaceholderVotes();
 
