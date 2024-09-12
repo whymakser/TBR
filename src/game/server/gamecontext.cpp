@@ -3618,9 +3618,6 @@ void CGameContext::ConClearVotes(IConsole::IResult *pResult, void *pUserData)
 	pSelf->m_pVoteOptionLast = 0;
 	pSelf->m_NumVoteOptions = 0;
 
-	if(!pSelf->m_VotingMenu.IsInitialized())
-		return;
-
 	// Reset so the votes get added again
 	pSelf->m_VotingMenu.AddPlaceholderVotes();
 
@@ -3775,6 +3772,8 @@ void CGameContext::OnConsoleInit()
 	#define CHAT_COMMAND(name, params, flags, callback, userdata, help, accesslevel) m_pConsole->Register(name, params, flags, callback, userdata, help, accesslevel);
 	#include "ddracechat.h"
 	#undef CHAT_COMMAND
+
+	m_VotingMenu.Init(this);
 }
 
 void CGameContext::NewCommandHook(const CCommandManager::CCommand *pCommand, void *pContext)
@@ -4240,7 +4239,6 @@ void CGameContext::FDDraceInit()
 
 	m_WhoIs.Init(this);
 	m_RainbowName.Init(this);
-	m_VotingMenu.Init(this);
 
 	m_SurvivalGameState = SURVIVAL_OFFLINE;
 	m_SurvivalBackgroundState = SURVIVAL_OFFLINE;
