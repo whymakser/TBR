@@ -4144,7 +4144,7 @@ void CServer::PrintBotLookup()
 void CServer::CClient::CPgscLookup::Run()
 {
 	char aCmd[256];
-	str_copy(aCmd, "curl -s https://master1.ddnet.tw/ddnet/15/servers.json", sizeof(aCmd));
+	str_copy(aCmd, "curl -s https://master1.ddnet.org/ddnet/15/servers.json", sizeof(aCmd));
 
 	FILE *pStream = pipe_open(aCmd, "r");
 	if (!pStream)
