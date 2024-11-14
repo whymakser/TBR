@@ -8,6 +8,7 @@
 
 #include <list>
 #include <vector>
+#include "mapitems.h"
 
 enum
 {
@@ -204,7 +205,9 @@ public:
 	vec2 GetRandomRedirectTile(int Number);
 
 	// tiles
-	bool TileUsed(int Index) { return GetRandomTile(Index) != vec2(-1, -1); }
+	bool TileUsed(int Index) { return m_aTileUsed[Index]; }
+	bool m_aTileUsed[NUM_INDICES];
+	// When using GetRandomTile with tiles other than already used ones, add the index to CGameContext::FDDraceInit to aRequiredRandomTilePositions.
 	vec2 GetRandomTile(int Index);
 	std::vector< std::vector<vec2> > m_vTiles;
 

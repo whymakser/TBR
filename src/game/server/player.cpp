@@ -1343,6 +1343,7 @@ void CPlayer::TryRespawn()
 	int Index = ENTITY_SPAWN;
 	bool JailRelease = false;
 
+	// When adding other indices for spawning, add it to CGameContext::FDDraceInit to aRequiredRandomTilePositions.
 	if (m_ForceSpawnPos != vec2(-1, -1))
 	{
 		SpawnPos = m_ForceSpawnPos;

@@ -4168,6 +4168,36 @@ void CGameContext::FDDraceInitPreMapInit()
 
 void CGameContext::FDDraceInit()
 {
+	// Save memory. Only save those few tiles we really use when calling CCollision::GetRandomTile or CGameworld::CanSpawn (due to calling getrandomtile)
+	bool aRequiredRandomTilePositions[NUM_INDICES] = { 0 };
+	aRequiredRandomTilePositions[ENTITY_SPAWN] = true;
+	aRequiredRandomTilePositions[ENTITY_SPAWN_RED] = true;
+	aRequiredRandomTilePositions[ENTITY_SPAWN_BLUE] = true;
+	// for dummy spawns
+	aRequiredRandomTilePositions[ENTITY_SHOP_DUMMY_SPAWN] = true;
+	aRequiredRandomTilePositions[ENTITY_PLOT_SHOP_DUMMY_SPAWN] = true;
+	aRequiredRandomTilePositions[ENTITY_BANK_DUMMY_SPAWN] = true;
+	aRequiredRandomTilePositions[ENTITY_TAVERN_DUMMY_SPAWN] = true;
+	aRequiredRandomTilePositions[TILE_SHOP] = true;
+	aRequiredRandomTilePositions[TILE_PLOT_SHOP] = true;
+	aRequiredRandomTilePositions[TILE_BANK] = true;
+	aRequiredRandomTilePositions[TILE_TAVERN] = true;
+	// minigames
+	aRequiredRandomTilePositions[TILE_MINIGAME_BLOCK] = true;
+	aRequiredRandomTilePositions[TILE_SURVIVAL_LOBBY] = true;
+	aRequiredRandomTilePositions[TILE_SURVIVAL_SPAWN] = true;
+	aRequiredRandomTilePositions[TILE_SURVIVAL_DEATHMATCH] = true;
+	aRequiredRandomTilePositions[TILE_1VS1_LOBBY] = true;
+	// jail
+	aRequiredRandomTilePositions[TILE_JAIL] = true;
+	aRequiredRandomTilePositions[TILE_JAIL_RELEASE] = true;
+	for (int i = 0; i < NUM_INDICES; i++)
+	{
+		Collision()->m_aTileUsed[i] = Collision()->GetRandomTile(i) != vec2(-1, -1);
+		if (!aRequiredRandomTilePositions[i])
+			Collision()->m_vTiles[i].clear();
+	}
+
 	CreateFolders();
 
 	AddAccount(); // account id 0 means not logged in, so we add an unused account with id 0
