@@ -143,9 +143,10 @@ void CDragger::Tick()
 		m_Pos += m_Core;
 	}
 
+	CGameTeams *pTeams = &((CGameControllerDDRace*)GameServer()->m_pController)->m_Teams;
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
-		if (((CGameControllerDDRace *)GameServer()->m_pController)->m_Teams.GetTeamState(i) == CGameTeams::TEAMSTATE_EMPTY)
+		if (pTeams->GetTeamState(i) == CGameTeams::TEAMSTATE_EMPTY)
 			continue;
 
 		if (Tick)

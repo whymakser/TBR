@@ -66,10 +66,11 @@ void CLight::Move()
 	}
 
 	m_Rotation += m_AngularSpeed * m_Tick;
-	if (m_Rotation > pi * 2)
-		m_Rotation -= pi * 2;
+	const float pidouble = pi * 2;
+	if (m_Rotation > pidouble)
+		m_Rotation -= pidouble;
 	else if (m_Rotation < 0)
-		m_Rotation += pi * 2;
+		m_Rotation += pidouble;
 }
 
 void CLight::Step()

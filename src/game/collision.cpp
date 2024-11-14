@@ -1487,7 +1487,7 @@ int CCollision::IntersectNoLaser(vec2 Pos0, vec2 Pos1, vec2* pOutCollision, vec2
 	float d = distance(Pos0, Pos1);
 	vec2 Last = Pos0;
 
-	for (float f = 0; f < d; f++)
+	for (float f = 0; f < d; f += 3.f)
 	{
 		float a = f / d;
 		vec2 Pos = mix(Pos0, Pos1, a);
@@ -1524,7 +1524,7 @@ int CCollision::IntersectNoLaserNW(vec2 Pos0, vec2 Pos1, vec2* pOutCollision, ve
 	float d = distance(Pos0, Pos1);
 	vec2 Last = Pos0;
 
-	for (float f = 0; f < d; f++)
+	for (float f = 0; f < d; f += 3.f)
 	{
 		float a = f / d;
 		vec2 Pos = mix(Pos0, Pos1, a);
