@@ -360,7 +360,7 @@ MACRO_CONFIG_INT(SvNoBonusScoreTreshold, sv_bonus_score_treshold, 10, 0, 100, CF
 MACRO_CONFIG_INT(SvNoBonusScoreDecrease, sv_bonus_score_decrease, 10, 0, 60, CFGFLAG_SERVER, "Time in seconds between bonus score decrease", AUTHED_ADMIN)
 
 // grog
-MACRO_CONFIG_INT(SvGrogPrice, sv_grog_price, 5000, 1, 50000, CFGFLAG_SERVER, "Price per grog", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvGrogPrice, sv_grog_price, 500, 1, 50000, CFGFLAG_SERVER, "Price per grog", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvGrogHoldLimit, sv_grog_hold_limit, 3, 1, 10, CFGFLAG_SERVER, "Amount of grogs a player can carry", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvGrogMinPermilleLimit, sv_grog_min_permille_limit, 6, 0, 39, CFGFLAG_SERVER, "Divided by 10: Minimum legal permille limit, if exceeded=wanted", AUTHED_ADMIN)
 
