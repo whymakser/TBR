@@ -284,6 +284,7 @@ static int Here(int MoveRestrictions)
 
 static int GetMoveRestrictionsRaw(int Direction, int Tile, int Flags, CCollision::MoveRestrictionExtra Extra)
 {
+	Flags = Flags & (TILEFLAG_HFLIP | TILEFLAG_VFLIP | TILEFLAG_ROTATE);
 	switch(Tile)
 	{
 	case TILE_STOP:
@@ -295,6 +296,11 @@ static int GetMoveRestrictionsRaw(int Direction, int Tile, int Flags, CCollision
 			case ROTATION_90: MoveRestrictions = CANTMOVE_LEFT; break;
 			case ROTATION_180: MoveRestrictions = CANTMOVE_UP; break;
 			case ROTATION_270: MoveRestrictions = CANTMOVE_RIGHT; break;
+
+			case TILEFLAG_HFLIP ^ ROTATION_0: MoveRestrictions = CANTMOVE_UP; break;
+			case TILEFLAG_HFLIP ^ ROTATION_90: MoveRestrictions = CANTMOVE_RIGHT; break;
+			case TILEFLAG_HFLIP ^ ROTATION_180: MoveRestrictions = CANTMOVE_DOWN; break;
+			case TILEFLAG_HFLIP ^ ROTATION_270: MoveRestrictions = CANTMOVE_LEFT; break;
 			}
 			return Direction == MR_DIR_HERE ? Here(MoveRestrictions) : MoveRestrictions;
 		}
@@ -303,9 +309,13 @@ static int GetMoveRestrictionsRaw(int Direction, int Tile, int Flags, CCollision
 		{
 		case ROTATION_0:
 		case ROTATION_180:
+		case TILEFLAG_HFLIP ^ ROTATION_0:
+		case TILEFLAG_HFLIP ^ ROTATION_180:
 			return Twoway(CANTMOVE_DOWN|CANTMOVE_UP);
 		case ROTATION_90:
 		case ROTATION_270:
+		case TILEFLAG_HFLIP ^ ROTATION_90:
+		case TILEFLAG_HFLIP ^ ROTATION_270:
 			return Twoway(CANTMOVE_LEFT|CANTMOVE_RIGHT);
 		}
 		break;
