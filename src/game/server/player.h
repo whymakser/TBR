@@ -367,6 +367,12 @@ public:
 	bool m_LocalChat;
 	int GetAuthedHighlighted();
 
+	bool m_IsBirthdayGift;
+	enum
+	{
+		BIRTHDAY_JETPACK_GIFT_TIME = 45
+	};
+
 	// Voting Menu calls, used when executing the chat command aswell
 	void SetSilentFarm(bool Set);
 	void SetHideDrawings(bool Set);

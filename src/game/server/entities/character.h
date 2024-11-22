@@ -595,6 +595,9 @@ public:
 	bool TryCatchingWanted(int TargetCID, vec2 EffectPos);
 	int GetCorruptionScore();
 
+	int64 m_BirthdayGiftEndTick;
+	int64 m_LastBirthdayMsg;
+
 	// broadcast and ddrace hud
 	bool ShowAmmoHud();
 	int NumDDraceHudRows();

@@ -517,14 +517,24 @@ void IGameController::Snap(int SnappingClient)
 	CPlayer *pSnap = GameServer()->m_apPlayers[SnappingClient];
 	CCharacter *pSnappingChar = GameServer()->GetPlayerChar(SnappingClient);
 	CCharacter *pSpectator = !pSnap ? 0 : (pSnap->GetTeam() == TEAM_SPECTATORS || pSnap->IsPaused()) ? GameServer()->GetPlayerChar(pSnap->GetSpectatorID()) : pSnap->m_pControlledTee ? pSnap->m_pControlledTee->GetCharacter() : 0;
-	int GameStartTick = 0;
+	int GameStartTick = m_GameStartTick;
+	bool IsBirthdayPresent = false;
 	{
-		if (pSpectator && pSpectator->m_DDRaceState == DDRACE_STARTED)
-			GameStartTick = pSpectator->m_StartTime;
-		else if (!pSpectator && pSnappingChar && pSnappingChar->m_DDRaceState == DDRACE_STARTED)
-			GameStartTick = pSnappingChar->m_StartTime;
-		else
-			GameStartTick = m_GameStartTick;
+		if (pSpectator)
+		{
+			if (pSpectator->m_DDRaceState == DDRACE_STARTED)
+				GameStartTick = pSpectator->m_StartTime;
+		}
+		else if (pSnappingChar)
+		{
+			if (pSnappingChar->m_BirthdayGiftEndTick > Server()->Tick())
+			{
+				GameStartTick = pSnappingChar->m_BirthdayGiftEndTick - Server()->TickSpeed() * 60;
+				IsBirthdayPresent = true;
+			}
+			else if (pSnappingChar->m_DDRaceState == DDRACE_STARTED)
+				GameStartTick = pSnappingChar->m_StartTime;
+		}
 	}
 
 	int GameStateFlags = 0;
@@ -571,7 +581,7 @@ void IGameController::Snap(int SnappingClient)
 		((int*)pGameData)[2] = GameStartTick;
 		((int*)pGameData)[3] = 0;
 		((int*)pGameData)[4] = ScoreLimit;
-		((int*)pGameData)[5] = m_GameInfo.m_TimeLimit;
+		((int*)pGameData)[5] = IsBirthdayPresent ? 1 : m_GameInfo.m_TimeLimit;
 		((int*)pGameData)[6] = 0;
 		((int*)pGameData)[7] = m_RoundCount+1;
 	}
@@ -786,6 +796,9 @@ void IGameController::UpdateGameInfo(int ClientID)
 			else if (pPlayer->m_ScoreMode == SCORE_BONUS)
 				GameInfoMsg.m_ScoreLimit = Config()->m_SvNoBonusScoreTreshold;
 
+			if (pPlayer->GetCharacter() && pPlayer->GetCharacter()->m_BirthdayGiftEndTick > Server()->Tick())
+				GameInfoMsg.m_TimeLimit = 1;
+
 			CNetMsg_Sv_GameInfo *pInfoMsg = (Server()->GetClientVersion(i) < CGameContext::MIN_RACE_CLIENTVERSION) ? &GameInfoMsgNoRace : &GameInfoMsg;
 			Server()->SendPackMsg(pInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, i);
 		}
@@ -801,6 +814,9 @@ void IGameController::UpdateGameInfo(int ClientID)
 			GameInfoMsg.m_ScoreLimit = GameServer()->Arenas()->GetScoreLimit(ClientID);
 		else if (pPlayer->m_ScoreMode == SCORE_BONUS)
 			GameInfoMsg.m_ScoreLimit = Config()->m_SvNoBonusScoreTreshold;
+
+		if (pPlayer->GetCharacter() && pPlayer->GetCharacter()->m_BirthdayGiftEndTick > Server()->Tick())
+			GameInfoMsg.m_TimeLimit = 1;
 
 		CNetMsg_Sv_GameInfo *pInfoMsg = (Server()->GetClientVersion(ClientID) < CGameContext::MIN_RACE_CLIENTVERSION) ? &GameInfoMsgNoRace : &GameInfoMsg;
 		Server()->SendPackMsg(pInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD, ClientID);

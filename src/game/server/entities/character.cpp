@@ -331,7 +331,7 @@ void CCharacter::DoWeaponSwitch()
 {
 	// make sure we can switch
 	if (m_ReloadTimer != 0 || m_QueuedWeapon == -1 || (m_QueuedWeapon != -2 && !m_aWeapons[m_QueuedWeapon].m_Got) || (m_aWeapons[WEAPON_NINJA].m_Got && !m_ScrollNinja)
-		|| m_DrawEditor.Selecting() || (m_NumGrogsHolding && !m_DrawEditor.Active()))
+		|| m_DrawEditor.Selecting() || (m_NumGrogsHolding && !m_DrawEditor.Active()) || m_BirthdayGiftEndTick > Server()->Tick())
 		return;
 
 	if (m_QueuedWeapon == -2)
@@ -3089,6 +3089,35 @@ void CCharacter::HandleTiles(int Index)
 	else if ((m_TileIndex == TILE_NO_BONUS_AREA_LEAVE) || (m_TileFIndex == TILE_NO_BONUS_AREA_LEAVE))
 		OnNoBonusArea(false);
 
+	if ((m_TileIndex == TILE_BIRTHDAY_ENABLE) || (m_TileFIndex == TILE_BIRTHDAY_ENABLE))
+	{
+		m_pPlayer->m_IsBirthdayGift = true;
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Seems like it's your birthday! You may pick up your present at any time.");
+	}
+	else if ((m_TileIndex == TILE_BIRTHDAY_JETPACK_RECV || m_TileFIndex == TILE_BIRTHDAY_JETPACK_RECV) && m_LastBirthdayMsg + Server()->TickSpeed() < Server()->Tick())
+	{
+		m_LastBirthdayMsg = Server()->Tick();
+		if (m_pPlayer->m_IsBirthdayGift)
+		{
+			if ((m_BirthdayGiftEndTick && m_BirthdayGiftEndTick > Server()->Tick()) || m_Jetpack)
+			{
+				GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You've picked up your present already! Come back next year.");
+			}
+			else
+			{
+				Jetpack(true, -1, true);
+				SetWeapon(WEAPON_GUN);
+				m_BirthdayGiftEndTick = Server()->Tick() + Server()->TickSpeed() * CPlayer::BIRTHDAY_JETPACK_GIFT_TIME;
+				GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Happy birthday! :) You have jetpack for 45 seconds");
+				GameServer()->m_pController->UpdateGameInfo(m_pPlayer->GetCID());
+			}
+		}
+		else
+		{
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Is it your birthday?");
+		}
+	}
+
 	// update this AFTER you are done using this var above
 	m_LastIndexTile = m_TileIndex;
 	m_LastIndexFrontTile = m_TileFIndex;
@@ -4074,6 +4103,9 @@ void CCharacter::FDDraceInit()
 	m_GrogBalancePosX = GROG_BALANCE_POS_UNSET;
 	m_GrogDirection = -1;
 
+	m_BirthdayGiftEndTick = 0;
+	m_LastBirthdayMsg = 0;
+
 	m_pDummyHandle = 0;
 	CreateDummyHandle(m_pPlayer->GetDummyMode());
 }
@@ -4335,6 +4367,13 @@ void CCharacter::FDDraceTick()
 	{
 		GameWorld()->ResetSeeOthers(m_pPlayer->GetCID());
 		m_pPlayer->m_DoSeeOthersByVote = false;
+	}
+
+	if (m_BirthdayGiftEndTick && m_BirthdayGiftEndTick <= Server()->Tick())
+	{
+		m_BirthdayGiftEndTick = 0;
+		Jetpack(false, -1, true);
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Your jetpack is now disabled");
 	}
 
 	// update
@@ -5513,6 +5552,7 @@ void CCharacter::WeaponMoneyReward(int Weapon)
 
 void CCharacter::Jetpack(bool Set, int FromID, bool Silent)
 {
+	m_BirthdayGiftEndTick = 0;
 	m_Jetpack = Set;
 	GameServer()->SendExtraMessage(JETPACK, m_pPlayer->GetCID(), Set, FromID, Silent);
 }

@@ -237,6 +237,8 @@ void CPlayer::Reset()
 	m_LastMoneyPay = 0;
 	m_DoSeeOthersByVote = false;
 	m_HideBroadcasts = false;
+
+	m_IsBirthdayGift = false;
 }
 
 void CPlayer::Tick()
