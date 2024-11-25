@@ -3006,7 +3006,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 			Server()->ExpireServerInfo();
 
-			if (pPlayer->m_SpookyGhost || pPlayer->m_ForcedSkin != SKIN_NONE)
+			if (pPlayer->m_SpookyGhost || pPlayer->m_ForcedSkin != SKIN_NONE || (pPlayer->GetCharacter() && pPlayer->GetCharacter()->m_IsZombie))
 				return;
 
 			// update currently visable teeinfos

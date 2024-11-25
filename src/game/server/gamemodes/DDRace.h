@@ -12,6 +12,12 @@
 class CGameControllerDDRace : public IGameController
 {
 public:
+	static const int ZombieBodyValue;
+	static const int ZombieFeetValue;
+	static const vec3 ZombieBodyHSL;
+	static const vec3 ZombieFeetHSL;
+
+	int m_ZombieTick;
 
 	class CFlag* m_apFlags[2];
 

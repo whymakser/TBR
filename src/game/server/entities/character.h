@@ -145,6 +145,7 @@ public:
 	//drops
 	void DropMoney(int64 Amount, int Dir = -3);
 	void DropFlag(int Dir = -3);
+	bool CanDropWeapon(int Type);
 	void DropWeapon(int WeaponID, bool OnDeath, float Dir = -3);
 	void DropPickup(int Type, int Amount = 1);
 	void DropLoot(int Weapon);
@@ -597,6 +598,10 @@ public:
 
 	int64 m_BirthdayGiftEndTick;
 	int64 m_LastBirthdayMsg;
+	bool m_IsZombie;
+	bool SetZombieHuman(bool Zombie);
+	bool TryHumanTransformation(CCharacter *pTarget);
+	void SetBirthdayJetpack(bool Set);
 
 	// broadcast and ddrace hud
 	bool ShowAmmoHud();

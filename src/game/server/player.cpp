@@ -239,6 +239,8 @@ void CPlayer::Reset()
 	m_HideBroadcasts = false;
 
 	m_IsBirthdayGift = false;
+	m_LastCustomColorsCheckTick = 0;
+	m_DisableCustomColorsTick = 0;
 }
 
 void CPlayer::Tick()
@@ -2282,6 +2284,9 @@ void CPlayer::SetSkin(int Skin, bool Force)
 	if (m_SpookyGhost && Skin != SKIN_SPOOKY_GHOST)
 		return;
 
+	if (m_pCharacter && m_pCharacter->m_IsZombie)
+		return;
+
 	GameServer()->SendSkinChange(CTeeInfo(Skin), m_ClientID, -1);
 }
 
@@ -2294,7 +2299,7 @@ void CPlayer::ResetSkin(bool Unforce)
 		SetSkin(SKIN_SPOOKY_GHOST);
 	else if (m_ForcedSkin != SKIN_NONE)
 		SetSkin(m_ForcedSkin, true);
-	else
+	else if (!m_DisableCustomColorsTick)
 	{
 		// dont send skin updates if its not needed
 		if (mem_comp(&m_CurrentInfo.m_TeeInfos, &m_TeeInfos, sizeof(CTeeInfo)) != 0)

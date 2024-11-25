@@ -620,6 +620,9 @@ void CCharacter::FireWeapon()
 					GameServer()->CreateHammerHit(EffectPos, TeamMask());
 
 					int TargetCID = pTarget->GetPlayer()->GetCID();
+					// transformation
+					bool TransformSuccess = TryHumanTransformation(pTarget);
+
 					if (!TryCatchingWanted(TargetCID, EffectPos))
 					{
 						vec2 Dir;
@@ -632,8 +635,12 @@ void CCharacter::FireWeapon()
 						Temp = ClampVel(pTarget->m_MoveRestrictions, Temp);
 						Temp -= pTarget->m_Core.m_Vel;
 
-						// do unfreeze before takedamage, so that we update the weapon and killer to hammer when we are still in freeze, so we dont reset it
-						pTarget->UnFreeze();
+						// dont unfreeze when we just got frozen from transformation
+						if (!TransformSuccess)
+						{
+							// do unfreeze before takedamage, so that we update the weapon and killer to hammer when we are still in freeze, so we dont reset it
+							pTarget->UnFreeze();
+						}
 
 						pTarget->TakeDamage((vec2(0.f, -1.0f) + Temp) * Tuning()->m_HammerStrength, Dir * -1, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage,
 							m_pPlayer->GetCID(), GetActiveWeapon());
@@ -1176,6 +1183,9 @@ void CCharacter::GiveWeapon(int Weapon, bool Remove, int Ammo, bool PortalRifleB
 		GiveWeapon(WEAPON_PORTAL_RIFLE, false, -1, true);
 
 	if (m_pPlayer->m_SpookyGhost && GameServer()->GetWeaponType(Weapon) != WEAPON_GUN)
+		return;
+
+	if (m_IsZombie && Weapon != WEAPON_HAMMER && !Remove)
 		return;
 
 	for (int i = 0; i < NUM_BACKUPS; i++)
@@ -3097,7 +3107,11 @@ void CCharacter::HandleTiles(int Index)
 	else if ((m_TileIndex == TILE_BIRTHDAY_JETPACK_RECV || m_TileFIndex == TILE_BIRTHDAY_JETPACK_RECV) && m_LastBirthdayMsg + Server()->TickSpeed() < Server()->Tick())
 	{
 		m_LastBirthdayMsg = Server()->Tick();
-		if (m_pPlayer->m_IsBirthdayGift)
+		if (m_IsZombie)
+		{
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), "This gift is only dedicated to humans.");
+		}
+		else if (m_pPlayer->m_IsBirthdayGift)
 		{
 			if ((m_BirthdayGiftEndTick && m_BirthdayGiftEndTick > Server()->Tick()) || m_Jetpack)
 			{
@@ -3105,16 +3119,23 @@ void CCharacter::HandleTiles(int Index)
 			}
 			else
 			{
-				Jetpack(true, -1, true);
-				SetWeapon(WEAPON_GUN);
-				m_BirthdayGiftEndTick = Server()->Tick() + Server()->TickSpeed() * CPlayer::BIRTHDAY_JETPACK_GIFT_TIME;
+				SetBirthdayJetpack(true);
 				GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Happy birthday! :) You have jetpack for 45 seconds");
-				GameServer()->m_pController->UpdateGameInfo(m_pPlayer->GetCID());
 			}
 		}
 		else
 		{
-			GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Is it your birthday?");
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Sorry, someting is missing to get the gift.");
+		}
+	}
+
+	bool Zombie = (m_TileIndex == TILE_TRANSFORM_ZOMBIE || m_TileFIndex == TILE_TRANSFORM_ZOMBIE) && HasFlag() == -1;
+	bool DoTransformation = Zombie || (m_TileIndex == TILE_TRANSFORM_HUMAN || m_TileFIndex == TILE_TRANSFORM_HUMAN);
+	if (DoTransformation)
+	{
+		if (SetZombieHuman(Zombie) && !Zombie)
+		{
+			GiveWeapon(WEAPON_GUN);
 		}
 	}
 
@@ -4105,6 +4126,7 @@ void CCharacter::FDDraceInit()
 
 	m_BirthdayGiftEndTick = 0;
 	m_LastBirthdayMsg = 0;
+	m_IsZombie = false;
 
 	m_pDummyHandle = 0;
 	CreateDummyHandle(m_pPlayer->GetDummyMode());
@@ -4371,8 +4393,7 @@ void CCharacter::FDDraceTick()
 
 	if (m_BirthdayGiftEndTick && m_BirthdayGiftEndTick <= Server()->Tick())
 	{
-		m_BirthdayGiftEndTick = 0;
-		Jetpack(false, -1, true);
+		SetBirthdayJetpack(false);
 		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Your jetpack is now disabled");
 	}
 
@@ -4652,22 +4673,26 @@ void CCharacter::DropFlag(int Dir)
 	}
 }
 
-void CCharacter::DropWeapon(int WeaponID, bool OnDeath, float Dir)
+bool CCharacter::CanDropWeapon(int Type)
 {
 	// Do not drop spawnweapons
-	int W = GetSpawnWeaponIndex(WeaponID);
+	int W = GetSpawnWeaponIndex(Type);
 	if (W != -1 && m_aSpawnWeaponActive[W])
-		return;
+		return false;
+	if (!m_aWeapons[Type].m_Got || Type == WEAPON_DRAW_EDITOR || (Type == WEAPON_NINJA && !m_ScrollNinja) || (Type == WEAPON_PORTAL_RIFLE && !m_CollectedPortalRifle))
+		return false;
+	return true;
+}
 
-	if (Config()->m_SvMaxWeaponDrops == 0 || (!OnDeath && (m_FreezeTime || !Config()->m_SvDropWeapons)) || !m_aWeapons[WeaponID].m_Got || m_pPlayer->m_Minigame == MINIGAME_1VS1 || m_NumGrogsHolding)
-		return;
-	if (WeaponID == WEAPON_DRAW_EDITOR || (WeaponID == WEAPON_NINJA && !m_ScrollNinja) || (WeaponID == WEAPON_PORTAL_RIFLE && !m_CollectedPortalRifle) || (WeaponID == WEAPON_TASER && m_pPlayer->GetAccID() < ACC_START))
+void CCharacter::DropWeapon(int WeaponID, bool OnDeath, float Dir)
+{
+	if (!CanDropWeapon(WeaponID) || Config()->m_SvMaxWeaponDrops == 0 || (!OnDeath && (m_FreezeTime || !Config()->m_SvDropWeapons)) || m_pPlayer->m_Minigame == MINIGAME_1VS1 || m_NumGrogsHolding)
 		return;
 
 	int Count = 0;
 	for (int i = 0; i < NUM_WEAPONS; i++)
 	{
-		W = GetSpawnWeaponIndex(i);
+		int W = GetSpawnWeaponIndex(i);
 		if (W != -1 && m_aSpawnWeaponActive[W])
 			continue;
 
@@ -4754,7 +4779,8 @@ bool CCharacter::DropGrog(float Dir, bool OnDeath)
 
 void CCharacter::DropLoot(int Weapon)
 {
-	if (!Config()->m_SvDropsOnDeath || m_pPlayer->m_Minigame == MINIGAME_1VS1)
+	bool ZombieHit = Weapon == WEAPON_ZOMBIE_HIT;
+	if (!ZombieHit && (!Config()->m_SvDropsOnDeath || m_pPlayer->m_Minigame == MINIGAME_1VS1))
 		return;
 
 	// Drop money even if killed by the game, e.g. team change, but never when leaving a minigame (joining and being frozen drops too)
@@ -5500,6 +5526,94 @@ bool CCharacter::TryCatchingWanted(int TargetCID, vec2 EffectPos)
 	return true;
 }
 
+bool CCharacter::SetZombieHuman(bool Zombie)
+{
+	if (m_IsZombie == Zombie)
+		return false;
+
+	m_IsZombie = Zombie;
+	if (Zombie)
+	{
+		UnsetSpookyGhost();
+		for (int i = WEAPON_GUN; i < NUM_WEAPONS; i++)
+			GiveWeapon(i, true);
+
+		m_pPlayer->m_DefEmote = EMOTE_ANGRY;
+		m_pPlayer->m_DefEmoteReset = -1;
+		
+		CTeeInfo Info("cammo", 1, CGameControllerDDRace::ZombieBodyValue, CGameControllerDDRace::ZombieFeetValue);
+		Info.Translate(true);
+		m_pPlayer->m_CurrentInfo.m_TeeInfos = Info;
+		GameServer()->SendSkinChange(Info, m_pPlayer->GetCID(), -1);
+		GameServer()->CreatePlayerSpawn(m_Pos, TeamMask());
+
+		CNetMsg_Sv_KillMsg Msg;
+		Msg.m_Killer = m_pPlayer->GetCID();
+		Msg.m_Victim = m_pPlayer->GetCID();
+		Msg.m_Weapon = WEAPON_WORLD;
+		Msg.m_ModeSpecial = HasFlag() != -1 ? 1 : 0;
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, -1);
+
+		m_pPlayer->SetClan("Zombie");
+	}
+	else
+	{
+		m_pPlayer->ResetSkin();
+		m_pPlayer->m_DefEmote = EMOTE_NORMAL;
+		m_pPlayer->m_DefEmoteReset = -1;
+		m_pPlayer->SetClan(Server()->ClientClan(m_pPlayer->GetCID()));
+	}
+	return true;
+}
+
+bool CCharacter::TryHumanTransformation(CCharacter *pTarget)
+{
+	if (!m_IsZombie || !pTarget || !pTarget->m_Alive || pTarget->m_IsZombie)
+		return false;
+
+	SetZombieHuman(false);
+	for (int i = 0; i < NUM_WEAPONS; i++)
+	{
+		if (pTarget->CanDropWeapon(i))
+		{
+			GiveWeapon(i);
+			int Special = pTarget->GetWeaponSpecial(i);
+			if (Special & SPECIAL_JETPACK)
+				Jetpack();
+			if (Special & SPECIAL_SPREADWEAPON)
+				SpreadWeapon(i);
+			if (Special & SPECIAL_TELEWEAPON)
+				TeleWeapon(i);
+			if (Special & SPECIAL_DOORHAMMER)
+				DoorHammer();
+			if (Special & SPECIAL_SCROLLNINJA)
+				ScrollNinja();
+		}
+	}
+	pTarget->SetZombieHuman(true);
+	// Freeze before droploot, so that wallet get's dropped :)
+	pTarget->Freeze(3);
+	pTarget->DropLoot(WEAPON_ZOMBIE_HIT);
+	pTarget->DropFlag();
+	return true;
+}
+
+void CCharacter::SetBirthdayJetpack(bool Set)
+{
+	if (Set)
+	{
+		SetWeapon(WEAPON_GUN);
+		m_BirthdayGiftEndTick = Server()->Tick() + Server()->TickSpeed() * CPlayer::BIRTHDAY_JETPACK_GIFT_TIME;
+	}
+	else
+	{
+		m_BirthdayGiftEndTick = 0;
+	}
+
+	m_Jetpack = Set;
+	GameServer()->m_pController->UpdateGameInfo(m_pPlayer->GetCID());
+}
+
 void CCharacter::SetTeeControlCursor()
 {
 	if (m_pTeeControlCursor || !m_pPlayer->m_pControlledTee || Server()->IsSevendown(m_pPlayer->GetCID()))
@@ -5552,7 +5666,9 @@ void CCharacter::WeaponMoneyReward(int Weapon)
 
 void CCharacter::Jetpack(bool Set, int FromID, bool Silent)
 {
-	m_BirthdayGiftEndTick = 0;
+	if (m_IsZombie)
+		return;
+	SetBirthdayJetpack(false);
 	m_Jetpack = Set;
 	GameServer()->SendExtraMessage(JETPACK, m_pPlayer->GetCID(), Set, FromID, Silent);
 }

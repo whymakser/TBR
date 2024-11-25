@@ -975,6 +975,9 @@ void CGameContext::ConEyeEmote(IConsole::IResult *pResult, void *pUserData)
 	if (!pPlayer)
 		return;
 
+	if (pPlayer->GetCharacter() && pPlayer->GetCharacter()->m_IsZombie)
+		return;
+
 	if (pResult->NumArguments() == 0)
 	{
 		pSelf->Console()->Print(

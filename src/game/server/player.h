@@ -46,6 +46,7 @@ enum Transaction
 
 enum
 {
+	WEAPON_ZOMBIE_HIT = -6,
 	WEAPON_MINIGAME_CHANGE = -5, // killed due to minigame swap
 	WEAPON_PLAYER = -4, // killed by a player
 	WEAPON_GAME = -3, // team switching etc
@@ -372,6 +373,8 @@ public:
 	{
 		BIRTHDAY_JETPACK_GIFT_TIME = 45
 	};
+	int64 m_LastCustomColorsCheckTick;
+	int64 m_DisableCustomColorsTick;
 
 	// Voting Menu calls, used when executing the chat command aswell
 	void SetSilentFarm(bool Set);

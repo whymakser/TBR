@@ -210,7 +210,7 @@ void CPickup::Tick()
 				case POWERUP_WEAPON:
 					if (m_Subtype >= 0 && m_Subtype < NUM_WEAPONS && (!pChr->GetWeaponGot(m_Subtype) || pChr->GetWeaponAmmo(m_Subtype) != -1))
 					{
-						if (pChr->GetPlayer()->m_SpookyGhost && GameServer()->GetWeaponType(m_Subtype) != WEAPON_GUN)
+						if ((pChr->GetPlayer()->m_SpookyGhost && GameServer()->GetWeaponType(m_Subtype) != WEAPON_GUN) || (pChr->m_IsZombie && m_Subtype != WEAPON_HAMMER))
 							break;
 
 						bool FightStarted = GameServer()->Arenas()->FightStarted(pChr->GetPlayer()->GetCID());
@@ -246,7 +246,7 @@ void CPickup::Tick()
 
 				case POWERUP_NINJA:
 				{
-					if (pChr->GetPlayer()->m_SpookyGhost)
+					if (pChr->GetPlayer()->m_SpookyGhost || pChr->m_IsZombie)
 						break;
 
 					// activate ninja on target player
