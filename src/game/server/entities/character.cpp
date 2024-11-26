@@ -5577,19 +5577,26 @@ bool CCharacter::TryHumanTransformation(CCharacter *pTarget)
 		if (pTarget->CanDropWeapon(i))
 		{
 			GiveWeapon(i);
+
 			int Special = pTarget->GetWeaponSpecial(i);
 			if (Special & SPECIAL_JETPACK)
-				Jetpack();
+				Jetpack(true, -1, true);
 			if (Special & SPECIAL_SPREADWEAPON)
-				SpreadWeapon(i);
+				SpreadWeapon(i, true, -1, true);
 			if (Special & SPECIAL_TELEWEAPON)
-				TeleWeapon(i);
+				TeleWeapon(i, true, -1, true);
 			if (Special & SPECIAL_DOORHAMMER)
-				DoorHammer();
+				DoorHammer(true, -1, true);
 			if (Special & SPECIAL_SCROLLNINJA)
-				ScrollNinja();
+				ScrollNinja(true, -1, true);
 		}
 	}
+	
+	m_EndlessHook = m_EndlessHook || pTarget->m_EndlessHook;
+	m_SuperJump = m_SuperJump || pTarget->m_SuperJump;
+	SetJumps(max(m_Core.m_Jumps, pTarget->m_Core.m_Jumps), true);
+
+	// transform other guy to zombie
 	pTarget->SetZombieHuman(true);
 	// Freeze before droploot, so that wallet get's dropped :)
 	pTarget->Freeze(3);

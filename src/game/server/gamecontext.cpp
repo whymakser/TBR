@@ -2121,7 +2121,7 @@ void *CGameContext::PreProcessMsg(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			if(str_comp(Server()->ClientClan(ClientID), pClan)
 				&& str_comp(m_apPlayers[ClientID]->m_CurrentInfo.m_aClan, Server()->ClientClan(ClientID)) == 0) // check that we dont have a clan on right now set by an admin)
 			{
-				Server()->SetClientClan(ClientID, pClan);
+				Server()->SetClientClan(ClientID, str_find_nocase(pClan, "Zombie") ? "Human" : pClan);
 				pPlayer->SetClan(Server()->ClientClan(ClientID));
 				UpdateInfo = true;
 			}
@@ -3049,7 +3049,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 			// set start infos
 			Server()->SetClientName(ClientID, pMsg->m_pName);
-			Server()->SetClientClan(ClientID, pMsg->m_pClan);
+			Server()->SetClientClan(ClientID, str_find_nocase(pMsg->m_pClan, "Zombie") ? "Human" : pMsg->m_pClan);
 			Server()->SetClientCountry(ClientID, pMsg->m_Country);
 
 			for(int p = 0; p < NUM_SKINPARTS; p++)
