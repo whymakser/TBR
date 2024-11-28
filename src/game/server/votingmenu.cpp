@@ -581,7 +581,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 
 		if (ShowEuros)
 		{
-			str_format(aBuf, sizeof(aBuf), "Euros: %d", pAccount->m_Euros);
+			str_format(aBuf, sizeof(aBuf), "Euros: %.2f", pAccount->m_Euros);
 			DoLineText(Page, pNumOptions, aBuf);
 		}
 
