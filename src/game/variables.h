@@ -161,8 +161,8 @@ MACRO_CONFIG_INT(SvDataSaveInterval, sv_data_save_interval, 30, 5, 60, CFGFLAG_S
 MACRO_CONFIG_STR(SvDonationFilePath, sv_donation_file_path, 128, "data", CFGFLAG_SERVER, "The path where the server searches the for the donation file (relative to binary)", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvPlotFilePath, sv_plot_file_path, 128, "data/plots", CFGFLAG_SERVER, "The path where the server searches the plot files (relative to binary)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvKillLogout, sv_kill_logout, 0, 0, 60, CFGFLAG_SERVER, "Time in seconds a tee can kill after trying to logout (0 = disabled)", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvEuroMode, sv_euro_mode, 1, 0, 1, CFGFLAG_SERVER, "Whether euro mode is enabled", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvEuroDiscountPercentage, sv_euro_discount_percentage, 50, 0, 100, CFGFLAG_SERVER, "Euro discount percentage for shop (requires reload)", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvEuroMode, sv_euro_mode, 0, 0, 1, CFGFLAG_SERVER, "Whether euro mode is enabled", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvEuroDiscountPercentage, sv_euro_discount_percentage, 0, 0, 100, CFGFLAG_SERVER, "Euro discount percentage for shop (requires reload)", AUTHED_ADMIN)
 
 MACRO_CONFIG_STR(SvExpMsgColorText, sv_exp_msg_color_text, 4, "999", CFGFLAG_SERVER|CFGFLAG_GAME, "Text color for the experience broadcast", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvExpMsgColorSymbol, sv_exp_msg_color_symbol, 4, "999", CFGFLAG_SERVER|CFGFLAG_GAME, "Symbol color for the experience broadcast", AUTHED_ADMIN)
