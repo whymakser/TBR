@@ -5812,7 +5812,7 @@ void CGameContext::SetAccVar(int ID, int VariableID, const char *pData)
 	case ACC_INSTAGIB_DEATHS:			m_Accounts[ID].m_InstagibDeaths = atoi(pData); break;
 	case ACC_TASER_LEVEL:				m_Accounts[ID].m_TaserLevel = atoi(pData); break;
 	case ACC_KILLING_SPREE_RECORD:		m_Accounts[ID].m_KillingSpreeRecord = atoi(pData); break;
-	case ACC_EUROS:						m_Accounts[ID].m_Euros = atoi(pData); break;
+	case ACC_EUROS:						m_Accounts[ID].m_Euros = atof(pData); break;
 	case ACC_EXPIRE_DATE_VIP:			m_Accounts[ID].m_ExpireDateVIP = atoll(pData); break;
 	case ACC_PORTAL_RIFLE:				m_Accounts[ID].m_PortalRifle = atoi(pData); break;
 	case ACC_EXPIRE_DATE_PORTAL_RIFLE:	m_Accounts[ID].m_ExpireDatePortalRifle = atoll(pData); break;
@@ -5934,7 +5934,7 @@ const char *CGameContext::GetAccVarValue(int ID, int VariableID)
 	case ACC_INSTAGIB_DEATHS:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_InstagibDeaths); break;
 	case ACC_TASER_LEVEL:				str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_TaserLevel); break;
 	case ACC_KILLING_SPREE_RECORD:		str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_KillingSpreeRecord); break;
-	case ACC_EUROS:						str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_Euros); break;
+	case ACC_EUROS:						str_format(aBuf, sizeof(aBuf), "%.2f", m_Accounts[ID].m_Euros); break;
 	case ACC_EXPIRE_DATE_VIP:			str_format(aBuf, sizeof(aBuf), "%lld", (int64)m_Accounts[ID].m_ExpireDateVIP); break;
 	case ACC_PORTAL_RIFLE:				str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_PortalRifle); break;
 	case ACC_EXPIRE_DATE_PORTAL_RIFLE:	str_format(aBuf, sizeof(aBuf), "%lld", (int64)m_Accounts[ID].m_ExpireDatePortalRifle); break;
@@ -6262,12 +6262,12 @@ const char *CGameContext::GetDate(time_t Time, bool ShowTime)
 	return aBuf;
 }
 
-void CGameContext::WriteDonationFile(int Type, int Amount, int ID, const char *pDescription)
+void CGameContext::WriteDonationFile(int Type, float Amount, int ID, const char *pDescription)
 {
 	const char* pFrom = Type == TYPE_DONATION ? "donation" : Type == TYPE_PURCHASE ? "purchase" : "";
 	char aBuf[256], aMsg[256];
 	time_t Now = time(0);
-	str_format(aMsg, sizeof(aMsg), "Date: %s, Euros: %d, Account: '%s', Description: '%s'", GetDate(Now, false), Amount, m_Accounts[ID].m_Username, pDescription);
+	str_format(aMsg, sizeof(aMsg), "Date: %s, Euros: %.2f, Account: '%s', Description: '%s'", GetDate(Now, false), Amount, m_Accounts[ID].m_Username, pDescription);
 	Console()->Format(aBuf, sizeof(aBuf), pFrom, aMsg);
 
 	char aFile[256];

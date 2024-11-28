@@ -13,6 +13,8 @@ CShop::CShop(CGameContext *pGameServer, int Type) : CHouse(pGameServer, Type)
 	for (int i = PAGE_MAIN+1; i < MAX_PLOTS; i++)
 		m_aItems[i].m_Used = false;
 
+	m_CurrentDiscount = GameServer()->Config()->m_SvEuroDiscountPercentage;
+
 	if (IsType(HOUSE_SHOP))
 	{
 		m_NumItems = NUM_ITEMS_SHOP;
@@ -69,12 +71,17 @@ CShop::CShop(CGameContext *pGameServer, int Type) : CHouse(pGameServer, Type)
 	}
 }
 
-void CShop::AddItem(const char *pName, int Level, int Price, int Time, const char *pDescription, bool IsEuro, int Amount)
+void CShop::AddItem(const char *pName, int Level, float Price, int Time, const char *pDescription, bool IsEuro, int Amount)
 {
 	for (int i = 0; i < m_NumItems; i++)
 	{
 		if (!m_aItems[i].m_Used)
 		{
+			if (GameServer()->Config()->m_SvEuroMode && IsEuro)
+			{
+				Price = (Price / 100.f) * (100.f - m_CurrentDiscount);
+			}
+
 			m_aItems[i].m_pName = pName;
 			m_aItems[i].m_Level = Level;
 			m_aItems[i].m_Price = Price;
@@ -214,17 +221,27 @@ void CShop::OnPageChange(int ClientID)
 		if (IsType(HOUSE_SHOP) && m_aItems[Item].m_Amount > 1)
 			str_format(aAmount, sizeof(aAmount), "Amount: %d\n\n", m_aItems[Item].m_Amount);
 
+		char aPrice[16];
+		if (m_aItems[Item].m_IsEuro)
+			str_format(aPrice, sizeof(aPrice), "%.2f", m_aItems[Item].m_Price);
+		else
+			str_format(aPrice, sizeof(aPrice), "%d", (int)m_aItems[Item].m_Price);
+
+		char aDiscountMsg[64] = "\0";
+		if (m_CurrentDiscount && m_aItems[Item].m_IsEuro)
+			str_format(aDiscountMsg, sizeof(aDiscountMsg), " (-%d%% discount!)", m_CurrentDiscount);
+
 		str_format(aMsg, sizeof(aMsg),
 			"%s\n\n"
 			"Level: %d\n"
-			"Price: %d%s\n"
+			"Price: %s%s%s\n"
 			"Time: %s\n"
 			"%s"
 			"%s%s",
 			GetHeadline(Item),
 			m_aItems[Item].m_Level,
-			m_aItems[Item].m_Price,
-			m_aItems[Item].m_IsEuro ? " Euros" : "",
+			aPrice,
+			m_aItems[Item].m_IsEuro ? " EUR" : "", aDiscountMsg,
 			GetTimeMessage(m_aItems[Item].m_Time),
 			aAmount,
 			aDescription,
@@ -353,7 +370,7 @@ void CShop::BuyItem(int ClientID, int Item)
 	if (Amount <= 0)
 		return;
 
-	int Price = Amount * (m_aItems[ItemID].m_Price/m_aItems[ItemID].m_Amount);
+	float Price = Amount * (m_aItems[ItemID].m_Price/m_aItems[ItemID].m_Amount);
 
 	// check for the correct price
 	if ((m_aItems[ItemID].m_IsEuro && pAccount->m_Euros < Price)
@@ -384,7 +401,10 @@ void CShop::BuyItem(int ClientID, int Item)
 		GameServer()->SendChatTarget(ClientID, "Check '/account' for more information about the expiration date");
 
 	// apply a message to the history
-	str_format(aMsg, sizeof(aMsg), "%s, bought '%s'", m_aItems[ItemID].m_IsEuro ? "euros" : "money", aDescription);
+	char aDiscountMsg[64] = "\0";
+	if (m_CurrentDiscount && m_aItems[Item].m_IsEuro)
+		str_format(aDiscountMsg, sizeof(aDiscountMsg), " (-%d%% discount)", m_CurrentDiscount);
+	str_format(aMsg, sizeof(aMsg), "%s, bought '%s'%s", m_aItems[ItemID].m_IsEuro ? "euros" : "money", aDescription, aDiscountMsg);
 	if (m_aItems[ItemID].m_IsEuro)
 		pPlayer->BankTransaction(-Price, aMsg, true);
 	else

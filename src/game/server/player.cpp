@@ -1759,7 +1759,7 @@ int CPlayer::GetAccID()
 	return 0;
 }
 
-void CPlayer::BankTransaction(int64 Amount, const char *pDescription, bool IsEuro)
+void CPlayer::BankTransaction(float Amount, const char *pDescription, bool IsEuro)
 {
 	if (GetAccID() < ACC_START || Amount == 0)
 		return;
@@ -1771,7 +1771,7 @@ void CPlayer::BankTransaction(int64 Amount, const char *pDescription, bool IsEur
 		pAccount->m_Euros += Amount;
 
 		char aDescription[256];
-		str_format(aDescription, sizeof(aDescription), "%lld %s", Amount, pDescription);
+		str_format(aDescription, sizeof(aDescription), "%.2f %s", Amount, pDescription);
 		GameServer()->WriteDonationFile(TYPE_PURCHASE, Amount, GetAccID(), aDescription);
 	}
 	else
@@ -1780,7 +1780,7 @@ void CPlayer::BankTransaction(int64 Amount, const char *pDescription, bool IsEur
 	ApplyMoneyHistoryMsg(TRANSACTION_BANK, Amount, pDescription);
 }
 
-void CPlayer::WalletTransaction(int64 Amount, const char *pDescription)
+void CPlayer::WalletTransaction(int Amount, const char *pDescription)
 {
 	if (Amount == 0)
 		return;
@@ -1788,14 +1788,14 @@ void CPlayer::WalletTransaction(int64 Amount, const char *pDescription)
 	ApplyMoneyHistoryMsg(TRANSACTION_WALLET, Amount, pDescription);
 }
 
-void CPlayer::ApplyMoneyHistoryMsg(int Type, int Amount, const char *pDescription)
+void CPlayer::ApplyMoneyHistoryMsg(int Type, float Amount, const char *pDescription)
 {
 	if (!pDescription[0] || GetAccID() < ACC_START)
 		return;
 
 	const char *pType = Type == TRANSACTION_BANK ? "BANK" : Type == TRANSACTION_WALLET ? "WALLET" : "UNKNOWN";
 	char aDescription[256];
-	str_format(aDescription, sizeof(aDescription), "[%s] %s%d %s", pType, Amount > 0 ? "+" : "", Amount, pDescription);
+	str_format(aDescription, sizeof(aDescription), "[%s] %s%.2f %s", pType, Amount > 0 ? "+" : "", Amount, pDescription);
 
 	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[GetAccID()];
 	str_copy(pAccount->m_aLastMoneyTransaction[4], pAccount->m_aLastMoneyTransaction[3], sizeof(pAccount->m_aLastMoneyTransaction[4]));
@@ -1811,7 +1811,7 @@ void CPlayer::ApplyMoneyHistoryMsg(int Type, int Amount, const char *pDescriptio
 	str_format(aFilename, sizeof(aFilename), "dumps/%s/money_%s.txt", GameServer()->Config()->m_SvMoneyHistoryFilePath, aTimestamp);
 	str_timestamp_format(aTimestamp, sizeof(aTimestamp), FORMAT_SPACE);
 	str_format(aBuf, sizeof(aBuf),
-		"[%s][%s] account='%s' msg='%s%d %s' name='%s'",
+		"[%s][%s] account='%s' msg='%s%.2f %s' name='%s'",
 		aTimestamp, pType,
 		GameServer()->m_Accounts[GetAccID()].m_Username,
 		Amount > 0 ? "+" : "", Amount, pDescription,

@@ -1693,17 +1693,17 @@ void CGameContext::ConAccAddEuros(IConsole::IResult* pResult, void* pUserData)
 		return;
 	}
 
-	int Euros = pResult->GetInteger(1);
+	float Euros = pResult->GetFloat(1);
 	char aBuf[256];
 	pSelf->m_Accounts[ID].m_Euros += Euros;
 
 	if (pSelf->m_Accounts[ID].m_ClientID >= 0)
 	{
-		str_format(aBuf, sizeof(aBuf), "You %s %d euros", Euros >= 0 ? "got" : "lost", Euros);
+		str_format(aBuf, sizeof(aBuf), "You %s %.2f euros", Euros >= 0 ? "got" : "lost", Euros);
 		pSelf->SendChatTarget(pSelf->m_Accounts[ID].m_ClientID, aBuf);
 	}
 
-	str_format(aBuf, sizeof(aBuf), "%d euros given to account '%s'", Euros, pSelf->m_Accounts[ID].m_Username);
+	str_format(aBuf, sizeof(aBuf), "%.2f euros given to account '%s'", Euros, pSelf->m_Accounts[ID].m_Username);
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
 
 	pSelf->WriteDonationFile(TYPE_DONATION, Euros, ID, "");

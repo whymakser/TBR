@@ -522,7 +522,7 @@ public:
 	int m_LastDataSaveTick;
 
 	const char *GetDate(time_t Time, bool ShowTime = true);
-	void WriteDonationFile(int Type, int Amount, int ID, const char *pDescription);
+	void WriteDonationFile(int Type, float Amount, int ID, const char *pDescription);
 
 	struct AccountInfo
 	{
@@ -553,7 +553,7 @@ public:
 		int m_InstagibDeaths;
 		int m_TaserLevel;
 		int m_KillingSpreeRecord;
-		int m_Euros;
+		float m_Euros;
 		time_t m_ExpireDateVIP;
 		int m_PortalRifle;
 		time_t m_ExpireDatePortalRifle;

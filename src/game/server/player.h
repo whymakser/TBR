@@ -313,9 +313,9 @@ public:
 	bool IsExpiredItem(int Item);
 	void ExpireItems();
 
-	void BankTransaction(int64 Amount, const char *pDescription = "", bool IsEuro = false);
-	void WalletTransaction(int64 Amount, const char *pDescription = "");
-	void ApplyMoneyHistoryMsg(int Type, int Amount, const char *pDescription);
+	void BankTransaction(float Amount, const char *pDescription = "", bool IsEuro = false);
+	void WalletTransaction(int Amount, const char *pDescription = "");
+	void ApplyMoneyHistoryMsg(int Type, float Amount, const char *pDescription);
 	int64 GetWalletMoney() { return m_WalletMoney; }
 	void SetWalletMoney(int64 Amount) { m_WalletMoney = Amount; }
 

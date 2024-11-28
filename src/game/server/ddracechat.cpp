@@ -1312,7 +1312,7 @@ void CGameContext::ConAccount(IConsole::IResult* pResult, void* pUserData)
 
 	if (pSelf->Config()->m_SvEuroMode || pAccount->m_Euros > 0)
 	{
-		str_format(aBuf, sizeof(aBuf), "Euros: %d", pAccount->m_Euros);
+		str_format(aBuf, sizeof(aBuf), "Euros: %.2f", pAccount->m_Euros);
 		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	}
 
@@ -1376,7 +1376,7 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 				pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 				if (pSelf->Config()->m_SvEuroMode || pAccount->m_Euros > 0)
 				{
-					str_format(aBuf, sizeof(aBuf), "Euros [%d]", pAccount->m_Euros);
+					str_format(aBuf, sizeof(aBuf), "Euros [%.2f]", pAccount->m_Euros);
 					pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 				}
 			}
@@ -1931,7 +1931,7 @@ void CGameContext::ConMoney(IConsole::IResult* pResult, void* pUserData)
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	if (pSelf->Config()->m_SvEuroMode || pSelf->m_Accounts[pPlayer->GetAccID()].m_Euros > 0)
 	{
-		str_format(aBuf, sizeof(aBuf), "Euros: %d", pSelf->m_Accounts[pPlayer->GetAccID()].m_Euros);
+		str_format(aBuf, sizeof(aBuf), "Euros: %.2f", pSelf->m_Accounts[pPlayer->GetAccID()].m_Euros);
 		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	}
 	pSelf->SendChatTarget(pResult->m_ClientID, "~~~~~~~~~~");
