@@ -1184,6 +1184,7 @@ void CGameContext::SendTuningParams(int ClientID, int Zone)
 
 void CGameContext::OnTick()
 {
+	Config()->m_SvTestingCommands = 1;
 	if(m_TeeHistorianActive)
 	{
 		if(!m_TeeHistorian.Starting())
@@ -7937,7 +7938,7 @@ void CGameContext::SurvivalTick()
 			// add a win to the winners' accounts
 			if (m_apPlayers[m_SurvivalWinner]->GetAccID() >= ACC_START)
 				m_Accounts[m_apPlayers[m_SurvivalWinner]->GetAccID()].m_SurvivalWins++;
-			m_apPlayers[m_SurvivalWinner]->GiveXP(250, "win a survival round");
+			m_apPlayers[m_SurvivalWinner]->GiveXP(250, "for winning a survival round");
 		}
 
 		// sending back to lobby
@@ -8157,7 +8158,7 @@ void CGameContext::InstagibTick(int Type)
 		return;
 	}
 
-	//m_apPlayers[Winner]->GiveXP(250, "win an instagib round");
+	//m_apPlayers[Winner]->GiveXP(250, "for winning an instagib round");
 
 	// add instagib here
 }

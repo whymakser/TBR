@@ -1733,7 +1733,7 @@ void CGameContext::ConContact(IConsole::IResult* pResult, void* pUserData)
 	}
 
 	if (pSelf->m_Accounts[pPlayer->GetAccID()].m_aContact[0] == '\0')
-		pPlayer->GiveXP(500, "initial contact info set");
+		pPlayer->GiveXP(500, "for setting initial contact info");
 
 	str_copy(pSelf->m_Accounts[pPlayer->GetAccID()].m_aContact, pContact, sizeof(pSelf->m_Accounts[pPlayer->GetAccID()].m_aContact));
 	pSelf->WriteAccountStats(pPlayer->GetAccID());
@@ -2997,6 +2997,8 @@ void CGameContext::ConTaserInfo(IConsole::IResult* pResult, void* pUserData)
 	str_format(aBuf, sizeof(aBuf), "FreezeTime: %.2f seconds", pAccount->m_TaserLevel * 0.1f);
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	str_format(aBuf, sizeof(aBuf), "Taser battery: %d/%d", pAccount->m_TaserBattery, MAX_TASER_BATTERY);
+	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+	str_format(aBuf, sizeof(aBuf), "Taser shield: %d%%", pPlayer->m_TaserShield);
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	pSelf->SendChatTarget(pResult->m_ClientID, "~~~~~~~~~~");
 	pSelf->SendChatTarget(pResult->m_ClientID, "Drop taser battery: '/taser drop <amount>'");

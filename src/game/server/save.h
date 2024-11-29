@@ -167,6 +167,8 @@ private:
 	int m_NumGrogsHolding;
 	int m_Permille;
 	int m_TicksSinceFirstPermille;
+	int m_IsZombie;
+	int m_IsDoubleXp;
 
 	// core
 	int m_MoveRestrictionExtraRoomKey;
@@ -185,6 +187,9 @@ private:
 	int64 m_JailTime;
 	int64 m_EscapeTime;
 	int m_RainbowName;
+	int m_IsBirthdayGift;
+	int m_TaserShield;
+	int m_DoubleXpLifesLeft;
 
 	SSavedIdentity m_Identity;
 };

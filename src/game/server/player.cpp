@@ -241,6 +241,9 @@ void CPlayer::Reset()
 	m_IsBirthdayGift = false;
 	m_LastCustomColorsCheckTick = 0;
 	m_DisableCustomColorsTick = 0;
+
+	m_TaserShield = 0;
+	m_DoubleXpLifesLeft = 0;
 }
 
 void CPlayer::Tick()
@@ -1836,13 +1839,16 @@ void CPlayer::GiveXP(int64 Amount, const char *pMessage)
 		return;
 
 	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[GetAccID()];
+	bool IsDoubleXp = m_pCharacter && m_pCharacter->m_IsDoubleXp;
+	if (IsDoubleXp)
+		Amount *= 2;
 	pAccount->m_XP += Amount;
 
 	char aBuf[256];
 
 	if (pMessage[0])
 	{
-		str_format(aBuf, sizeof(aBuf), "+%lld XP (%s)", Amount, pMessage);
+		str_format(aBuf, sizeof(aBuf), "+%lld XP %s%s", Amount, pMessage, IsDoubleXp ? " (doubled xp)" : "");
 		GameServer()->SendChatTarget(m_ClientID, aBuf);
 	}
 
@@ -2541,6 +2547,18 @@ bool CPlayer::ShowDDraceHud()
 	if ((m_Team == TEAM_SPECTATORS || m_Paused) && m_SpectatorID >= 0 && GameServer()->m_apPlayers[m_SpectatorID])
 		pPlayer = GameServer()->m_apPlayers[m_SpectatorID];
 	return !pPlayer->IsMinigame() || pPlayer->m_Minigame == MINIGAME_BLOCK || pPlayer->m_Minigame == MINIGAME_1VS1;
+}
+
+void CPlayer::UpdateDoubleXpLifes()
+{
+	m_DoubleXpLifesLeft--;
+	char aBuf[64];
+	if (m_DoubleXpLifesLeft > 0)
+		str_format(aBuf, sizeof(aBuf), "You have %dx double-xp life left", m_DoubleXpLifesLeft);
+	else
+		str_copy(aBuf, "You have no double-xp lifes anymore (last use)", sizeof(aBuf));
+	GameServer()->SendChatTarget(m_ClientID, aBuf);
+	m_pCharacter->m_IsDoubleXp = true;
 }
 
 void CPlayer::SetSilentFarm(bool Set)

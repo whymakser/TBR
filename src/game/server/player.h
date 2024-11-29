@@ -376,6 +376,10 @@ public:
 	int64 m_LastCustomColorsCheckTick;
 	int64 m_DisableCustomColorsTick;
 
+	int m_TaserShield;
+	int m_DoubleXpLifesLeft;
+	void UpdateDoubleXpLifes();
+
 	// Voting Menu calls, used when executing the chat command aswell
 	void SetSilentFarm(bool Set);
 	void SetHideDrawings(bool Set);

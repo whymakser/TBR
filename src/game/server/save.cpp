@@ -209,6 +209,8 @@ void CSaveTee::Save(CCharacter *pChr)
 		m_TicksSinceFirstPermille = pChr->Server()->Tick() - pChr->m_FirstPermilleTick;
 	else
 		m_TicksSinceFirstPermille = 0;
+	m_IsZombie = pChr->m_IsZombie;
+	m_IsDoubleXp = pChr->m_IsDoubleXp;
 
 	// core
 	m_MoveRestrictionExtraRoomKey = pChr->Core()->m_MoveRestrictionExtra.m_RoomKey;
@@ -230,6 +232,9 @@ void CSaveTee::Save(CCharacter *pChr)
 	m_JailTime = pChr->GetPlayer()->m_JailTime;
 	m_EscapeTime = pChr->GetPlayer()->m_EscapeTime;
 	m_RainbowName = pChr->GetPlayer()->m_RainbowName;
+	m_IsBirthdayGift = pChr->GetPlayer()->m_IsBirthdayGift;
+	m_TaserShield = pChr->GetPlayer()->m_TaserShield;
+	m_DoubleXpLifesLeft = pChr->GetPlayer()->m_DoubleXpLifesLeft;
 
 	if (m_Flags&SAVE_IDENTITY)
 	{
@@ -403,6 +408,8 @@ void CSaveTee::Load(CCharacter *pChr, int Team)
 			// Don't trigger confetti effect on loading. We could save m_GrogSpirit, but it's useless so we just determine it here before already.
 			pChr->m_GrogSpirit = pChr->DetermineGrogSpirit();
 		}
+		pChr->SetZombieHuman(m_IsZombie);
+		pChr->m_IsDoubleXp = m_IsDoubleXp;
 
 		// core
 		pChr->Core()->m_MoveRestrictionExtra.m_RoomKey = m_MoveRestrictionExtraRoomKey;
@@ -420,6 +427,9 @@ void CSaveTee::Load(CCharacter *pChr, int Team)
 		pChr->GetPlayer()->m_PlotSpawn = m_PlotSpawn;
 		pChr->GetPlayer()->m_HasRoomKey = m_HasRoomKey;
 		pChr->RainbowName(m_RainbowName, -1, true);
+		pChr->GetPlayer()->m_IsBirthdayGift = m_IsBirthdayGift;
+		pChr->GetPlayer()->m_TaserShield = m_TaserShield;
+		pChr->GetPlayer()->m_DoubleXpLifesLeft = m_DoubleXpLifesLeft;
 	}
 
 	if (m_Flags&SAVE_IDENTITY)
@@ -484,7 +494,7 @@ char* CSaveTee::GetString()
 		"%d\t%d\t%lld\t%d\t%d\t%d\t"
 		"%d\t%d\t%d\t%d\t%d\t%d\t"
 		"%d\t%d\t%d\t%lld\t%d\t%d\t%d\t%d\t%d\t%d\t"
-		"%lld\t%lld\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t"
+		"%lld\t%lld\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t"
 		"%s\t%s\t%s\t%s\t%lld\t%d\t"
 		"%s\t%s\t%s\t%s\t%s\t%s\t"
 		"%d\t%d\t%d\t%d\t%d\t%d\t"
@@ -535,7 +545,7 @@ char* CSaveTee::GetString()
 		m_HasFinishedSpecialRace, m_GotMoneyXPBomb, m_SpawnTick, m_KillStreak, m_MaxJumps, m_CarriedFlag,
 		m_MoveRestrictionExtraRoomKey, m_Lovely, m_RotatingBall, m_EpicCircle, m_StaffInd, m_Confetti,
 		m_Gamemode, m_SavedGamemode, m_Minigame, m_WalletMoney, m_RainbowSpeed, m_InfRainbow, m_InfMeteors, m_HasSpookyGhost, m_PlotSpawn, m_HasRoomKey,
-		m_JailTime, m_EscapeTime, m_CollectedPortalRifle, m_RainbowName, m_InNoBonusArea, m_PreviousPort, m_NumGrogsHolding, m_Permille, m_TicksSinceFirstPermille,
+		m_JailTime, m_EscapeTime, m_CollectedPortalRifle, m_RainbowName, m_InNoBonusArea, m_PreviousPort, m_NumGrogsHolding, m_Permille, m_TicksSinceFirstPermille, m_IsBirthdayGift, m_IsZombie, m_TaserShield, m_DoubleXpLifesLeft, m_IsDoubleXp,
 		m_Identity.m_aAccUsername, aSavedAddress, m_Identity.m_aTimeoutCode, m_Identity.m_aName, (int64)m_Identity.m_ExpireDate, m_Identity.m_RedirectTilePort,
 		m_Identity.m_TeeInfo.m_aaSkinPartNames[0], m_Identity.m_TeeInfo.m_aaSkinPartNames[1], m_Identity.m_TeeInfo.m_aaSkinPartNames[2], m_Identity.m_TeeInfo.m_aaSkinPartNames[3], m_Identity.m_TeeInfo.m_aaSkinPartNames[4], m_Identity.m_TeeInfo.m_aaSkinPartNames[5],
 		m_Identity.m_TeeInfo.m_aUseCustomColors[0], m_Identity.m_TeeInfo.m_aUseCustomColors[1], m_Identity.m_TeeInfo.m_aUseCustomColors[2], m_Identity.m_TeeInfo.m_aUseCustomColors[3], m_Identity.m_TeeInfo.m_aUseCustomColors[4], m_Identity.m_TeeInfo.m_aUseCustomColors[5],
@@ -594,7 +604,7 @@ int CSaveTee::LoadString(char* String)
 		"%d\t%d\t%lld\t%d\t%d\t%d\t"
 		"%d\t%d\t%d\t%d\t%d\t%d\t"
 		"%d\t%d\t%d\t%lld\t%d\t%d\t%d\t%d\t%d\t%d\t"
-		"%lld\t%lld\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t"
+		"%lld\t%lld\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t"
 		"%[^\t]\t%[^\t]\t%[^\t]\t%[^\t]\t%lld\t%d\t"
 		"%[^\t]\t%[^\t]\t%[^\t]\t%[^\t]\t%[^\t]\t%[^\t]\t"
 		"%d\t%d\t%d\t%d\t%d\t%d\t"
@@ -645,7 +655,7 @@ int CSaveTee::LoadString(char* String)
 		&m_HasFinishedSpecialRace, &m_GotMoneyXPBomb, &m_SpawnTick, &m_KillStreak, &m_MaxJumps, &m_CarriedFlag,
 		&m_MoveRestrictionExtraRoomKey, &m_Lovely, &m_RotatingBall, &m_EpicCircle, &m_StaffInd, &m_Confetti,
 		&m_Gamemode, &m_SavedGamemode, &m_Minigame, &m_WalletMoney, &m_RainbowSpeed, &m_InfRainbow, &m_InfMeteors, &m_HasSpookyGhost, &m_PlotSpawn, &m_HasRoomKey,
-		&m_JailTime, &m_EscapeTime, &m_CollectedPortalRifle, &m_RainbowName, &m_InNoBonusArea, &m_PreviousPort, &m_NumGrogsHolding, &m_Permille, &m_TicksSinceFirstPermille,
+		&m_JailTime, &m_EscapeTime, &m_CollectedPortalRifle, &m_RainbowName, &m_InNoBonusArea, &m_PreviousPort, &m_NumGrogsHolding, &m_Permille, &m_TicksSinceFirstPermille, &m_IsBirthdayGift, &m_IsZombie, &m_TaserShield, &m_DoubleXpLifesLeft, &m_IsDoubleXp,
 		m_Identity.m_aAccUsername, aSavedAddress, m_Identity.m_aTimeoutCode, m_Identity.m_aName, &ExpireDate, &m_Identity.m_RedirectTilePort,
 		m_Identity.m_TeeInfo.m_aaSkinPartNames[0], m_Identity.m_TeeInfo.m_aaSkinPartNames[1], m_Identity.m_TeeInfo.m_aaSkinPartNames[2], m_Identity.m_TeeInfo.m_aaSkinPartNames[3], m_Identity.m_TeeInfo.m_aaSkinPartNames[4], m_Identity.m_TeeInfo.m_aaSkinPartNames[5],
 		&m_Identity.m_TeeInfo.m_aUseCustomColors[0], &m_Identity.m_TeeInfo.m_aUseCustomColors[1], &m_Identity.m_TeeInfo.m_aUseCustomColors[2], &m_Identity.m_TeeInfo.m_aUseCustomColors[3], &m_Identity.m_TeeInfo.m_aUseCustomColors[4], &m_Identity.m_TeeInfo.m_aUseCustomColors[5],
@@ -677,7 +687,7 @@ int CSaveTee::LoadString(char* String)
 	{
 	case 91:
 		return 0;
-	case 246: // F-DDrace extra vars
+	case 251: // F-DDrace extra vars
 		return 0;
 	default:
 		dbg_msg("load", "failed to load tee-string");

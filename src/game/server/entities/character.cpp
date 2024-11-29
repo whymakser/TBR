@@ -139,6 +139,11 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	SendTuneMsg(GameServer()->m_aaZoneEnterMsg[m_TuneZone]); // we want a entermessage also on spawn
 	GameServer()->SendTuningParams(m_pPlayer->GetCID(), m_TuneZone);
 
+	if (m_pPlayer->m_DoubleXpLifesLeft && !m_pPlayer->IsMinigame())
+	{
+		m_pPlayer->UpdateDoubleXpLifes();
+	}
+
 	return true;
 }
 
@@ -1675,7 +1680,7 @@ void CCharacter::Die(int Weapon, bool UpdateTeeControl, bool OnArenaDie)
 		{
 			str_format(aBuf, sizeof(aBuf), "%s's killing spree was ended by %s (%d %s)", Server()->ClientName(m_pPlayer->GetCID()), Server()->ClientName(Killer), m_KillStreak, IsBlock ? "blocks" : "kills");
 			GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
-			pKiller->GiveXP(250, "end a killing spree");
+			pKiller->GiveXP(250, "for ending a killing spree");
 			GameServer()->CreateFinishConfetti(pKillerChar->GetPos(), pKillerChar->TeamMask());
 		}
 
@@ -1805,6 +1810,7 @@ void CCharacter::Die(int Weapon, bool UpdateTeeControl, bool OnArenaDie)
 	if (m_Passive)
 		Passive(false, -1, true);
 	UnsetSpookyGhost();
+	SetZombieHuman(false);
 
 	// unset skin specific stuff
 	m_pPlayer->ResetSkin();
@@ -2715,7 +2721,7 @@ void CCharacter::HandleTiles(int Index)
 		if (((m_TileIndex == TILE_END) || (m_TileFIndex == TILE_END) || FTile1 == TILE_END || FTile2 == TILE_END || FTile3 == TILE_END || FTile4 == TILE_END || Tile1 == TILE_END || Tile2 == TILE_END || Tile3 == TILE_END || Tile4 == TILE_END) && m_DDRaceState == DDRACE_STARTED)
 		{
 			Controller->m_Teams.OnCharacterFinish(m_pPlayer->GetCID());
-			m_pPlayer->GiveXP(500, "finish the race");
+			m_pPlayer->GiveXP(500, "for finishing the race");
 		}
 
 		//shop
@@ -2816,11 +2822,12 @@ void CCharacter::HandleTiles(int Index)
 
 				str_format(aSurvival, sizeof(aSurvival), " +%dsurvival", AliveState);
 				str_format(aSpirit, sizeof(aSpirit), " +%dspirit", m_GrogSpirit);
-				str_format(aPlusXP, sizeof(aPlusXP), " +%d%s%s%s%s", TileXP,
+				str_format(aPlusXP, sizeof(aPlusXP), " +%d%s%s%s%s%s", TileXP,
 					FlagBonus ? " +1flag" : "",
 					pAccount->m_VIP ? " +2vip" : "",
 					AliveState ? aSurvival : "",
-					m_GrogSpirit ? aSpirit : "");
+					m_GrogSpirit ? aSpirit : "",
+					m_IsDoubleXp ? " (x2)" : "");
 				str_format(m_aLineExp, sizeof(m_aLineExp), "XP [%lld/%lld]%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level), aPlusXP);
 
 				str_format(aPolice, sizeof(aPolice), " +%dpolice", pAccount->m_PoliceLevel);
@@ -2835,8 +2842,40 @@ void CCharacter::HandleTiles(int Index)
 			}
 		}
 
+		// taser shield
+		if (m_TileIndex == TILE_TASER_SHIELD_PLUS || m_TileFIndex == TILE_TASER_SHIELD_PLUS)
+		{
+			m_pPlayer->m_TaserShield = min(m_pPlayer->m_TaserShield + 10, 100);
+			char aBuf[128];
+			str_format(aBuf, sizeof(aBuf), "Congratulations, +10%% taser shield, current: %d%%. Use '/taser' to check later.", m_pPlayer->m_TaserShield);
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
+		}
+
+		// double-xp for +2 lifes
+		if (m_TileIndex == TILE_ADD_2X_XP_TWO_LIFES || m_TileFIndex == TILE_ADD_2X_XP_TWO_LIFES)
+		{
+			bool FirstlyAdded = m_pPlayer->m_DoubleXpLifesLeft == 0;
+			m_pPlayer->m_DoubleXpLifesLeft = min(m_pPlayer->m_DoubleXpLifesLeft + 2, 99);
+			char aBuf[128];
+			str_format(aBuf, sizeof(aBuf), "Congratulations, double-xp has been activated for %d lifes", m_pPlayer->m_DoubleXpLifesLeft);
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
+			if (FirstlyAdded)
+			{
+				// first enable, use one life.
+				m_pPlayer->UpdateDoubleXpLifes();
+			}
+		}
+
 		// money xp bomb
-		if (!m_GotMoneyXPBomb && (m_TileIndex == TILE_MONEY_XP_BOMB || m_TileFIndex == TILE_MONEY_XP_BOMB))
+		if (m_TileIndex == TILE_TRANSFORM_HUMAN && m_TileFIndex == TILE_MONEY_XP_BOMB)
+		{
+			// only process if a zombie actually is transforming
+			if (m_IsZombie && m_pPlayer->GetAccID() >= ACC_START)
+			{
+				m_pPlayer->GiveXP(5000, "for force human transformation");
+			}
+		}
+		else if (!m_GotMoneyXPBomb && (m_TileIndex == TILE_MONEY_XP_BOMB || m_TileFIndex == TILE_MONEY_XP_BOMB))
 		{
 			if (m_pPlayer->GetAccID() < ACC_START)
 			{
@@ -2846,8 +2885,7 @@ void CCharacter::HandleTiles(int Index)
 			else if (m_pPlayer->m_LastMoneyXPBomb < Server()->Tick() - Server()->TickSpeed() * 5)
 			{
 				m_pPlayer->WalletTransaction(500, "from money-xp bomb");
-				m_pPlayer->GiveXP(2500);
-				GameServer()->SendChatTarget(m_pPlayer->GetCID(), "+2500 XP, +500 money (money-xp bomb)");
+				m_pPlayer->GiveXP(2500, "+500 money (from money-xp bomb)");
 
 				m_GotMoneyXPBomb = true;
 				m_pPlayer->m_LastMoneyXPBomb = Server()->Tick();
@@ -2860,7 +2898,7 @@ void CCharacter::HandleTiles(int Index)
 			char aBuf[64];
 			str_format(aBuf, sizeof(aBuf), "'%s' finished the special race!", Server()->ClientName(m_pPlayer->GetCID()));
 			GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
-			m_pPlayer->GiveXP(750, "finish the special race");
+			m_pPlayer->GiveXP(750, "for finishing the special race");
 
 			m_HasFinishedSpecialRace = true;
 			GameServer()->CreateFinishConfetti(m_Pos, TeamMask());
@@ -4128,6 +4166,8 @@ void CCharacter::FDDraceInit()
 	m_LastBirthdayMsg = 0;
 	m_IsZombie = false;
 
+	m_IsDoubleXp = false;
+
 	m_pDummyHandle = 0;
 	CreateDummyHandle(m_pPlayer->GetDummyMode());
 }
@@ -4292,10 +4332,11 @@ void CCharacter::FDDraceTick()
 			char aSpirit[32];
 			str_format(aSurvival, sizeof(aSurvival), " +%dsurvival", AliveState);
 			str_format(aSpirit, sizeof(aSpirit), " +%dspirit", m_GrogSpirit);
-			str_format(m_aLineExp, sizeof(m_aLineExp), "XP [%lld/%lld] +1flag%s%s%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level),
+			str_format(m_aLineExp, sizeof(m_aLineExp), "XP [%lld/%lld] +1flag%s%s%s%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level),
 				pAccount->m_VIP ? " +2vip" : "",
 				AliveState ? aSurvival : "",
-				m_GrogSpirit ? aSpirit : "");
+				m_GrogSpirit ? aSpirit : "",
+				m_IsDoubleXp ? " (x2)" : "");
 			if (!IsWeaponIndicator() && !m_pPlayer->m_HideBroadcasts)
 			{
 				SendBroadcastHud(GameServer()->FormatExperienceBroadcast(m_aLineExp, m_pPlayer->GetCID()));
@@ -5992,7 +6033,7 @@ void CCharacter::SetJumps(int NewJumps, bool Silent)
 
 	if (NewJumps > m_MaxJumps && m_DDRaceState != DDRACE_CHEAT && !GameServer()->Arenas()->FightStarted(m_pPlayer->GetCID()))
 	{
-		m_pPlayer->GiveXP(NewJumps * 100, "upgrading jumps");
+		m_pPlayer->GiveXP(NewJumps * 100, "for upgrading jumps");
 		m_MaxJumps = NewJumps;
 	}
 

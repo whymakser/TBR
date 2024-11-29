@@ -1559,6 +1559,8 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   entities/stable_projectile.h
   entities/staff_ind.cpp
   entities/staff_ind.h
+  entities/taser_shield.cpp
+  entities/taser_shield.h
   entities/teleporter.cpp
   entities/teleporter.h
   entities/trail.cpp

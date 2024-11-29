@@ -6,6 +6,7 @@
 
 #include "character.h"
 #include "laser.h"
+#include "taser_shield.h"
 
 #include <engine/shared/config.h>
 #include <game/server/teams.h>
@@ -160,8 +161,18 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 	{
 		if (pChr)
 		{
-			pChr->Freeze(m_TaserStrength / 10.f);
-			pChr->m_GotLasered = true;
+			int RandomPercentage = random(0, 100);
+			if (pChr->GetPlayer()->m_TaserShield > 0 && pChr->GetPlayer()->m_TaserShield >= RandomPercentage)
+			{
+				pChr->GetPlayer()->m_TaserShield = max(pChr->GetPlayer()->m_TaserShield - 5, 0);
+				new CTaserShield(GameWorld(), pChr->GetPos(), pChr->GetPlayer()->GetCID());
+				GameServer()->SendChatTarget(pChr->GetPlayer()->GetCID(), "Taser shield has been used, -5%");
+			}
+			else
+			{
+				pChr->Freeze(m_TaserStrength / 10.f);
+				pChr->m_GotLasered = true;
+			}
 		}
 	 	else if (IsPlotTaser)
 		{
