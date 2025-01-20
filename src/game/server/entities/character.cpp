@@ -5597,6 +5597,7 @@ bool CCharacter::SetZombieHuman(bool Zombie)
 	}
 	else
 	{
+		m_pPlayer->m_DisableCustomColorsTick = 0;
 		m_pPlayer->ResetSkin();
 		m_pPlayer->m_DefEmote = EMOTE_NORMAL;
 		m_pPlayer->m_DefEmoteReset = -1;
