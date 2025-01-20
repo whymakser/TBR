@@ -1392,6 +1392,67 @@ void CGameContext::ConConfetti(IConsole::IResult *pResult, void *pUserData)
 	if (pChr) pChr->Confetti(!pChr->m_Confetti, pResult->m_ClientID);
 }
 
+void CGameContext::ConForceTransformZombie(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int Victim = pResult->NumArguments() ? pResult->GetVictim() : pResult->m_ClientID;
+	CCharacter *pChr = pSelf->GetPlayerChar(Victim);
+	if (pChr && pChr->SetZombieHuman(true))
+	{
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "Transformed '%s' to zombie", pSelf->Server()->ClientName(Victim));
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
+	}
+}
+
+void CGameContext::ConForceTransformHuman(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int Victim = pResult->NumArguments() ? pResult->GetVictim() : pResult->m_ClientID;
+	CCharacter *pChr = pSelf->GetPlayerChar(Victim);
+	if (pChr && pChr->SetZombieHuman(false))
+	{
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "Transformed '%s' to human", pSelf->Server()->ClientName(Victim));
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
+	}
+}
+
+void CGameContext::ConSetDoubleXpLifes(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int Victim = pResult->GetVictim();
+	CPlayer *pPlayer = pSelf->m_apPlayers[Victim];
+	if (pPlayer)
+	{
+		int NewLifes = pResult->GetInteger(1);
+		pPlayer->m_DoubleXpLifesLeft = NewLifes;
+		pPlayer->UpdateDoubleXpLifes();
+
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "Set double xp lifes of '%s' to %d", pSelf->Server()->ClientName(Victim), NewLifes);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
+	}
+}
+
+void CGameContext::ConSetTaserShield(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int Victim = pResult->GetVictim();
+	CPlayer *pPlayer = pSelf->m_apPlayers[Victim];
+	if (pPlayer)
+	{
+		pPlayer->m_TaserShield = clamp(pResult->GetInteger(1), 0, 100);
+
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "Your taser shield has been set to %d%%. Use '/taser' to check later.", pPlayer->m_TaserShield);
+		pSelf->SendChatTarget(Victim, aBuf);
+
+		str_format(aBuf, sizeof(aBuf), "Set taser shield percentage of '%s' to %d%%", pSelf->Server()->ClientName(Victim), pPlayer->m_TaserShield);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
+	}
+}
+
 void CGameContext::ConConnectDummy(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;

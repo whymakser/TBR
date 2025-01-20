@@ -161,6 +161,12 @@ CONSOLE_COMMAND("helicopter", "?v[id]", CFGFLAG_SERVER|CMDFLAG_TEST, ConHelicopt
 CONSOLE_COMMAND("remove_helicopters", "", CFGFLAG_SERVER, ConRemoveHelicopters, this, "Removes all helicopters", AUTHED_ADMIN)
 CONSOLE_COMMAND("snake", "?v[id]", CFGFLAG_SERVER|CMDFLAG_TEST, ConSnake, this, "Toggles snake for player v", AUTHED_ADMIN)
 
+//zombie
+CONSOLE_COMMAND("force_transform_zombie", "?v[id]", CFGFLAG_SERVER|CMDFLAG_TEST, ConForceTransformZombie, this, "Forces transformation to zombie for player v", AUTHED_ADMIN)
+CONSOLE_COMMAND("force_transform_human", "?v[id]", CFGFLAG_SERVER|CMDFLAG_TEST, ConForceTransformHuman, this, "Forces transformation to human for player v", AUTHED_ADMIN)
+CONSOLE_COMMAND("set_double_xp_lifes", "v[id] i[amount]", CFGFLAG_SERVER|CMDFLAG_TEST, ConSetDoubleXpLifes, this, "Sets double xp lifes for player v", AUTHED_ADMIN)
+CONSOLE_COMMAND("set_taser_shield", "v[id] i[percentage]", CFGFLAG_SERVER|CMDFLAG_TEST, ConSetTaserShield, this, "Sets taser shield percentage for player v", AUTHED_ADMIN)
+
 //client information
 CONSOLE_COMMAND("player_name", "v[id] ?r[name]", CFGFLAG_SERVER, ConPlayerName, this, "Sets name of player v", AUTHED_ADMIN)
 CONSOLE_COMMAND("player_clan", "v[id] ?r[clan]", CFGFLAG_SERVER, ConPlayerClan, this, "Sets clan of player v", AUTHED_ADMIN)

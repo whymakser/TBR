@@ -1504,11 +1504,8 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 						return;
 					}
 				}
-				else
-				{
-					m_aClients[ClientID].m_Version = Unpacker.GetInt();
-				}
 
+				m_aClients[ClientID].m_Version = Unpacker.GetInt();
 				SendRconType(ClientID, m_AuthManager.NumNonDefaultKeys() > 0);
 				SendCapabilities(ClientID);
 

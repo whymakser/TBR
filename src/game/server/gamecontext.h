@@ -997,6 +997,11 @@ private:
 	static void ConRemoveHelicopters(IConsole::IResult* pResult, void* pUserData);
 	static void ConSnake(IConsole::IResult* pResult, void* pUserData);
 
+	static void ConForceTransformZombie(IConsole::IResult* pResult, void* pUserData);
+	static void ConForceTransformHuman(IConsole::IResult* pResult, void* pUserData);
+	static void ConSetDoubleXpLifes(IConsole::IResult* pResult, void* pUserData);
+	static void ConSetTaserShield(IConsole::IResult* pResult, void* pUserData);
+
 	static void ConConnectDummy(IConsole::IResult* pResult, void* pUserData);
 	static void ConDisconnectDummy(IConsole::IResult* pResult, void* pUserData);
 	static void ConDummymode(IConsole::IResult* pResult, void* pUserData);
