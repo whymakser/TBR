@@ -520,20 +520,16 @@ void IGameController::Snap(int SnappingClient)
 	int GameStartTick = m_GameStartTick;
 	bool IsBirthdayPresent = false;
 	{
-		if (pSpectator)
+		CCharacter *pChr = pSpectator ? pSpectator : pSnappingChar;
+		if (pChr)
 		{
-			if (pSpectator->m_DDRaceState == DDRACE_STARTED)
-				GameStartTick = pSpectator->m_StartTime;
-		}
-		else if (pSnappingChar)
-		{
-			if (pSnappingChar->m_BirthdayGiftEndTick > Server()->Tick())
+			if (pChr->m_BirthdayGiftEndTick > Server()->Tick())
 			{
-				GameStartTick = pSnappingChar->m_BirthdayGiftEndTick - Server()->TickSpeed() * 60;
+				GameStartTick = pChr->m_BirthdayGiftEndTick - Server()->TickSpeed() * 60;
 				IsBirthdayPresent = true;
 			}
-			else if (pSnappingChar->m_DDRaceState == DDRACE_STARTED)
-				GameStartTick = pSnappingChar->m_StartTime;
+			else if (pChr->m_DDRaceState == DDRACE_STARTED)
+				GameStartTick = pChr->m_StartTime;
 		}
 	}
 
