@@ -1444,7 +1444,7 @@ void CGameContext::ConSetTaserShield(IConsole::IResult *pResult, void *pUserData
 	{
 		pPlayer->m_TaserShield = clamp(pResult->GetInteger(1), 0, 100);
 
-		char aBuf[64];
+		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "Your taser shield has been set to %d%%. Use '/taser' to check later.", pPlayer->m_TaserShield);
 		pSelf->SendChatTarget(Victim, aBuf);
 
