@@ -92,3 +92,6 @@ The inventory has been extended to support more than the regular weapons. If not
 
 * **Many settings and commands** <br>
 The list of [settings](https://github.com/fokkonaut/F-DDrace/blob/F-DDrace/src/game/variables.h) and [commands](https://github.com/fokkonaut/F-DDrace/blob/F-DDrace/src/game/ddracecommands.h) can be found in the source files when scrolling down a little bit.
+
+Buy me a coffee:
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.me/fokkonaut)
