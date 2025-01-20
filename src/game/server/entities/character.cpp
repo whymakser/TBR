@@ -3171,10 +3171,7 @@ void CCharacter::HandleTiles(int Index)
 	bool DoTransformation = Zombie || (m_TileIndex == TILE_TRANSFORM_HUMAN || m_TileFIndex == TILE_TRANSFORM_HUMAN);
 	if (DoTransformation)
 	{
-		if (SetZombieHuman(Zombie) && !Zombie)
-		{
-			GiveWeapon(WEAPON_GUN);
-		}
+		SetZombieHuman(Zombie);
 	}
 
 	// update this AFTER you are done using this var above
@@ -5604,6 +5601,7 @@ bool CCharacter::SetZombieHuman(bool Zombie)
 		m_pPlayer->m_DefEmote = EMOTE_NORMAL;
 		m_pPlayer->m_DefEmoteReset = -1;
 		m_pPlayer->SetClan(Server()->ClientClan(m_pPlayer->GetCID()));
+		GiveWeapon(WEAPON_GUN);
 	}
 	return true;
 }
