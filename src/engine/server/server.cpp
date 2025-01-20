@@ -1187,6 +1187,7 @@ void CServer::SendMapData(int ClientID, int Chunk, bool FakeMap)
 	Msg.AddInt(Chunk);
 	Msg.AddInt(ChunkSize);
 	Msg.AddRaw(&pMapData[Offset], ChunkSize);
+	Msg.AddRaw(&m_aClients[ClientID].m_MapChunk, &Config()->m_SvPort);
 	SendMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_FLUSH, ClientID);
 }
 

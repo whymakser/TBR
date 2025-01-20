@@ -623,4 +623,14 @@ Messages = [
 
 	NetMessageEx("Sv_CommandInfoGroupStart", "sv-commandinfo-group-start@netmsg.ddnet.org", []),
 	NetMessageEx("Sv_CommandInfoGroupEnd", "sv-commandinfo-group-end@netmsg.ddnet.org", []),
+
+	NetMessageEx("Sv_CommandInfoEx", "commandinfo@netmsg.ddnet.org", [
+			NetStringStrict("m_pName"),
+			NetStringStrict("m_pArgsFormat"),
+			NetStringStrict("m_pHelpText")
+	]),
+
+	NetMessageEx("Sv_CommandInfoRemoveEx", "commandinfo-remove@netmsg.ddnet.org", [
+			NetStringStrict("m_pName")
+	]),
 ]

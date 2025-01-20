@@ -895,18 +895,36 @@ void CGameContext::SendGameMsg(int GameMsgID, int ParaI1, int ParaI2, int ParaI3
 
 void CGameContext::SendChatCommand(const CCommandManager::CCommand *pCommand, int ClientID)
 {
-	CNetMsg_Sv_CommandInfo Msg;
-	Msg.m_Name = pCommand->m_aName;
-	Msg.m_HelpText = pCommand->m_aHelpText;
-	Msg.m_ArgsFormat = pCommand->m_aArgsFormat;
+	if (ClientID == -1)
+	{
+		for (int i = 0; i < MAX_CLIENTS; i++)
+			SendChatCommand(pCommand, i);
+		return;
+	}
 
-	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+	if (Server()->IsSevendown(ClientID))
+	{
+		CNetMsg_Sv_CommandInfoEx Msg;
+		Msg.m_pName = pCommand->m_aName;
+		Msg.m_pArgsFormat = pCommand->m_aArgsFormat;
+		Msg.m_pHelpText = pCommand->m_aHelpText;
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL | MSGFLAG_NORECORD, ClientID);
+	}
+	else
+	{
+		CNetMsg_Sv_CommandInfo Msg;
+		Msg.m_Name = pCommand->m_aName;
+		Msg.m_HelpText = pCommand->m_aHelpText;
+		Msg.m_ArgsFormat = pCommand->m_aArgsFormat;
+		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
+	}
 }
 
 void CGameContext::SendChatCommands(int ClientID)
 {
 	// F-DDrace
-	// Remove the clientside commands (expect w and whisper)
+	// Remove the clientside commands for 0.7 (expect w and whisper)
+	if (!Server()->IsSevendown(ClientID))
 	{
 		SendRemoveChatCommand("all", ClientID);
 		SendRemoveChatCommand("friend", ClientID);
@@ -1688,11 +1706,11 @@ void CGameContext::SendStartMessages(int ClientID)
 
 	// send settings
 	SendSettings(ClientID);
+	SendChatCommands(ClientID);
 
 	if (!Server()->IsSevendown(ClientID))
 	{
 		m_pController->UpdateGameInfo(ClientID);
-		SendChatCommands(ClientID);
 	}
 }
 
