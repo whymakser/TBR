@@ -106,7 +106,7 @@ void CSaveTee::Save(CCharacter *pChr)
 	m_EndlessHook = pChr->m_EndlessHook;
 	m_DDRaceState = pChr->m_DDRaceState;
 
-	m_Hit = pChr->m_Hit;
+	m_Hit = pChr->Config()->m_SvHit ? pChr->m_Hit : pChr->m_HitSaved;
 	m_TuneZone = pChr->m_TuneZone;
 	m_TuneZoneOld = pChr->m_TuneZoneOld;
 
@@ -292,7 +292,14 @@ void CSaveTee::Load(CCharacter *pChr, int Team)
 		pChr->m_EndlessHook = m_EndlessHook;
 		pChr->m_DDRaceState = m_DDRaceState;
 
-		pChr->m_Hit = m_Hit;
+		if (!pChr->Config()->m_SvHit)
+		{
+			pChr->m_HitSaved = m_Hit;
+		}
+		else
+		{
+			pChr->m_Hit = m_Hit;
+		}
 		pChr->m_TuneZone = m_TuneZone;
 		pChr->m_TuneZoneOld = m_TuneZoneOld;
 

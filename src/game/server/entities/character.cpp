@@ -4165,6 +4165,8 @@ void CCharacter::FDDraceInit()
 
 	m_IsDoubleXp = false;
 
+	m_HitSaved = m_Hit;
+
 	m_pDummyHandle = 0;
 	CreateDummyHandle(m_pPlayer->GetDummyMode());
 }

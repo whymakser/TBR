@@ -335,6 +335,7 @@ public:
 		DISABLE_HIT_RIFLE = 8
 	};
 	int m_Hit;
+	int m_HitSaved;
 	int m_TuneZone;
 	int m_TuneZoneOld;
 	LOCKED_TUNES m_LockedTunings;
