@@ -181,6 +181,7 @@ void CGrog::Tick()
 	}
 
 	m_TeamMask = GetOwner() ? GetOwner()->TeamMask() : Mask128();
+	m_PrevPos = m_Pos;
 }
 
 void CGrog::Pickup()
