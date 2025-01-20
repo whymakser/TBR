@@ -80,7 +80,7 @@ private:
 		int m_Amount;
 		bool m_IsEuro;
 	} m_aItems[MAX_PLOTS];
-
+	
 	void AddItem(const char *pName, int Level, float Price, int Time, const char *pDescription, bool IsEuro = false, int Amount = 1);
 	void BuyItem(int ClientID, int Item);
 	

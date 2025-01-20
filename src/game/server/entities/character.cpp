@@ -5578,6 +5578,7 @@ bool CCharacter::SetZombieHuman(bool Zombie)
 		UnsetSpookyGhost();
 		for (int i = WEAPON_GUN; i < NUM_WEAPONS; i++)
 			GiveWeapon(i, true);
+		Jetpack(false, -1, true);
 
 		m_pPlayer->m_DefEmote = EMOTE_ANGRY;
 		m_pPlayer->m_DefEmoteReset = -1;
@@ -5621,21 +5622,43 @@ bool CCharacter::TryHumanTransformation(CCharacter *pTarget)
 
 			int Special = pTarget->GetWeaponSpecial(i);
 			if (Special & SPECIAL_JETPACK)
+			{
 				Jetpack(true, -1, true);
+				pTarget->Jetpack(false, -1, true);
+			}
 			if (Special & SPECIAL_SPREADWEAPON)
+			{
 				SpreadWeapon(i, true, -1, true);
+				pTarget->SpreadWeapon(i, false, -1, true);
+			}
 			if (Special & SPECIAL_TELEWEAPON)
+			{
 				TeleWeapon(i, true, -1, true);
+				pTarget->TeleWeapon(i, false, -1, true);
+			}
 			if (Special & SPECIAL_DOORHAMMER)
+			{
 				DoorHammer(true, -1, true);
+				pTarget->DoorHammer(false, -1, true);
+			}
 			if (Special & SPECIAL_SCROLLNINJA)
+			{
 				ScrollNinja(true, -1, true);
+				pTarget->ScrollNinja(false, -1, true);
+			}
 		}
 	}
 	
-	m_EndlessHook = m_EndlessHook || pTarget->m_EndlessHook;
-	m_SuperJump = m_SuperJump || pTarget->m_SuperJump;
-	SetJumps(max(m_Core.m_Jumps, pTarget->m_Core.m_Jumps), true);
+	if (!m_EndlessHook && pTarget->m_EndlessHook)
+	{
+		m_EndlessHook = pTarget->m_EndlessHook;
+		pTarget->m_EndlessHook = false;
+	}
+	if (!m_SuperJump && pTarget->m_SuperJump)
+	{
+		m_SuperJump = pTarget->m_SuperJump;
+		pTarget->m_SuperJump = false;
+	}
 
 	// transform other guy to zombie
 	pTarget->SetZombieHuman(true);
