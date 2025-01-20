@@ -1425,12 +1425,22 @@ void CGameContext::ConSetDoubleXpLifes(IConsole::IResult *pResult, void *pUserDa
 	CPlayer *pPlayer = pSelf->m_apPlayers[Victim];
 	if (pPlayer)
 	{
-		int NewLifes = pResult->GetInteger(1);
-		pPlayer->m_DoubleXpLifesLeft = NewLifes;
-		pPlayer->UpdateDoubleXpLifes();
-
 		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "Set double xp lifes of '%s' to %d", pSelf->Server()->ClientName(Victim), NewLifes);
+		int NewLifes = clamp(pResult->GetInteger(1), 0, 99);
+		pPlayer->m_DoubleXpLifesLeft = NewLifes;
+
+		if (NewLifes == 0)
+		{
+			if (pPlayer->GetCharacter())
+				pPlayer->GetCharacter()->m_IsDoubleXp = false;
+			str_format(aBuf, sizeof(aBuf), "Removed double xp from '%s'", pSelf->Server()->ClientName(Victim));
+		}
+		else
+		{
+			pPlayer->UpdateDoubleXpLifes();
+			str_format(aBuf, sizeof(aBuf), "Set double xp lifes of '%s' to %d", pSelf->Server()->ClientName(Victim), NewLifes);
+		}
+
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
 	}
 }
