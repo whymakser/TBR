@@ -502,6 +502,7 @@ public:
 	{
 		bool m_InArea = false;
 		int m_Score = 0;
+		int64 m_LastAlertTick = 0;
 
 		struct SNoBonusSave
 		{
