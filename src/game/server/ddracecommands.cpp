@@ -1624,10 +1624,17 @@ void CGameContext::ConSetPermille(IConsole::IResult *pResult, void *pUserData)
 	{
 		pChr->m_Permille = 0;
 		pChr->m_FirstPermilleTick = 0;
-		pChr->IncreasePermille(Permille);
-		
+
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "Set permille for '%s' to '%.1f'", pSelf->Server()->ClientName(Victim), Permille / 10.f);
+		if (Permille > 0)
+		{
+			pChr->IncreasePermille(Permille);
+			str_format(aBuf, sizeof(aBuf), "Set permille for '%s' to '%.1f'", pSelf->Server()->ClientName(Victim), Permille / 10.f);
+		}
+		else
+		{
+			str_format(aBuf, sizeof(aBuf), "Reset permille for '%s' to '0.0'", pSelf->Server()->ClientName(Victim));
+		}
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
 	}
 }
