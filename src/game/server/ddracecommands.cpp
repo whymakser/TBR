@@ -306,6 +306,7 @@ void CGameContext::ConToCheckTeleporter(IConsole::IResult *pResult, void *pUserD
 			pChr->ForceSetPos(TelePos);
 			pChr->m_DDRaceState = DDRACE_CHEAT;
 			pChr->m_TeleCheckpoint = TeleTo;
+			pChr->AddCheckpointList(pSelf->Config()->m_SvPort, TeleTo);
 		}
 	}
 }
