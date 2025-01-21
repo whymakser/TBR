@@ -5327,14 +5327,12 @@ bool CCharacter::LoadRedirectTile(int Port)
 
 void CCharacter::AddCheckpointList(int Port, int Checkpoint)
 {
-	bool Found = false;
 	for (unsigned int i = 0; i < m_vCheckpoints.size(); i++)
 	{
 		int PortMatch = GameServer()->GetRediretListPort(m_vCheckpoints[i].first);
 		if (PortMatch == Port)
 		{
 			m_vCheckpoints[i].second = Checkpoint;
-			Found = true;
 			return;
 		}
 	}
