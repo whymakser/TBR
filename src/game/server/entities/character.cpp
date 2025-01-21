@@ -5167,7 +5167,7 @@ void CCharacter::IncreaseNoBonusScore(int Summand)
 	{
 		if (Wanted)
 		{
-			if (!m_NoBonusContext.m_LastAlertTick || m_NoBonusContext.m_LastAlertTick + Server()->TickSpeed() * 20 > Server()->Tick())
+			if (!m_NoBonusContext.m_LastAlertTick || m_NoBonusContext.m_LastAlertTick + Server()->TickSpeed() * 20 < Server()->Tick())
 			{
 				char aBuf[128];
 				str_format(aBuf, sizeof(aBuf), "'%s' is using bonus illegally. Catch him!", Server()->ClientName(m_pPlayer->GetCID()));
