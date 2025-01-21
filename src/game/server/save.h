@@ -6,6 +6,7 @@
 #include <engine/shared/protocol.h>
 #include <game/server/gamecontroller.h>
 #include "teeinfo.h"
+#include <vector>
 
 class CCharacter;
 class CGameContext;
@@ -169,6 +170,7 @@ private:
 	int m_TicksSinceFirstPermille;
 	int m_IsZombie;
 	int m_IsDoubleXp;
+	std::vector< std::pair<int, int> > m_vCheckpoints;
 
 	// core
 	int m_MoveRestrictionExtraRoomKey;

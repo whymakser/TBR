@@ -555,6 +555,10 @@ public:
 	int m_RedirectTilePort;
 	int64 m_PassiveEndTick;
 
+	std::vector< std::pair<int, int> > m_vCheckpoints;
+	void AddCheckpointList(int Port, int Checkpoint);
+	void SetCheckpointList(std::vector< std::pair<int, int> > vCheckpoints);
+
 	// Grog
 	bool AddGrog();
 	int m_NumGrogsHolding;

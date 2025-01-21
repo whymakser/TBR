@@ -785,6 +785,8 @@ public:
 	void OnRedirectSaveTeeAdd(const char *pHash) override;
 	void OnRedirectSaveTeeRemove(const char *pHash) override;
 	int GetIdentityIndexByHash(const char *pHash);
+	int GetRediretListPort(int WantedSwitchNumber);
+	int GetRediretListSwitch(int WantedPort);
 
 private:
 

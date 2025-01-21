@@ -2680,7 +2680,10 @@ void CCharacter::HandleTiles(int Index)
 	}
 	int tcp = GameServer()->Collision()->IsTCheckpoint(MapIndex);
 	if (tcp)
+	{
 		m_TeleCheckpoint = tcp;
+		AddCheckpointList(Config()->m_SvPort, m_TeleCheckpoint);
+	}
 
 	// 1vs1 over the whole map, we need to avoid some stuff here
 	bool FightStarted = GameServer()->Arenas()->FightStarted(m_pPlayer->GetCID());
@@ -3454,10 +3457,7 @@ void CCharacter::HandleTiles(int Index)
 			return;
 		}
 
-		char aBuf[16];
-		str_format(aBuf, sizeof(aBuf), "%d:", SwitchNumber);	
-		const char *pPort = str_find(Config()->m_SvRedirectServerTilePorts, aBuf);
-		int Port = pPort ? atoi(pPort + 2) : 0;
+		int Port = GameServer()->GetRediretListPort(SwitchNumber);
 		if (!TrySafelyRedirectClient(Port))
 			LoadRedirectTile(Port);
 		return;
@@ -4166,6 +4166,7 @@ void CCharacter::FDDraceInit()
 	m_IsDoubleXp = false;
 
 	m_HitSaved = m_Hit;
+	m_vCheckpoints.clear();
 
 	m_pDummyHandle = 0;
 	CreateDummyHandle(m_pPlayer->GetDummyMode());
@@ -5322,6 +5323,44 @@ bool CCharacter::LoadRedirectTile(int Port)
 	if (GameServer()->m_pController->CanSpawn(&Pos, ENTITY_SPAWN))
 		ForceSetPos(Pos);
 	return false;
+}
+
+void CCharacter::AddCheckpointList(int Port, int Checkpoint)
+{
+	bool Found = false;
+	for (unsigned int i = 0; i < m_vCheckpoints.size(); i++)
+	{
+		int PortMatch = GameServer()->GetRediretListPort(m_vCheckpoints[i].first);
+		if (PortMatch == Port)
+		{
+			m_vCheckpoints[i].second = Checkpoint;
+			Found = true;
+			return;
+		}
+	}
+
+	int SwitchNumber = GameServer()->GetRediretListSwitch(Port);
+	if (SwitchNumber > 0)
+	{
+		std::pair<int, int> Pair;
+		Pair.first = SwitchNumber;
+		Pair.second = Checkpoint;
+		m_vCheckpoints.push_back(Pair);
+	}
+}
+
+void CCharacter::SetCheckpointList(std::vector< std::pair<int, int> > vCheckpoints)
+{
+	m_vCheckpoints = vCheckpoints;
+	for (unsigned int i = 0; i < m_vCheckpoints.size(); i++)
+	{
+		int PortMatch = GameServer()->GetRediretListPort(m_vCheckpoints[i].first);
+		if (PortMatch == Config()->m_SvPort)
+		{
+			m_TeleCheckpoint = m_vCheckpoints[i].second;
+			break;
+		}
+	}
 }
 
 bool CCharacter::TryMountHelicopter()

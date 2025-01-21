@@ -6652,6 +6652,38 @@ int CGameContext::GetIdentityIndexByHash(const char *pHash)
 	return -1;
 }
 
+int CGameContext::GetRediretListPort(int WantedSwitchNumber)
+{
+	const char *pList = Config()->m_SvRedirectServerTilePorts;
+	char aBuf[16];
+	while ((pList = str_next_token(pList, ",", aBuf, sizeof(aBuf))))
+	{
+		int Switch = 0;
+		int Port = 0;
+		if (sscanf(aBuf, "%d:%d", &Switch, &Port) == 2 && Switch == WantedSwitchNumber)
+		{
+			return Port;
+		}
+	}
+	return 0;
+}
+
+int CGameContext::GetRediretListSwitch(int WantedPort)
+{
+	const char *pList = Config()->m_SvRedirectServerTilePorts;
+	char aBuf[16];
+	while ((pList = str_next_token(pList, ",", aBuf, sizeof(aBuf))))
+	{
+		int Switch = 0;
+		int Port = 0;
+		if (sscanf(aBuf, "%d:%d", &Switch, &Port) == 2 && Port == WantedPort)
+		{
+			return Switch;
+		}
+	}
+	return 0;
+}
+
 void CGameContext::CreateFolders()
 {
 	char aBuf[IO_MAX_PATH_LENGTH] = { 0 };
