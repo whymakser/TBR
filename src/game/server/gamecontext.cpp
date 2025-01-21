@@ -4468,9 +4468,16 @@ void CGameContext::OnPreShutdown()
 		{
 			// Either save the character and it's money or simply drop the money so it can get loaded on next server start
 			if (Config()->m_SvShutdownSaveTees)
+			{
 				SaveCharacter(i, SAVE_WALLET|SAVE_FLAG, Config()->m_SvShutdownSaveTeeExpire);
+				// Reset, so CPlayer::OnDisconnect() will not create a jail savetee when we have this already.
+				pPlayer->m_EscapeTime = 0;
+				pPlayer->m_JailTime = 0;
+			}
 			else
+			{
 				pPlayer->GetCharacter()->DropMoney(pPlayer->GetWalletMoney());
+			}
 		}
 
 		// properly disconnect dummies on reload/shutdown
