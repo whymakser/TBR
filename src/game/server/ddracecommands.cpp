@@ -1623,6 +1623,7 @@ void CGameContext::ConSetPermille(IConsole::IResult *pResult, void *pUserData)
 	if (pChr)
 	{
 		pChr->m_Permille = 0;
+		pChr->m_FirstPermilleTick = 0;
 		pChr->IncreasePermille(Permille);
 		
 		char aBuf[128];
