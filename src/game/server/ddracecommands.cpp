@@ -1604,6 +1604,19 @@ void CGameContext::ConSound(IConsole::IResult* pResult, void* pUserData)
 void CGameContext::ConAddGrog(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
+	int Victim = pResult->NumArguments() ? pResult->GetVictim() : pResult->m_ClientID;
+	CCharacter *pChr = pSelf->GetPlayerChar(Victim);
+	if (pChr && pChr->AddGrog())
+	{
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "Added a grog to '%s'", pSelf->Server()->ClientName(Victim));
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
+	}
+}
+
+void CGameContext::ConSetPermille(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
 	int Victim = pResult->GetVictim();
 	int Permille = pResult->GetFloat(1) * 10.f;
 	CCharacter *pChr = pSelf->GetPlayerChar(Victim);
@@ -1614,19 +1627,6 @@ void CGameContext::ConAddGrog(IConsole::IResult *pResult, void *pUserData)
 		
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "Set permille for '%s' to '%.1f'", pSelf->Server()->ClientName(Victim), Permille / 10.f);
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
-	}
-}
-
-void CGameContext::ConSetPermille(IConsole::IResult *pResult, void *pUserData)
-{
-	CGameContext *pSelf = (CGameContext *)pUserData;
-	int Victim = pResult->NumArguments() ? pResult->GetVictim() : pResult->m_ClientID;
-	CCharacter *pChr = pSelf->GetPlayerChar(Victim);
-	if (pChr && pChr->AddGrog())
-	{
-		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "Added a grog to '%s'", pSelf->Server()->ClientName(Victim));
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
 	}
 }
