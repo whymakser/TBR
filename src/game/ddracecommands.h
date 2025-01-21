@@ -152,6 +152,7 @@ CONSOLE_COMMAND("reload_designs", "", CFGFLAG_SERVER, ConReloadDesigns, this, "R
 
 //grog
 CONSOLE_COMMAND("add_grog", "?v[id]", CFGFLAG_SERVER|CMDFLAG_TEST, ConAddGrog, this, "Gives a grog to player v", AUTHED_ADMIN)
+CONSOLE_COMMAND("set_permille", "v[id] f[permille]", CFGFLAG_SERVER|CMDFLAG_TEST, ConSetPermille, this, "Sets permille for player v", AUTHED_ADMIN)
 
 //fun
 CONSOLE_COMMAND("sound", "i[sound]", CFGFLAG_SERVER, ConSound, this, "Plays the sound with id i", AUTHED_ADMIN)

@@ -1104,6 +1104,7 @@ private:
 
 	static void ConReloadDesigns(IConsole::IResult* pResult, void* pUserData);
 	static void ConAddGrog(IConsole::IResult* pResult, void* pUserData);
+	static void ConSetPermille(IConsole::IResult* pResult, void* pUserData);
 
 	enum
 	{
