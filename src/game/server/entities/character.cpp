@@ -5352,6 +5352,7 @@ void CCharacter::AddCheckpointList(int Port, int Checkpoint)
 void CCharacter::SetCheckpointList(std::vector< std::pair<int, int> > vCheckpoints)
 {
 	m_vCheckpoints = vCheckpoints;
+	m_TeleCheckpoint = 0;
 	for (unsigned int i = 0; i < m_vCheckpoints.size(); i++)
 	{
 		int PortMatch = GameServer()->GetRediretListPort(m_vCheckpoints[i].first);
