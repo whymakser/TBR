@@ -5349,12 +5349,11 @@ void CCharacter::AddCheckpointList(int Port, int Checkpoint)
 
 void CCharacter::SetCheckpointList(std::vector< std::pair<int, int> > vCheckpoints)
 {
-	m_vCheckpoints = vCheckpoints;
-
 	// don't reset checkpoint if we have nothing to use anyways.
-	if (!m_vCheckpoints.size())
+	if (!vCheckpoints.size())
 		return;
 
+	m_vCheckpoints = vCheckpoints;
 	m_TeleCheckpoint = 0;
 
 	for (unsigned int i = 0; i < m_vCheckpoints.size(); i++)
