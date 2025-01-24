@@ -171,6 +171,7 @@ private:
 	int m_IsZombie;
 	int m_IsDoubleXp;
 	std::vector< std::pair<int, int> > m_vCheckpoints;
+	int m_BirthdayGiftTicksLeft;
 
 	// core
 	int m_MoveRestrictionExtraRoomKey;

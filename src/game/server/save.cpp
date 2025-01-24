@@ -212,6 +212,10 @@ void CSaveTee::Save(CCharacter *pChr)
 	m_IsZombie = pChr->m_IsZombie;
 	m_IsDoubleXp = pChr->m_IsDoubleXp;
 	m_vCheckpoints = pChr->m_vCheckpoints;
+	if (pChr->m_BirthdayGiftEndTick)
+	{
+		m_BirthdayGiftTicksLeft = pChr->m_BirthdayGiftEndTick - pChr->Server()->Tick();
+	}
 
 	// core
 	m_MoveRestrictionExtraRoomKey = pChr->Core()->m_MoveRestrictionExtra.m_RoomKey;
@@ -419,6 +423,10 @@ void CSaveTee::Load(CCharacter *pChr, int Team)
 		pChr->SetZombieHuman(m_IsZombie);
 		pChr->m_IsDoubleXp = m_IsDoubleXp;
 		pChr->SetCheckpointList(m_vCheckpoints);
+		if (m_BirthdayGiftTicksLeft)
+		{
+			pChr->m_BirthdayGiftEndTick = pChr->Server()->Tick() + m_BirthdayGiftTicksLeft;
+		}
 
 		// core
 		pChr->Core()->m_MoveRestrictionExtra.m_RoomKey = m_MoveRestrictionExtraRoomKey;
@@ -465,6 +473,10 @@ char* CSaveTee::GetString()
 		char aEntry[32];
 		str_format(aEntry, sizeof(aEntry), "%d:%d,", m_vCheckpoints[i].first, m_vCheckpoints[i].second);
 		str_append(aCheckpointList, aEntry, sizeof(aCheckpointList));
+	}
+	if (!aCheckpointList[0])
+	{
+		str_copy(aCheckpointList, "x_", sizeof(aCheckpointList));
 	}
 
 	str_format(m_aString, sizeof(m_aString),
@@ -517,7 +529,7 @@ char* CSaveTee::GetString()
 		"%d\t%d\t%d\t%d\t%d\t%d\t"
 		"%d\t%d\t%d\t%d\t%d\t%d\t"
 		"%s\t%d\t%d\t%d\t"
-		"%s\t",
+		"%s\t%d",
 		m_aName, m_Alive, m_Paused, m_TeeFinished, m_IsSolo,
 		m_aWeapons[0].m_AmmoRegenStart, m_aWeapons[0].m_Ammo, m_aWeapons[0].m_Got,
 		m_aWeapons[1].m_AmmoRegenStart, m_aWeapons[1].m_Ammo, m_aWeapons[1].m_Got,
@@ -569,7 +581,7 @@ char* CSaveTee::GetString()
 		m_Identity.m_TeeInfo.m_aUseCustomColors[0], m_Identity.m_TeeInfo.m_aUseCustomColors[1], m_Identity.m_TeeInfo.m_aUseCustomColors[2], m_Identity.m_TeeInfo.m_aUseCustomColors[3], m_Identity.m_TeeInfo.m_aUseCustomColors[4], m_Identity.m_TeeInfo.m_aUseCustomColors[5],
 		m_Identity.m_TeeInfo.m_aSkinPartColors[0], m_Identity.m_TeeInfo.m_aSkinPartColors[1], m_Identity.m_TeeInfo.m_aSkinPartColors[2], m_Identity.m_TeeInfo.m_aSkinPartColors[3], m_Identity.m_TeeInfo.m_aSkinPartColors[4], m_Identity.m_TeeInfo.m_aSkinPartColors[5],
 		m_Identity.m_TeeInfo.m_Sevendown.m_SkinName, m_Identity.m_TeeInfo.m_Sevendown.m_UseCustomColor, m_Identity.m_TeeInfo.m_Sevendown.m_ColorBody, m_Identity.m_TeeInfo.m_Sevendown.m_ColorFeet,
-		aCheckpointList
+		aCheckpointList, m_BirthdayGiftTicksLeft
 	);
 	return m_aString;
 }
@@ -630,7 +642,7 @@ int CSaveTee::LoadString(char* String)
 		"%d\t%d\t%d\t%d\t%d\t%d\t"
 		"%d\t%d\t%d\t%d\t%d\t%d\t"
 		"%[^\t]\t%d\t%d\t%d\t"
-		"%[^\t]\t",
+		"%[^\t]\t%d",
 		m_aName, &m_Alive, &m_Paused, &m_TeeFinished, &m_IsSolo,
 		&m_aWeapons[0].m_AmmoRegenStart, &m_aWeapons[0].m_Ammo, &m_aWeapons[0].m_Got,
 		&m_aWeapons[1].m_AmmoRegenStart, &m_aWeapons[1].m_Ammo, &m_aWeapons[1].m_Got,
@@ -682,7 +694,7 @@ int CSaveTee::LoadString(char* String)
 		&m_Identity.m_TeeInfo.m_aUseCustomColors[0], &m_Identity.m_TeeInfo.m_aUseCustomColors[1], &m_Identity.m_TeeInfo.m_aUseCustomColors[2], &m_Identity.m_TeeInfo.m_aUseCustomColors[3], &m_Identity.m_TeeInfo.m_aUseCustomColors[4], &m_Identity.m_TeeInfo.m_aUseCustomColors[5],
 		&m_Identity.m_TeeInfo.m_aSkinPartColors[0], &m_Identity.m_TeeInfo.m_aSkinPartColors[1], &m_Identity.m_TeeInfo.m_aSkinPartColors[2], &m_Identity.m_TeeInfo.m_aSkinPartColors[3], &m_Identity.m_TeeInfo.m_aSkinPartColors[4], &m_Identity.m_TeeInfo.m_aSkinPartColors[5],
 		m_Identity.m_TeeInfo.m_Sevendown.m_SkinName, &m_Identity.m_TeeInfo.m_Sevendown.m_UseCustomColor, &m_Identity.m_TeeInfo.m_Sevendown.m_ColorBody, &m_Identity.m_TeeInfo.m_Sevendown.m_ColorFeet,
-		aCheckpointList
+		aCheckpointList, &m_BirthdayGiftTicksLeft
 	);
 
 	const char *pList = aCheckpointList;
@@ -720,7 +732,7 @@ int CSaveTee::LoadString(char* String)
 	{
 	case 91:
 		return 0;
-	case 252: // F-DDrace extra vars
+	case 253: // F-DDrace extra vars
 		return 0;
 	default:
 		dbg_msg("load", "failed to load tee-string");
