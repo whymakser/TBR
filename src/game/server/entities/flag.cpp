@@ -192,6 +192,17 @@ void CFlag::Tick()
 		}
 	}
 
+	if (!GetCarrier() && !m_AtStand)
+	{
+		if (m_DropTick && Config()->m_SvFlagRespawnDropped && Server()->Tick() > m_DropTick + Server()->TickSpeed() * Config()->m_SvFlagRespawnDropped)
+		{
+			Reset();
+			return;
+		}
+		else
+			HandleDropped();
+	}
+
 	// check tiles inbetween pos and prevpos in case a flag is being carried and the guy has vip+ or a plot door is opened and he tries to skip it with ninja or speed.
 	// in such a case the tee wouldnt be stopped by MoveBox() means he would simply skip the tile without the flag noticing
 	const int End = distance(m_Pos, m_PrevPos)+1;
@@ -216,17 +227,6 @@ void CFlag::Tick()
 			m_Vel = vec2(0, 0);
 			m_Pos = m_PrevPos;
 		}
-	}
-
-	if (!GetCarrier() && !m_AtStand)
-	{
-		if (m_DropTick && Config()->m_SvFlagRespawnDropped && Server()->Tick() > m_DropTick + Server()->TickSpeed() * Config()->m_SvFlagRespawnDropped)
-		{
-			Reset();
-			return;
-		}
-		else
-			HandleDropped();
 	}
 
 	m_TeamMask = GetCarrier() ? GetCarrier()->TeamMask() : Mask128();
