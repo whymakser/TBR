@@ -213,9 +213,9 @@ void CSaveTee::Save(CCharacter *pChr)
 	m_IsDoubleXp = pChr->m_IsDoubleXp;
 	m_vCheckpoints = pChr->m_vCheckpoints;
 	if (pChr->m_BirthdayGiftEndTick)
-	{
 		m_BirthdayGiftTicksLeft = pChr->m_BirthdayGiftEndTick - pChr->Server()->Tick();
-	}
+	else
+		m_BirthdayGiftTicksLeft = 0;
 
 	// core
 	m_MoveRestrictionExtraRoomKey = pChr->Core()->m_MoveRestrictionExtra.m_RoomKey;
