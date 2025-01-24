@@ -439,7 +439,7 @@ void CCharacterCore::Tick(bool UseInput)
 				continue;
 
 			//player *p = (player*)ent;
-			if (pCharCore == this || !pCharCore->m_Collision || (m_Id != -1 && !m_pTeams->CanCollide(m_Id, i, false)))
+			if (pCharCore == this || (m_Id != -1 && !m_pTeams->CanCollide(m_Id, i, false)))
 				continue; // make sure that we don't nudge our self
 
 			// handle player <-> player collision
@@ -452,7 +452,7 @@ void CCharacterCore::Tick(bool UseInput)
 				m_FakeTuneCID = i;
 			}
 
-			if(m_Tuning.m_PlayerCollision && m_pTeams->CanCollide(m_Id, i) && Distance < PHYS_SIZE*1.25f && Distance > 0.0f)
+			if(m_Tuning.m_PlayerCollision && m_Collision && pCharCore->m_Collision && m_pTeams->CanCollide(m_Id, i) && Distance < PHYS_SIZE*1.25f && Distance > 0.0f)
 			{
 				float a = (PHYS_SIZE*1.45f - Distance);
 				float Velocity = 0.5f;
