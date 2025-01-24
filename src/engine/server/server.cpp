@@ -2432,6 +2432,48 @@ void CServer::SendRedirectSaveTeeImpl(bool Add, int Port, const char *pHash)
 	m_NetServer.Send(&Packet, NET_TOKEN_NONE, true);
 }
 
+void CServer::SendPlayerCountUpdate(bool Shutdown)
+{
+	int PlayerCount = 0;
+	if (Shutdown)
+	{
+		PlayerCount = -1;
+	}
+	else
+	{
+		for (int i = 0; i < MAX_CLIENTS; i++)
+			if (m_aClients[i].m_State != CClient::STATE_EMPTY && m_aClients[i].m_State != CClient::STATE_DUMMY && GameServer()->IsClientPlayer(i))
+				PlayerCount++;
+	}
+
+	CPacker Packer;
+	Packer.Reset();
+	Packer.AddRaw(PLAYERCOUNTER_UPDATE, sizeof(PLAYERCOUNTER_UPDATE));
+	Packer.AddInt(Config()->m_SvPort);
+	Packer.AddInt(PlayerCount);
+
+	CNetChunk Packet;
+	Packet.m_ClientID = -1;
+	mem_zero(&Packet.m_Address, sizeof(Packet.m_Address));
+	Packet.m_Address.type = m_NetServer.NetType(SOCKET_MAIN) | NETTYPE_LINK_BROADCAST;
+	Packet.m_Flags = NETSENDFLAG_CONNLESS;
+	Packet.m_DataSize = Packer.Size();
+	Packet.m_pData = Packer.Data();
+
+	const char *pList = Config()->m_SvRedirectServerTilePorts;
+	char aBuf[16];
+	while ((pList = str_next_token(pList, ",", aBuf, sizeof(aBuf))))
+	{
+		int Switch = 0;
+		int Port = 0;
+		if (sscanf(aBuf, "%d:%d", &Switch, &Port) == 2)
+		{
+			Packet.m_Address.port = Port;
+			m_NetServer.Send(&Packet, NET_TOKEN_NONE, true);
+		}
+	}
+}
+
 void CServer::PumpNetwork()
 {
 	CNetChunk Packet;
@@ -2518,6 +2560,19 @@ void CServer::PumpNetwork()
 						continue;
 
 					GameServer()->OnRedirectSaveTeeRemove(pHash);
+				}
+				else if (Packet.m_DataSize >= int(sizeof(PLAYERCOUNTER_UPDATE)) && mem_comp(Packet.m_pData, PLAYERCOUNTER_UPDATE, sizeof(PLAYERCOUNTER_UPDATE)) == 0)
+				{
+					CUnpacker Unpacker;
+					Unpacker.Reset((unsigned char*)Packet.m_pData + sizeof(PLAYERCOUNTER_UPDATE), Packet.m_DataSize - sizeof(PLAYERCOUNTER_UPDATE));
+
+					int Port = Unpacker.GetInt();
+					int PlayerCount = Unpacker.GetInt();
+
+					if (Unpacker.Error())
+						continue;
+
+					GameServer()->OnPlayerCountUpdate(Port, PlayerCount);
 				}
 			}
 			else

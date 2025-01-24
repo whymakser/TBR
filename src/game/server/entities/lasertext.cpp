@@ -315,7 +315,7 @@ void CLaserText::Reset()
 
 void CLaserText::Tick()
 {
-	if(++m_CurTicks - m_StartTick > m_AliveTicks) GameWorld()->DestroyEntity(this);
+	if(m_AliveTicks > 0 && (++m_CurTicks - m_StartTick > m_AliveTicks)) GameWorld()->DestroyEntity(this);
 
 	CCharacter *pOwner = GameServer()->GetPlayerChar(m_Owner);
 	if (pOwner)

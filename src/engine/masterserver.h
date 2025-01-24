@@ -40,5 +40,6 @@ static const unsigned char SERVERBROWSE_FWERROR[] = {255, 255, 255, 255, 'f', 'w
 // redirect tile communication
 static const unsigned char REDIRECT_SAVE_TEE_ADD[] = { 255, 255, 255, 255, 'r', 's', 't', 'a' };
 static const unsigned char REDIRECT_SAVE_TEE_REMOVE[] = { 255, 255, 255, 255, 'r', 's', 't', 'r' };
+static const unsigned char PLAYERCOUNTER_UPDATE[] = { 255, 255, 255, 255, 'p', 'c', 'u', 'p' };
 
 #endif

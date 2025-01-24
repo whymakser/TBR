@@ -15,6 +15,7 @@
 #include <string>
 #include "entities/pickup_drop.h"
 #include "entities/money.h"
+#include "entities/lasertext.h"
 #include "houses/house.h"
 #include "minigames/minigame.h"
 #include "minigames/arenas.h"
@@ -680,7 +681,7 @@ public:
 
 	int CountConnectedPlayers(bool CountSpectators = true, bool ExcludeBots = false);
 
-	void CreateLaserText(vec2 Pos, int Owner, const char* pText, int Seconds = 3);
+	CLaserText *CreateLaserText(vec2 Pos, int Owner, const char* pText, int Seconds = 3, bool AboveTee = true);
 	int MoneyLaserTextTime(int64 Amount) { return Amount < SMALL_MONEY_AMOUNT ? 1 : 3; }
 
 	class CHouse *m_pHouses[NUM_HOUSES];
@@ -787,6 +788,8 @@ public:
 	int GetIdentityIndexByHash(const char *pHash);
 	int GetRediretListPort(int WantedSwitchNumber);
 	int GetRediretListSwitch(int WantedPort);
+
+	void OnPlayerCountUpdate(int Port, int PlayerCount) override;
 
 private:
 

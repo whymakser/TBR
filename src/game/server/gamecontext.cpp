@@ -24,6 +24,7 @@
 #include "entities/speedup.h"
 #include "entities/button.h"
 #include "entities/teleporter.h"
+#include "entities/playercounter.h"
 #include "gamemodes/DDRace.h"
 #include "teeinfo.h"
 #include "gamecontext.h"
@@ -1696,6 +1697,7 @@ void CGameContext::OnClientEnter(int ClientID)
 	m_apPlayers[ClientID]->CheckClanProtection();
 
 	SendStartMessages(ClientID);
+	Server()->SendPlayerCountUpdate();
 }
 
 void CGameContext::SendStartMessages(int ClientID)
@@ -1838,6 +1840,11 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 	m_VoteUpdate = true;
 
 	Server()->ExpireServerInfo();
+
+	if (((CServer*)Server())->m_RunServer != CServer::STOPPING)
+	{
+		Server()->SendPlayerCountUpdate();
+	}
 }
 
 void CGameContext::OnClientEngineJoin(int ClientID)
@@ -4313,6 +4320,8 @@ void CGameContext::FDDraceInit()
 	char aPath[IO_MAX_PATH_LENGTH];
 	str_format(aPath, sizeof(aPath), "%s/presets", Config()->m_SvPlotFilePath);
 	Storage()->ListDirectory(IStorage::TYPE_ALL, aPath, LoadPresetListCallback, this);
+
+	Server()->SendPlayerCountUpdate();
 }
 
 void CGameContext::DeleteTempfile()
@@ -4515,6 +4524,7 @@ void CGameContext::OnPreShutdown()
 		Console()->ExecuteLine(aBuf);
 	}
 	Server()->SaveWhitelist();
+	Server()->SendPlayerCountUpdate(true);
 }
 
 void CGameContext::OnShutdown(bool FullShutdown)
@@ -6652,6 +6662,15 @@ int CGameContext::GetIdentityIndexByHash(const char *pHash)
 	return -1;
 }
 
+void CGameContext::OnPlayerCountUpdate(int Port, int PlayerCount)
+{
+	CPlayerCounter *pEnt = (CPlayerCounter *)m_World.FindFirst(CGameWorld::ENTTYPE_PLAYER_COUNTER);
+	for (; pEnt; pEnt = (CPlayerCounter *)pEnt->TypeNext())
+	{
+		pEnt->OnUpdate(Port, PlayerCount);
+	}
+}
+
 int CGameContext::GetRediretListPort(int WantedSwitchNumber)
 {
 	const char *pList = Config()->m_SvRedirectServerTilePorts;
@@ -7396,10 +7415,15 @@ void CGameContext::SetMapSpecificOptions()
 	}
 }
 
-void CGameContext::CreateLaserText(vec2 Pos, int Owner, const char *pText, int Seconds)
+CLaserText *CGameContext::CreateLaserText(vec2 Pos, int Owner, const char *pText, int Seconds, bool AboveTee)
 {
-	Pos.y -= 40.f * 2.5f;
-	new CLaserText(&m_World, Pos, Owner, Server()->TickSpeed() * Seconds, pText, (int)(strlen(pText)));
+	if (AboveTee)
+	{
+		Pos.y -= 70.f;
+	}
+	Pos.y -= 32.f;
+	Pos.x -= 16.f;
+	return new CLaserText(&m_World, Pos, Owner, Seconds > 0 ? Server()->TickSpeed() * Seconds : -1, pText, (int)(strlen(pText)));
 }
 
 void CGameContext::SpawnHelicopter(vec2 Pos)

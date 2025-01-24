@@ -275,6 +275,7 @@ public:
 
 	virtual void SendRedirectSaveTeeAdd(int Port, const char *pHash) = 0;
 	virtual void SendRedirectSaveTeeRemove(int Port, const char *pHash) = 0;
+	virtual void SendPlayerCountUpdate(bool Shutdown = false) = 0;
 
 	virtual void SendMsgRaw(int ClientID, const void *pData, int Size, int Flags) = 0;
 
@@ -326,6 +327,7 @@ public:
 
 	virtual void OnRedirectSaveTeeAdd(const char *pHash) = 0;
 	virtual void OnRedirectSaveTeeRemove(const char *pHash) = 0;
+	virtual void OnPlayerCountUpdate(int Port, int PlayerCount) = 0;
 
 	virtual const CUuid GameUuid() const = 0;
 	virtual const char *GameType() const = 0;

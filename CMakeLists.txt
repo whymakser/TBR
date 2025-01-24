@@ -1542,6 +1542,8 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   entities/pickup_drop.h
   entities/plasma.cpp
   entities/plasma.h
+  entities/playercounter.cpp
+  entities/playercounter.h
   entities/portal.cpp
   entities/portal.h
   entities/portalblocker.cpp

@@ -6,6 +6,7 @@
 
 #include "entities/character.h"
 #include "entities/pickup.h"
+#include "entities/playercounter.h"
 #include "gamecontext.h"
 #include "gamecontroller.h"
 #include "player.h"
@@ -230,10 +231,22 @@ bool IGameController::OnEntity(int Index, vec2 Pos, int Layer, int Flags, int Nu
 	}
 	else if (Layer == LAYER_SWITCH && Index == TILE_SWITCH_REDIRECT_SERVER_TO && Number > 0)
 	{
-		CCollision::SRedirectTile RedirectTile;
-		RedirectTile.m_Number = Number;
-		RedirectTile.m_Pos = Pos;
-		GameServer()->Collision()->m_vRedirectTiles.push_back(RedirectTile);
+		int Delay = GameServer()->Collision()->GetSwitchDelay(GameServer()->Collision()->GetMapIndex(Pos));
+		if (Delay == 0)
+		{
+			CCollision::SRedirectTile RedirectTile;
+			RedirectTile.m_Number = Number;
+			RedirectTile.m_Pos = Pos;
+			GameServer()->Collision()->m_vRedirectTiles.push_back(RedirectTile);
+		}
+		else
+		{
+			int Port = GameServer()->GetRediretListPort(Number);
+			if (Port > 0)
+			{
+				new CPlayerCounter(&GameServer()->m_World, Pos, Port);
+			}
+		}
 	}
 	else if(Index == ENTITY_CRAZY_SHOTGUN_EX)
 	{
