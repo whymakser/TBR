@@ -439,7 +439,7 @@ void CCharacterCore::Tick(bool UseInput)
 				continue;
 
 			//player *p = (player*)ent;
-			if (pCharCore == this || (m_Id != -1 && !m_pTeams->CanCollide(m_Id, i, false)))
+			if (pCharCore == this || !pCharCore->m_Collision || (m_Id != -1 && !m_pTeams->CanCollide(m_Id, i, false)))
 				continue; // make sure that we don't nudge our self
 
 			// handle player <-> player collision
