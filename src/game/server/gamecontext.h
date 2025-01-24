@@ -790,6 +790,8 @@ public:
 	int GetRediretListSwitch(int WantedPort);
 
 	void OnPlayerCountUpdate(int Port, int PlayerCount) override;
+	void SendPlayerCountUpdate(bool Shutdown = false);
+	int64 m_LastPlayerCountUpdate;
 
 private:
 

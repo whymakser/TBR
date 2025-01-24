@@ -1487,6 +1487,12 @@ void CGameContext::OnTick()
 		}
 	}
 
+	if (m_LastPlayerCountUpdate + Server()->TickSpeed() * 60 < Server()->Tick())
+	{
+		SendPlayerCountUpdate();
+	}
+
+
 #ifdef CONF_DEBUG
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
@@ -1697,7 +1703,7 @@ void CGameContext::OnClientEnter(int ClientID)
 	m_apPlayers[ClientID]->CheckClanProtection();
 
 	SendStartMessages(ClientID);
-	Server()->SendPlayerCountUpdate();
+	SendPlayerCountUpdate();
 }
 
 void CGameContext::SendStartMessages(int ClientID)
@@ -1843,7 +1849,7 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 
 	if (((CServer*)Server())->m_RunServer != CServer::STOPPING)
 	{
-		Server()->SendPlayerCountUpdate();
+		SendPlayerCountUpdate();
 	}
 }
 
@@ -4321,7 +4327,8 @@ void CGameContext::FDDraceInit()
 	str_format(aPath, sizeof(aPath), "%s/presets", Config()->m_SvPlotFilePath);
 	Storage()->ListDirectory(IStorage::TYPE_ALL, aPath, LoadPresetListCallback, this);
 
-	Server()->SendPlayerCountUpdate();
+	m_LastPlayerCountUpdate = 0;
+	SendPlayerCountUpdate();
 }
 
 void CGameContext::DeleteTempfile()
@@ -4524,7 +4531,7 @@ void CGameContext::OnPreShutdown()
 		Console()->ExecuteLine(aBuf);
 	}
 	Server()->SaveWhitelist();
-	Server()->SendPlayerCountUpdate(true);
+	SendPlayerCountUpdate(true);
 }
 
 void CGameContext::OnShutdown(bool FullShutdown)
@@ -6669,6 +6676,12 @@ void CGameContext::OnPlayerCountUpdate(int Port, int PlayerCount)
 	{
 		pEnt->OnUpdate(Port, PlayerCount);
 	}
+}
+
+void CGameContext::SendPlayerCountUpdate(bool Shutdown)
+{
+	m_LastPlayerCountUpdate = Server()->Tick();
+	Server()->SendPlayerCountUpdate(Shutdown);
 }
 
 int CGameContext::GetRediretListPort(int WantedSwitchNumber)

@@ -57,7 +57,7 @@ void CPlayerCounter::Update(int PlayerCount)
 
 void CPlayerCounter::Tick()
 {
-	if (m_LastUpdate && m_LastUpdate + Server()->TickSpeed() * 120 < Server()->Tick())
+	if (m_LastUpdate && m_LastUpdate + Server()->TickSpeed() * 65 < Server()->Tick())
 	{
 		Update(-1);
 	}
