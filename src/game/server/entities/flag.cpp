@@ -220,7 +220,7 @@ void CFlag::Tick()
 		int MapIndex = GameServer()->Collision()->GetMapIndex(Pos);
 		int TileIndex = GameServer()->Collision()->GetTileIndex(MapIndex);
 		int TileFIndex = GameServer()->Collision()->GetFTileIndex(MapIndex);
-		if (TileIndex == TILE_VIP_PLUS_ONLY || TileFIndex == TILE_VIP_PLUS_ONLY || TileIndex == TILE_FLAG_RESET || TileFIndex == TILE_FLAG_RESET)
+		if (TileIndex == TILE_VIP_PLUS_ONLY || TileFIndex == TILE_VIP_PLUS_ONLY || TileIndex == TILE_FLAG_STOP || TileFIndex == TILE_FLAG_STOP)
 		{
 			GameServer()->CreateDeath(m_Pos, GetCarrier() ? m_Carrier : GetLastCarrier() ? m_LastCarrier : -1);
 			Drop();

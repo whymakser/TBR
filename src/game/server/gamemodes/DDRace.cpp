@@ -256,6 +256,8 @@ void CGameControllerDDRace::ForceFlagOwner(int ClientID, int Team)
 		if (F->GetCarrier())
 			F->SetLastCarrier(F->GetCarrier()->GetPlayer()->GetCID());
 		F->Grab(ClientID);
+		F->SetPos(pChr->GetPos());
+		F->SetPrevPos(pChr->GetPos());
 	}
 	else if (ClientID == -1)
 		F->Reset();

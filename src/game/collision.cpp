@@ -1855,8 +1855,8 @@ int CCollision::IntersectLineFlagPickup(vec2 Pos0, vec2 Pos1, vec2* pOutCollisio
 		int Index = GetIndex(Nx, Ny);
 		int FIndex = GetFIndex(Nx, Ny);
 
-		bool GameLayerBlocked = Index == TILE_VIP_PLUS_ONLY || Index == TILE_FLAG_RESET;
-		bool FrontLayerBlocked = FIndex == TILE_VIP_PLUS_ONLY || Index == TILE_FLAG_RESET;
+		bool GameLayerBlocked = Index == TILE_VIP_PLUS_ONLY || Index == TILE_FLAG_STOP;
+		bool FrontLayerBlocked = FIndex == TILE_VIP_PLUS_ONLY || Index == TILE_FLAG_STOP;
 		int PlotDoor = GetPlotBySwitch(CheckPointDoor(Pos, 0, true, false));
 
 		if (CheckPoint(ix, iy) || GameLayerBlocked || FrontLayerBlocked || PlotDoor)
