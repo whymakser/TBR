@@ -154,6 +154,14 @@ void CFlag::TeleToPlot(int PlotID)
 	m_Pos = m_PrevPos = GameServer()->m_aPlots[PlotID].m_ToTele;
 }
 
+void CFlag::ResetPrevPos()
+{
+	GameServer()->CreateDeath(m_Pos, GetCarrier() ? m_Carrier : GetLastCarrier() ? m_LastCarrier : -1);
+	Drop();
+	m_Vel = vec2(0, 0);
+	m_Pos = m_PrevPos;
+}
+
 void CFlag::Tick()
 {
 	// for the CAdvancedEntity part
@@ -222,10 +230,7 @@ void CFlag::Tick()
 		int TileFIndex = GameServer()->Collision()->GetFTileIndex(MapIndex);
 		if (TileIndex == TILE_VIP_PLUS_ONLY || TileFIndex == TILE_VIP_PLUS_ONLY || TileIndex == TILE_FLAG_STOP || TileFIndex == TILE_FLAG_STOP)
 		{
-			GameServer()->CreateDeath(m_Pos, GetCarrier() ? m_Carrier : GetLastCarrier() ? m_LastCarrier : -1);
-			Drop();
-			m_Vel = vec2(0, 0);
-			m_Pos = m_PrevPos;
+			ResetPrevPos();
 		}
 	}
 

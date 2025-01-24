@@ -3129,6 +3129,17 @@ void CCharacter::HandleTiles(int Index)
 		ResetOnlyFirstPortal();
 	}
 
+	// gets checked in flag.cpp already, but in case a flag stop tile is placed in a teleporter, we wanna drop it
+	if ((m_TileIndex == TILE_FLAG_STOP) || (m_TileFIndex == TILE_FLAG_STOP))
+	{
+		int Flag = HasFlag();
+		if (Flag != -1)
+		{
+			CFlag *pFlag = ((CGameControllerDDRace*)GameServer()->m_pController)->m_apFlags[Flag];
+			pFlag->ResetPrevPos();
+		}
+	}
+
 	int PlotDoor = GameServer()->Collision()->GetPlotBySwitch(GameServer()->Collision()->CheckPointDoor(m_Pos, Team(), true, false));
 	if (PlotDoor >= PLOT_START && m_pPlayer->m_pPortal[PORTAL_FIRST] && !m_pPlayer->m_pPortal[PORTAL_SECOND])
 	{
