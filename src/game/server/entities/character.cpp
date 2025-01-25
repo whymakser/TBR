@@ -3123,7 +3123,7 @@ void CCharacter::HandleTiles(int Index)
 	}
 
 	// vip plus only
-	if ((m_TileIndex == TILE_VIP_PLUS_ONLY) || (m_TileFIndex == TILE_VIP_PLUS_ONLY))
+	if ((m_TileIndex == TILE_VIP_PLUS_ONLY) || (m_TileFIndex == TILE_VIP_PLUS_ONLY) || (m_TileIndex == TILE_REM_FIRST_PORTAL) || (m_TileFIndex == TILE_REM_FIRST_PORTAL))
 	{
 		// only reset portal if we have only shot the first one. if both are there already it means they are either both inside, or both outside.
 		ResetOnlyFirstPortal();
