@@ -61,14 +61,13 @@ class CVotingMenu
 		PREVFLAG_ACC_VIP_PLUS_EPICCIRCLE = 1 << 13,
 		PREVFLAG_ACC_VIP_PLUS_LOVELY = 1 << 14,
 		PREVFLAG_ACC_VIP_PLUS_RAINBOWNAME = 1 << 15,
-		PREVFLAG_ACC_VIP_PLUS_SPARKLE = 1 << 16,
 		// Acc Misc
-		PREVFLAG_ACC_MISC_SILENTFARM = 1 << 17,
-		PREVFLAG_ACC_NINJAJETPACK = 1 << 18,
+		PREVFLAG_ACC_MISC_SILENTFARM = 1 << 16,
+		PREVFLAG_ACC_NINJAJETPACK = 1 << 17,
 		// Acc Plot
-		PREVFLAG_PLOT_SPAWN = 1 << 19,
+		PREVFLAG_PLOT_SPAWN = 1 << 18,
 		// Resend when no plus xp is found (means no flag and no moneytile)
-		PREVFLAG_ISPLUSXP = 1 << 20,
+		PREVFLAG_ISPLUSXP = 1 << 19,
 	};
 
 	CGameContext *m_pGameServer;

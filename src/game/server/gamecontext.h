@@ -949,7 +949,6 @@ private:
 	static void ConRainbowHookVIP(IConsole::IResult* pResult, void* pUserData);
 	static void ConRainbowNameVIP(IConsole::IResult* pResult, void* pUserData);
 	static void ConRainbowSpeedVIP(IConsole::IResult* pResult, void* pUserData);
-	static void ConSparkleVIP(IConsole::IResult* pResult, void* pUserData);
 	static void ConShrug(IConsole::IResult* pResult, void* pUserData);
 
 	static void ConPlot(IConsole::IResult* pResult, void* pUserData);
