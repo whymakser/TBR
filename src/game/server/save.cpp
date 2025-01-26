@@ -202,7 +202,6 @@ void CSaveTee::Save(CCharacter *pChr)
 	m_EpicCircle = pChr->m_EpicCircle;
 	m_StaffInd = pChr->m_StaffInd;
 	m_Confetti = pChr->m_Confetti;
-	m_Sparkle = pChr->m_Sparkle;
 	m_InNoBonusArea = pChr->m_NoBonusContext.m_InArea;
 	m_NumGrogsHolding = pChr->m_NumGrogsHolding;
 	m_Permille = pChr->m_Permille;
@@ -238,6 +237,7 @@ void CSaveTee::Save(CCharacter *pChr)
 	m_JailTime = pChr->GetPlayer()->m_JailTime;
 	m_EscapeTime = pChr->GetPlayer()->m_EscapeTime;
 	m_RainbowName = pChr->GetPlayer()->m_RainbowName;
+	m_Sparkle = pChr->GetPlayer()->m_Sparkle;
 	m_IsBirthdayGift = pChr->GetPlayer()->m_IsBirthdayGift;
 	m_TaserShield = pChr->GetPlayer()->m_TaserShield;
 	m_DoubleXpLifesLeft = pChr->GetPlayer()->m_DoubleXpLifesLeft;
@@ -411,7 +411,6 @@ void CSaveTee::Load(CCharacter *pChr, int Team)
 		pChr->EpicCircle(m_EpicCircle, -1, true);
 		pChr->StaffInd(m_StaffInd, -1, true);
 		pChr->Confetti(m_Confetti, -1, true);
-		pChr->Sparkle(m_Sparkle, -1, true);
 		pChr->OnNoBonusArea(m_InNoBonusArea, true);
 		for (int i = 0; i < m_NumGrogsHolding; i++)
 			pChr->AddGrog();
@@ -446,6 +445,7 @@ void CSaveTee::Load(CCharacter *pChr, int Team)
 		pChr->GetPlayer()->m_PlotSpawn = m_PlotSpawn;
 		pChr->GetPlayer()->m_HasRoomKey = m_HasRoomKey;
 		pChr->RainbowName(m_RainbowName, -1, true);
+		pChr->Sparkle(m_Sparkle, -1, true);
 		pChr->GetPlayer()->m_IsBirthdayGift = m_IsBirthdayGift;
 		pChr->GetPlayer()->m_TaserShield = m_TaserShield;
 		pChr->GetPlayer()->m_DoubleXpLifesLeft = m_DoubleXpLifesLeft;

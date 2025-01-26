@@ -150,6 +150,8 @@ void CPlayer::Reset()
 
 	m_RainbowSpeed = GameServer()->Config()->m_SvRainbowSpeedDefault;
 	m_RainbowColor = 0;
+	m_RainbowName = false;
+	m_Sparkle = false;
 	m_InfRainbow = false;
 	m_InfMeteors = 0;
 

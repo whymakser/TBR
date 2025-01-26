@@ -2200,7 +2200,7 @@ int CCharacter::GetDDNetCharacterFlags(int SnappingClient)
 		Flags |= CHARACTERFLAG_LOCK_MODE;
 	//if(Teams()->TeamLocked(Team()))
 	//	Flags |= CHARACTERFLAG_TEAM0_MODE;
-	if(m_Sparkle)
+	if(m_pPlayer->m_Sparkle)
 		Flags |= CHARACTERFLAG_INVINCIBLE;
 
 	return Flags;
@@ -4146,7 +4146,6 @@ void CCharacter::FDDraceInit()
 	m_EpicCircle = false;
 	m_StaffInd = false;
 	m_Confetti = false;
-	m_Sparkle = false;
 
 	for (int i = 0; i < EUntranslatedMap::NUM_IDS; i++)
 		m_aUntranslatedID[i] = Server()->SnapNewID();
@@ -6101,7 +6100,7 @@ void CCharacter::Confetti(bool Set, int FromID, bool Silent)
 
 void CCharacter::Sparkle(bool Set, int FromID, bool Silent)
 {
-	m_Sparkle = Set;
+	m_pPlayer->m_Sparkle = Set;
 	GameServer()->SendExtraMessage(SPARKLE, m_pPlayer->GetCID(), Set, FromID, Silent);
 }
 
@@ -6265,5 +6264,5 @@ void CCharacter::OnSparkleVIP()
 		return;
 	}
 
-	Sparkle(!m_Sparkle, m_pPlayer->GetCID());
+	Sparkle(!m_pPlayer->m_Sparkle, m_pPlayer->GetCID());
 }

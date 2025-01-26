@@ -470,7 +470,6 @@ public:
 	bool m_EpicCircle;
 	bool m_StaffInd;
 	bool m_Confetti;
-	bool m_Sparkle;
 
 	void ResetOnlyFirstPortal();
 	int64 m_LastLinkedPortals;

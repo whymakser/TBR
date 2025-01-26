@@ -283,6 +283,7 @@ public:
 	int m_RainbowColor;
 	void RainbowTick();
 	bool m_RainbowName;
+	bool m_Sparkle;
 
 	bool m_InfRainbow;
 	int m_InfMeteors;

@@ -1398,7 +1398,7 @@ void CGameContext::ConSparkle(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	int Victim = pResult->NumArguments() ? pResult->GetVictim() : pResult->m_ClientID;
 	CCharacter *pChr = pSelf->GetPlayerChar(Victim);
-	if (pChr) pChr->Sparkle(!pChr->m_Sparkle, pResult->m_ClientID);
+	if (pChr) pChr->Sparkle(!pChr->GetPlayer()->m_Sparkle, pResult->m_ClientID);
 }
 
 void CGameContext::ConForceTransformZombie(IConsole::IResult *pResult, void *pUserData)
