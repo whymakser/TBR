@@ -6255,3 +6255,14 @@ void CCharacter::OnRainbowNameVIP()
 
 	RainbowName(!m_pPlayer->m_RainbowName, m_pPlayer->GetCID());
 }
+
+void CCharacter::OnSparkleVIP()
+{
+	if (GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP != VIP_PLUS)
+	{
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP+");
+		return;
+	}
+
+	Sparkle(!m_pPlayer->m_Sparkle, m_pPlayer->GetCID());
+}

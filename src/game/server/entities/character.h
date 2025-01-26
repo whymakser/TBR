@@ -202,6 +202,7 @@ public:
 	void OnEpicCircleVIP();
 	void OnLovelyVIP();
 	void OnRainbowNameVIP();
+	void OnSparkleVIP();
 
 private:
 	// player controlling this character
