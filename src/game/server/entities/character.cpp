@@ -2200,7 +2200,7 @@ int CCharacter::GetDDNetCharacterFlags(int SnappingClient)
 		Flags |= CHARACTERFLAG_LOCK_MODE;
 	//if(Teams()->TeamLocked(Team()))
 	//	Flags |= CHARACTERFLAG_TEAM0_MODE;
-	if(m_pPlayer->m_Sparkle)
+	if(m_pPlayer->m_Sparkle && (SnappingClient != m_pPlayer->GetCID() || !(m_Core.m_Jumped & 2)))
 		Flags |= CHARACTERFLAG_INVINCIBLE;
 
 	return Flags;
