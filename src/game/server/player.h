@@ -303,6 +303,8 @@ public:
 
 	//account
 	int GetAccID();
+	void UpdateAccID();
+	int m_AccountID;
 	void GiveXP(int64 Amount, const char *pMessage = "");
 	void GiveBlockPoints(int Amount, int Victim);
 	bool GiveTaserBattery(int Amount);
