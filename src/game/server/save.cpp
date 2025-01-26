@@ -202,6 +202,7 @@ void CSaveTee::Save(CCharacter *pChr)
 	m_EpicCircle = pChr->m_EpicCircle;
 	m_StaffInd = pChr->m_StaffInd;
 	m_Confetti = pChr->m_Confetti;
+	m_Sparkle = pChr->m_Sparkle;
 	m_InNoBonusArea = pChr->m_NoBonusContext.m_InArea;
 	m_NumGrogsHolding = pChr->m_NumGrogsHolding;
 	m_Permille = pChr->m_Permille;
@@ -410,6 +411,7 @@ void CSaveTee::Load(CCharacter *pChr, int Team)
 		pChr->EpicCircle(m_EpicCircle, -1, true);
 		pChr->StaffInd(m_StaffInd, -1, true);
 		pChr->Confetti(m_Confetti, -1, true);
+		pChr->Sparkle(m_Sparkle, -1, true);
 		pChr->OnNoBonusArea(m_InNoBonusArea, true);
 		for (int i = 0; i < m_NumGrogsHolding; i++)
 			pChr->AddGrog();
@@ -521,7 +523,7 @@ char* CSaveTee::GetString()
 		"%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t"
 		"%d\t%d\t%d\t%d\t"
 		"%d\t%d\t%lld\t%d\t%d\t%d\t"
-		"%d\t%d\t%d\t%d\t%d\t%d\t"
+		"%d\t%d\t%d\t%d\t%d\t%d\t%d\t"
 		"%d\t%d\t%d\t%lld\t%d\t%d\t%d\t%d\t%d\t%d\t"
 		"%lld\t%lld\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t"
 		"%s\t%s\t%s\t%s\t%lld\t%d\t"
@@ -573,7 +575,7 @@ char* CSaveTee::GetString()
 		m_FakeTuneCollision, m_OldFakeTuneCollision, m_Passive, m_PoliceHelper, m_Item, m_DoorHammer, m_AlwaysTeleWeapon, m_FreezeHammer,
 		m_aSpawnWeaponActive[0], m_aSpawnWeaponActive[1], m_aSpawnWeaponActive[2], m_PassiveTicksLeft,
 		m_HasFinishedSpecialRace, m_GotMoneyXPBomb, m_SpawnTick, m_KillStreak, m_MaxJumps, m_CarriedFlag,
-		m_MoveRestrictionExtraRoomKey, m_Lovely, m_RotatingBall, m_EpicCircle, m_StaffInd, m_Confetti,
+		m_MoveRestrictionExtraRoomKey, m_Lovely, m_RotatingBall, m_EpicCircle, m_StaffInd, m_Confetti, m_Sparkle,
 		m_Gamemode, m_SavedGamemode, m_Minigame, m_WalletMoney, m_RainbowSpeed, m_InfRainbow, m_InfMeteors, m_HasSpookyGhost, m_PlotSpawn, m_HasRoomKey,
 		m_JailTime, m_EscapeTime, m_CollectedPortalRifle, m_RainbowName, m_InNoBonusArea, m_PreviousPort, m_NumGrogsHolding, m_Permille, m_TicksSinceFirstPermille, m_IsBirthdayGift, m_IsZombie, m_TaserShield, m_DoubleXpLifesLeft, m_IsDoubleXp,
 		m_Identity.m_aAccUsername, aSavedAddress, m_Identity.m_aTimeoutCode, m_Identity.m_aName, (int64)m_Identity.m_ExpireDate, m_Identity.m_RedirectTilePort,
@@ -634,7 +636,7 @@ int CSaveTee::LoadString(char* String)
 		"%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t"
 		"%d\t%d\t%d\t%d\t"
 		"%d\t%d\t%lld\t%d\t%d\t%d\t"
-		"%d\t%d\t%d\t%d\t%d\t%d\t"
+		"%d\t%d\t%d\t%d\t%d\t%d\t%d\t"
 		"%d\t%d\t%d\t%lld\t%d\t%d\t%d\t%d\t%d\t%d\t"
 		"%lld\t%lld\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t"
 		"%[^\t]\t%[^\t]\t%[^\t]\t%[^\t]\t%lld\t%d\t"
@@ -686,7 +688,7 @@ int CSaveTee::LoadString(char* String)
 		&m_FakeTuneCollision, &m_OldFakeTuneCollision, &m_Passive, &m_PoliceHelper, &m_Item, &m_DoorHammer, &m_AlwaysTeleWeapon, &m_FreezeHammer,
 		&m_aSpawnWeaponActive[0], &m_aSpawnWeaponActive[1], &m_aSpawnWeaponActive[2], &m_PassiveTicksLeft,
 		&m_HasFinishedSpecialRace, &m_GotMoneyXPBomb, &m_SpawnTick, &m_KillStreak, &m_MaxJumps, &m_CarriedFlag,
-		&m_MoveRestrictionExtraRoomKey, &m_Lovely, &m_RotatingBall, &m_EpicCircle, &m_StaffInd, &m_Confetti,
+		&m_MoveRestrictionExtraRoomKey, &m_Lovely, &m_RotatingBall, &m_EpicCircle, &m_StaffInd, &m_Confetti, &m_Sparkle,
 		&m_Gamemode, &m_SavedGamemode, &m_Minigame, &m_WalletMoney, &m_RainbowSpeed, &m_InfRainbow, &m_InfMeteors, &m_HasSpookyGhost, &m_PlotSpawn, &m_HasRoomKey,
 		&m_JailTime, &m_EscapeTime, &m_CollectedPortalRifle, &m_RainbowName, &m_InNoBonusArea, &m_PreviousPort, &m_NumGrogsHolding, &m_Permille, &m_TicksSinceFirstPermille, &m_IsBirthdayGift, &m_IsZombie, &m_TaserShield, &m_DoubleXpLifesLeft, &m_IsDoubleXp,
 		m_Identity.m_aAccUsername, aSavedAddress, m_Identity.m_aTimeoutCode, m_Identity.m_aName, &ExpireDate, &m_Identity.m_RedirectTilePort,
@@ -732,7 +734,7 @@ int CSaveTee::LoadString(char* String)
 	{
 	case 91:
 		return 0;
-	case 253: // F-DDrace extra vars
+	case 254: // F-DDrace extra vars
 		return 0;
 	default:
 		dbg_msg("load", "failed to load tee-string");

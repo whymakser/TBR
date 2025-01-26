@@ -164,6 +164,7 @@ private:
 	int m_EpicCircle;
 	int m_StaffInd;
 	int m_Confetti;
+	int m_Sparkle;
 	int m_InNoBonusArea;
 	int m_NumGrogsHolding;
 	int m_Permille;

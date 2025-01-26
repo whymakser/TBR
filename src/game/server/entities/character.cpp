@@ -2200,6 +2200,8 @@ int CCharacter::GetDDNetCharacterFlags(int SnappingClient)
 		Flags |= CHARACTERFLAG_LOCK_MODE;
 	//if(Teams()->TeamLocked(Team()))
 	//	Flags |= CHARACTERFLAG_TEAM0_MODE;
+	if(m_Sparkle)
+		Flags |= CHARACTERFLAG_INVINCIBLE;
 
 	return Flags;
 }
@@ -4144,6 +4146,7 @@ void CCharacter::FDDraceInit()
 	m_EpicCircle = false;
 	m_StaffInd = false;
 	m_Confetti = false;
+	m_Sparkle = false;
 
 	for (int i = 0; i < EUntranslatedMap::NUM_IDS; i++)
 		m_aUntranslatedID[i] = Server()->SnapNewID();
@@ -6096,6 +6099,12 @@ void CCharacter::Confetti(bool Set, int FromID, bool Silent)
 	GameServer()->SendExtraMessage(CONFETTI, m_pPlayer->GetCID(), Set, FromID, Silent);
 }
 
+void CCharacter::Sparkle(bool Set, int FromID, bool Silent)
+{
+	m_Sparkle = Set;
+	GameServer()->SendExtraMessage(SPARKLE, m_pPlayer->GetCID(), Set, FromID, Silent);
+}
+
 void CCharacter::SetJumps(int NewJumps, bool Silent)
 {
 	if (NewJumps == m_Core.m_Jumps)
@@ -6246,4 +6255,15 @@ void CCharacter::OnRainbowNameVIP()
 	}
 
 	RainbowName(!m_pPlayer->m_RainbowName, m_pPlayer->GetCID());
+}
+
+void CCharacter::OnSparkleVIP()
+{
+	if (GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP != VIP_PLUS)
+	{
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP+");
+		return;
+	}
+
+	Sparkle(!m_Sparkle, m_pPlayer->GetCID());
 }

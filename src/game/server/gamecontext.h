@@ -949,6 +949,7 @@ private:
 	static void ConRainbowHookVIP(IConsole::IResult* pResult, void* pUserData);
 	static void ConRainbowNameVIP(IConsole::IResult* pResult, void* pUserData);
 	static void ConRainbowSpeedVIP(IConsole::IResult* pResult, void* pUserData);
+	static void ConSparkleVIP(IConsole::IResult* pResult, void* pUserData);
 	static void ConShrug(IConsole::IResult* pResult, void* pUserData);
 
 	static void ConPlot(IConsole::IResult* pResult, void* pUserData);
@@ -1063,6 +1064,7 @@ private:
 	static void ConStaffInd(IConsole::IResult* pResult, void* pUserData);
 	static void ConRainbowName(IConsole::IResult* pResult, void* pUserData);
 	static void ConConfetti(IConsole::IResult* pResult, void* pUserData);
+	static void ConSparkle(IConsole::IResult* pResult, void* pUserData);
 
 	static void ConAccLogoutPort(IConsole::IResult* pResult, void* pUserData);
 	static void ConAccLogout(IConsole::IResult* pResult, void* pUserData);

@@ -215,6 +215,7 @@ CONSOLE_COMMAND("epiccircle", "?v[id]", CFGFLAG_SERVER, ConEpicCircle, this, "To
 CONSOLE_COMMAND("staffind", "?v[id]", CFGFLAG_SERVER, ConStaffInd, this, "Toggles staff indicator for player v", AUTHED_ADMIN)
 CONSOLE_COMMAND("rainbowname", "?v[id]", CFGFLAG_SERVER, ConRainbowName, this, "Toggles rainbow name for player v", AUTHED_ADMIN)
 CONSOLE_COMMAND("confetti", "?v[id]", CFGFLAG_SERVER, ConConfetti, this, "Toggles confetti for player v", AUTHED_ADMIN)
+CONSOLE_COMMAND("sparkle", "?v[id]", CFGFLAG_SERVER, ConSparkle, this, "Toggles sparkle for player v", AUTHED_ADMIN)
 
 //account
 CONSOLE_COMMAND("acc_logout_port", "i[port]", CFGFLAG_SERVER, ConAccLogoutPort, this, "Logs out all accounts with last port i", AUTHED_ADMIN)

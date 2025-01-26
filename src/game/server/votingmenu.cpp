@@ -41,6 +41,7 @@ static const char *ACC_VIP_PLUS_EPICCIRCLE = "Epic Circle";
 static const char *ACC_VIP_PLUS_LOVELY = "Lovely";
 static const char *ACC_VIP_PLUS_RAINBOWNAME = "Rainbow Name";
 static const char *ACC_VIP_PLUS_RAINBOWSPEED = "Rainbow Speed";
+static const char *ACC_VIP_PLUS_SPARKLE = "Sparkle";
 // Misc
 static const char *MISC_HIDEDRAWINGS = "Hide Drawings";
 static const char *MISC_WEAPONINDICATOR = "Weapon Indicator";
@@ -361,6 +362,11 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc, const char *
 		if (IsOption(pDesc, ACC_VIP_PLUS_RAINBOWNAME))
 		{
 			if (pChr) pChr->OnRainbowNameVIP();
+			return true;
+		}
+		if (IsOption(pDesc, ACC_VIP_PLUS_SPARKLE))
+		{
+			if (pChr) pChr->OnSparkleVIP();
 			return true;
 		}
 		if (IsOptionWithSuffix(pDesc, ACC_VIP_PLUS_RAINBOWSPEED))
@@ -716,6 +722,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 			DoLineToggleOption(Page, pNumOptions, ACC_VIP_PLUS_EPICCIRCLE, pChr && pChr->m_EpicCircle);
 			DoLineToggleOption(Page, pNumOptions, ACC_VIP_PLUS_LOVELY, pChr && pChr->m_Lovely);
 			DoLineToggleOption(Page, pNumOptions, ACC_VIP_PLUS_RAINBOWNAME, pPlayer->m_RainbowName);
+			DoLineToggleOption(Page, pNumOptions, ACC_VIP_PLUS_SPARKLE, pChr && pChr->m_Sparkle);
 		}
 	}
 }
@@ -876,6 +883,8 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 					Flags |= PREVFLAG_ACC_VIP_PLUS_LOVELY;
 				if (pPlayer->m_RainbowName)
 					Flags |= PREVFLAG_ACC_VIP_PLUS_RAINBOWNAME;
+				if (pChr && pChr->m_Sparkle)
+					Flags |= PREVFLAG_ACC_VIP_PLUS_SPARKLE;
 				pStats->m_RainbowSpeed = pPlayer->m_RainbowSpeed;
 			}
 		}

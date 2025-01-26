@@ -1393,6 +1393,14 @@ void CGameContext::ConConfetti(IConsole::IResult *pResult, void *pUserData)
 	if (pChr) pChr->Confetti(!pChr->m_Confetti, pResult->m_ClientID);
 }
 
+void CGameContext::ConSparkle(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	int Victim = pResult->NumArguments() ? pResult->GetVictim() : pResult->m_ClientID;
+	CCharacter *pChr = pSelf->GetPlayerChar(Victim);
+	if (pChr) pChr->Sparkle(!pChr->m_Sparkle, pResult->m_ClientID);
+}
+
 void CGameContext::ConForceTransformZombie(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;

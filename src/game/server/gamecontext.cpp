@@ -7791,6 +7791,8 @@ const char *CGameContext::GetExtraName(int Extra, int Special)
 		return "Rainbow Name";
 	case CONFETTI:
 		return "Confetti";
+	case SPARKLE:
+		return "Sparkle";
 	}
 	return "Unknown";
 }

@@ -56,6 +56,7 @@ enum Extra
 	STAFF_IND,
 	RAINBOW_NAME,
 	CONFETTI,
+	SPARKLE,
 	NUM_EXTRAS
 };
 
@@ -186,6 +187,7 @@ public:
 	void StaffInd(bool Set = true, int FromID = -1, bool Silent = false);
 	void RainbowName(bool Set = true, int FromID = -1, bool Silent = false);
 	void Confetti(bool Set = true, int FromID = -1, bool Silent = false);
+	void Sparkle(bool Set = true, int FromID = -1, bool Silent = false);
 	void SetJumps(int NewJumps, bool Silent = false);
 
 	// vip classic
@@ -200,6 +202,7 @@ public:
 	void OnEpicCircleVIP();
 	void OnLovelyVIP();
 	void OnRainbowNameVIP();
+	void OnSparkleVIP();
 
 private:
 	// player controlling this character
@@ -467,6 +470,7 @@ public:
 	bool m_EpicCircle;
 	bool m_StaffInd;
 	bool m_Confetti;
+	bool m_Sparkle;
 
 	void ResetOnlyFirstPortal();
 	int64 m_LastLinkedPortals;
