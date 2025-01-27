@@ -120,7 +120,7 @@ template<typename T>
 constexpr inline vector2_base<T> normalize_pre_length(const vector2_base<T> &v, T len)
 {
 	if(len == 0)
-		return vector2_base<T>();
+		return vector2_base<T>(0.0f, 0.0f);
 	return vector2_base<T>(v.x / len, v.y / len);
 }
 
