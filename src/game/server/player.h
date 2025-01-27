@@ -219,6 +219,7 @@ public:
 		int m_Deadzone;
 		int m_FollowFactor;
 
+		vec2 ConvertTargetToWorld(vec2 Position, vec2 Target) const;
 		void Write(const CNetMsg_Cl_CameraInfo *pMsg);
 		void Reset();
 	} m_CameraInfo;

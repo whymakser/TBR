@@ -116,6 +116,14 @@ inline float angle(const vector2_base<float> &a)
 	return atan2f(a.y, a.x);
 }
 
+template<typename T>
+constexpr inline vector2_base<T> normalize_pre_length(const vector2_base<T> &v, T len)
+{
+	if(len == 0)
+		return vector2_base<T>();
+	return vector2_base<T>(v.x / len, v.y / len);
+}
+
 inline vector2_base<float> normalize(const vector2_base<float> &v)
 {
 	float divisor = sqrtf(v.x * v.x + v.y * v.y);

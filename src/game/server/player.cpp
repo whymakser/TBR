@@ -2751,6 +2751,20 @@ void CPlayer::SetRainbowSpeedVIP(int Value)
 	GameServer()->SendChatTarget(m_ClientID, aBuf);
 }
 
+vec2 CPlayer::CCameraInfo::ConvertTargetToWorld(vec2 Position, vec2 Target) const
+{
+	vec2 TargetCameraOffset(0, 0);
+	float l = length(Target);
+
+	if(l > 0.0001f) // make sure that this isn't 0
+	{
+		float OffsetAmount = max(l - m_Deadzone, 0.0f) * (m_FollowFactor / 100.0f);
+		TargetCameraOffset = normalize_pre_length(Target, l) * OffsetAmount;
+	}
+
+	return Position + (Target - TargetCameraOffset) * m_Zoom + TargetCameraOffset;
+}
+
 void CPlayer::CCameraInfo::Write(const CNetMsg_Cl_CameraInfo *Msg)
 {
 	m_Zoom = Msg->m_Zoom / 1000.0f;

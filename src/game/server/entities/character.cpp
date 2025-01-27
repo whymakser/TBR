@@ -4224,10 +4224,18 @@ void CCharacter::HandleCursor()
 void CCharacter::CalculateCursorPosZoomed()
 {
 	vec2 Pos = m_Pos;
+	vec2 MousePos = vec2(m_Input.m_TargetX, m_Input.m_TargetY);
+
+	int DDNetVersion = GameServer()->GetClientDDNetVersion(m_pPlayer->GetCID());
+	if (DDNetVersion >= VERSION_DDNET_CAMERA_INFO)
+	{
+		m_CursorPosZoomed = m_pPlayer->m_CameraInfo.ConvertTargetToWorld(Pos, MousePos);
+		return;
+	}
+
 	if (m_DynamicCamera)
 	{
 		vec2 TargetCameraOffset(0, 0);
-		vec2 MousePos = vec2(m_Input.m_TargetX, m_Input.m_TargetY);
 		float l = length(MousePos);
 		if(l > 0.0001f) // make sure that this isn't 0
 		{
@@ -4241,8 +4249,7 @@ void CCharacter::CalculateCursorPosZoomed()
 
 	float TargetX = m_Input.m_TargetX;
 	float TargetY = m_Input.m_TargetY;
-	int DDNetVersion = GameServer()->GetClientDDNetVersion(m_pPlayer->GetCID());
-	if (DDNetVersion < VERSION_DDNET_ZOOM_CURSOR || DDNetVersion >= VERSION_DDNET_CAMERA_INFO)
+	if (DDNetVersion < VERSION_DDNET_ZOOM_CURSOR)
 	{
 		TargetX *= m_pPlayer->GetZoomLevel();
 		TargetY *= m_pPlayer->GetZoomLevel();
