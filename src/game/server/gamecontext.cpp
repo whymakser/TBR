@@ -1980,6 +1980,10 @@ bool CGameContext::OnClientDDNetVersionKnown(int ClientID)
 	}
 
 	m_World.UpdateTeamsState(ClientID);
+	if (ClientVersion >= VERSION_DDNET_CAMERA_INFO)
+	{
+		m_apPlayers[ClientID]->m_ZoomCursor = true;
+	}
 	return false;
 }
 
@@ -3066,6 +3070,11 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 			float Aspect = pPlayer->m_ShowDistance.x / pPlayer->m_ShowDistance.y;
 			CalcScreenParams(Aspect, 1.f, &pPlayer->m_StandardShowDistance.x, &pPlayer->m_StandardShowDistance.y);
+		}
+		else if (MsgID == NETMSGTYPE_CL_CAMERAINFO)
+		{
+			CNetMsg_Cl_CameraInfo *pMsg = (CNetMsg_Cl_CameraInfo *)pRawMsg;
+			pPlayer->m_CameraInfo.Write(pMsg);
 		}
 	}
 	else

@@ -211,6 +211,18 @@ public:
 
 	int m_ChatScore;
 
+	// camera info is used sparingly for converting aim target to absolute world coordinates
+	class CCameraInfo
+	{
+	public:
+		float m_Zoom;
+		int m_Deadzone;
+		int m_FollowFactor;
+
+		void Write(const CNetMsg_Cl_CameraInfo *pMsg);
+		void Reset();
+	} m_CameraInfo;
+
 	bool AfkTimer(int new_target_x, int new_target_y); //returns true if kicked
 	void UpdatePlaytime();
 	void AfkVoteTimer(CNetObj_PlayerInput* NewTarget);

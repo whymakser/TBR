@@ -225,6 +225,7 @@ void CPlayer::Reset()
 	m_ZoomCursor = false;
 	m_StandardShowDistance = m_ShowDistance;
 	m_SentShowDistance = false;
+	m_CameraInfo.Reset();
 
 	for (int i = 0; i < VANILLA_MAX_CLIENTS; i++)
 		m_aStrongWeakID[i] = 0;
@@ -2623,7 +2624,7 @@ void CPlayer::SetWeaponIndicator(bool Set)
 
 void CPlayer::SetZoomCursor(bool Set)
 {
-	if (m_ZoomCursor == Set)
+	if (m_ZoomCursor == Set || (!Set && GameServer()->GetClientDDNetVersion(m_ClientID) >= VERSION_DDNET_CAMERA_INFO))
 		return;
 	m_ZoomCursor = Set;
 	if (Set)
@@ -2748,4 +2749,18 @@ void CPlayer::SetRainbowSpeedVIP(int Value)
 	char aBuf[64];
 	str_format(aBuf, sizeof(aBuf), "Rainbow speed has been updated to %d", Value);
 	GameServer()->SendChatTarget(m_ClientID, aBuf);
+}
+
+void CPlayer::CCameraInfo::Write(const CNetMsg_Cl_CameraInfo *Msg)
+{
+	m_Zoom = Msg->m_Zoom / 1000.0f;
+	m_Deadzone = Msg->m_Deadzone;
+	m_FollowFactor = Msg->m_FollowFactor;
+}
+
+void CPlayer::CCameraInfo::Reset()
+{
+	m_Zoom = 1.0f;
+	m_Deadzone = 300.0f;
+	m_FollowFactor = 60.0f;
 }

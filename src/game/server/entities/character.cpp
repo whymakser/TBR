@@ -4231,10 +4231,8 @@ void CCharacter::CalculateCursorPosZoomed()
 		float l = length(MousePos);
 		if(l > 0.0001f) // make sure that this isn't 0
 		{
-			// TODO: buggy if followfactor and deadzone don't match the default values
-			float DeadZone = 300;
-			float FollowFactor = 60 / 100.0f;
-			float OffsetAmount = max(l - DeadZone, 0.0f) * FollowFactor;
+			float FollowFactor = m_pPlayer->m_CameraInfo.m_FollowFactor / 100.0f;
+			float OffsetAmount = max(l - m_pPlayer->m_CameraInfo.m_Deadzone, 0.0f) * FollowFactor;
 
 			TargetCameraOffset = normalize(MousePos) * OffsetAmount;
 			Pos -= TargetCameraOffset * (m_pPlayer->GetZoomLevel() - 1.f);
@@ -4243,7 +4241,8 @@ void CCharacter::CalculateCursorPosZoomed()
 
 	float TargetX = m_Input.m_TargetX;
 	float TargetY = m_Input.m_TargetY;
-	if (GameServer()->GetClientDDNetVersion(m_pPlayer->GetCID()) < VERSION_DDNET_ZOOM_CURSOR)
+	int DDNetVersion = GameServer()->GetClientDDNetVersion(m_pPlayer->GetCID());
+	if (DDNetVersion < VERSION_DDNET_ZOOM_CURSOR || DDNetVersion >= VERSION_DDNET_CAMERA_INFO)
 	{
 		TargetX *= m_pPlayer->GetZoomLevel();
 		TargetY *= m_pPlayer->GetZoomLevel();
