@@ -27,7 +27,7 @@ void CStableProjectile::Reset()
 
 void CStableProjectile::TickDeferred()
 {
-	if(Server()->Tick() % (Config()->m_SvHighBandwidth ? 2 : 4) == 1)
+	if(Server()->Tick()%4 == 1)
 	{
 		m_LastResetPos = m_Pos;
 		m_LastResetTick = Server()->Tick();
