@@ -2747,7 +2747,7 @@ void CCharacter::HandleTiles(int Index)
 					GameServer()->m_pHouses[i]->OnEnter(m_pPlayer->GetCID());
 			}
 		}
-		Config()->m_SvTestingCommands = 1;
+
 		bool MoneyTile = m_TileIndex == TILE_MONEY || m_TileFIndex == TILE_MONEY;
 		bool PoliceMoneyTile = m_TileIndex == TILE_MONEY_POLICE || m_TileFIndex == TILE_MONEY_POLICE;
 		bool ExtraMoneyTile = m_TileIndex == TILE_MONEY_EXTRA || m_TileFIndex == TILE_MONEY_EXTRA;
