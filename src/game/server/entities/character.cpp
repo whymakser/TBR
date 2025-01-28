@@ -2747,14 +2747,32 @@ void CCharacter::HandleTiles(int Index)
 					GameServer()->m_pHouses[i]->OnEnter(m_pPlayer->GetCID());
 			}
 		}
-
+		Config()->m_SvTestingCommands = 1;
 		bool MoneyTile = m_TileIndex == TILE_MONEY || m_TileFIndex == TILE_MONEY;
 		bool PoliceMoneyTile = m_TileIndex == TILE_MONEY_POLICE || m_TileFIndex == TILE_MONEY_POLICE;
 		bool ExtraMoneyTile = m_TileIndex == TILE_MONEY_EXTRA || m_TileFIndex == TILE_MONEY_EXTRA;
 		if ((MoneyTile || PoliceMoneyTile || ExtraMoneyTile) && !m_ProcessedMoneyTile)
 		{
-			m_MoneyTile = true;
 			m_ProcessedMoneyTile = true; // when multiple speedups on a moneytile face into each other the player skips multiple tiles in one tick leading to doubled xp and money
+			if (MoneyTile)
+			{
+				m_MoneyTile = MONEYTILE_NORMAL;
+			}
+			else if (PoliceMoneyTile)
+			{
+				m_MoneyTile = MONEYTILE_POLICE;
+				if (!GameWorld()->m_PoliceFarm.IsActive())
+				{
+					char aBuf[64];
+					str_format(aBuf, sizeof(aBuf), "Too many players on police tiles [%d/%d]", GameWorld()->m_PoliceFarm.m_NumPoliceTilePlayers, GameWorld()->m_PoliceFarm.m_MaxPoliceTilePlayers);
+					GameServer()->SendBroadcast(aBuf, m_pPlayer->GetCID(), false);
+					return;
+				}
+			}
+			else if (ExtraMoneyTile)
+			{
+				m_MoneyTile = MONEYTILE_EXTRA;
+			}
 
 			bool Plot = GetCurrentTilePlotID() >= PLOT_START;
 			int Ticks = Server()->TickSpeed();
@@ -4106,7 +4124,7 @@ void CCharacter::FDDraceInit()
 	m_GotMoneyXPBomb = false;
 	m_SpawnTick = Now;
 	m_WeaponChangeTick = Now;
-	m_MoneyTile = false;
+	m_MoneyTile = MONEYTILE_NONE;
 	m_ProcessedMoneyTile = false;
 	m_GotLasered = false;
 	m_KillStreak = 0;
@@ -4486,7 +4504,7 @@ void CCharacter::HandleLastIndexTiles()
 			&& m_TileIndex != TILE_MONEY_EXTRA && m_TileFIndex != TILE_MONEY_EXTRA)
 		{
 			GameServer()->SendBroadcast("", m_pPlayer->GetCID(), false);
-			m_MoneyTile = false;
+			m_MoneyTile = MONEYTILE_NONE;
 		}
 	}
 }

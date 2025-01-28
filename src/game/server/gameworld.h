@@ -137,6 +137,14 @@ public:
 	CWorldCore m_Core;
 
 	// F-DDrace
+	bool m_IsPoliceFarmActive;
+	struct
+	{
+		int m_NumPoliceTilePlayers = 0;
+		int m_MaxPoliceTilePlayers = 0;
+		bool IsActive() { return m_MaxPoliceTilePlayers <= 0 || m_NumPoliceTilePlayers <= m_MaxPoliceTilePlayers; }
+	} m_PoliceFarm;
+
 	void InitPlayerMap(int ClientID, bool Rejoin = false) { m_aMap[ClientID].InitPlayer(Rejoin); }
 	void UpdateTeamsState(int ClientID) { m_aMap[ClientID].m_UpdateTeamsState = true; }
 	void ForceInsertPlayer(int Insert, int ClientID) { m_aMap[ClientID].InsertNextEmpty(Insert); }

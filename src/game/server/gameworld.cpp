@@ -37,6 +37,7 @@ CGameWorld::CGameWorld()
 
 	m_Paused = false;
 	m_ResetRequested = false;
+	m_IsPoliceFarmActive = true;
 	for(int i = 0; i < NUM_ENTTYPES; i++)
 		m_apFirstEntityTypes[i] = 0;
 }
@@ -700,11 +701,20 @@ void CGameWorld::Tick()
 			}
 		}
 
+		int NumCharacters = 0;
+		m_PoliceFarm.m_NumPoliceTilePlayers = 0;
 		// we need to do this between core tick and Move of all the players, because otherwise its getting jiggly for those whose coretick didnt happen yet
 		for (CCharacter *pChr = (CCharacter *)FindFirst(ENTTYPE_CHARACTER); pChr; pChr = (CCharacter *)pChr->TypeNext())
 		{
 			pChr->m_Snake.Tick();
+
+			NumCharacters++;
+			if (pChr->m_MoneyTile == CCharacter::MONEYTILE_POLICE)
+			{
+				m_PoliceFarm.m_NumPoliceTilePlayers++;
+			}
 		}
+		m_PoliceFarm.m_MaxPoliceTilePlayers = Config()->m_SvPoliceFarmLimit ? clamp((int)floor(NumCharacters * 0.125f + 3), 3, 16) : 0;
 
 		for(int i = 0; i < NUM_ENTTYPES; i++)
 			for(CEntity *pEnt = m_apFirstEntityTypes[i]; pEnt; )

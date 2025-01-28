@@ -1251,10 +1251,11 @@ void CGameContext::OnTick()
 
 	for(int i = 0; i < MAX_CLIENTS; i++)
 	{
-		if(m_apPlayers[i])
+		CPlayer *pPlayer = m_apPlayers[i];
+		if(pPlayer)
 		{
 			// Do it safely here so we dont get any crashes
-			if (m_apPlayers[i]->m_BotDetected)
+			if (pPlayer->m_BotDetected)
 			{
 				char aBuf[64];
 				str_format(aBuf, sizeof(aBuf), "Bot detected (%s)", Server()->ClientName(i));
@@ -1265,8 +1266,8 @@ void CGameContext::OnTick()
 			// send vote options
 			ProgressVoteOptions(i);
 
-			m_apPlayers[i]->Tick();
-			m_apPlayers[i]->PostTick();
+			pPlayer->Tick();
+			pPlayer->PostTick();
 
 			// F-DDrace
 			for (int j = 0; j < NUM_HOUSES; j++)

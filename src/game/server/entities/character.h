@@ -460,7 +460,14 @@ public:
 	int m_Item;
 	CPickup* m_pItem;
 	bool m_PoliceHelper;
-	bool m_MoneyTile;
+	enum
+	{
+		MONEYTILE_NONE = 0,
+		MONEYTILE_NORMAL,
+		MONEYTILE_POLICE,
+		MONEYTILE_EXTRA,
+	};
+	int m_MoneyTile;
 	bool m_ProcessedMoneyTile;
 	int64 m_RoomAntiSpamTick;
 	CSnake m_Snake;
