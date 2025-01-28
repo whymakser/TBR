@@ -2409,6 +2409,8 @@ bool CPlayer::CheckClanProtection()
 
 bool CPlayer::SilentFarmActive()
 {
+	if (GameServer()->Config()->m_SvPoliceFarmLimit && m_pCharacter->m_MoneyTile == CCharacter::MONEYTILE_POLICE)
+		return false;
 	return m_SilentFarm && m_pCharacter && m_pCharacter->m_MoneyTile && !m_Paused && m_Team != TEAM_SPECTATORS;
 }
 

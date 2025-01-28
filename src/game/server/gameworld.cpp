@@ -707,6 +707,9 @@ void CGameWorld::Tick()
 		{
 			pChr->m_Snake.Tick();
 
+			if (pChr->GetPlayer()->m_IsDummy)
+				continue;
+
 			NumCharacters++;
 			if (pChr->m_MoneyTile == CCharacter::MONEYTILE_POLICE)
 			{

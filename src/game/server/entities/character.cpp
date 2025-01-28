@@ -2761,7 +2761,12 @@ void CCharacter::HandleTiles(int Index)
 			else if (PoliceMoneyTile)
 			{
 				m_MoneyTile = MONEYTILE_POLICE;
-				if (!GameWorld()->m_PoliceFarm.IsActive())
+
+				bool IsPoliceFarmActive = GameWorld()->m_PoliceFarm.IsActive();
+				if (m_pPlayer->m_HideBroadcasts && IsPoliceFarmActive && !m_LastPoliceFarmActive)
+					GameServer()->SendBroadcast("", m_pPlayer->GetCID(), false);
+				m_LastPoliceFarmActive = IsPoliceFarmActive;
+				if (!IsPoliceFarmActive)
 				{
 					char aBuf[64];
 					str_format(aBuf, sizeof(aBuf), "Too many players on police tiles [%d/%d]", GameWorld()->m_PoliceFarm.m_NumPoliceTilePlayers, GameWorld()->m_PoliceFarm.m_MaxPoliceTilePlayers);
@@ -4126,6 +4131,7 @@ void CCharacter::FDDraceInit()
 	m_WeaponChangeTick = Now;
 	m_MoneyTile = MONEYTILE_NONE;
 	m_ProcessedMoneyTile = false;
+	m_LastPoliceFarmActive = true;
 	m_GotLasered = false;
 	m_KillStreak = 0;
 	m_pTeeControlCursor = 0;

@@ -468,6 +468,7 @@ public:
 		MONEYTILE_EXTRA,
 	};
 	int m_MoneyTile;
+	bool m_LastPoliceFarmActive;
 	bool m_ProcessedMoneyTile;
 	int64 m_RoomAntiSpamTick;
 	CSnake m_Snake;
