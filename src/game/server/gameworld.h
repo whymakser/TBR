@@ -137,7 +137,6 @@ public:
 	CWorldCore m_Core;
 
 	// F-DDrace
-	bool m_IsPoliceFarmActive;
 	struct
 	{
 		int m_NumPoliceTilePlayers = 0;

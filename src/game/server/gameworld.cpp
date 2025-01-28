@@ -37,7 +37,6 @@ CGameWorld::CGameWorld()
 
 	m_Paused = false;
 	m_ResetRequested = false;
-	m_IsPoliceFarmActive = true;
 	for(int i = 0; i < NUM_ENTTYPES; i++)
 		m_apFirstEntityTypes[i] = 0;
 }
