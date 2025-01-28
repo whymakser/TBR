@@ -2763,7 +2763,7 @@ void CCharacter::HandleTiles(int Index)
 				m_MoneyTile = MONEYTILE_POLICE;
 
 				bool IsPoliceFarmActive = GameWorld()->m_PoliceFarm.IsActive();
-				if (m_pPlayer->m_HideBroadcasts && IsPoliceFarmActive && !m_LastPoliceFarmActive)
+				if (IsPoliceFarmActive && !m_LastPoliceFarmActive)
 					GameServer()->SendBroadcast("", m_pPlayer->GetCID(), false);
 				m_LastPoliceFarmActive = IsPoliceFarmActive;
 				if (!IsPoliceFarmActive)
