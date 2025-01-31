@@ -6200,9 +6200,6 @@ int CGameContext::GetAccount(const char *pUsername)
 void CGameContext::FreeAccount(int ID)
 {
 	m_Accounts.erase(m_Accounts.begin() + ID);
-	for (int i = 0; i < MAX_CLIENTS; i++)
-		if (m_apPlayers[i])
-			m_apPlayers[i]->UpdateAccID();
 }
 
 bool CGameContext::IsAccLoggedInThisPort(int ID)

@@ -247,7 +247,6 @@ void CPlayer::Reset()
 
 	m_TaserShield = 0;
 	m_DoubleXpLifesLeft = 0;
-	UpdateAccID();
 }
 
 void CPlayer::Tick()
@@ -1760,18 +1759,10 @@ void CPlayer::ShowNameShort()
 
 int CPlayer::GetAccID()
 {
-	return m_AccountID;
-}
-
-void CPlayer::UpdateAccID()
-{
 	for (unsigned int i = ACC_START; i < GameServer()->m_Accounts.size(); i++)
 		if (GameServer()->m_Accounts[i].m_ClientID == m_ClientID)
-		{
-			m_AccountID = i;
-			return;
-		}
-	m_AccountID = 0;
+			return i;
+	return 0;
 }
 
 void CPlayer::BankTransaction(float Amount, const char *pDescription, bool IsEuro)
@@ -1965,8 +1956,6 @@ bool CPlayer::GivePortalBattery(int Amount)
 
 void CPlayer::OnLogin(bool ForceDesignLoad)
 {
-	UpdateAccID();
-
 	GameServer()->SendChatTarget(m_ClientID, "Successfully logged in");
 
 	ExpireItems();
