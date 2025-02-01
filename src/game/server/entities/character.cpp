@@ -2766,7 +2766,7 @@ void CCharacter::HandleTiles(int Index)
 				if (IsPoliceFarmActive && !m_LastPoliceFarmActive)
 					GameServer()->SendBroadcast("", m_pPlayer->GetCID(), false);
 				m_LastPoliceFarmActive = IsPoliceFarmActive;
-				if (!IsPoliceFarmActive)
+				if (!IsPoliceFarmActive && (m_LastPoliceFarmActive || Server()->Tick() % Server()->TickSpeed() == 0))
 				{
 					char aBuf[64];
 					str_format(aBuf, sizeof(aBuf), "Too many players on police tiles [%d/%d]", GameWorld()->m_PoliceFarm.m_NumPoliceTilePlayers, GameWorld()->m_PoliceFarm.m_MaxPoliceTilePlayers);

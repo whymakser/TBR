@@ -485,6 +485,8 @@ public:
 	int64 m_LastBatteryDrop;
 	CPortalBlocker *m_pPortalBlocker;
 
+	int64 m_LastPoliceFarmBroadcast;
+
 	int64 m_VipPlusAntiSpamTick;
 
 	int SendDroppedFlagCooldown(int SnappingClient);
