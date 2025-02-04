@@ -711,7 +711,7 @@ void CGameWorld::Tick()
 				continue;
 
 			NumCharacters++;
-			if (pChr->m_MoneyTile == CCharacter::MONEYTILE_POLICE)
+			if (pChr->m_MoneyTile == CCharacter::MONEYTILE_POLICE && !pChr->m_Passive)
 			{
 				m_PoliceFarm.m_NumPoliceTilePlayers++;
 			}

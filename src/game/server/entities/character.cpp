@@ -2775,6 +2775,12 @@ void CCharacter::HandleTiles(int Index)
 					return;
 				}
 				m_LastPoliceFarmActive = IsPoliceFarmActive;
+
+				// disallow passive farming with grog on policefarm. use it for tactics, but not to get around the limit. passive players are also not counted to the numpolicetileplayers
+				if (Config()->m_SvPoliceFarmLimit && m_Passive)
+				{
+					return;
+				}
 			}
 			else if (ExtraMoneyTile)
 			{
