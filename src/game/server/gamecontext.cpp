@@ -831,7 +831,7 @@ void CGameContext::SendWeaponPickup(int ClientID, int Weapon)
 	// include ninja, client doesnt auto switch to ninja on pickup, or when we have no weapon at all
 	if (Weapon >= NUM_VANILLA_WEAPONS-1 || pChr->GetActiveWeaponUnclamped() == -1)
 	{
-		pChr->SetWeapon(Weapon);
+		pChr->SetQueuedWeapon(Weapon);
 	}
 	else
 	{
