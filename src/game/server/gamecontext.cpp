@@ -828,8 +828,8 @@ void CGameContext::SendWeaponPickup(int ClientID, int Weapon)
 	if (!pChr || pChr->m_DrawEditor.Active() || (pChr->GetActiveWeapon() == WEAPON_NINJA && !pChr->m_ScrollNinja))
 		return;
 
-	// include ninja, client doesnt auto switch to ninja on pickup
-	if (Weapon >= NUM_VANILLA_WEAPONS-1)
+	// include ninja, client doesnt auto switch to ninja on pickup, or when we have no weapon at all
+	if (Weapon >= NUM_VANILLA_WEAPONS-1 || pChr->GetActiveWeaponUnclamped() == -1)
 	{
 		pChr->SetWeapon(Weapon);
 	}
