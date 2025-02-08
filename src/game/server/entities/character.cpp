@@ -162,7 +162,7 @@ void CCharacter::SetWeapon(int W)
 		return;
 	}
 
-	if(W == GetActiveWeapon())
+	if(W == GetActiveWeaponUnclamped())
 		return;
 
 	m_LastWeapon = GetActiveWeapon();
