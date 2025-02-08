@@ -2725,7 +2725,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				if (pPlayer->m_TeeControlMode)
 				{
 					if (pControlledTee)
-						pControlledTee->DropWeapon(pControlledTee->GetActiveWeapon(), false);
+						pControlledTee->DropWeapon(pControlledTee->GetActiveWeaponUnclamped(), false);
 				}
 				else if (pChr)
 				{
@@ -2747,7 +2747,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 						}
 						else if (!pChr->TryMountHelicopter() && !pChr->DropGrog())
 						{
-							pChr->DropWeapon(pChr->GetActiveWeapon(), false);
+							pChr->DropWeapon(pChr->GetActiveWeaponUnclamped(), false);
 						}
 					}
 				}

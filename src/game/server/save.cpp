@@ -131,7 +131,7 @@ void CSaveTee::Save(CCharacter *pChr)
 
 	m_NotEligibleForFinish = pChr->GetPlayer()->m_NotEligibleForFinish;
 
-	m_ActiveWeapon = pChr->GetActiveWeapon();
+	m_ActiveWeapon = pChr->GetActiveWeaponUnclamped();
 
 	// Core
 	m_CorePos = pChr->GetCore().m_Pos;

@@ -65,6 +65,11 @@ void CGrog::DecreaseNumGrogsHolding()
 	GetOwner()->m_NumGrogsHolding--;
 	GetOwner()->m_pGrog = GetOwner()->m_NumGrogsHolding ? new CGrog(GameWorld(), GetOwner()->GetPos(), m_Owner) : 0;
 	GetOwner()->UpdateWeaponIndicator();
+
+	if (!GetOwner()->m_pGrog)
+	{
+		GetOwner()->SetWeapon(WEAPON_HAMMER);
+	}
 }
 
 void CGrog::OnSip()

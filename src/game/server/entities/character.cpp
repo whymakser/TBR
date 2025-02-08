@@ -336,7 +336,7 @@ void CCharacter::DoWeaponSwitch()
 {
 	// make sure we can switch
 	if (m_ReloadTimer != 0 || m_QueuedWeapon == -1 || (m_QueuedWeapon != -2 && !m_aWeapons[m_QueuedWeapon].m_Got) || (m_aWeapons[WEAPON_NINJA].m_Got && !m_ScrollNinja)
-		|| m_DrawEditor.Selecting() || (m_NumGrogsHolding && !m_DrawEditor.Active()) || m_BirthdayGiftEndTick > Server()->Tick())
+		|| m_DrawEditor.Selecting() || ((m_NumGrogsHolding || m_pHelicopter) && !m_DrawEditor.Active()) || m_BirthdayGiftEndTick > Server()->Tick())
 		return;
 
 	if (m_QueuedWeapon == -2)
@@ -558,6 +558,15 @@ void CCharacter::FireWeapon()
 					break;
 				}
 
+				if (Sound)
+					GameServer()->CreateSound(m_Pos, SOUND_HAMMER_FIRE, TeamMask());
+
+				// no active weapon
+				if (GetActiveWeaponUnclamped() == -1)
+				{
+					break;
+				}
+
 				// 4 x 3 = 12 (reachable tiles x (game layer, front layer, switch layer))
 				CDoor *apDoors[12];
 				int NumDoors = GameWorld()->IntersectDoorsUniqueNumbers(ProjStartPos, GetProximityRadius() * 0.75f, apDoors, 12);
@@ -598,8 +607,6 @@ void CCharacter::FireWeapon()
 
 				// reset objects Hit
 				m_NumObjectsHit = 0;
-				if (Sound)
-					GameServer()->CreateSound(m_Pos, SOUND_HAMMER_FIRE, TeamMask());
 
 				Antibot()->OnHammerFire(m_pPlayer->GetCID());
 
@@ -2307,6 +2314,11 @@ void CCharacter::SnapCharacter(int SnappingClient, int ID)
 	else
 	{
 		pCharacter->m_Weapon = GameServer()->GetWeaponType(m_ActiveWeapon);
+	}
+
+	if (pCharacter->m_Weapon == -1 && GameServer()->GetClientDDNetVersion(SnappingClient) < VERSION_DDNET_TEE_NO_WEAPON)
+	{
+		pCharacter->m_Weapon = WEAPON_HAMMER;
 	}
 
 	pCharacter->m_AttackTick = m_AttackTick;
@@ -4632,9 +4644,17 @@ void CCharacter::SetAvailableWeapon(int PreferedWeapon)
 		}
 	}
 
-	// no weapon found --> force gun so we dont end up with weird behaviour
-	GiveWeapon(WEAPON_GUN);
-	SetWeapon(WEAPON_GUN);
+	if (Config()->m_SvAllowEmptyInventory)
+	{
+		// DDNet can show no weapon at all now. haha.
+		m_ActiveWeapon = -1;
+	}
+	else
+	{
+		// no weapon found --> force gun so we dont end up with weird behaviour
+		GiveWeapon(WEAPON_GUN);
+		SetWeapon(WEAPON_GUN);
+	}
 }
 
 void CCharacter::SetLastTouchedSwitcher(int Number)
@@ -4730,10 +4750,12 @@ bool CCharacter::AddGrog()
 	UpdateWeaponIndicator();
 	if (!m_pGrog)
 		m_pGrog = new CGrog(GameWorld(), m_Pos, m_pPlayer->GetCID());
-	
+
+	// DDNet client allows showing no weapon now.
+	SetActiveWeapon(-1);
 	// Force hammer while holding grog
-	GiveWeapon(WEAPON_HAMMER);
-	SetWeapon(WEAPON_HAMMER);
+	//GiveWeapon(WEAPON_HAMMER);
+	//SetWeapon(WEAPON_HAMMER);
 	return true;
 }
 
@@ -4771,7 +4793,7 @@ bool CCharacter::CanDropWeapon(int Type)
 	int W = GetSpawnWeaponIndex(Type);
 	if (W != -1 && m_aSpawnWeaponActive[W])
 		return false;
-	if (!m_aWeapons[Type].m_Got || Type == WEAPON_DRAW_EDITOR || (Type == WEAPON_NINJA && !m_ScrollNinja) || (Type == WEAPON_PORTAL_RIFLE && !m_CollectedPortalRifle))
+	if (Type == -1 || !m_aWeapons[Type].m_Got || Type == WEAPON_DRAW_EDITOR || (Type == WEAPON_NINJA && !m_ScrollNinja) || (Type == WEAPON_PORTAL_RIFLE && !m_CollectedPortalRifle))
 		return false;
 	return true;
 }
@@ -4781,18 +4803,21 @@ void CCharacter::DropWeapon(int WeaponID, bool OnDeath, float Dir)
 	if (!CanDropWeapon(WeaponID) || Config()->m_SvMaxWeaponDrops == 0 || (!OnDeath && (m_FreezeTime || !Config()->m_SvDropWeapons)) || m_pPlayer->m_Minigame == MINIGAME_1VS1 || m_NumGrogsHolding)
 		return;
 
-	int Count = 0;
-	for (int i = 0; i < NUM_WEAPONS; i++)
+	if (!Config()->m_SvAllowEmptyInventory)
 	{
-		int W = GetSpawnWeaponIndex(i);
-		if (W != -1 && m_aSpawnWeaponActive[W])
-			continue;
+		int Count = 0;
+		for (int i = 0; i < NUM_WEAPONS; i++)
+		{
+			int W = GetSpawnWeaponIndex(i);
+			if (W != -1 && m_aSpawnWeaponActive[W])
+				continue;
 
-		if (i != WEAPON_NINJA && (i != WEAPON_PORTAL_RIFLE || m_CollectedPortalRifle) && i != WEAPON_DRAW_EDITOR && m_aWeapons[i].m_Got)
-			Count++;
+			if (i != WEAPON_NINJA && (i != WEAPON_PORTAL_RIFLE || m_CollectedPortalRifle) && i != WEAPON_DRAW_EDITOR && m_aWeapons[i].m_Got)
+				Count++;
+		}
+		if (Count < 2)
+			return;
 	}
-	if (Count < 2)
-		return;
 
 	if (m_pPlayer->m_vWeaponLimit[WeaponID].size() == (unsigned)Config()->m_SvMaxWeaponDrops)
 		m_pPlayer->m_vWeaponLimit[WeaponID][0]->Reset(false);
@@ -4991,7 +5016,7 @@ void CCharacter::SetActiveWeapon(int Weapon)
 		return;
 	}
 
-	if (!GetWeaponGot(Weapon))
+	if (Weapon != -1 && !GetWeaponGot(Weapon))
 		return;
 
 	m_ActiveWeapon = Weapon;
