@@ -366,6 +366,7 @@ MACRO_CONFIG_INT(SvNoBonusScoreDecrease, sv_bonus_score_decrease, 10, 0, 60, CFG
 MACRO_CONFIG_INT(SvGrogPrice, sv_grog_price, 500, 1, 50000, CFGFLAG_SERVER, "Price per grog", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvGrogHoldLimit, sv_grog_hold_limit, 3, 1, 10, CFGFLAG_SERVER, "Amount of grogs a player can carry", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvGrogMinPermilleLimit, sv_grog_min_permille_limit, 6, 0, 39, CFGFLAG_SERVER, "Divided by 10: Minimum legal permille limit, if exceeded=wanted", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvGrogForceHammer, sv_grog_force_hammer, 0, 0, 1, CFGFLAG_SERVER, "Whether holding grog forces to hold hammer, or can have no weapon (new DDNet can render tee without weapon)", AUTHED_ADMIN)
 
 // other
 MACRO_CONFIG_INT(SvHideMinigamePlayers, sv_hide_minigame_players, 1, 0, 1, CFGFLAG_SERVER, "Whether players in different minigames are shown in the scoreboard", AUTHED_ADMIN)

@@ -4751,11 +4751,17 @@ bool CCharacter::AddGrog()
 	if (!m_pGrog)
 		m_pGrog = new CGrog(GameWorld(), m_Pos, m_pPlayer->GetCID());
 
-	// DDNet client allows showing no weapon now.
-	SetActiveWeapon(-1);
-	// Force hammer while holding grog
-	//GiveWeapon(WEAPON_HAMMER);
-	//SetWeapon(WEAPON_HAMMER);
+	if (Config()->m_SvGrogForceHammer)
+	{
+		// Force hammer while holding grog
+		GiveWeapon(WEAPON_HAMMER);
+		SetWeapon(WEAPON_HAMMER);
+	}
+	else
+	{
+		// DDNet client allows showing no weapon now.
+		SetActiveWeapon(-1);
+	}
 	return true;
 }
 
@@ -5008,7 +5014,7 @@ void CCharacter::UnsetSpookyGhost()
 
 void CCharacter::SetActiveWeapon(int Weapon)
 {
-	if (m_NumGrogsHolding && Weapon != WEAPON_HAMMER && Weapon != WEAPON_DRAW_EDITOR)
+	if (Config()->m_SvGrogForceHammer && m_NumGrogsHolding && Weapon != WEAPON_HAMMER && Weapon != WEAPON_DRAW_EDITOR)
 	{
 		if (!GetWeaponGot(WEAPON_HAMMER))
 			GiveWeapon(WEAPON_HAMMER);
