@@ -165,7 +165,7 @@ void CCharacter::SetWeapon(int W)
 	if(W == GetActiveWeaponUnclamped())
 		return;
 
-	m_LastWeapon = GetActiveWeapon();
+	m_LastWeapon = GetActiveWeaponUnclamped();
 	m_QueuedWeapon = -1;
 	SetActiveWeapon(W);
 	GameServer()->CreateSound(m_Pos, SOUND_WEAPON_SWITCH, TeamMask());
