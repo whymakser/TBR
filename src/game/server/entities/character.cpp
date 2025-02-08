@@ -4759,8 +4759,13 @@ bool CCharacter::AddGrog()
 	}
 	else
 	{
-		// DDNet client allows showing no weapon now.
-		SetWeapon(-1);
+		// re-implement bug-behaviour which works in Config()->m_SvGrogForceHammer because SetWeapon(WEAPON_HAMMER) does nothing, because spookyghost doesnt have hammer.
+		// so this if-catch will literally do the same as the behaviour above. used to get jetpack with grog, for transportation, etc.
+		if (!m_pPlayer->m_SpookyGhost)
+		{
+			// DDNet client allows showing no weapon now.
+			SetWeapon(-1);
+		}
 	}
 	return true;
 }
