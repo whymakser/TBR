@@ -5017,12 +5017,9 @@ void CCharacter::SetActiveWeapon(int Weapon)
 	int GrogWeapon = Config()->m_SvGrogForceHammer ? WEAPON_HAMMER : -1;
 	if (m_NumGrogsHolding && Weapon != GrogWeapon && Weapon != WEAPON_DRAW_EDITOR)
 	{
-		if (GrogWeapon == WEAPON_HAMMER)
-		{
-			if (!GetWeaponGot(WEAPON_HAMMER))
-				GiveWeapon(WEAPON_HAMMER);
-			SetActiveWeapon(WEAPON_HAMMER);
-		}
+		if (GrogWeapon == WEAPON_HAMMER && !GetWeaponGot(WEAPON_HAMMER))
+			GiveWeapon(WEAPON_HAMMER);
+		SetActiveWeapon(GrogWeapon);
 		return;
 	}
 
