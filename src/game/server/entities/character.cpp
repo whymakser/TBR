@@ -156,7 +156,7 @@ void CCharacter::Destroy()
 void CCharacter::SetWeapon(int W)
 {
 	// F-DDrace
-	if (!GetWeaponGot(W))
+	if (W != -1 && !GetWeaponGot(W))
 	{
 		SetAvailableWeapon();
 		return;
@@ -4760,7 +4760,7 @@ bool CCharacter::AddGrog()
 	else
 	{
 		// DDNet client allows showing no weapon now.
-		SetActiveWeapon(-1);
+		SetWeapon(-1);
 	}
 	return true;
 }

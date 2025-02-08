@@ -118,7 +118,7 @@ bool CHelicopter::Mount(int ClientID)
 	if (GetOwner())
 	{
 		GetOwner()->m_pHelicopter = this;
-		GetOwner()->SetActiveWeapon(-1);
+		GetOwner()->SetWeapon(-1);
 		GameServer()->SendTuningParams(m_Owner, GetOwner()->m_TuneZone);
 	}
 	return true;
@@ -134,7 +134,7 @@ void CHelicopter::Dismount()
 	if (GetOwner())
 	{
 		GetOwner()->m_pHelicopter = 0;
-		GetOwner()->SetWeapon(WEAPON_GUN);
+		GetOwner()->SetWeapon(GetOwner()->GetLastWeapon());
 		GameServer()->SendTuningParams(m_Owner, GetOwner()->m_TuneZone);
 	}
 	m_Owner = -1;
