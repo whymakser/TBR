@@ -2318,7 +2318,7 @@ void CCharacter::SnapCharacter(int SnappingClient, int ID)
 
 	if (pCharacter->m_Weapon == -1 && GameServer()->GetClientDDNetVersion(SnappingClient) < VERSION_DDNET_TEE_NO_WEAPON)
 	{
-		pCharacter->m_Weapon = WEAPON_HAMMER;
+		pCharacter->m_Weapon = m_NumGrogsHolding ? WEAPON_HAMMER : WEAPON_GUN;
 	}
 
 	pCharacter->m_AttackTick = m_AttackTick;
