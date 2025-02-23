@@ -449,7 +449,7 @@ void CGameTeams::SendTeamsState(int ClientID)
 	bool LegacyTeams = DDNetVersion >= VERSION_DDNET_UNIQUE_TEAMS;
 	CMsgPacker Msg(NETMSGTYPE_SV_TEAMSSTATE);
 
-	for(unsigned i = 0; i < Server()->GetMaxClients(ClientID); i++)
+	for(int i = 0; i < Server()->GetMaxClients(ClientID); i++)
 	{
 		if (Server()->IsSevendown(ClientID) && GameServer()->FlagsUsed())
 		{
