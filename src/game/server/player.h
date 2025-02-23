@@ -421,7 +421,7 @@ public:
 	int m_ViewCursorID;
 
 	void SkipSetViewPos() { m_SkipSetViewPos = 2; }
-	int m_aStrongWeakID[VANILLA_MAX_CLIENTS];
+	int m_aStrongWeakID[MAX_CLIENTS];
 	bool m_aMuted[MAX_CLIENTS];
 
 	bool m_BotDetected;
