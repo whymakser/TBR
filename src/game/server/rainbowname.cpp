@@ -89,7 +89,7 @@ void CRainbowName::Update(int ClientID)
 	int DummyID = Server()->GetDummy(ClientID);
 	CTeamsCore *pCore = &((CGameControllerDDRace *)GameServer()->m_pController)->m_Teams.m_Core;
 
-	for (int i = 0; i < VANILLA_MAX_CLIENTS; i++)
+	for (int i = 0; i < Server()->GetMaxClients(ClientID); i++)
 	{
 		if (i == OwnMapID)
 			continue;
@@ -120,7 +120,7 @@ void CRainbowName::Update(int ClientID)
 		int SpectatorID = pPlayer->GetSpectatorID();
 		bool NoSpecOrFollow = (pPlayer->GetTeam() != TEAM_SPECTATORS && !pPlayer->IsPaused()) || (SpectatorID != -1 && GameServer()->m_apPlayers[SpectatorID]);
 		if (NoSpecOrFollow)
-			pInfo->m_aTeam[OwnMapID] = VANILLA_MAX_CLIENTS; // TEAM_SUPER, but it's 128 due to increased client capability
+			pInfo->m_aTeam[OwnMapID] = VANILLA_MAX_CLIENTS; // TEAM_SUPER, but it's 128 due to increased client capability // might have to adapt this in the future when teams are expanded to 128
 	}
 
 	// if a player close to a rainbow name player sent a chat message, we send himself to t0 for one run, cuz that resets the chat color from TEAM_SUPER to grey
