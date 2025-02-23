@@ -205,9 +205,9 @@ int CGameWorld::GetSeeOthersID(int ClientID)
 {
 	// 0.7 or if no flags been used on the map
 	if (!Server()->IsSevendown(ClientID) || !GameServer()->FlagsUsed())
-		return VANILLA_MAX_CLIENTS - 2;
+		return Server()->GetMaxClients(ClientID) - 2;
 	// 0.6 AND flags
-	return SPEC_SELECT_FLAG_BLUE - 1;
+	return GetSpecSelectFlag(ClientID, SPEC_FLAGBLUE) - 1;
 }
 
 void CGameWorld::DoSeeOthers(int ClientID)
@@ -294,14 +294,14 @@ void CGameWorld::PlayerMap::CycleSeeOthers()
 	if (m_TotalOverhang <= 0)
 		return;
 
-	for (int i = 0; i < VANILLA_MAX_CLIENTS; i++)
+	for (int i = 0; i < m_pGameWorld->Server()->GetMaxClients(m_ClientID); i++)
 		if (m_pMap[i] != -1)
 			m_aWasSeeOthers[m_pMap[i]] = true;
 
 	int Size = min(m_TotalOverhang, (int)PlayerMap::SSeeOthers::MAX_NUM_SEE_OTHERS);
 	int Added = 0;
 	int MapID = GetMapSize()-1;
-	for (int i = 0; i < MAX_CLIENTS; i++)
+	for (int i = 0; i < m_pGameWorld->Server()->GetMaxClients(m_ClientID); i++)
 	{
 		if (!m_pGameWorld->GameServer()->m_apPlayers[i] || m_aWasSeeOthers[i])
 			continue;
@@ -351,6 +351,20 @@ void CGameWorld::PlayerMap::ResetSeeOthers()
 		m_aWasSeeOthers[i] = false;
 	m_UpdateTeamsState = true;
 	UpdateSeeOthers();
+}
+
+bool CGameWorld::PlayerMap::Supports128()
+{
+	return m_pGameWorld->GameServer()->GetClientDDNetVersion(m_ClientID) >= VERSION_DDNET_128;
+}
+
+int CGameWorld::PlayerMap::GetSpecSelectFlag(int SpecFlag)
+{
+	if (SpecFlag == SPEC_FLAGRED)
+		return Supports128() ? SPEC_SELECT_FLAG_RED_128 : SPEC_SELECT_FLAG_RED;
+	else if (SpecFlag == SPEC_FLAGBLUE)
+		return Supports128() ? SPEC_SELECT_FLAG_BLUE_128 : SPEC_SELECT_FLAG_BLUE;
+	return -1;
 }
 
 void CGameWorld::PlayerMap::UpdateSeeOthers()
@@ -404,11 +418,11 @@ void CGameWorld::PlayerMap::InitPlayer(bool Rejoin)
 	{
 		m_UpdateTeamsState = true; // to get flag spectators back and all teams aswell
 
-		for (int i = 0; i < VANILLA_MAX_CLIENTS; i++)
+		for (int i = 0; i < MAX_CLIENTS; i++)
 			Remove(i);
 	}
 
-	for (int i = 0; i < VANILLA_MAX_CLIENTS; i++)
+	for (int i = 0; i < MAX_CLIENTS; i++)
 		m_pMap[i] = -1;
 
 	for (int i = 0; i < MAX_CLIENTS; i++)
@@ -444,7 +458,7 @@ void CGameWorld::PlayerMap::InitPlayer(bool Rejoin)
 	}
 
 	m_NumReserved = 1;
-	m_pMap[VANILLA_MAX_CLIENTS - 1] = -1; // player with empty name to say chat msgs
+	m_pMap[m_pGameWorld->Server()->GetMaxClients(m_ClientID) - 1] = -1; // player with empty name to say chat msgs
 
 	// see others in spec menu
 	m_NumReserved++;
@@ -454,7 +468,7 @@ void CGameWorld::PlayerMap::InitPlayer(bool Rejoin)
 	if (!m_pGameWorld->Server()->IsSevendown(m_ClientID))
 	{
 		CNetMsg_Sv_ClientInfo FakeInfo;
-		FakeInfo.m_ClientID = VANILLA_MAX_CLIENTS-1;
+		FakeInfo.m_ClientID = m_pGameWorld->Server()->GetMaxClients(m_ClientID)-1;
 		FakeInfo.m_Local = 0;
 		FakeInfo.m_Team = TEAM_BLUE;
 		FakeInfo.m_pName = " ";
@@ -476,8 +490,8 @@ void CGameWorld::PlayerMap::InitPlayer(bool Rejoin)
 		if (m_pGameWorld->GameServer()->FlagsUsed())
 		{
 			m_NumReserved += 2;
-			m_pMap[SPEC_SELECT_FLAG_RED] = -1;
-			m_pMap[SPEC_SELECT_FLAG_BLUE] = -1;
+			m_pMap[GetSpecSelectFlag(SPEC_FLAGRED)] = -1;
+			m_pMap[GetSpecSelectFlag(SPEC_FLAGBLUE)] = -1;
 		}
 	}
 
@@ -657,6 +671,11 @@ void CGameWorld::PlayerMap::InsertNextEmpty(int ClientID)
 			break;
 		}
 	}
+}
+
+int CGameWorld::PlayerMap::GetMapSize()
+{
+	return m_pGameWorld->Server()->GetMaxClients(m_ClientID) - m_NumReserved;
 }
 
 void CGameWorld::Tick()

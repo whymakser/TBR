@@ -848,7 +848,7 @@ void CPlayer::FakeSnap()
 	}
 
 	// empty name to say chat messages
-	int FakeID = VANILLA_MAX_CLIENTS - 1;
+	int FakeID = Server()->GetMaxClients(m_ClientID) - 1;
 
 	int *pClientInfo = (int*)Server()->SnapNewItem(11 + NUM_NETOBJTYPES, FakeID, 17*4); // NETOBJTYPE_CLIENTINFO
 	if(!pClientInfo)
@@ -906,7 +906,7 @@ void CPlayer::FakeSnap()
 
 	// We dont send the NETOBJTYPE_PLAYERINFO object, because that would make the client render the tee. We could send it every 2nd snapshot, so the client doesnt
 	// have the SNAP_PREV of it and wont render it aswell, but it seems to me that not having the object at all is also fine
-	FakeID = VANILLA_MAX_CLIENTS - 1;
+	FakeID = Server()->GetMaxClients(m_ClientID) - 1;
 
 	// Send character at the position of the flag we are currently hooking
 	CNetObj_Character *pCharacter = static_cast<CNetObj_Character *>(Server()->SnapNewItem(NETOBJTYPE_CHARACTER, FakeID, sizeof(CNetObj_Character)));
@@ -2086,7 +2086,7 @@ void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 		CNetMsg_Sv_VoteSet Msg;
 		Msg.m_Type = VOTE_START_OP;
 		Msg.m_Timeout = TimeoutSec;
-		Msg.m_ClientID = VANILLA_MAX_CLIENTS-1;
+		Msg.m_ClientID = Server()->GetMaxClients(m_ClientID)-1;
 		Msg.m_pDescription = aText;
 		Msg.m_pReason = "";
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOTRANSLATE, m_ClientID);
