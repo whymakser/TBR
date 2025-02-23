@@ -355,7 +355,7 @@ void CGameWorld::PlayerMap::ResetSeeOthers()
 
 bool CGameWorld::PlayerMap::Supports128()
 {
-	return m_pGameWorld->GameServer()->GetClientDDNetVersion(m_ClientID) >= VERSION_DDNET_128;
+	return m_pGameWorld->Server()->IsSevendown(m_ClientID) && m_pGameWorld->GameServer()->GetClientDDNetVersion(m_ClientID) >= VERSION_DDNET_128;
 }
 
 int CGameWorld::PlayerMap::GetSpecSelectFlag(int SpecFlag)
@@ -468,7 +468,7 @@ void CGameWorld::PlayerMap::InitPlayer(bool Rejoin)
 	if (!m_pGameWorld->Server()->IsSevendown(m_ClientID))
 	{
 		CNetMsg_Sv_ClientInfo FakeInfo;
-		FakeInfo.m_ClientID = m_pGameWorld->Server()->GetMaxClients(m_ClientID)-1;
+		FakeInfo.m_ClientID = VANILLA_MAX_CLIENTS-1;
 		FakeInfo.m_Local = 0;
 		FakeInfo.m_Team = TEAM_BLUE;
 		FakeInfo.m_pName = " ";
