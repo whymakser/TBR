@@ -355,7 +355,7 @@ void CGameWorld::PlayerMap::ResetSeeOthers()
 
 bool CGameWorld::PlayerMap::Supports128()
 {
-	return m_pGameWorld->Server()->IsSevendown(m_ClientID) && m_pGameWorld->GameServer()->GetClientDDNetVersion(m_ClientID) >= VERSION_DDNET_128;
+	return m_pGameWorld->Server()->GetMaxClients(m_ClientID) > VANILLA_MAX_CLIENTS;
 }
 
 int CGameWorld::PlayerMap::GetSpecSelectFlag(int SpecFlag)

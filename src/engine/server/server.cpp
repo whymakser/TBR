@@ -295,7 +295,7 @@ void CServer::CClient::Reset()
 	m_Score = 0;
 	m_MapChunk = 0;
 
-	for (int i = 0; i < VANILLA_MAX_CLIENTS; i++)
+	for (int i = 0; i < MAX_CLIENTS; i++)
 		m_aIdMap[i] = -1;
 	for (int i = 0; i < MAX_CLIENTS; i++)
 		m_aReverseIdMap[i] = -1;
