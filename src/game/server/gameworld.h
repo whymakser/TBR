@@ -114,7 +114,7 @@ private:
 		void Add(int MapID, int ClientID);
 		int Remove(int MapID);
 		void InsertNextEmpty(int ClientID);
-		int GetMapSize();
+		int GetMapSize() { return VANILLA_MAX_CLIENTS - m_NumReserved; }
 		// See others
 		int m_SeeOthersState;
 		int m_TotalOverhang;
@@ -124,8 +124,6 @@ private:
 		void CycleSeeOthers();
 		void UpdateSeeOthers();
 		void ResetSeeOthers();
-		bool Supports128();
-		int GetSpecSelectFlag(int SpecFlag);
 	} m_aMap[MAX_CLIENTS];
 	void UpdatePlayerMap(int ClientID);
 
@@ -163,8 +161,6 @@ public:
 	int GetTotalOverhang(int ClientID);
 	int GetSeeOthersInd(int ClientID, int MapID);
 	const char *GetSeeOthersName(int ClientID);
-
-	int GetSpecSelectFlag(int ClientID, int SpecFlag) { return m_aMap[ClientID].GetSpecSelectFlag(SpecFlag); }
 
 	CGameWorld();
 	~CGameWorld();
