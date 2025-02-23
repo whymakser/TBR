@@ -2358,6 +2358,11 @@ void CServer::ExpireServerInfo()
 	m_ServerInfoNeedsUpdate = true;
 }
 
+int CServer::GetMaxClients(int ClientID)
+{
+	return (m_aClients[ClientID].m_Sevendown && m_aClients[ClientID].m_DDNetVersion >= VERSION_DDNET_128) ? MAX_CLIENTS : VANILLA_MAX_CLIENTS;
+}
+
 void CServer::SendServerInfo(int ClientID)
 {
 	CMsgPacker MsgMain(NETMSG_SERVERINFO, true);

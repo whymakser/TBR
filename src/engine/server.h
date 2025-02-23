@@ -96,6 +96,8 @@ public:
 
 	virtual int SendMsg(CMsgPacker *pMsg, int Flags, int ClientID) = 0;
 
+	virtual int GetMaxClients(int ClientID) = 0;
+
 	template<class T>
 	int SendPackMsg(T *pMsg, int Flags, int ClientID)
 	{
@@ -148,7 +150,7 @@ public:
 			if (pMsg->m_Mode == CHAT_WHISPER_SEND && *pID == ClientID)
 				Translate(*pID, ClientID);
 			else
-				*pID = VANILLA_MAX_CLIENTS - 1;
+				*pID = GetMaxClients(ClientID) - 1;
 		}
 
 		if (!IsSevendown(ClientID))
@@ -231,7 +233,7 @@ public:
 
 	bool ReverseTranslate(int& Target, int Client)
 	{
-		if (Target < 0 || Target >= VANILLA_MAX_CLIENTS)
+		if (Target < 0 || Target >= GetMaxClients(Client))
 			return false;
 		int *pMap = GetIdMap(Client);
 		if (pMap[Target] == -1)
