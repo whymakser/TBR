@@ -353,18 +353,11 @@ void CGameWorld::PlayerMap::ResetSeeOthers()
 	UpdateSeeOthers();
 }
 
-bool CGameWorld::PlayerMap::Supports128()
-{
-	return m_pGameWorld->Server()->GetMaxClients(m_ClientID) > VANILLA_MAX_CLIENTS;
-}
-
 int CGameWorld::PlayerMap::GetSpecSelectFlag(int SpecFlag)
 {
-	if (SpecFlag == SPEC_FLAGRED)
-		return Supports128() ? SPEC_SELECT_FLAG_RED_128 : SPEC_SELECT_FLAG_RED;
-	else if (SpecFlag == SPEC_FLAGBLUE)
-		return Supports128() ? SPEC_SELECT_FLAG_BLUE_128 : SPEC_SELECT_FLAG_BLUE;
-	return -1;
+	if (SpecFlag != SPEC_FLAGRED && SpecFlag != SPEC_FLAGBLUE)
+		return -1;
+	return m_pGameWorld->Server()->GetMaxClients(m_ClientID) - SpecFlag;
 }
 
 void CGameWorld::PlayerMap::UpdateSeeOthers()

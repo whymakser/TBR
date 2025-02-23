@@ -124,7 +124,6 @@ private:
 		void CycleSeeOthers();
 		void UpdateSeeOthers();
 		void ResetSeeOthers();
-		bool Supports128();
 		int GetSpecSelectFlag(int SpecFlag);
 	} m_aMap[MAX_CLIENTS];
 	void UpdatePlayerMap(int ClientID);
