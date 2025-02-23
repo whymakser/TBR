@@ -255,7 +255,7 @@ public:
 		int m_PgscState; // Proxy Game Server Check
 		std::shared_ptr<CPgscLookup> m_pPgscLookup;
 
-		int m_aIdMap[MAX_CLIENTS];
+		int m_aIdMap[VANILLA_MAX_CLIENTS];
 		int m_aReverseIdMap[MAX_CLIENTS];
 
 		bool m_GotDDNetVersionPacket;
@@ -440,7 +440,6 @@ public:
 	void ExpireServerInfo() override;
 	void FillAntibot(CAntibotRoundData *pData) override;
 	const char *GetGameTypeServerInfo();
-	int GetMaxClients(int ClientID) override;
 
 	void SendRedirectSaveTeeAdd(int Port, const char *pHash) override;
 	void SendRedirectSaveTeeRemove(int Port, const char *pHash) override;

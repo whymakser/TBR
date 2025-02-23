@@ -449,14 +449,14 @@ void CGameTeams::SendTeamsState(int ClientID)
 	bool LegacyTeams = DDNetVersion >= VERSION_DDNET_UNIQUE_TEAMS;
 	CMsgPacker Msg(NETMSGTYPE_SV_TEAMSSTATE);
 
-	for(unsigned i = 0; i < Server()->GetMaxClients(ClientID); i++)
+	for(unsigned i = 0; i < VANILLA_MAX_CLIENTS; i++)
 	{
 		if (Server()->IsSevendown(ClientID) && GameServer()->FlagsUsed())
 		{
 			int Team = -1;
-			if (i == GameServer()->m_World.GetSpecSelectFlag(ClientID, SPEC_FLAGRED))
+			if (i == SPEC_SELECT_FLAG_RED)
 				Team = LegacyTeams ? 56 : 63; // red colored team, used 1 before but that is the most common team for 1vs1
-			else if (i == GameServer()->m_World.GetSpecSelectFlag(ClientID, SPEC_FLAGBLUE))
+			else if (i == SPEC_SELECT_FLAG_BLUE)
 				Team = LegacyTeams ? 60 : 36; // blue colored team
 			// try to make hook visible in most cases, i dont want to use TEAM_SUPER cause that would make names red when NONAME e.g. spookyghost
 			// but this right now means, that if u r in a team and ur dummy isnt, and u swap, and both try to hook the flag, one will have invisible hook
