@@ -622,6 +622,8 @@ int CServer::GetClientInfo(int ClientID, CClientInfo *pInfo) const
 		}
 		return 1;
 	}
+	// Reset cuz used to check if it's existing
+	pInfo->m_pConnectionID = 0;
 	return 0;
 }
 
