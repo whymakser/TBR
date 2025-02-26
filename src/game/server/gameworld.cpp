@@ -72,8 +72,13 @@ int CGameWorld::FindEntities(vec2 Pos, float Radius, CEntity **ppEnts, int Max, 
 	int Num = 0;
 	for(CEntity *pEnt = m_apFirstEntityTypes[Type];	pEnt; pEnt = pEnt->m_pNextTypeEntity)
 	{
-		if ((Type == ENTTYPE_MONEY || Type == ENTTYPE_PICKUP_DROP || Type == ENTTYPE_GROG) && Team != -1 && Team != TEAM_SUPER && Team != ((CAdvancedEntity *)pEnt)->GetDDTeam())
-			continue;
+		if (Team != -1 && Team != TEAM_SUPER)
+		{
+			if (Type == ENTTYPE_CHARACTER && Team != ((CCharacter*)pEnt)->Team())
+				continue;
+			if ((Type == ENTTYPE_MONEY || Type == ENTTYPE_PICKUP_DROP || Type == ENTTYPE_GROG) && Team != ((CAdvancedEntity*)pEnt)->GetDDTeam())
+				continue;
+		}
 
 		if(distance(pEnt->m_Pos, Pos) < Radius+pEnt->m_ProximityRadius)
 		{
