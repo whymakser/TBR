@@ -209,6 +209,8 @@ public:
 	class CCameraInfo
 	{
 	public:
+		//friend class CPlayer;
+		bool m_HasCameraInfo;
 		float m_Zoom;
 		int m_Deadzone;
 		int m_FollowFactor;

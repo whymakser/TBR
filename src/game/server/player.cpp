@@ -760,6 +760,52 @@ void CPlayer::Snap(int SnappingClient)
 		pPlayerInfo->m_Score = Score;
 	}
 
+	if(m_ClientID == SnappingClient)
+	{
+		// send extended spectator info even when playing, this allows demo to record camera settings for local player
+		const int SpectatingClient = ((m_Team != TEAM_SPECTATORS && !m_Paused) || m_SpectatorID < 0 || m_SpectatorID >= MAX_CLIENTS) ? m_ClientID : m_SpectatorID;
+		const CPlayer *pSpecPlayer = GameServer()->m_apPlayers[SpectatingClient];
+
+		if(pSpecPlayer)
+		{
+			CNetObj_DDNetSpectatorInfo *pDDNetSpectatorInfo = static_cast<CNetObj_DDNetSpectatorInfo *>(Server()->SnapNewItem(NETOBJTYPE_DDNETSPECTATORINFO, ID, sizeof(CNetObj_DDNetSpectatorInfo)));
+			if(!pDDNetSpectatorInfo)
+				return;
+
+			pDDNetSpectatorInfo->m_HasCameraInfo = pSpecPlayer->m_CameraInfo.m_HasCameraInfo;
+			pDDNetSpectatorInfo->m_Zoom = pSpecPlayer->m_CameraInfo.m_Zoom * 1000.0f;
+			pDDNetSpectatorInfo->m_Deadzone = pSpecPlayer->m_CameraInfo.m_Deadzone;
+			pDDNetSpectatorInfo->m_FollowFactor = pSpecPlayer->m_CameraInfo.m_FollowFactor;
+
+			if(SpectatingClient == m_ClientID && SnappingClient != -1 && m_Team != TEAM_SPECTATORS && !m_Paused)
+			{
+				int SpectatorCount = 0;
+				for(auto &pPlayer : GameServer()->m_apPlayers)
+				{
+					if(!pPlayer || pPlayer->m_ClientID == m_ClientID || pPlayer->m_Afk ||
+						!(pPlayer->m_Paused || pPlayer->m_Team == TEAM_SPECTATORS))
+					{
+						continue;
+					}
+
+					if(pPlayer->m_SpectatorID == m_ClientID)
+					{
+						SpectatorCount++;
+					}
+					else if(GameServer()->m_apPlayers[m_ClientID]->GetCharacter())
+					{
+						vec2 CheckPos = GameServer()->m_apPlayers[m_ClientID]->GetCharacter()->GetPos();
+						float dx = pPlayer->m_ViewPos.x - CheckPos.x;
+						float dy = pPlayer->m_ViewPos.y - CheckPos.y;
+						if(absolute(dx) < (pPlayer->m_ShowDistance.x / 2.5f) && absolute(dy) < (pPlayer->m_ShowDistance.y / 2.3f))
+							SpectatorCount++;
+					}
+				}
+				pDDNetSpectatorInfo->m_SpectatorCount = SpectatorCount;
+			}
+		}
+	}
+
 	CNetObj_DDNetPlayer *pDDNetPlayer = static_cast<CNetObj_DDNetPlayer *>(Server()->SnapNewItem(NETOBJTYPE_DDNETPLAYER, ID, sizeof(CNetObj_DDNetPlayer)));
 	if(!pDDNetPlayer)
 		return;
@@ -1058,7 +1104,7 @@ void CPlayer::OnPredictedInput(CNetObj_PlayerInput *NewInput, bool TeeControlled
 
 	AfkVoteTimer(NewInput);
 
-	if(m_pCharacter && !m_Paused && (!m_TeeControlMode || TeeControlled))
+	if(m_pCharacter && !m_Paused && (!m_TeeControlMode || TeeControlled) && !(NewInput->m_PlayerFlags & PLAYERFLAG_SPEC_CAM))
 		m_pCharacter->OnPredictedInput(NewInput);
 }
 
@@ -1086,7 +1132,8 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput, bool TeeControlled)
 		return;
 	}
 
-	if ((((!m_pCharacter && m_Team == TEAM_SPECTATORS) || m_Paused) && m_SpecMode == SPEC_FREEVIEW) || GameServer()->Arenas()->IsConfiguring(m_ClientID))
+	if (((NewInput->m_PlayerFlags & PLAYERFLAG_SPEC_CAM) || GameServer()->GetClientDDNetVersion(m_ClientID) < VERSION_DDNET_PLAYERFLAG_SPEC_CAM) &&
+		(((!m_pCharacter && m_Team == TEAM_SPECTATORS) || m_Paused) && m_SpecMode == SPEC_FREEVIEW) || GameServer()->Arenas()->IsConfiguring(m_ClientID))
 	{
 		if (m_SkipSetViewPos <= 0)
 			m_ViewPos = vec2(NewInput->m_TargetX, NewInput->m_TargetY);
@@ -1195,7 +1242,7 @@ void CPlayer::OnPredictedEarlyInput(CNetObj_PlayerInput *NewInput, bool TeeContr
 	if((m_PlayerFlags&PLAYERFLAG_CHATTING) && (NewInput->m_PlayerFlags&PLAYERFLAG_CHATTING))
 		return;
 
-	if(m_pCharacter && ApplyDirectInput(TeeControlled))
+	if(m_pCharacter && ApplyDirectInput(TeeControlled) && !(m_PlayerFlags & PLAYERFLAG_SPEC_CAM))
 		m_pCharacter->OnDirectInput(NewInput);
 }
 
@@ -2617,7 +2664,7 @@ void CPlayer::SetWeaponIndicator(bool Set)
 
 void CPlayer::SetZoomCursor(bool Set)
 {
-	if (m_ZoomCursor == Set || (!Set && GameServer()->GetClientDDNetVersion(m_ClientID) >= VERSION_DDNET_CAMERA_INFO))
+	if (m_ZoomCursor == Set || (!Set && GameServer()->GetClientDDNetVersion(m_ClientID) >= VERSION_DDNET_PLAYERFLAG_SPEC_CAM))
 		return;
 	m_ZoomCursor = Set;
 	if (Set)
@@ -2760,6 +2807,7 @@ vec2 CPlayer::CCameraInfo::ConvertTargetToWorld(vec2 Position, vec2 Target) cons
 
 void CPlayer::CCameraInfo::Write(const CNetMsg_Cl_CameraInfo *Msg)
 {
+	m_HasCameraInfo = true;
 	m_Zoom = Msg->m_Zoom / 1000.0f;
 	m_Deadzone = Msg->m_Deadzone;
 	m_FollowFactor = Msg->m_FollowFactor;
@@ -2767,6 +2815,7 @@ void CPlayer::CCameraInfo::Write(const CNetMsg_Cl_CameraInfo *Msg)
 
 void CPlayer::CCameraInfo::Reset()
 {
+	m_HasCameraInfo = false;
 	m_Zoom = 1.0f;
 	m_Deadzone = 300.0f;
 	m_FollowFactor = 60.0f;

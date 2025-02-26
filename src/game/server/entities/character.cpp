@@ -4271,7 +4271,7 @@ void CCharacter::CalculateCursorPosZoomed()
 	vec2 MousePos = vec2(m_Input.m_TargetX, m_Input.m_TargetY);
 
 	int DDNetVersion = GameServer()->GetClientDDNetVersion(m_pPlayer->GetCID());
-	if (DDNetVersion >= VERSION_DDNET_CAMERA_INFO)
+	if (DDNetVersion >= VERSION_DDNET_PLAYERFLAG_SPEC_CAM)
 	{
 		m_CursorPosZoomed = m_pPlayer->m_CameraInfo.ConvertTargetToWorld(Pos, MousePos);
 		return;

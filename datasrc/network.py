@@ -7,7 +7,7 @@ Emoticons = Enum("EMOTICON", ["OOP", "EXCLAMATION", "HEARTS", "DROP", "DOTDOT", 
 Votes = Enum("VOTE", ["UNKNOWN", "START_OP", "START_KICK", "START_SPEC", "END_ABORT", "END_PASS", "END_FAIL"]) # todo 0.8: add RUN_OP, RUN_KICK, RUN_SPEC; rem UNKNOWN
 ChatModes = Enum("CHAT", ["NONE", "ALL", "TEAM", "WHISPER", "SINGLE", "SINGLE_TEAM", "ATEVERYONE", "LOCAL", "WHISPER_SEND", "WHISPER_RECV", "POLICE_CHANNEL"])
 
-PlayerFlags = Flags("PLAYERFLAG", ["ADMIN", "CHATTING", "SCOREBOARD", "READY", "DEAD", "WATCHING", "BOT", "AIM", "IN_MENU"])
+PlayerFlags = Flags("PLAYERFLAG", ["ADMIN", "CHATTING", "SCOREBOARD", "READY", "DEAD", "WATCHING", "BOT", "AIM", "IN_MENU", "SPEC_CAM"])
 GameFlags = Flags("GAMEFLAG", ["TEAMS", "FLAGS", "SURVIVAL", "RACE"])
 GameStateFlags = Flags("GAMESTATEFLAG", ["WARMUP", "SUDDENDEATH", "ROUNDOVER", "GAMEOVER", "PAUSED", "STARTCOUNTDOWN"])
 CoreEventFlags = Flags("COREEVENTFLAG", ["GROUND_JUMP", "AIR_JUMP", "HOOK_ATTACH_PLAYER", "HOOK_ATTACH_GROUND", "HOOK_HIT_NOHOOK", "HOOK_ATTACH_FLAG"])
@@ -391,6 +391,14 @@ Objects = [
 		NetIntAny("m_SwitchNumber"),
 		NetIntAny("m_Layer"),
 		NetIntAny("m_EntityClass"),
+	]),
+
+	NetObjectEx("DDNetSpectatorInfo", "spectator-info@netobj.ddnet.org", [
+		NetBool("m_HasCameraInfo"),
+		NetIntRange("m_Zoom", 0, 'max_int'),
+		NetIntRange("m_Deadzone", 0, 'max_int'),
+		NetIntRange("m_FollowFactor", 0, 'max_int'),
+		NetIntRange("m_SpectatorCount", 0, 'MAX_CLIENTS-1'),
 	]),
 ]
 

@@ -1981,7 +1981,7 @@ bool CGameContext::OnClientDDNetVersionKnown(int ClientID)
 	}
 
 	m_World.UpdateTeamsState(ClientID);
-	if (ClientVersion >= VERSION_DDNET_CAMERA_INFO)
+	if (ClientVersion >= VERSION_DDNET_PLAYERFLAG_SPEC_CAM)
 	{
 		m_apPlayers[ClientID]->m_ZoomCursor = true;
 	}
