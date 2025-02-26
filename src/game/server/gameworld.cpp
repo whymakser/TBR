@@ -72,7 +72,7 @@ int CGameWorld::FindEntities(vec2 Pos, float Radius, CEntity **ppEnts, int Max, 
 	int Num = 0;
 	for(CEntity *pEnt = m_apFirstEntityTypes[Type];	pEnt; pEnt = pEnt->m_pNextTypeEntity)
 	{
-		if ((Type == ENTTYPE_MONEY || Type == ENTTYPE_PICKUP_DROP || Type == ENTTYPE_GROG) && Team != -1 && Team != ((CAdvancedEntity *)pEnt)->GetDDTeam())
+		if ((Type == ENTTYPE_MONEY || Type == ENTTYPE_PICKUP_DROP || Type == ENTTYPE_GROG) && Team != -1 && Team != TEAM_SUPER && Team != ((CAdvancedEntity *)pEnt)->GetDDTeam())
 			continue;
 
 		if(distance(pEnt->m_Pos, Pos) < Radius+pEnt->m_ProximityRadius)
@@ -825,7 +825,7 @@ CEntity *CGameWorld::ClosestEntity(vec2 Pos, float Radius, int Type, CEntity *pN
 		if(p == pNotThis)
 			continue;
 
-		if ((Type == ENTTYPE_MONEY || Type == ENTTYPE_PICKUP_DROP || Type == ENTTYPE_GROG) && Team != -1 && Team != ((CAdvancedEntity *)p)->GetDDTeam())
+		if ((Type == ENTTYPE_MONEY || Type == ENTTYPE_PICKUP_DROP || Type == ENTTYPE_GROG) && Team != -1 && Team != TEAM_SUPER && Team != ((CAdvancedEntity *)p)->GetDDTeam())
 			continue;
 
 		float Len = distance(Pos, p->m_Pos);
