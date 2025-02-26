@@ -2423,6 +2423,7 @@ void CCharacter::SnapCharacter(int SnappingClient, int ID)
 		if (m_pPlayer->m_PlayerFlags&PLAYERFLAG_CHATTING) PlayerFlags |= 4;
 		if (m_pPlayer->m_PlayerFlags&PLAYERFLAG_SCOREBOARD) PlayerFlags |= 8;
 		if (m_pPlayer->m_PlayerFlags&PLAYERFLAG_AIM) PlayerFlags |= 16;
+		if (m_pPlayer->m_PlayerFlags&PLAYERFLAG_SPEC_CAM) PlayerFlags |= 32;
 
 		int Health = pCharacter->m_Health;
 		int Armor = pCharacter->m_Armor;

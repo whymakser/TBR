@@ -1081,6 +1081,7 @@ void CPlayer::TranslatePlayerFlags(CNetObj_PlayerInput *NewInput)
 	if (NewInput->m_PlayerFlags&4) PlayerFlags |= PLAYERFLAG_CHATTING;
 	if (NewInput->m_PlayerFlags&8) PlayerFlags |= PLAYERFLAG_SCOREBOARD;
 	if (NewInput->m_PlayerFlags&16) PlayerFlags |= PLAYERFLAG_AIM;
+	if (NewInput->m_PlayerFlags&32) PlayerFlags |= PLAYERFLAG_SPEC_CAM;
 	NewInput->m_PlayerFlags = PlayerFlags;
 }
 
@@ -1132,16 +1133,24 @@ void CPlayer::OnDirectInput(CNetObj_PlayerInput *NewInput, bool TeeControlled)
 		return;
 	}
 
-	if (((NewInput->m_PlayerFlags & PLAYERFLAG_SPEC_CAM) || GameServer()->GetClientDDNetVersion(m_ClientID) < VERSION_DDNET_PLAYERFLAG_SPEC_CAM) &&
-		(((!m_pCharacter && m_Team == TEAM_SPECTATORS) || m_Paused) && m_SpecMode == SPEC_FREEVIEW) || GameServer()->Arenas()->IsConfiguring(m_ClientID))
+	if ((((!m_pCharacter && m_Team == TEAM_SPECTATORS) || m_Paused) && m_SpecMode == SPEC_FREEVIEW) || GameServer()->Arenas()->IsConfiguring(m_ClientID))
 	{
 		if (m_SkipSetViewPos <= 0)
-			m_ViewPos = vec2(NewInput->m_TargetX, NewInput->m_TargetY);
+		{
+			if (((NewInput->m_PlayerFlags & PLAYERFLAG_SPEC_CAM) || GameServer()->GetClientDDNetVersion(m_ClientID) < VERSION_DDNET_PLAYERFLAG_SPEC_CAM))
+			{
+				m_ViewPos = vec2(NewInput->m_TargetX, NewInput->m_TargetY);
+			}
+		}
 		else
+		{
 			m_SkipSetViewPos--;
+		}
 	}
 	else
+	{
 		SkipSetViewPos();
+	}
 
 	if(NewInput->m_PlayerFlags&PLAYERFLAG_CHATTING)
 	{
