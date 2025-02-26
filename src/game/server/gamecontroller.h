@@ -43,8 +43,8 @@ class IGameController
 		float m_Score;
 	};
 
-	float EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos) const;
-	void EvaluateSpawnType(CSpawnEval* pEval, int MapIndex) const;
+	float EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos, int DDTeam) const;
+	void EvaluateSpawnType(CSpawnEval* pEval, int MapIndex, int DDTeam) const;
 
 protected:
 
@@ -129,7 +129,7 @@ public:
 	void ChangeMap(const char *pToMap);
 
 	//spawn
-	bool CanSpawn(vec2* pPos, int Index) const;
+	bool CanSpawn(vec2* pPos, int Index, int DDTeam) const;
 
 	// team
 	bool CanJoinTeam(int Team, int NotThisID) const;

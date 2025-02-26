@@ -187,7 +187,7 @@ public:
 		Returns:
 			Number of entities found and added to the ents array.
 	*/
-	int FindEntities(vec2 Pos, float Radius, CEntity **ppEnts, int Max, int Type);
+	int FindEntities(vec2 Pos, float Radius, CEntity **ppEnts, int Max, int Type, int Team = -1);
 
 	/*
 		Function: closest_CEntity
@@ -202,7 +202,7 @@ public:
 		Returns:
 			Returns a pointer to the closest CEntity or NULL if no CEntity is close enough.
 	*/
-	CEntity *ClosestEntity(vec2 Pos, float Radius, int Type, CEntity *pNotThis, bool CheckWall = false);
+	CEntity *ClosestEntity(vec2 Pos, float Radius, int Type, CEntity *pNotThis, bool CheckWall = false, int Team = -1);
 
 	/*
 		Function: interserct_CCharacter
@@ -232,7 +232,7 @@ public:
 		Returns:
 			Returns a pointer to the closest CCharacter or NULL if no CCharacter is close enough.
 	*/
-	class CCharacter* ClosestCharacter(vec2 Pos, float Radius, CEntity* ppNotThis, int CollideWith = -1, bool CheckPassive = true, bool CheckWall = false, bool CheckMinigameTee = false);
+	class CCharacter* ClosestCharacter(vec2 Pos, float Radius, CEntity* ppNotThis, int CollideWith = -1, bool CheckPassive = true, bool CheckWall = false, bool CheckMinigameTee = false, int Team = -1);
 
 	/*
 		Function: insert_entity

@@ -1430,7 +1430,7 @@ void CPlayer::TryRespawn()
 		if (!GameServer()->Collision()->TileUsed(Index))
 			Index = ENTITY_SPAWN;
 
-		if (m_ForceSpawnPos == vec2(-1, -1) && !GameServer()->m_pController->CanSpawn(&SpawnPos, Index))
+		if (m_ForceSpawnPos == vec2(-1, -1) && !GameServer()->m_pController->CanSpawn(&SpawnPos, Index, GameServer()->GetDDRaceTeam(m_ClientID)))
 			return;
 	}
 

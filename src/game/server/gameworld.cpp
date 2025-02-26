@@ -64,7 +64,7 @@ CEntity *CGameWorld::FindFirst(int Type)
 	return Type < 0 || Type >= NUM_ENTTYPES ? 0 : m_apFirstEntityTypes[Type];
 }
 
-int CGameWorld::FindEntities(vec2 Pos, float Radius, CEntity **ppEnts, int Max, int Type)
+int CGameWorld::FindEntities(vec2 Pos, float Radius, CEntity **ppEnts, int Max, int Type, int Team)
 {
 	if(Type < 0 || Type >= NUM_ENTTYPES)
 		return 0;
@@ -72,6 +72,9 @@ int CGameWorld::FindEntities(vec2 Pos, float Radius, CEntity **ppEnts, int Max, 
 	int Num = 0;
 	for(CEntity *pEnt = m_apFirstEntityTypes[Type];	pEnt; pEnt = pEnt->m_pNextTypeEntity)
 	{
+		if ((Type == ENTTYPE_MONEY || Type == ENTTYPE_PICKUP_DROP || Type == ENTTYPE_GROG) && Team != -1 && Team != ((CAdvancedEntity *)pEnt)->GetDDTeam())
+			continue;
+
 		if(distance(pEnt->m_Pos, Pos) < Radius+pEnt->m_ProximityRadius)
 		{
 			if(ppEnts)
@@ -810,7 +813,7 @@ CCharacter* CGameWorld::IntersectCharacter(vec2 Pos0, vec2 Pos1, float Radius, v
 }
 
 
-CEntity *CGameWorld::ClosestEntity(vec2 Pos, float Radius, int Type, CEntity *pNotThis, bool CheckWall)
+CEntity *CGameWorld::ClosestEntity(vec2 Pos, float Radius, int Type, CEntity *pNotThis, bool CheckWall, int Team)
 {
 	// Find other players
 	float ClosestRange = Radius*2;
@@ -820,6 +823,9 @@ CEntity *CGameWorld::ClosestEntity(vec2 Pos, float Radius, int Type, CEntity *pN
 	for(; p; p = p->TypeNext())
  	{
 		if(p == pNotThis)
+			continue;
+
+		if ((Type == ENTTYPE_MONEY || Type == ENTTYPE_PICKUP_DROP || Type == ENTTYPE_GROG) && Team != -1 && Team != ((CAdvancedEntity *)p)->GetDDTeam())
 			continue;
 
 		float Len = distance(Pos, p->m_Pos);
@@ -839,7 +845,7 @@ CEntity *CGameWorld::ClosestEntity(vec2 Pos, float Radius, int Type, CEntity *pN
 	return pClosest;
 }
 
-CCharacter* CGameWorld::ClosestCharacter(vec2 Pos, float Radius, CEntity* pNotThis, int CollideWith, bool CheckPassive, bool CheckWall, bool CheckMinigameTee)
+CCharacter* CGameWorld::ClosestCharacter(vec2 Pos, float Radius, CEntity* pNotThis, int CollideWith, bool CheckPassive, bool CheckWall, bool CheckMinigameTee, int Team)
 {
 	// Find other players
 	float ClosestRange = Radius * 2;
@@ -849,6 +855,9 @@ CCharacter* CGameWorld::ClosestCharacter(vec2 Pos, float Radius, CEntity* pNotTh
 	for (; p; p = (CCharacter*)p->TypeNext())
 	{
 		if (p == pNotThis)
+			continue;
+
+		if (Team != -1 && Team != p->Team())
 			continue;
 
 		if (CollideWith != -1 && !p->CanCollide(CollideWith, CheckPassive))

@@ -24,6 +24,8 @@ public:
 	void SetPrevPos(vec2 Pos) { m_PrevPos = Pos; }
 	virtual void ReleaseHooked() {}
 
+	int GetDDTeam() { return m_DDTeam; }
+
 protected:
 	bool IsGrounded(bool GroundVel = false, bool AirVel = false);
 	// HandleDropped() has to be called within the tick function of the child entity whenever the entity is dropped and not being carried
@@ -42,6 +44,7 @@ protected:
 	bool m_CheckDeath;
 	bool m_CheckGameLayerClipped;
 	Mask128 m_TeamMask;
+	int m_DDTeam;
 
 	bool m_Gravity;
 	bool m_GroundVel;

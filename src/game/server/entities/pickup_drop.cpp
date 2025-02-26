@@ -146,7 +146,7 @@ void CPickupDrop::Pickup()
 int CPickupDrop::IsCharacterNear()
 {
 	CCharacter *apEnts[MAX_CLIENTS];
-	int Num = GameWorld()->FindEntities(m_Pos, 20.0f, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
+	int Num = GameWorld()->FindEntities(m_Pos, 20.0f, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER, m_DDTeam);
 
 	for (int i = 0; i < Num; i++)
 	{
@@ -198,7 +198,7 @@ void CPickupDrop::IsShieldNear()
 		return;
 
 	CPickup *apEnts[9];
-	int Num = GameWorld()->FindEntities(m_Pos, 20.0f, (CEntity**)apEnts, 9, CGameWorld::ENTTYPE_PICKUP);
+	int Num = GameWorld()->FindEntities(m_Pos, 20.0f, (CEntity**)apEnts, 9, CGameWorld::ENTTYPE_PICKUP, m_DDTeam);
 
 	for (int i = 0; i < Num; i++)
 	{

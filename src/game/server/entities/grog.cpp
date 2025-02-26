@@ -145,7 +145,7 @@ void CGrog::Tick()
 			// Nudging
 			m_ProcessedNudge = false;
 			CGrog *apEnts[4];
-			int Num = GameWorld()->FindEntities(m_Pos, 40.f, (CEntity * *)apEnts, 4, CGameWorld::ENTTYPE_GROG);
+			int Num = GameWorld()->FindEntities(m_Pos, 40.f, (CEntity * *)apEnts, 4, CGameWorld::ENTTYPE_GROG, m_DDTeam);
 			for (int i = 0; i < Num; ++i)
 			{
 				CGrog *pGrog = apEnts[i];
@@ -192,7 +192,7 @@ void CGrog::Tick()
 void CGrog::Pickup()
 {
 	CCharacter *apEnts[MAX_CLIENTS];
-	int Num = GameWorld()->FindEntities(m_Pos, 20.0f, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
+	int Num = GameWorld()->FindEntities(m_Pos, 20.0f, (CEntity**)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER, m_DDTeam);
 
 	for (int i = 0; i < Num; i++)
 	{

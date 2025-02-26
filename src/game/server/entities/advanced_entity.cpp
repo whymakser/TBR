@@ -15,6 +15,7 @@ CAdvancedEntity::CAdvancedEntity(CGameWorld *pGameWorld, int Objtype, vec2 Pos, 
 	m_TeleCheckpoint = GetOwner() ? GetOwner()->m_TeleCheckpoint : 0;
 	m_PrevPos = m_Pos;
 	m_TeamMask = GetOwner() ? GetOwner()->TeamMask() : Mask128();
+	m_DDTeam = GetOwner() ? GetOwner()->Team() : 0;
 	m_Gravity = true;
 	m_GroundVel = true;
 	m_AirVel = true;
@@ -174,10 +175,7 @@ bool CAdvancedEntity::IsSwitchActiveCb(int Number, void* pUser)
 {
 	CAdvancedEntity *pThis = (CAdvancedEntity *)pUser;
 	CCollision* pCollision = pThis->GameServer()->Collision();
-	int Team = 0;
-	if (pThis->GetOwner())
-		Team = pThis->GetOwner()->Team();
-	return pCollision->m_pSwitchers && pCollision->m_pSwitchers[Number].m_Status[Team] && Team != TEAM_SUPER;
+	return pCollision->m_pSwitchers && pThis->m_DDTeam != TEAM_SUPER && pCollision->m_pSwitchers[Number].m_Status[pThis->m_DDTeam];
 }
 
 CCollision::MoveRestrictionExtra CAdvancedEntity::GetMoveRestrictionExtra()
@@ -259,7 +257,7 @@ void CAdvancedEntity::HandleTiles(int Index)
 		}
 		// if no checkpointout have been found (or if there no recorded checkpoint), teleport to start
 		vec2 SpawnPos;
-		if (GameServer()->m_pController->CanSpawn(&SpawnPos, ENTITY_SPAWN))
+		if (GameServer()->m_pController->CanSpawn(&SpawnPos, ENTITY_SPAWN, m_DDTeam))
 		{
 			m_PrevPos = m_Pos = SpawnPos;
 			m_Vel = vec2(0, 0);
@@ -282,7 +280,7 @@ void CAdvancedEntity::HandleTiles(int Index)
 		}
 		// if no checkpointout have been found (or if there no recorded checkpoint), teleport to start
 		vec2 SpawnPos;
-		if (GameServer()->m_pController->CanSpawn(&SpawnPos, ENTITY_SPAWN))
+		if (GameServer()->m_pController->CanSpawn(&SpawnPos, ENTITY_SPAWN, m_DDTeam))
 			m_PrevPos = m_Pos = SpawnPos;
 		return;
 	}

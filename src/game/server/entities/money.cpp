@@ -50,7 +50,7 @@ void CMoney::Tick()
 
 	m_Gravity = true;
 
-	CCharacter *pClosest = GameWorld()->ClosestCharacter(m_Pos, RADIUS_FIND_PLAYERS, SecondsPassed(2) ? 0 : GetOwner(), m_Owner, false, true);
+	CCharacter *pClosest = GameWorld()->ClosestCharacter(m_Pos, RADIUS_FIND_PLAYERS, SecondsPassed(2) ? 0 : GetOwner(), m_Owner, false, true, m_DDTeam);
 	if (pClosest)
 	{
 		if (distance(m_Pos, pClosest->GetPos()) < GetRadius() + pClosest->GetProximityRadius())
@@ -71,7 +71,7 @@ void CMoney::Tick()
 			MoveTo(pClosest->GetPos(), RADIUS_FIND_PLAYERS);
 	}
 
-	CMoney *pMoney = (CMoney *)GameWorld()->ClosestEntity(m_Pos, RADIUS_FIND_MONEY, CGameWorld::ENTTYPE_MONEY, this, true);
+	CMoney *pMoney = (CMoney *)GameWorld()->ClosestEntity(m_Pos, RADIUS_FIND_MONEY, CGameWorld::ENTTYPE_MONEY, this, true, m_DDTeam);
 	if (pMoney)
 	{
 		if (distance(m_Pos, pMoney->GetPos()) < GetRadius() + pMoney->GetRadius())

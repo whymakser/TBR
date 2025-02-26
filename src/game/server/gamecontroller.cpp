@@ -50,23 +50,27 @@ IGameController::IGameController(CGameContext *pGameServer)
 	m_CurrentRecord = 0;
 }
 
-bool IGameController::CanSpawn(vec2 *pOutPos, int Index) const
+bool IGameController::CanSpawn(vec2 *pOutPos, int Index, int DDTeam) const
 {
 	if (Index < TILE_AIR || Index >= NUM_INDICES)
 		return false;
 
 	CSpawnEval Eval;
-	EvaluateSpawnType(&Eval, Index);
+	EvaluateSpawnType(&Eval, Index, DDTeam);
 	*pOutPos = Eval.m_Pos;
 	return Eval.m_Got;
 }
 
-float IGameController::EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos) const
+float IGameController::EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos, int DDTeam) const
 {
 	float Score = 0.0f;
 	CCharacter *pC = static_cast<CCharacter *>(GameServer()->m_World.FindFirst(CGameWorld::ENTTYPE_CHARACTER));
 	for(; pC; pC = (CCharacter *)pC->TypeNext())
 	{
+		// ignore players in other teams
+		if(GameServer()->GetDDRaceTeam(pC->GetPlayer()->GetCID()) != DDTeam)
+			continue;
+
 		// team mates are not as dangerous as enemies
 		float Scoremod = 1.0f;
 		if(pEval->m_FriendlyTeam != -1 && pC->GetPlayer()->GetTeam() == pEval->m_FriendlyTeam)
@@ -79,7 +83,7 @@ float IGameController::EvaluateSpawnPos(CSpawnEval *pEval, vec2 Pos) const
 	return Score;
 }
 
-void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int MapIndex) const
+void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int MapIndex, int DDTeam) const
 {
 	// get spawn point
 	for(unsigned int i = 0; i < GameServer()->Collision()->m_vTiles[MapIndex].size(); i++)
@@ -104,7 +108,7 @@ void IGameController::EvaluateSpawnType(CSpawnEval *pEval, int MapIndex) const
 			continue;	// try next spawn point
 
 		vec2 P = GameServer()->Collision()->m_vTiles[MapIndex][i] + Positions[Result];
-		float S = EvaluateSpawnPos(pEval, P);
+		float S = EvaluateSpawnPos(pEval, P, DDTeam);
 		if(!pEval->m_Got || pEval->m_Score > S)
 		{
 			pEval->m_Got = true;

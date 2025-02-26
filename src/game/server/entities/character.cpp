@@ -3644,7 +3644,7 @@ void CCharacter::HandleTiles(int Index)
 		}
 		// if no checkpointout have been found (or if there no recorded checkpoint), teleport to start
 		vec2 SpawnPos;
-		if (GameServer()->m_pController->CanSpawn(&SpawnPos, ENTITY_SPAWN))
+		if (GameServer()->m_pController->CanSpawn(&SpawnPos, ENTITY_SPAWN, Team()))
 		{
 			if (FightStarted)
 			{
@@ -3691,7 +3691,7 @@ void CCharacter::HandleTiles(int Index)
 		}
 		// if no checkpointout have been found (or if there no recorded checkpoint), teleport to start
 		vec2 SpawnPos;
-		if (GameServer()->m_pController->CanSpawn(&SpawnPos, ENTITY_SPAWN))
+		if (GameServer()->m_pController->CanSpawn(&SpawnPos, ENTITY_SPAWN, Team()))
 		{
 			if (FightStarted)
 			{
@@ -5408,7 +5408,7 @@ bool CCharacter::LoadRedirectTile(int Port)
 	}
 
 	// nothing found, send to spawn tile
-	if (GameServer()->m_pController->CanSpawn(&Pos, ENTITY_SPAWN))
+	if (GameServer()->m_pController->CanSpawn(&Pos, ENTITY_SPAWN, Team()))
 		ForceSetPos(Pos);
 	return false;
 }
