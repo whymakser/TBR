@@ -830,8 +830,13 @@ CEntity *CGameWorld::ClosestEntity(vec2 Pos, float Radius, int Type, CEntity *pN
 		if(p == pNotThis)
 			continue;
 
-		if ((Type == ENTTYPE_MONEY || Type == ENTTYPE_PICKUP_DROP || Type == ENTTYPE_GROG) && Team != -1 && Team != TEAM_SUPER && Team != ((CAdvancedEntity *)p)->GetDDTeam())
-			continue;
+		if (Team != -1 && Team != TEAM_SUPER)
+		{
+			if (Type == ENTTYPE_CHARACTER && Team != ((CCharacter*)p)->Team())
+				continue;
+			if ((Type == ENTTYPE_MONEY || Type == ENTTYPE_PICKUP_DROP || Type == ENTTYPE_GROG) && Team != ((CAdvancedEntity*)p)->GetDDTeam())
+				continue;
+		}
 
 		float Len = distance(Pos, p->m_Pos);
 		if(Len < p->m_ProximityRadius+Radius)

@@ -72,13 +72,14 @@ void CMoney::Tick()
 	}
 
 	CMoney *pMoney = (CMoney *)GameWorld()->ClosestEntity(m_Pos, RADIUS_FIND_MONEY, CGameWorld::ENTTYPE_MONEY, this, true, m_DDTeam);
-	if (pMoney)
+	if (pMoney && !pMoney->IsMarkedForDestroy())
 	{
 		if (distance(m_Pos, pMoney->GetPos()) < GetRadius() + pMoney->GetRadius())
 		{
-			m_Amount += pMoney->m_Amount;
-			pMoney->Reset();
+			pMoney->m_Amount += m_Amount;
 			GameServer()->CreateDeath(m_Pos, m_Owner, m_TeamMask);
+			Reset();
+			return;
 		}
 		else if (!pClosest)
 			MoveTo(pMoney->GetPos(), RADIUS_FIND_MONEY);
