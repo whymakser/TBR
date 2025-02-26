@@ -152,7 +152,7 @@ int CPickupDrop::IsCharacterNear()
 	{
 		CCharacter* pChr = apEnts[i];
 
-		if (m_PickupDelay > 0 && pChr == GetOwner())
+		if ((m_PickupDelay > 0 && pChr == GetOwner()) || (m_Owner >= 0 && !pChr->CanCollide(m_Owner, false)))
 			continue;
 
 		if (m_Type == POWERUP_WEAPON)

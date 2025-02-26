@@ -151,7 +151,7 @@ void CGrog::Tick()
 				CGrog *pGrog = apEnts[i];
 				if (pGrog == this || pGrog->m_ProcessedNudge || pGrog->m_Lifetime != -1)
 					continue;
-				if (pGrog->m_LastDirChange + Server()->TickSpeed() / 3 < Server()->Tick())
+				if (pGrog->m_LastDirChange + Server()->TickSpeed() / 3 < Server()->Tick() || (pGrog->m_Owner >= 0 && !GetOwner()->CanCollide(pGrog->m_Owner, false)))
 					continue;
 				if (m_Direction == pGrog->m_Direction || (m_Direction == -1 && m_Pos.x < pGrog->GetPos().x) || (m_Direction == 1 && m_Pos.x > pGrog->GetPos().x))
 					continue;
@@ -196,7 +196,7 @@ void CGrog::Pickup()
 	for (int i = 0; i < Num; i++)
 	{
 		CCharacter* pChr = apEnts[i];
-		if (m_PickupDelay > 0 && pChr == GetOwner())
+		if ((m_PickupDelay > 0 && pChr == GetOwner()) || (m_Owner >= 0 && !pChr->CanCollide(m_Owner, false)))
 			continue;
 
 		if (pChr->AddGrog())
