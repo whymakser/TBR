@@ -39,7 +39,10 @@ CCharacter *CAdvancedEntity::GetOwner()
 void CAdvancedEntity::Tick()
 {
 	if (m_Owner >= 0 && !GameServer()->m_apPlayers[m_Owner])
+	{
 		m_Owner = -1;
+		m_DDTeam = 0;
+	}
 
 	m_TeamMask = GetOwner() ? GetOwner()->TeamMask() : Mask128();
 
