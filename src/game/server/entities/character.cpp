@@ -1542,7 +1542,7 @@ void CCharacter::TickDeferred()
 
 	if (Events&(COREEVENTFLAG_GROUND_JUMP|COREEVENTFLAG_HOOK_ATTACH_GROUND|COREEVENTFLAG_HOOK_HIT_NOHOOK))
 	{
-		Mask256 TeamMask = TeamMaskExceptSelf(true);
+		Mask128 TeamMask = TeamMaskExceptSelf(true);
 		if(Events&COREEVENTFLAG_GROUND_JUMP) GameServer()->CreateSound(m_Pos, SOUND_PLAYER_JUMP, TeamMask);
 		if(Events&COREEVENTFLAG_HOOK_ATTACH_GROUND) GameServer()->CreateSound(m_Pos, SOUND_HOOK_ATTACH_GROUND, TeamMask);
 		if(Events&COREEVENTFLAG_HOOK_HIT_NOHOOK) GameServer()->CreateSound(m_Pos, SOUND_HOOK_NOATTACH, TeamMask);
@@ -1883,7 +1883,7 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 		// do damage Hit sound
 		if(From >= 0 && From != m_pPlayer->GetCID() && GameServer()->m_apPlayers[From])
 		{
-			Mask256 Mask = CmaskOne(From);
+			Mask128 Mask = CmaskOne(From);
 			for(int i = 0; i < MAX_CLIENTS; i++)
 			{
 				if(GameServer()->m_apPlayers[i] && GameServer()->m_apPlayers[i]->GetTeam() == TEAM_SPECTATORS && GameServer()->m_apPlayers[i]->GetSpectatorID() == From)
@@ -2471,12 +2471,12 @@ int CCharacter::Team()
 	return Teams()->m_Core.Team(m_pPlayer->GetCID());
 }
 
-Mask256 CCharacter::TeamMask(bool SevendownOnly)
+Mask128 CCharacter::TeamMask(bool SevendownOnly)
 {
 	return Teams()->TeamMask(Team(), -1, m_pPlayer->GetCID(), SevendownOnly);
 }
 
-Mask256 CCharacter::TeamMaskExceptSelf(bool SevendownOnly)
+Mask128 CCharacter::TeamMaskExceptSelf(bool SevendownOnly)
 {
 	return Teams()->TeamMask(Team(), m_pPlayer->GetCID(), m_pPlayer->GetCID(), SevendownOnly);
 }

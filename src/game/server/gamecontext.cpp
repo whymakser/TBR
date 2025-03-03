@@ -274,7 +274,7 @@ void CGameContext::FillAntibot(CAntibotRoundData *pData)
 	}
 }
 
-void CGameContext::CreateDamage(vec2 Pos, int Id, vec2 Source, int HealthAmount, int ArmorAmount, bool Self, Mask256 Mask, int SevendownAmount)
+void CGameContext::CreateDamage(vec2 Pos, int Id, vec2 Source, int HealthAmount, int ArmorAmount, bool Self, Mask128 Mask, int SevendownAmount)
 {
 	float a = 3 * 3.14159f / 2 + -atan2(Source.x, Source.y);
 	float s = a-pi/3;
@@ -308,7 +308,7 @@ void CGameContext::CreateDamage(vec2 Pos, int Id, vec2 Source, int HealthAmount,
 	}
 }
 
-void CGameContext::CreateHammerHit(vec2 Pos, Mask256 Mask)
+void CGameContext::CreateHammerHit(vec2 Pos, Mask128 Mask)
 {
 	// create the event
 	CNetEvent_HammerHit *pEvent = (CNetEvent_HammerHit *)m_Events.Create(NETEVENTTYPE_HAMMERHIT, sizeof(CNetEvent_HammerHit), Mask);
@@ -320,7 +320,7 @@ void CGameContext::CreateHammerHit(vec2 Pos, Mask256 Mask)
 }
 
 
-void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamage, int ActivatedTeam, Mask256 Mask)
+void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamage, int ActivatedTeam, Mask128 Mask)
 {
 	// create the event
 	CNetEvent_Explosion *pEvent = (CNetEvent_Explosion *)m_Events.Create(NETEVENTTYPE_EXPLOSION, sizeof(CNetEvent_Explosion), Mask);
@@ -339,7 +339,7 @@ void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamag
 	if (Config()->m_SvInteractiveDrops)
 		Types |= (1<<CGameWorld::ENTTYPE_FLAG) | (1<<CGameWorld::ENTTYPE_PICKUP_DROP) | (1<<CGameWorld::ENTTYPE_MONEY) | (1<<CGameWorld::ENTTYPE_GROG);
 	int Num = m_World.FindEntitiesTypes(Pos, Radius, (CEntity * *)apEnts, MAX_CLIENTS, Types);
-	Mask256 TeamMask = Mask256();
+	Mask128 TeamMask = Mask128();
 	for (int i = 0; i < Num; i++)
 	{
 		CCharacter *pChr = 0;
@@ -404,7 +404,7 @@ void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamag
 	}
 }
 
-void CGameContext::CreatePlayerSpawn(vec2 Pos, Mask256 Mask)
+void CGameContext::CreatePlayerSpawn(vec2 Pos, Mask128 Mask)
 {
 	// create the event
 	CNetEvent_Spawn *pEvent = (CNetEvent_Spawn *)m_Events.Create(NETEVENTTYPE_SPAWN, sizeof(CNetEvent_Spawn), Mask);
@@ -415,7 +415,7 @@ void CGameContext::CreatePlayerSpawn(vec2 Pos, Mask256 Mask)
 	}
 }
 
-void CGameContext::CreateDeath(vec2 Pos, int ClientID, Mask256 Mask)
+void CGameContext::CreateDeath(vec2 Pos, int ClientID, Mask128 Mask)
 {
 	// create the event
 	CNetEvent_Death *pEvent = (CNetEvent_Death *)m_Events.Create(NETEVENTTYPE_DEATH, sizeof(CNetEvent_Death), Mask);
@@ -427,7 +427,7 @@ void CGameContext::CreateDeath(vec2 Pos, int ClientID, Mask256 Mask)
 	}
 }
 
-void CGameContext::CreateFinishConfetti(vec2 Pos, Mask256 Mask)
+void CGameContext::CreateFinishConfetti(vec2 Pos, Mask128 Mask)
 {
 	// create the event
 	CNetEvent_Finish *pEvent = (CNetEvent_Finish *)m_Events.Create(NETEVENTTYPE_FINISH, sizeof(CNetEvent_Finish), Mask);
@@ -438,7 +438,7 @@ void CGameContext::CreateFinishConfetti(vec2 Pos, Mask256 Mask)
 	}
 }
 
-void CGameContext::CreateSound(vec2 Pos, int Sound, Mask256 Mask)
+void CGameContext::CreateSound(vec2 Pos, int Sound, Mask128 Mask)
 {
 	if (Sound < 0)
 		return;
@@ -4872,9 +4872,9 @@ int CGameContext::GetClientDDNetVersion(int ClientID)
 	return Info.m_DDNetVersion;
 }
 
-Mask256 CGameContext::ClientsMaskExcludeClientVersionAndHigher(int Version)
+Mask128 CGameContext::ClientsMaskExcludeClientVersionAndHigher(int Version)
 {
-	Mask256 Mask = CmaskNone();
+	Mask128 Mask = CmaskNone();
 	for(int i = 0; i < MAX_CLIENTS; ++i)
 	{
 		if(GetClientDDNetVersion(i) >= Version)

@@ -43,7 +43,7 @@ protected:
 
 	bool m_CheckDeath;
 	bool m_CheckGameLayerClipped;
-	Mask256 m_TeamMask;
+	Mask128 m_TeamMask;
 	int m_DDTeam;
 
 	bool m_Gravity;

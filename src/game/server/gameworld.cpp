@@ -281,7 +281,7 @@ const char *CGameWorld::GetSeeOthersName(int ClientID)
 
 	if (State == PlayerMap::SSeeOthers::STATE_PAGE_FIRST)
 	{
-		if (m_aMap[ClientID].m_TotalOverhang > m_aMap[ClientID].GetMaxNumSeeOthers())
+		if (m_aMap[ClientID].m_TotalOverhang > PlayerMap::SSeeOthers::MAX_NUM_SEE_OTHERS)
 			str_format(aName, sizeof(aName), "%s 1/2", pDot);
 		else
 			str_format(aName, sizeof(aName), "%s Close", pDot);
@@ -306,7 +306,7 @@ void CGameWorld::PlayerMap::CycleSeeOthers()
 		if (m_pMap[i] != -1)
 			m_aWasSeeOthers[m_pMap[i]] = true;
 
-	int Size = min(m_TotalOverhang, GetMaxNumSeeOthers());
+	int Size = min(m_TotalOverhang, (int)PlayerMap::SSeeOthers::MAX_NUM_SEE_OTHERS);
 	int Added = 0;
 	int MapID = GetMapSize()-1;
 	for (int i = 0; i < MAX_CLIENTS; i++)
@@ -366,11 +366,6 @@ int CGameWorld::PlayerMap::GetSpecSelectFlag(int SpecFlag)
 	if (SpecFlag != SPEC_FLAGRED && SpecFlag != SPEC_FLAGBLUE)
 		return -1;
 	return m_pGameWorld->Server()->GetMaxClients(m_ClientID) - SpecFlag;
-}
-
-int CGameWorld::PlayerMap::GetMaxNumSeeOthers()
-{
-	return m_pGameWorld->Server()->GetMaxClients(m_ClientID) >= DDNET_MAX_CLIENTS ? MAX_NUM_SEE_OTHERS_DDNET : MAX_NUM_SEE_OTHERS;
 }
 
 void CGameWorld::PlayerMap::UpdateSeeOthers()

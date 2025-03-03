@@ -30,7 +30,7 @@ CPickup::CPickup(CGameWorld* pGameWorld, vec2 Pos, int Type, int SubType, int La
 		m_aLastRespawnMsg[i] = 0;
 
 	m_PickupTick = 0;
-	m_TeamMask = Mask256();
+	m_TeamMask = Mask128();
 
 	Reset();
 

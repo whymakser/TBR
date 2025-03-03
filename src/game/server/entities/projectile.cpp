@@ -58,7 +58,7 @@ CProjectile::CProjectile
 	DetermineTuning();
 	m_DefaultTuning = IsDefaultTuning() && m_DDrace;
 
-	m_TeamMask = Mask256();
+	m_TeamMask = Mask128();
 	m_LastResetPos = Pos;
 	m_LastResetTick = Server()->Tick();
 	m_CalculatedVel = false;
@@ -112,7 +112,7 @@ void CProjectile::Tick()
 	{
 		IsWeaponCollide = true;
 	}
-	m_TeamMask = Mask256();
+	m_TeamMask = Mask128();
 	if (pOwnerChar && pOwnerChar->IsAlive())
 	{
 		m_TeamMask = pOwnerChar->TeamMask();

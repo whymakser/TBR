@@ -5,7 +5,7 @@ CEpicCircle::CEpicCircle(CGameWorld *pGameWorld, vec2 Pos, int Owner)
 : CEntity(pGameWorld, CGameWorld::ENTTYPE_PROJECTILE, Pos)
 {
 	m_Owner = Owner;
-	m_TeamMask = Mask256();
+	m_TeamMask = Mask128();
 
 	for(int i = 0; i < MAX_PARTICLES; i ++)
 		m_aIDs[i] = Server()->SnapNewID();

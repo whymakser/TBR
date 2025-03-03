@@ -12,7 +12,7 @@ CFlyingPoint::CFlyingPoint(CGameWorld *pGameWorld, vec2 Pos, int To, int Owner, 
 	m_To = To;
 	m_ToPos = ToPos;
 	m_InitialAmount = 1.0f;
-	m_TeamMask = Mask256();
+	m_TeamMask = Mask128();
 	GameWorld()->InsertEntity(this);
 }
 
@@ -47,7 +47,7 @@ void CFlyingPoint::Tick()
 	}
 	else
 	{
-		m_TeamMask = Mask256();
+		m_TeamMask = Mask128();
 	}
 
 	float Dist = distance(m_Pos, ToPos);

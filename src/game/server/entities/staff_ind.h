@@ -16,7 +16,7 @@ class CStaffInd : public CEntity
 	int m_aID[NUM_IDS];
 	vec2 m_aPos[2];
 
-	Mask256 m_TeamMask;
+	Mask128 m_TeamMask;
 	int m_Owner;
 	float m_Dist;
 	bool m_BallFirst;

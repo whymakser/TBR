@@ -39,7 +39,7 @@ private:
 	void makeLaser(char pChar, int pCharOffset, int& charCount);
 
 	int m_Owner;
-	Mask256 m_TeamMask;
+	Mask128 m_TeamMask;
 	
 	int m_AliveTicks;
 	int m_CurTicks;

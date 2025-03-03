@@ -31,7 +31,7 @@ private:
 	int m_EvalTick;
 	int m_LifeTime;
 
-	Mask256 m_TeamMask;
+	Mask128 m_TeamMask;
 	CCharacter* m_pOwner;
 	int m_Owner;
 

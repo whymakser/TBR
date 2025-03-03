@@ -8,7 +8,7 @@ class CEpicCircle : public CEntity
 		MAX_PARTICLES = 9
 	};
 
-	Mask256 m_TeamMask;
+	Mask128 m_TeamMask;
 	int m_Owner;
 	int m_aIDs[MAX_PARTICLES];
 	vec2 m_RotatePos[MAX_PARTICLES];

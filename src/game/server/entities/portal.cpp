@@ -20,7 +20,7 @@ CPortal::CPortal(CGameWorld *pGameWorld, vec2 Pos, int Owner, int ThroughPlotDoo
 	m_StartTick = Server()->Tick();
 	m_pLinkedPortal = 0;
 	m_LinkedTick = 0;
-	m_TeamMask = Mask256();
+	m_TeamMask = Mask128();
 
 	for (int i = 0; i < NUM_PORTAL_IDS; i++)
 		m_aID[i] = Server()->SnapNewID();
@@ -73,7 +73,7 @@ void CPortal::Tick()
 		return;
 	}
 
-	m_TeamMask = GameServer()->GetPlayerChar(m_Owner) ? GameServer()->GetPlayerChar(m_Owner)->TeamMask() : Mask256();
+	m_TeamMask = GameServer()->GetPlayerChar(m_Owner) ? GameServer()->GetPlayerChar(m_Owner)->TeamMask() : Mask128();
 	 
 	if ((m_LinkedTick == 0 && m_StartTick < Server()->Tick() - Server()->TickSpeed() * Config()->m_SvPortalDetonation)
 		|| (m_LinkedTick != 0 && m_LinkedTick < Server()->Tick() - Server()->TickSpeed() * Config()->m_SvPortalDetonationLinked))
@@ -233,7 +233,7 @@ void CPortal::EntitiesEnter()
 		}
 
 		int ID = pAffectedChr ? pAffectedChr->GetPlayer()->GetCID() : -1;
-		Mask256 TeamMask = pAffectedChr ? pAffectedChr->TeamMask() : Mask256();
+		Mask128 TeamMask = pAffectedChr ? pAffectedChr->TeamMask() : Mask128();
 
 		GameServer()->CreateSound(m_Pos, SOUND_WEAPON_SPAWN, TeamMask);
 		GameServer()->CreateDeath(m_Pos, ID, TeamMask);

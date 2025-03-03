@@ -10,7 +10,7 @@ class CLovely : public CEntity
 		MAX_HEARTS = 4
 	};
 
-	Mask256 m_TeamMask;
+	Mask128 m_TeamMask;
 	int m_Owner;
 	float m_SpawnDelay;
 

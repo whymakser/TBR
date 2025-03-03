@@ -41,7 +41,7 @@ void CFlag::Reset(bool Init)
 	m_TeleCheckpoint = 0;
 	m_SoundTick = 0;
 	m_CanPlaySound = true;
-	m_TeamMask = Mask256();
+	m_TeamMask = Mask128();
 }
 
 void CFlag::SetAtStand(bool AtStand)
@@ -79,7 +79,7 @@ void CFlag::PlaySound(int Sound)
 		}
 		else if (Config()->m_SvFlagSounds == 2)
 		{
-			Mask256 TeamMask = Mask256();
+			Mask128 TeamMask = Mask128();
 			CCharacter *pChr = GetCarrier() ? GetCarrier() : GetLastCarrier() ? GetLastCarrier() : 0;
 			if (pChr)
 				TeamMask = pChr->TeamMask();
@@ -234,7 +234,7 @@ void CFlag::Tick()
 		}
 	}
 
-	m_TeamMask = GetCarrier() ? GetCarrier()->TeamMask() : Mask256();
+	m_TeamMask = GetCarrier() ? GetCarrier()->TeamMask() : Mask128();
 	m_PrevPos = m_Pos;
 
 	if (m_SoundTick && Server()->Tick() % Server()->TickSpeed() == 0)

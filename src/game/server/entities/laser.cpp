@@ -26,7 +26,7 @@ CLaser::CLaser(CGameWorld* pGameWorld, vec2 Pos, vec2 Direction, float StartEner
 	m_TaserStrength = TaserStrength;
 	m_TeleportCancelled = false;
 	m_IsBlueTeleport = false;
-	m_TeamMask = GameServer()->GetPlayerChar(Owner) ? GameServer()->GetPlayerChar(Owner)->TeamMask() : Mask256();
+	m_TeamMask = GameServer()->GetPlayerChar(Owner) ? GameServer()->GetPlayerChar(Owner)->TeamMask() : Mask128();
 
 	m_TuneZone = GameServer()->Collision()->IsTune(GameServer()->Collision()->GetMapIndex(m_Pos));
 	CTuningParams *pTuning = GameServer()->TuningFromChrOrZone(m_Owner, m_TuneZone);
@@ -381,7 +381,7 @@ void CLaser::Snap(int SnappingClient)
 		return;
 
 	CCharacter* pOwnerChar = 0;
-	Mask256 TeamMask = Mask256();
+	Mask128 TeamMask = Mask128();
 
 	if (m_Owner >= 0)
 		pOwnerChar = GameServer()->GetPlayerChar(m_Owner);

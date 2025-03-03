@@ -31,7 +31,7 @@ private:
 	int m_PickupTick;
 
 	// F-DDrace
-	Mask256 m_TeamMask;
+	Mask128 m_TeamMask;
 	int m_Owner;
 	void Move();
 	vec2 m_Core;

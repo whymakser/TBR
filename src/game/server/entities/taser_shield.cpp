@@ -10,7 +10,7 @@ CTaserShield::CTaserShield(CGameWorld *pGameWorld, vec2 Pos, int Owner)
 {
 	m_Owner = Owner;
 	m_SpawnDelay = 0;
-	m_TeamMask = Mask256();
+	m_TeamMask = Mask128();
 	for (int i = 0; i < MAX_SHIELDS; i++)
 		m_aShieldData[i].m_ID = Server()->SnapNewID();
 	GameWorld()->InsertEntity(this);
