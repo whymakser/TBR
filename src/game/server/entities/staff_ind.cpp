@@ -8,7 +8,7 @@ CStaffInd::CStaffInd(CGameWorld *pGameWorld, vec2 Pos, int Owner)
 
 	m_Dist = 0.f;
 	m_BallFirst = true;
-	m_TeamMask = Mask128();
+	m_TeamMask = Mask256();
 
 	for (int i = 0; i < NUM_IDS; i++)
 		m_aID[i] = Server()->SnapNewID();

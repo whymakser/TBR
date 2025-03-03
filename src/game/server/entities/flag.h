@@ -17,7 +17,7 @@ private:
 	int m_DropTick;
 	int m_GrabTick;
 
-	Mask128 m_TeamMask;
+	Mask256 m_TeamMask;
 	int m_Carrier;
 	int m_LastCarrier;
 

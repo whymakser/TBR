@@ -368,9 +368,9 @@ bool CGameTeams::TeamFinished(int Team)
 	return true;
 }
 
-Mask128 CGameTeams::TeamMask(int Team, int ExceptID, int Asker, bool SevendownOnly)
+Mask256 CGameTeams::TeamMask(int Team, int ExceptID, int Asker, bool SevendownOnly)
 {
-	Mask128 Mask = CmaskNone();
+	Mask256 Mask = CmaskNone();
 
 	if(Team == TEAM_SUPER)
 	{

@@ -20,7 +20,7 @@ class CLightsaber : public CEntity
 	CCharacter *m_pOwner;
 	int m_EvalTick;
 	int m_SoundTick;
-	Mask128 m_TeamMask;
+	Mask256 m_TeamMask;
 
 	int m_LastHit[MAX_CLIENTS];
 

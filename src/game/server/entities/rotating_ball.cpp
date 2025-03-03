@@ -8,7 +8,7 @@ CRotatingBall::CRotatingBall(CGameWorld *pGameWorld, vec2 Pos, int Owner)
 	m_Pos = Pos;
 
 	m_IsRotating = true;
-	m_TeamMask = Mask128();
+	m_TeamMask = Mask256();
 
 	m_RotateDelay = Server()->TickSpeed() + 10;
 	m_LaserDirAngle = 0;

@@ -96,7 +96,8 @@ private:
 			STATE_PAGE_FIRST,
 			STATE_PAGE_SECOND,
 
-			MAX_NUM_SEE_OTHERS = 34,
+			MAX_NUM_SEE_OTHERS = (VANILLA_MAX_CLIENTS / 2) + 2,
+			MAX_NUM_SEE_OTHERS_DDNET = VANILLA_MAX_CLIENTS + 2,
 		};
 
 		void Init(int ClientID, CGameWorld *pGameWorld);
@@ -125,6 +126,7 @@ private:
 		void UpdateSeeOthers();
 		void ResetSeeOthers();
 		int GetSpecSelectFlag(int SpecFlag);
+		int GetMaxNumSeeOthers();
 	} m_aMap[MAX_CLIENTS];
 	void UpdatePlayerMap(int ClientID);
 

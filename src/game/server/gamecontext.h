@@ -281,13 +281,13 @@ public:
 	void AddVote(const char *pDescription, const char *pCommand);
 
 	// helper functions
-	void CreateDamage(vec2 Pos, int Id, vec2 Source, int HealthAmount, int ArmorAmount, bool Self, Mask128 Mask = Mask128(), int SevendownAmount = 0);
-	void CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamage, int ActivatedTeam, Mask128 Mask = Mask128());
-	void CreateHammerHit(vec2 Pos, Mask128 Mask = Mask128());
-	void CreatePlayerSpawn(vec2 Pos, Mask128 Mask = Mask128());
-	void CreateDeath(vec2 Pos, int Who, Mask128 Mask = Mask128());
-	void CreateFinishConfetti(vec2 Pos, Mask128 Mask = Mask128());
-	void CreateSound(vec2 Pos, int Sound, Mask128 Mask = Mask128());
+	void CreateDamage(vec2 Pos, int Id, vec2 Source, int HealthAmount, int ArmorAmount, bool Self, Mask256 Mask = Mask256(), int SevendownAmount = 0);
+	void CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamage, int ActivatedTeam, Mask256 Mask = Mask256());
+	void CreateHammerHit(vec2 Pos, Mask256 Mask = Mask256());
+	void CreatePlayerSpawn(vec2 Pos, Mask256 Mask = Mask256());
+	void CreateDeath(vec2 Pos, int Who, Mask256 Mask = Mask256());
+	void CreateFinishConfetti(vec2 Pos, Mask256 Mask = Mask256());
+	void CreateSound(vec2 Pos, int Sound, Mask256 Mask = Mask256());
 
 	enum
 	{
@@ -378,7 +378,7 @@ public:
 	void FillAntibot(CAntibotRoundData *pData) override;
 	bool OnClientDDNetVersionKnown(int ClientID);
 	int GetClientDDNetVersion(int ClientID);
-	Mask128 ClientsMaskExcludeClientVersionAndHigher(int Version);
+	Mask256 ClientsMaskExcludeClientVersionAndHigher(int Version);
 	int ProcessSpamProtection(int ClientID);
 	int GetDDRaceTeam(int ClientID);
 	int64 m_NonEmptySince;
@@ -1197,10 +1197,10 @@ public:
 	int m_ChatPrintCBIndex;
 };
 
-inline Mask128 CmaskAll() { return Mask128(); }
-inline Mask128 CmaskNone() { return Mask128(-1); }
-inline Mask128 CmaskOne(int ClientID) { return Mask128(ClientID); }
-inline Mask128 CmaskUnset(Mask128 Mask, int ClientID) { return Mask^CmaskOne(ClientID); }
-inline Mask128 CmaskAllExceptOne(int ClientID) { return CmaskUnset(CmaskAll(), ClientID); }
-inline bool CmaskIsSet(Mask128 Mask, int ClientID) { return (Mask&CmaskOne(ClientID)) != CmaskNone(); }
+inline Mask256 CmaskAll() { return Mask256(); }
+inline Mask256 CmaskNone() { return Mask256(-1); }
+inline Mask256 CmaskOne(int ClientID) { return Mask256(ClientID); }
+inline Mask256 CmaskUnset(Mask256 Mask, int ClientID) { return Mask^CmaskOne(ClientID); }
+inline Mask256 CmaskAllExceptOne(int ClientID) { return CmaskUnset(CmaskAll(), ClientID); }
+inline bool CmaskIsSet(Mask256 Mask, int ClientID) { return (Mask&CmaskOne(ClientID)) != CmaskNone(); }
 #endif

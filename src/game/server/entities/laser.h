@@ -28,7 +28,7 @@ private:
 	int m_Bounces;
 	int m_EvalTick;
 	int m_Owner;
-	Mask128 m_TeamMask;
+	Mask256 m_TeamMask;
 
 	// DDRace
 

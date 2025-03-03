@@ -12,7 +12,7 @@ class CTaserShield : public CEntity
 		MAX_SHIELDS = 3
 	};
 
-	Mask128 m_TeamMask;
+	Mask256 m_TeamMask;
 	int m_Owner;
 	float m_SpawnDelay;
 

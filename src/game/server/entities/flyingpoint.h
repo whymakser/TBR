@@ -9,7 +9,7 @@ private:
 	vec2 m_InitialVel;
 	float m_InitialAmount;
 	int m_Owner;
-	Mask128 m_TeamMask;
+	Mask256 m_TeamMask;
 
 	bool m_PortalBlocker;
 	vec2 m_PrevPos;

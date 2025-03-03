@@ -50,7 +50,7 @@ void CCustomProjectile::Tick()
 		return;
 	}
 
-	m_TeamMask = m_pOwner ? m_pOwner->TeamMask() : Mask128();
+	m_TeamMask = m_pOwner ? m_pOwner->TeamMask() : Mask256();
 
 	m_LifeTime--;
 	if (m_LifeTime <= 0)

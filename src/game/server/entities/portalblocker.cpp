@@ -12,7 +12,7 @@ CPortalBlocker::CPortalBlocker(CGameWorld *pGameWorld, vec2 Pos, int Owner)
 
 	m_HasStartPos = false;
 	m_HasEndPos = false;
-	m_TeamMask = Mask128();
+	m_TeamMask = Mask256();
 
 	// We always want the single ball to be on top of the laser edge
 	for (int i = 0; i < 2; i++)
@@ -31,7 +31,7 @@ CPortalBlocker::~CPortalBlocker()
 void CPortalBlocker::Tick()
 {
 	CCharacter *pOwner = GameServer()->GetPlayerChar(m_Owner);
-	m_TeamMask = pOwner ? pOwner->TeamMask() : Mask128();
+	m_TeamMask = pOwner ? pOwner->TeamMask() : Mask256();
 
 	if (!m_HasEndPos)
 	{

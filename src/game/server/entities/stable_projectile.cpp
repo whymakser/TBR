@@ -14,7 +14,7 @@ CStableProjectile::CStableProjectile(CGameWorld *pGameWorld, int Type, int Owner
 	m_HideOnSpec = HideOnSpec;
 	m_LastResetTick = Server()->Tick();
 	m_CalculatedVel = false;
-	m_TeamMask = Mask128();
+	m_TeamMask = Mask256();
 	m_OnlyShowOwner = OnlyShowOwner;
 
 	GameWorld()->InsertEntity(this);
@@ -33,7 +33,7 @@ void CStableProjectile::TickDeferred()
 		m_LastResetTick = Server()->Tick();
 	}
 	m_CalculatedVel = false;
-	m_TeamMask = GameServer()->GetPlayerChar(m_Owner) ? GameServer()->GetPlayerChar(m_Owner)->TeamMask() : Mask128();
+	m_TeamMask = GameServer()->GetPlayerChar(m_Owner) ? GameServer()->GetPlayerChar(m_Owner)->TeamMask() : Mask256();
 }
 
 void CStableProjectile::CalculateVel()

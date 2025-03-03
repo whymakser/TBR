@@ -12,7 +12,7 @@ class CStableProjectile : public CEntity
 	int m_VelX;
 	int m_VelY;
 
-	Mask128 m_TeamMask;
+	Mask256 m_TeamMask;
 	int m_Owner;
 	bool m_HideOnSpec;
 	bool m_OnlyShowOwner;

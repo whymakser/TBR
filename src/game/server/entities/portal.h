@@ -19,7 +19,7 @@ class CPortal : public CEntity
 	int m_LinkedTick;
 	CPortal *m_pLinkedPortal;
 
-	Mask128 m_TeamMask;
+	Mask256 m_TeamMask;
 	int m_Owner;
 	int m_ThroughPlotDoor; // for flags
 	bool m_InNoBonusArea;

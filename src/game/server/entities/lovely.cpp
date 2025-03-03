@@ -8,7 +8,7 @@ CLovely::CLovely(CGameWorld *pGameWorld, vec2 Pos, int Owner)
 {
 	m_Owner = Owner;
 	m_SpawnDelay = 0;
-	m_TeamMask = Mask128();
+	m_TeamMask = Mask256();
 	for (int i = 0; i < MAX_HEARTS; i++)
 		m_aLovelyData[i].m_ID = Server()->SnapNewID();
 	GameWorld()->InsertEntity(this);
