@@ -1707,7 +1707,7 @@ void CGameContext::OnClientEnter(int ClientID)
 	SendPlayerCountUpdate();
 
 	// initial chat delay
-	if(Config()->m_SvChatInitialDelay != 0 && m_apPlayers[ClientID]->m_JoinTick > m_NonEmptySince + 10 * Server()->TickSpeed())
+	if(Config()->m_SvChatInitialDelay != 0 && m_apPlayers[ClientID]->m_JoinTick > m_NonEmptySince + 10 * Server()->TickSpeed() && Server()->GetDummy(ClientID) == -1)
 	{
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "This server has an initial chat delay, you will need to wait %d seconds before talking.", Config()->m_SvChatInitialDelay);
