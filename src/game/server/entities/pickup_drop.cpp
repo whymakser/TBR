@@ -1,4 +1,4 @@
- // made by fokkonaut
+// made by fokkonaut
 
 #include <generated/protocol.h>
 #include <game/server/gamecontext.h>
