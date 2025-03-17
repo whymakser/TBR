@@ -786,7 +786,7 @@ void CPlayer::Snap(int SnappingClient)
 				int SpectatorCount = 0;
 				for(auto &pPlayer : GameServer()->m_apPlayers)
 				{
-					if(!pPlayer || pPlayer->m_ClientID == m_ClientID || pPlayer->m_Afk || m_HideFromSpecCount ||
+					if(!pPlayer || pPlayer->m_ClientID == m_ClientID || pPlayer->m_Afk || pPlayer->m_HideFromSpecCount ||
 						!(pPlayer->m_Paused || pPlayer->m_Team == TEAM_SPECTATORS))
 					{
 						continue;
