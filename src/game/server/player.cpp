@@ -252,6 +252,7 @@ void CPlayer::Reset()
 	m_DoubleXpLifesLeft = 0;
 
 	m_HideFromSpecCount = false;
+	m_aDelayedJoinMsg[0] = '\0';
 }
 
 void CPlayer::Tick()
@@ -462,6 +463,12 @@ void CPlayer::Tick()
 	// Automatic close/stop after 30 seconds
 	if (m_VoteQuestionEndTick && Server()->Tick() > m_VoteQuestionEndTick)
 		OnEndVoteQuestion();
+
+	if (m_aDelayedJoinMsg[0] != '\0' && m_JoinTick + Server()->TickSpeed() * GameServer()->Config()->m_SvJoinMsgDelay < Server()->Tick())
+	{
+		GameServer()->SendChat(-1, CHAT_ALL, -1, m_aDelayedJoinMsg);
+		m_aDelayedJoinMsg[0] = '\0';
+	}
 }
 
 void CPlayer::PostTick()

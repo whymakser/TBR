@@ -1679,7 +1679,11 @@ void CGameContext::OnClientEnter(int ClientID)
 		int Flags = CHAT_SEVEN|CHAT_SEVENDOWN;
 		if (m_apPlayers[ClientID]->m_IsDummy)
 			Flags |= CHAT_NO_WEBHOOK;
-		SendChat(-1, CHAT_ALL, -1, aBuf, -1, Flags);
+
+		if (Config()->m_SvJoinMsgDelay && !m_apPlayers[ClientID]->m_IsDummy)
+			str_copy(m_apPlayers[ClientID]->m_aDelayedJoinMsg, aBuf, sizeof(m_apPlayers[ClientID]->m_aDelayedJoinMsg));
+		else
+			SendChat(-1, CHAT_ALL, -1, aBuf, -1, Flags);
 	}
 
 	m_World.InitPlayerMap(ClientID);
@@ -1842,7 +1846,7 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 			char aBuf[128];
 			if (pReason && *pReason)
 				str_format(aBuf, sizeof(aBuf), "'%s' has left the game (%s)", Server()->ClientName(ClientID), pReason);
-			else
+			else if (m_apPlayers[ClientID]->m_aDelayedJoinMsg[0] == '\0')
 				str_format(aBuf, sizeof(aBuf), "'%s' has left the game", Server()->ClientName(ClientID));
 
 			int Flags = CHAT_SEVEN|CHAT_SEVENDOWN;
