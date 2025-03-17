@@ -432,9 +432,6 @@ void CGameContext::ConPractice(IConsole::IResult *pResult, void *pUserData)
 	if(!pPlayer)
 		return;
 
-	if(pSelf->ProcessSpamProtection(pResult->m_ClientID))
-		return;
-
 	if(!pSelf->Config()->m_SvPractice)
 	{
 		pSelf->Console()->Print(

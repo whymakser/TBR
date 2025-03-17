@@ -43,6 +43,7 @@ void CPlayer::Reset()
 	m_DieTick = Server()->Tick();
 	m_PreviousDieTick = m_DieTick;
 	m_ScoreStartTick = Server()->Tick();
+	m_JoinTick = Server()->Tick();
 	m_pCharacter = 0;
 	m_SpecMode = SPEC_FREEVIEW;
 	m_SpectatorID = -1;
@@ -335,6 +336,7 @@ void CPlayer::Tick()
 	{
 		++m_PreviousDieTick;
 		++m_DieTick;
+		++m_JoinTick;
 		++m_ScoreStartTick;
 		++m_LastActionTick;
 		++m_TeamChangeTick;

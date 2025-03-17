@@ -423,7 +423,7 @@ bool CGameContext::VoteUnmute(const NETADDR* pAddr, const char* pDisplayName, in
 	return false;
 }
 
-bool CGameContext::TryMute(const NETADDR *pAddr, int Secs, const char *pReason)
+bool CGameContext::TryMute(const NETADDR *pAddr, int Secs, const char *pReason, bool InitialChatDelay)
 {
 	// find a matching mute for this ip, update expiration time if found
 	for(int i = 0; i < m_NumMutes; i++)
@@ -433,6 +433,7 @@ bool CGameContext::TryMute(const NETADDR *pAddr, int Secs, const char *pReason)
 			m_aMutes[i].m_Expire = Server()->Tick()
 							+ Secs * Server()->TickSpeed();
 			str_copy(m_aMutes[i].m_aReason, pReason, sizeof(m_aMutes[i].m_aReason));
+			m_aMutes[i].m_InitialChatDelay = InitialChatDelay;
 			return true;
 		}
 	}
@@ -444,6 +445,7 @@ bool CGameContext::TryMute(const NETADDR *pAddr, int Secs, const char *pReason)
 		m_aMutes[m_NumMutes].m_Expire = Server()->Tick()
 						+ Secs * Server()->TickSpeed();
 		str_copy(m_aMutes[m_NumMutes].m_aReason, pReason, sizeof(m_aMutes[m_NumMutes].m_aReason));
+		m_aMutes[m_NumMutes].m_InitialChatDelay = InitialChatDelay;
 		m_NumMutes++;
 		return true;
 	}
@@ -452,11 +454,14 @@ bool CGameContext::TryMute(const NETADDR *pAddr, int Secs, const char *pReason)
 	return false;
 }
 
-void CGameContext::Mute(const NETADDR *pAddr, int Secs, const char *pDisplayName, const char *pReason, int ExecutorID)
+void CGameContext::Mute(const NETADDR *pAddr, int Secs, const char *pDisplayName, const char *pReason, int ExecutorID, bool InitialChatDelay)
 {
-	if (!TryMute(pAddr, Secs, pReason))
+	if(Secs <= 0)
 		return;
-
+	if(!TryMute(pAddr, Secs, pReason, InitialChatDelay))
+		return;
+	if(InitialChatDelay)
+		return;
 	if(!pDisplayName)
 		return;
 

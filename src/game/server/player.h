@@ -134,6 +134,7 @@ public:
 	int m_DieTick;
 	int m_Score;
 	int m_ScoreStartTick;
+	int m_JoinTick;
 	int m_LastActionTick;
 	int m_TeamChangeTick;
 
