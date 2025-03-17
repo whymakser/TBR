@@ -4062,7 +4062,7 @@ void CServer::AddRecentlyLeft(int ClientID)
 			str_copy(pEntry->m_aName, ClientName(ClientID), sizeof(pEntry->m_aName));
 			str_copy(pEntry->m_aVersion, GetClientVersionStr(ClientID), sizeof(pEntry->m_aVersion));
 			net_addr_str(m_NetServer.ClientAddr(ClientID), pEntry->m_aAddress, sizeof(pEntry->m_aAddress), true);
-			pEntry->m_RemoveTick = Tick() + TickSpeed() * 120;
+			pEntry->m_RemoveTick = Tick() + TickSpeed() * 60;
 		}
 	}
 }
