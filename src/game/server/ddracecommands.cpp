@@ -1412,7 +1412,7 @@ void CGameContext::ConHideFromViewCount(IConsole::IResult *pResult, void *pUserD
 	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
 	if (pPlayer)
 	{
-		pPlayer->m_HideFromViewCount = pResult->NumArguments() ? pResult->GetInteger(0) : !pPlayer->m_HideFromViewCount;
+		pPlayer->m_HideFromSpecCount = pResult->NumArguments() ? pResult->GetInteger(0) : !pPlayer->m_HideFromSpecCount;
 	}
 }
 
