@@ -4507,9 +4507,6 @@ void CGameContext::OnPreShutdown()
 			if (Config()->m_SvShutdownSaveTees)
 			{
 				SaveCharacter(i, SAVE_WALLET|SAVE_FLAG, Config()->m_SvShutdownSaveTeeExpire);
-				// Reset, so CPlayer::OnDisconnect() will not create a jail savetee when we have this already.
-				pPlayer->m_EscapeTime = 0;
-				pPlayer->m_JailTime = 0;
 			}
 			else
 			{
@@ -6545,6 +6542,12 @@ int CGameContext::SaveCharacter(int ClientID, int Flags, float Hours)
 	if (Flags & SAVE_WALLET)
 	{
 		m_apPlayers[ClientID]->SetWalletMoney(0);
+	}
+	if (!(Flags & SAVE_JAIL))
+	{
+		// Reset, so CPlayer::OnDisconnect() will not create a jail savetee when we have this already.
+		m_apPlayers[ClientID]->m_EscapeTime = 0;
+		m_apPlayers[ClientID]->m_JailTime = 0;
 	}
 	
 	// return index of newly added identity
