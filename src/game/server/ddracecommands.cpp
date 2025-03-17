@@ -1638,6 +1638,8 @@ void CGameContext::ConSetPermille(IConsole::IResult *pResult, void *pUserData)
 	{
 		pChr->m_Permille = 0;
 		pChr->m_FirstPermilleTick = 0;
+		pChr->m_GrogBalancePosX = CCharacter::GROG_BALANCE_POS_UNSET;
+		pChr->m_GrogDirDelayEnd = 0;
 
 		char aBuf[128];
 		if (Permille > 0)
