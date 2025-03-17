@@ -134,7 +134,7 @@ void CGameControllerDDRace::Tick()
 						if (SetDefaultColors)
 						{
 							pPlayer->m_DisableCustomColorsTick = Server()->Tick();
-							if (!str_comp(pPlayer->m_TeeInfos.m_Sevendown.m_SkinName, "cammostripes") || !str_comp(pPlayer->m_TeeInfos.m_Sevendown.m_SkinName, "cammo"))
+							if (!str_comp(pPlayer->m_TeeInfos.m_Sevendown.m_SkinName, "cammo"))
 							{
 								CTeeInfo Info = pPlayer->m_TeeInfos;
 								Info.m_Sevendown.m_UseCustomColor = 1;

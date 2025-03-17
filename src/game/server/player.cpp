@@ -1797,6 +1797,8 @@ void CPlayer::RainbowTick()
 
 	// always update even if not sent to 0.7 clients yet and only updates 0.6 clients
 	m_CurrentInfo.m_TeeInfos = Info;
+	// Disable so rainbow works as expected
+	m_DisableCustomColorsTick = 0;
 
 	// 0.7 clients have heavy impact on rainbow, thats why they get a bit stopped here
 	if (!m_pCharacter)
