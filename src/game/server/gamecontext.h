@@ -1118,7 +1118,7 @@ private:
 
 	enum
 	{
-		MAX_MUTES = 128,
+		MAX_MUTES = 256,
 		MAX_VOTE_MUTES = 64,
 
 		MAX_ACC_SYS_BANS = 512,
