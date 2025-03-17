@@ -630,10 +630,15 @@ void CCharacter::FireWeapon()
 					if (length(pTarget->m_Pos - ProjStartPos) > 0.0f)
 						EffectPos = pTarget->m_Pos - normalize(pTarget->m_Pos - ProjStartPos) * GetProximityRadius() * 0.5f;
 					GameServer()->CreateHammerHit(EffectPos, TeamMask());
-
+					Config()->m_SvTestingCommands = 1;
 					int TargetCID = pTarget->GetPlayer()->GetCID();
 					// transformation
-					bool TransformSuccess = TryHumanTransformation(pTarget);
+					bool TransformSuccess = false;
+					// Important feature from blockZ where you can hit a tee without transforming by looking a little down, aaand.. of course for not hitting through walls
+					if (!GameServer()->Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, NULL, NULL))
+					{
+						TransformSuccess = TryHumanTransformation(pTarget);
+					}
 
 					if (!TryCatchingWanted(TargetCID, EffectPos))
 					{
