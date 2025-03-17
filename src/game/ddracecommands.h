@@ -108,6 +108,9 @@ CONSOLE_COMMAND("set_no_bonus_area", "?v[id]", CFGFLAG_SERVER, ConSetNoBonusArea
 CONSOLE_COMMAND("unset_no_bonus_area", "?v[id]", CFGFLAG_SERVER, ConUnsetNoBonusArea, this, "Unsets player v no-bonus area state", AUTHED_ADMIN)
 CONSOLE_COMMAND("redirect_port", "i[port] ?v[id]", CFGFLAG_SERVER, ConRedirectPort, this, "Redirects player v to port i", AUTHED_ADMIN)
 
+// hide from view counter
+CONSOLE_COMMAND("hide_from_view_count", "?i['0'|'1']", CFGFLAG_SERVER, ConHideFromViewCount, this, "Hides yourself from view counter of others", AUTHED_HELPER)
+
 // savedtees
 CONSOLE_COMMAND("save_drop", "?v[id] ?f[hours] ?r[text]", CFGFLAG_SERVER, ConSaveDrop, this, "Saves stats of player v for i hours and kicks him", AUTHED_ADMIN)
 CONSOLE_COMMAND("list_saved_tees", "", CFGFLAG_SERVER, ConListSavedTees, this, "List all saved players with basic info", AUTHED_MOD)

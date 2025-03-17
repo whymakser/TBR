@@ -391,6 +391,8 @@ public:
 	int m_DoubleXpLifesLeft;
 	void UpdateDoubleXpLifes();
 
+	bool m_HideFromViewCount;
+
 	// Voting Menu calls, used when executing the chat command aswell
 	void SetSilentFarm(bool Set);
 	void SetHideDrawings(bool Set);

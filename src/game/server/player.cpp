@@ -250,6 +250,8 @@ void CPlayer::Reset()
 
 	m_TaserShield = 0;
 	m_DoubleXpLifesLeft = 0;
+
+	m_HideFromViewCount = false;
 }
 
 void CPlayer::Tick()
@@ -784,7 +786,7 @@ void CPlayer::Snap(int SnappingClient)
 				int SpectatorCount = 0;
 				for(auto &pPlayer : GameServer()->m_apPlayers)
 				{
-					if(!pPlayer || pPlayer->m_ClientID == m_ClientID || pPlayer->m_Afk ||
+					if(!pPlayer || pPlayer->m_ClientID == m_ClientID || pPlayer->m_Afk || m_HideFromViewCount ||
 						!(pPlayer->m_Paused || pPlayer->m_Team == TEAM_SPECTATORS))
 					{
 						continue;
