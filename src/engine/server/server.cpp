@@ -1070,6 +1070,8 @@ int CServer::DelClientCallback(int ClientID, const char *pReason, void *pUser)
 	str_format(aBuf, sizeof(aBuf), "client dropped. cid=%d addr=<{%s}> reason='%s'", ClientID, aAddrStr, pReason);
 	pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 
+	pThis->AddRecentlyLeft(ClientID);
+
 	// notify the mod about the drop
 	if(pThis->m_aClients[ClientID].m_State >= CClient::STATE_READY)
 	{
@@ -3219,6 +3221,33 @@ void CServer::ConStatus(IConsole::IResult *pResult, void *pUser)
 	}
 }
 
+void CServer::ConStatusRecentlyLeft(IConsole::IResult *pResult, void *pUser)
+{
+	char aBuf[1024];
+	CServer* pThis = static_cast<CServer *>(pUser);
+	const char *pName = pResult->NumArguments() == 1 ? pResult->GetString(0) : "";
+
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		SRecentlyLeft *pEntry = &pThis->m_aRecentlyLeft[i];
+		if (pEntry->m_RemoveTick < pThis->Tick())
+		{
+			pEntry->m_RemoveTick = 0;
+			pEntry->m_PrevClientID = -1;
+			pEntry->m_aName[0] = 0;
+			pEntry->m_aVersion[0] = 0;
+			pEntry->m_aAddress[0] = 0;
+		}
+
+		if (!str_utf8_find_nocase(pEntry->m_aName, pName))
+			continue;
+		if (!pEntry->m_RemoveTick)
+			continue;
+		str_format(aBuf, sizeof(aBuf), "prev-id=%d addr=<{%s}> client=%s name='%s'", pEntry->m_PrevClientID, pEntry->m_aAddress, pEntry->m_aVersion, pEntry->m_aName);
+		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+	}
+}
+
 void CServer::ConShutdown(IConsole::IResult *pResult, void *pUser)
 {
 	str_copy(((CServer*)pUser)->m_NetServer.m_ShutdownMessage, pResult->GetString(0), sizeof(((CServer*)pUser)->m_NetServer.m_ShutdownMessage));
@@ -3740,6 +3769,7 @@ void CServer::RegisterCommands()
 	// register console commands
 	Console()->Register("kick", "i[id] ?r[reason]", CFGFLAG_SERVER, ConKick, this, "Kick player with specified id for any reason", AUTHED_ADMIN);
 	Console()->Register("status", "?r[name]", CFGFLAG_SERVER, ConStatus, this, "List players containing name or all players", AUTHED_HELPER);
+	Console()->Register("status_recently_left", "?r[name]", CFGFLAG_SERVER, ConStatusRecentlyLeft, this, "List players containing name or all players that recently left", AUTHED_HELPER);
 	Console()->Register("shutdown", "?r[message]", CFGFLAG_SERVER, ConShutdown, this, "Shut down", AUTHED_ADMIN);
 	Console()->Register("logout", "", CFGFLAG_SERVER, ConLogout, this, "Logout of rcon", AUTHED_HELPER);
 	Console()->Register("show_ips", "?i[show]", CFGFLAG_SERVER, ConShowIps, this, "Show IP addresses in rcon commands (1 = on, 0 = off)", AUTHED_ADMIN);
@@ -4005,6 +4035,36 @@ bool CServer::SetTimedOut(int ClientID, int OrigID)
 
 	DelClientCallback(OrigID, "Timeout Protection used", this);
 	return true;
+}
+
+void CServer::AddRecentlyLeft(int ClientID)
+{
+	if (m_aClients[ClientID].m_State == CClient::STATE_EMPTY || m_aClients[ClientID].m_State == CClient::STATE_DUMMY)
+		return;
+
+	bool Added = false;
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		SRecentlyLeft *pEntry = &m_aRecentlyLeft[i];
+		if (pEntry->m_RemoveTick < Tick())
+		{
+			pEntry->m_RemoveTick = 0;
+			pEntry->m_PrevClientID = -1;
+			pEntry->m_aName[0] = 0;
+			pEntry->m_aVersion[0] = 0;
+			pEntry->m_aAddress[0] = 0;
+		}
+
+		if (!pEntry->m_RemoveTick && !Added)
+		{
+			Added = true;
+			pEntry->m_PrevClientID = ClientID;
+			str_copy(pEntry->m_aName, ClientName(ClientID), sizeof(pEntry->m_aName));
+			str_copy(pEntry->m_aVersion, GetClientVersionStr(ClientID), sizeof(pEntry->m_aVersion));
+			net_addr_str(m_NetServer.ClientAddr(ClientID), pEntry->m_aAddress, sizeof(pEntry->m_aAddress), true);
+			pEntry->m_RemoveTick = Tick() + TickSpeed() * 120;
+		}
+	}
 }
 
 int CServer::NumClients()

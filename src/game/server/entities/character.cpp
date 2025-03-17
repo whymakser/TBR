@@ -630,7 +630,7 @@ void CCharacter::FireWeapon()
 					if (length(pTarget->m_Pos - ProjStartPos) > 0.0f)
 						EffectPos = pTarget->m_Pos - normalize(pTarget->m_Pos - ProjStartPos) * GetProximityRadius() * 0.5f;
 					GameServer()->CreateHammerHit(EffectPos, TeamMask());
-					Config()->m_SvTestingCommands = 1;
+
 					int TargetCID = pTarget->GetPlayer()->GetCID();
 					// transformation
 					bool TransformSuccess = false;

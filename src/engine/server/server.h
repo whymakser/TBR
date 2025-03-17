@@ -466,6 +466,7 @@ public:
 	static void ConRescue(IConsole::IResult *pResult, void *pUser);
 	static void ConKick(IConsole::IResult *pResult, void *pUser);
 	static void ConStatus(IConsole::IResult *pResult, void *pUser);
+	static void ConStatusRecentlyLeft(IConsole::IResult *pResult, void *pUser);
 	static void ConShutdown(IConsole::IResult *pResult, void *pUser);
 	static void ConRecord(IConsole::IResult *pResult, void *pUser);
 	static void ConStopRecord(IConsole::IResult *pResult, void *pUser);
@@ -593,6 +594,17 @@ public:
 	bool IsSevendown(int ClientID) override { return m_aClients[ClientID].m_Sevendown; }
 	int NumClients() override;
 	bool IsDoubleInfo();
+
+	struct SRecentlyLeft
+	{
+		int m_RemoveTick;
+		int m_PrevClientID;
+		char m_aVersion[64];
+		char m_aName[MAX_NAME_LENGTH];
+		char m_aAddress[NETADDR_MAXSTRSIZE];
+	};
+	SRecentlyLeft m_aRecentlyLeft[MAX_CLIENTS];
+	void AddRecentlyLeft(int ClientID);
 
 	class CTranslateChat : public IJob
 	{
