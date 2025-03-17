@@ -3769,7 +3769,7 @@ void CServer::RegisterCommands()
 	// register console commands
 	Console()->Register("kick", "i[id] ?r[reason]", CFGFLAG_SERVER, ConKick, this, "Kick player with specified id for any reason", AUTHED_ADMIN);
 	Console()->Register("status", "?r[name]", CFGFLAG_SERVER, ConStatus, this, "List players containing name or all players", AUTHED_HELPER);
-	Console()->Register("status_recently_left", "?r[name]", CFGFLAG_SERVER, ConStatusRecentlyLeft, this, "List players containing name or all players that recently left", AUTHED_HELPER);
+	Console()->Register("status_recently_left", "?r[name]", CFGFLAG_SERVER, ConStatusRecentlyLeft, this, "List players that left within last minute", AUTHED_HELPER);
 	Console()->Register("shutdown", "?r[message]", CFGFLAG_SERVER, ConShutdown, this, "Shut down", AUTHED_ADMIN);
 	Console()->Register("logout", "", CFGFLAG_SERVER, ConLogout, this, "Logout of rcon", AUTHED_HELPER);
 	Console()->Register("show_ips", "?i[show]", CFGFLAG_SERVER, ConShowIps, this, "Show IP addresses in rcon commands (1 = on, 0 = off)", AUTHED_ADMIN);
