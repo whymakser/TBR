@@ -1406,7 +1406,7 @@ void CGameContext::ConSparkle(IConsole::IResult *pResult, void *pUserData)
 	if (pChr) pChr->Sparkle(!pChr->GetPlayer()->m_Sparkle, pResult->m_ClientID);
 }
 
-void CGameContext::ConHideFromViewCount(IConsole::IResult *pResult, void *pUserData)
+void CGameContext::ConHideFromSpecCount(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
