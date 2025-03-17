@@ -155,12 +155,12 @@ MACRO_CONFIG_INT(SvVotesPerTick, sv_votes_per_tick, 5, 1, 15, CFGFLAG_SERVER, "N
 // F-DDrace
 
 // account
-MACRO_CONFIG_INT(SvAccounts, sv_accounts, 0, 0, 1, CFGFLAG_SERVER, "Whether accounts are activated or deactivated", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvAccounts, sv_accounts, 1, 0, 1, CFGFLAG_SERVER, "Whether accounts are activated or deactivated", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvAccFilePath, sv_acc_file_path, 128, "data/accounts", CFGFLAG_SERVER, "The path where the server searches the account files (relative to binary)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvDataSaveInterval, sv_data_save_interval, 30, 5, 60, CFGFLAG_SERVER, "Intervall in minutes between data saves", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvDonationFilePath, sv_donation_file_path, 128, "data", CFGFLAG_SERVER, "The path where the server searches the for the donation file (relative to binary)", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvPlotFilePath, sv_plot_file_path, 128, "data/plots", CFGFLAG_SERVER, "The path where the server searches the plot files (relative to binary)", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvKillLogout, sv_kill_logout, 0, 0, 60, CFGFLAG_SERVER, "Time in seconds a tee can kill after trying to logout (0 = disabled)", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvKillLogout, sv_kill_logout, 3, 0, 60, CFGFLAG_SERVER, "Time in seconds a tee can kill after trying to logout (0 = disabled)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvEuroMode, sv_euro_mode, 0, 0, 1, CFGFLAG_SERVER, "Whether euro mode is enabled", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvEuroDiscountPercentage, sv_euro_discount_percentage, 0, 0, 100, CFGFLAG_SERVER, "Euro discount percentage for shop (requires reload)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvPoliceFarmLimit, sv_police_farm_limit, 0, 0, 1, CFGFLAG_SERVER|CFGFLAG_GAME, "Whether police farm tiles are limited to a dynamic number of players (disables silentfarm on police)", AUTHED_ADMIN)
@@ -178,7 +178,7 @@ MACRO_CONFIG_INT(SvAccSysBanPwFails, sv_acc_sys_ban_pw_fails, 5, 0, 10, CFGFLAG_
 MACRO_CONFIG_INT(SvAccSysBanPinFails, sv_acc_sys_ban_pin_fails, 3, 0, 10, CFGFLAG_SERVER, "Max passwords fails per IP within 6 hours", AUTHED_ADMIN)
 
 // saved tees
-MACRO_CONFIG_INT(SvShutdownSaveTees, sv_shutdown_save_tees, 0, 0, 1, CFGFLAG_SERVER, "Whether to save characters before shutdown/reload to load them again", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvShutdownSaveTees, sv_shutdown_save_tees, 1, 0, 1, CFGFLAG_SERVER, "Whether to save characters before shutdown/reload to load them again", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvSavedTeesFilePath, sv_saved_tees_file_path, 128, "savedtees", CFGFLAG_SAVE|CFGFLAG_SERVER, "The path to saved tees files (relative to dumps dir)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvShutdownSaveTeeExpire, sv_shutdown_save_tee_expire, 1, 1, 24*7, CFGFLAG_SERVER, "How many hours until a shutdown save expires", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvJailSaveTeeExpire, sv_jail_save_tee_expire, 24, 1, 24*7, CFGFLAG_SERVER, "How many hours until a jail save expires", AUTHED_ADMIN)
@@ -192,12 +192,12 @@ MACRO_CONFIG_INT(SvFlagHooking, sv_flag_hooking, 1, 0, 1, CFGFLAG_SERVER|CFGFLAG
 MACRO_CONFIG_INT(SvFlagRespawnDropped, sv_flag_respawn_dropped, 90, 0, 9999, CFGFLAG_SERVER|CFGFLAG_GAME, "Time in seconds a dropped flag resets", AUTHED_ADMIN)
 
 // dummy
-MACRO_CONFIG_INT(SvHideDummies, sv_hide_dummies, 1, 0, 1, CFGFLAG_SERVER, "Whether to hide server-side dummies from scoreboard", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvDefaultDummies, sv_default_dummies, 0, 0, 1, CFGFLAG_SERVER, "Whether to create default dummies for specific maps when the server starts", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvHideDummies, sv_hide_dummies, 0, 0, 1, CFGFLAG_SERVER, "Whether to hide server-side dummies from scoreboard", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvDefaultDummies, sv_default_dummies, 1, 0, 1, CFGFLAG_SERVER, "Whether to create default dummies for specific maps when the server starts", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvFakeDummyPing, sv_fake_dummy_ping, 0, 0, 1, CFGFLAG_SERVER, "Whether ping of server-side dummies are more natural or 0", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvV3OffsetX, sv_v3_offset_x, 0, 0, 9999, CFGFLAG_SERVER|CFGFLAG_GAME, "Offset X for the blmapV3 dummy", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvV3OffsetY, sv_v3_offset_y, 0, 0, 9999, CFGFLAG_SERVER|CFGFLAG_GAME, "Offset Y for the blmapV3 dummy", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvDummyBotSkin, sv_dummy_bot_skin, 1, 0, 1, CFGFLAG_SERVER, "Whether dummies should have the bot skin applied", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvDummyBotSkin, sv_dummy_bot_skin, 0, 0, 1, CFGFLAG_SERVER, "Whether dummies should have the bot skin applied (0.7 only)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvDummyBlocking, sv_dummy_blocking, 0, 0, 1, CFGFLAG_SERVER, "Whether blocking dummies increases killstreak and gives block points", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvHideBotsStatus, sv_hide_dummies_status, 1, 0, 1, CFGFLAG_SERVER, "Whether to hide server-side dummies from status command", AUTHED_ADMIN)
 
@@ -231,7 +231,7 @@ MACRO_CONFIG_INT(SvPortalMaxDistance, sv_portal_max_distance, 750, 50, 1000, CFG
 MACRO_CONFIG_INT(SvPortalRifleShop, sv_portal_rifle_shop, 1, 0, 1, CFGFLAG_SERVER, "Whether portal rifle is in shop", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvPortalRifleAmmo, sv_portal_rifle_ammo, 1, 0, 1, CFGFLAG_SERVER|CFGFLAG_GAME, "Whether portal rifle entity respawns after x minutes and portal requires ammo", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvPortalRifleRespawnTime, sv_portal_rifle_respawn_time, 15, 1, 999, CFGFLAG_SERVER, "Time in minutes a portal rifle respawns after pickup", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvPortalThroughDoor, sv_portal_through_door, 1, 0, 1, CFGFLAG_SERVER, "Whether portal rilfe can be used through a closed door (outside of plot only)", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvPortalThroughDoor, sv_portal_through_door, 0, 0, 1, CFGFLAG_SERVER, "Whether portal rilfe can be used through a closed door (outside of plot only)", AUTHED_ADMIN)
 
 // portal blocker
 MACRO_CONFIG_INT(SvPortalBlockerDetonation, sv_portal_blocker_detonation, 30, 0, 999, CFGFLAG_SERVER, "Time in seconds a portal blocker detonates", AUTHED_ADMIN)
@@ -240,7 +240,7 @@ MACRO_CONFIG_INT(SvPortalBlockerMaxLength, sv_portal_blocker_max_length, 15, 0, 
 // draw editor
 MACRO_CONFIG_INT(SvMaxObjectsPlotSmall, sv_max_objects_plot_small, 50, 0, 150, CFGFLAG_SERVER|CFGFLAG_GAME, "Maximum amount of objects that can be placed within a small plot", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvMaxObjectsPlotBig, sv_max_objects_plot_big, 150, 0, 500, CFGFLAG_SERVER|CFGFLAG_GAME, "Maximum amount of objects that can be placed within a big plot", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvMaxObjectsFreeDraw, sv_max_objects_free_draw, 500, 0, 5000, CFGFLAG_SERVER|CFGFLAG_GAME, "Maximum amount of objects that can be placed in free draw", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvMaxObjectsFreeDraw, sv_max_objects_free_draw, 5000, 0, 5000, CFGFLAG_SERVER|CFGFLAG_GAME, "Maximum amount of objects that can be placed in free draw", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvLightSpeedups, sv_light_speedups, 1, 0, 1, CFGFLAG_SERVER, "Whether draw editor speedups use light mode (heavy mode not recommended)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvLightTeleporters, sv_light_teleporters, 1, 0, 1, CFGFLAG_SERVER, "Whether draw editor teleporters use light mode (heavy mode not recommended)", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvPlotEditorCategories, sv_plot_editor_categories, 128, "pickups,walls,doors,speedups,teleporters,transform", CFGFLAG_SERVER, "Comma separated list (pickups,walls,doors,speedups,teleporters,transform)", AUTHED_ADMIN)
@@ -258,7 +258,7 @@ MACRO_CONFIG_INT(SvTaserStrengthDefault, sv_taser_strength_default, 0, 0, 10, CF
 
 // spawn weapons
 MACRO_CONFIG_INT(SvSpawnWeapons, sv_spawn_weapons, 1, 0, 1, CFGFLAG_SERVER|CFGFLAG_GAME, "Whether account spawn weapons will be given on spawn", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvSlashSpawn, sv_slash_spawn, 0, 0, 1, CFGFLAG_SERVER|CFGFLAG_GAME, "Whether /spawn is activated (WARNING: can be abused to dodge specific tiles)", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvSlashSpawn, sv_slash_spawn, 1, 0, 1, CFGFLAG_SERVER|CFGFLAG_GAME, "Whether /spawn is activated (WARNING: can be abused to dodge specific tiles)", AUTHED_ADMIN)
 
 // snake
 MACRO_CONFIG_INT(SvSnakeAutoMove, sv_snake_auto_move, 1, 0, 1, CFGFLAG_SERVER, "Whether snake keeps last input or can stand still if no inputs applied", AUTHED_ADMIN)
@@ -277,7 +277,7 @@ MACRO_CONFIG_INT(SvWhisperLog, sv_whisper_log, 0, 0, 1, CFGFLAG_SERVER, "Whether
 MACRO_CONFIG_INT(SvAuthedHighlighted, sv_authed_highlighted, 1, 0, 1, CFGFLAG_SERVER, "Whether authed players are highlighted in the scoreboard (deactivated by sv_local_chat)", AUTHED_ADMIN)
 
 // spawn block
-MACRO_CONFIG_INT(SvSpawnBlockProtection, sv_spawn_block_protection, 0, 0, 1, CFGFLAG_SERVER|CFGFLAG_GAME, "Whether spawnblocking in a given area will add escape time", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvSpawnBlockProtection, sv_spawn_block_protection, 1, 0, 1, CFGFLAG_SERVER|CFGFLAG_GAME, "Whether spawnblocking in a given area will add escape time", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvSpawnAreaLowX, sv_spawnarea_low_x, 0, 0, 9999, CFGFLAG_SERVER|CFGFLAG_GAME, "Low X tile position of area for spawnblock protection", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvSpawnAreaLowY, sv_spawnarea_low_y, 0, 0, 9999, CFGFLAG_SERVER|CFGFLAG_GAME, "Low Y tile position of area for spawnblock protection", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvSpawnAreaHighX, sv_spawnarea_high_x, 0, 0, 9999, CFGFLAG_SERVER|CFGFLAG_GAME, "High X tile position of area for spawnblock protection", AUTHED_ADMIN)
@@ -307,7 +307,7 @@ MACRO_CONFIG_STR(SvWebhookModLogURL, sv_webhook_mod_log_url, 128, "", CFGFLAG_SE
 
 MACRO_CONFIG_STR(SvWebhookChatURL, sv_webhook_chat_url, 128, "", CFGFLAG_SERVER, "Webhook URL for chat bridge", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvWebhookChatAvatarURL, sv_webhook_chat_avatar_url, 128, "", CFGFLAG_SERVER, "Webhook URL for chat bridge avatar", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvWebhookChatSkinAvatars, sv_webhook_chat_skin_avatars, 0, 0, 1, CFGFLAG_SERVER, "Whether chat bridge webhook shows skins as avatars", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvWebhookChatSkinAvatars, sv_webhook_chat_skin_avatars, 1, 0, 1, CFGFLAG_SERVER, "Whether chat bridge webhook shows skins as avatars", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvWebhookChatSkinRenderer, sv_webhook_chat_skin_renderer, 0, 0, 1, CFGFLAG_SERVER, "Webhook chat bridge skin renderer (0=skins.tw, 1=KoG)", AUTHED_ADMIN)
 
 MACRO_CONFIG_STR(SvWebhook1vs1URL, sv_webhook_1vs1_url, 128, "", CFGFLAG_SERVER, "Webhook URL for 1vs1", AUTHED_ADMIN)
@@ -326,7 +326,7 @@ MACRO_CONFIG_STR(SvLibreTranslateURL, sv_libretranslate_url, 128, "https://trans
 MACRO_CONFIG_STR(SvLibreTranslateKey, sv_libretranslate_key, 128, "", CFGFLAG_SERVER, "LibreTranslate API Key", AUTHED_ADMIN)
 
 // sockets
-MACRO_CONFIG_INT(SvPortTwo, sv_port_two, 8304, 0, 0, CFGFLAG_SAVE|CFGFLAG_SERVER, "Port to use for the second serverinfo in 0.7 server browser (0=disabled)", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvPortTwo, sv_port_two, 0, 0, 0, CFGFLAG_SAVE|CFGFLAG_SERVER, "Port to use for the second serverinfo in 0.7 server browser (0=disabled)", AUTHED_ADMIN)
 
 // redirect server tiles
 MACRO_CONFIG_STR(SvRedirectServerTilePorts, sv_redirect_server_tile_ports, 128, "", CFGFLAG_SERVER, "Comma separated list of switch number to port mapping (e.g. 1:8305,2:8303)", AUTHED_ADMIN)
@@ -358,7 +358,7 @@ MACRO_CONFIG_INT(SvShotgunBug, sv_shotgun_bug, 0, 0, 1, CFGFLAG_SERVER, "Whether
 MACRO_CONFIG_INT(SvDefaultScoreMode, sv_default_score_mode, SCORE_LEVEL, 0, NUM_SCORE_MODES-1, CFGFLAG_SERVER, "Default score (0=time, 1=level, 2=blockpoints, 3=bonus)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvAllowBonusScoreMode, sv_allow_bonus_score_mode, 0, 0, 1, CFGFLAG_SERVER, "Whether bonus score can be seen using '/score'", AUTHED_ADMIN)
 // no-bonus area
-MACRO_CONFIG_INT(SvNoBonusMaxJumps, sv_no_bonus_max_jumps, 2, 2, 9999, CFGFLAG_SERVER, "Maximum number of jumps in no-bonus area (treshold=0: set this amount, else: start score increase at this)", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvNoBonusMaxJumps, sv_no_bonus_max_jumps, 5, 2, 9999, CFGFLAG_SERVER, "Maximum number of jumps in no-bonus area (treshold=0: set this amount, else: start score increase at this)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvNoBonusScoreTreshold, sv_bonus_score_treshold, 10, 0, 100, CFGFLAG_SERVER, "Treshold value for bonus score in no-bonus area (0=bonus removal)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvNoBonusScoreDecrease, sv_bonus_score_decrease, 10, 0, 60, CFGFLAG_SERVER, "Time in seconds between bonus score decrease", AUTHED_ADMIN)
 

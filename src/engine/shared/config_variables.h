@@ -85,12 +85,12 @@ MACRO_CONFIG_STR(SvName, sv_name, 128, "Unnamed F-DDrace Server", CFGFLAG_SAVE|C
 MACRO_CONFIG_STR(SvHostname, sv_hostname, 128, "", CFGFLAG_SAVE|CFGFLAG_SERVER, "Server hostname", AUTHED_ADMIN)
 MACRO_CONFIG_STR(Bindaddr, bindaddr, 128, "", CFGFLAG_SAVE|CFGFLAG_CLIENT|CFGFLAG_SERVER|CFGFLAG_MASTER, "Address to bind the client/server to", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvPort, sv_port, 8303, 0, 0, CFGFLAG_SAVE|CFGFLAG_SERVER, "Port to use for the server", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvExternalPort, sv_external_port, 0, 0, 0, CFGFLAG_SAVE|CFGFLAG_SERVER, "External port to report to the master servers", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvExternalPort, sv_external_port, 69, 0, 0, CFGFLAG_SAVE|CFGFLAG_SERVER, "External port to report to the master servers", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvMap, sv_map, 128, "BlmapChill", CFGFLAG_SAVE|CFGFLAG_SERVER, "Map to use on the server", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvMaxClients, sv_max_clients, 128, 1, MAX_CLIENTS, CFGFLAG_SAVE|CFGFLAG_SERVER, "Maximum number of clients that are allowed on a server", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvMaxClientsPerIP, sv_max_clients_per_ip, 4, 1, MAX_CLIENTS, CFGFLAG_SAVE|CFGFLAG_SERVER, "Maximum number of clients with the same IP that can connect to the server", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvMapDownloadSpeed, sv_map_download_speed, 16, 1, 16, CFGFLAG_SAVE|CFGFLAG_SERVER, "Number of map data packages a client gets on each request", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvHighBandwidth, sv_high_bandwidth, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Use high bandwidth mode. Doubles the bandwidth required for the server. LAN use only", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvHighBandwidth, sv_high_bandwidth, 0, 0, 1, CFGFLAG_SAVE|CFGFLAG_SERVER, "Use high bandwidth mode. Doubles the bandwidth required for the server.", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvRconPassword, sv_rcon_password, 32, "", CFGFLAG_SAVE|CFGFLAG_SERVER|CFGFLAG_NONTEEHISTORIC, "Remote console password (full access)", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvRconModPassword, sv_rcon_mod_password, 32, "", CFGFLAG_SAVE|CFGFLAG_SERVER|CFGFLAG_NONTEEHISTORIC, "Remote console password for moderators (limited access)", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvRconHelperPassword, sv_rcon_helper_password, 32, "", CFGFLAG_SERVER|CFGFLAG_NONTEEHISTORIC, "Remote console password for helpers (limited access)", AUTHED_ADMIN)
@@ -135,7 +135,7 @@ MACRO_CONFIG_STR(SvSqlFailureFile, sv_sql_failure_file, 64, "failed_sql.sql", CF
 MACRO_CONFIG_INT(SvSqlQueriesDelay, sv_sql_queries_delay, 1, 0, 20, CFGFLAG_SERVER, "Delay in seconds between SQL queries of a single player", AUTHED_ADMIN)
 #endif
 
-MACRO_CONFIG_STR(SvWelcome, sv_welcome, 64, "", CFGFLAG_SERVER, "Message that will be displayed to players who join the server", AUTHED_ADMIN)
+MACRO_CONFIG_STR(SvWelcome, sv_welcome, 64, "Welcome to this F-DDrace server! For more info, type /info.", CFGFLAG_SERVER, "Message that will be displayed to players who join the server", AUTHED_ADMIN)
 MACRO_CONFIG_INT(ConnTimeout, conn_timeout, 100, 5, 1000, CFGFLAG_SAVE|CFGFLAG_CLIENT|CFGFLAG_SERVER, "Network timeout", AUTHED_ADMIN)
 MACRO_CONFIG_INT(ConnTimeoutProtection, conn_timeout_protection, 1000, 5, 10000, CFGFLAG_SERVER, "Network timeout protection", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvVoteDelay, sv_vote_delay, 3, 0, 9999, CFGFLAG_SERVER, "The time in seconds between any vote", AUTHED_ADMIN)
@@ -199,7 +199,7 @@ MACRO_CONFIG_INT(SvSpamMuteDuration, sv_spam_mute_duration, 60, 0, 3600, CFGFLAG
 MACRO_CONFIG_INT(SvRconVote, sv_rcon_vote, 0, 0, 1, CFGFLAG_SERVER, "Only allow authed clients to call votes", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvSpectatorVotes, sv_spectator_votes, 1, 0, 1, CFGFLAG_SERVER, "Choose if spectators are allowed to start votes", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvShutdownWhenEmpty, sv_shutdown_when_empty, 0, 0, 1, CFGFLAG_SERVER, "Shutdown server as soon as no one is on it anymore", AUTHED_ADMIN)
-MACRO_CONFIG_STR(SvBannedVersions, sv_banned_versions, 128, "", CFGFLAG_SERVER, "Comma separated list of banned clients to be kicked on join", AUTHED_ADMIN)
+MACRO_CONFIG_STR(SvBannedVersions, sv_banned_versions, 128, "1,16,308,405,502,602,604,605,666,708,1003,1661,2773,10072,11017,11072,12073", CFGFLAG_SERVER, "Comma separated list of banned clients to be kicked on join", AUTHED_ADMIN)
 
 // netlimit
 MACRO_CONFIG_INT(SvNetlimit, sv_netlimit, 0, 0, 10000, CFGFLAG_SERVER, "Netlimit: Maximum amount of traffic a client is allowed to use (in kb/s)", AUTHED_ADMIN)
