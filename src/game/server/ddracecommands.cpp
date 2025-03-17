@@ -1413,6 +1413,9 @@ void CGameContext::ConHideFromSpecCount(IConsole::IResult *pResult, void *pUserD
 	if (pPlayer)
 	{
 		pPlayer->m_HideFromSpecCount = pResult->NumArguments() ? pResult->GetInteger(0) : !pPlayer->m_HideFromSpecCount;
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "'%s' is now %s in spec counter", pSelf->Server()->ClientName(pResult->m_ClientID), pPlayer->m_HideFromSpecCount ? "hidden" : "shown");
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
 	}
 }
 
