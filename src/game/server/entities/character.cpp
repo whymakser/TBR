@@ -5719,7 +5719,7 @@ bool CCharacter::SetZombieHuman(bool Zombie, bool GiveGun)
 		for (int i = WEAPON_GUN; i < NUM_WEAPONS; i++)
 			GiveWeapon(i, true);
 		Jetpack(false, -1, true);
-		SetActiveWeapon(WEAPON_HAMMER);
+		SetWeapon(WEAPON_HAMMER);
 
 		m_pPlayer->m_DefEmote = EMOTE_ANGRY;
 		m_pPlayer->m_DefEmoteReset = -1;
