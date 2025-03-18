@@ -5707,7 +5707,7 @@ bool CCharacter::TryCatchingWanted(int TargetCID, vec2 EffectPos)
 	return true;
 }
 
-bool CCharacter::SetZombieHuman(bool Zombie)
+bool CCharacter::SetZombieHuman(bool Zombie, bool GiveGun)
 {
 	if (m_IsZombie == Zombie)
 		return false;
@@ -5745,7 +5745,10 @@ bool CCharacter::SetZombieHuman(bool Zombie)
 		m_pPlayer->m_DefEmote = EMOTE_NORMAL;
 		m_pPlayer->m_DefEmoteReset = -1;
 		m_pPlayer->SetClan(Server()->ClientClan(m_pPlayer->GetCID()));
-		GiveWeapon(WEAPON_GUN);
+		if (GiveGun)
+		{
+			GiveWeapon(WEAPON_GUN);
+		}
 	}
 	return true;
 }
@@ -5755,7 +5758,7 @@ bool CCharacter::TryHumanTransformation(CCharacter *pTarget)
 	if (!m_IsZombie || !pTarget || !pTarget->m_Alive || pTarget->m_IsZombie)
 		return false;
 
-	SetZombieHuman(false);
+	SetZombieHuman(false, false);
 	for (int i = 0; i < NUM_WEAPONS; i++)
 	{
 		if (pTarget->CanDropWeapon(i))
@@ -5789,6 +5792,14 @@ bool CCharacter::TryHumanTransformation(CCharacter *pTarget)
 				pTarget->ScrollNinja(false, -1, true);
 			}
 		}
+	}
+
+	// Transfer hammer the other way around, since players can have no weapons now. means:
+	// if you as a zombie hammer a human, you get human + their weapons, but you give your weapons (hammer) to them and they turn zombie. if both have hammer, np.
+	if (!pTarget->GetWeaponGot(WEAPON_HAMMER))
+	{
+		pTarget->GiveWeapon(WEAPON_HAMMER);
+		GiveWeapon(WEAPON_HAMMER, true);
 	}
 	
 	if (!m_EndlessHook && pTarget->m_EndlessHook)

@@ -619,7 +619,7 @@ public:
 	int64 m_BirthdayGiftEndTick;
 	int64 m_LastBirthdayMsg;
 	bool m_IsZombie;
-	bool SetZombieHuman(bool Zombie);
+	bool SetZombieHuman(bool Zombie, bool GiveGun = true);
 	bool TryHumanTransformation(CCharacter *pTarget);
 	void SetBirthdayJetpack(bool Set);
 
