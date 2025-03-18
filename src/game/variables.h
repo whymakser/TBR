@@ -327,7 +327,7 @@ MACRO_CONFIG_STR(SvLibreTranslateURL, sv_libretranslate_url, 128, "https://trans
 MACRO_CONFIG_STR(SvLibreTranslateKey, sv_libretranslate_key, 128, "", CFGFLAG_SERVER, "LibreTranslate API Key", AUTHED_ADMIN)
 
 // sockets
-MACRO_CONFIG_INT(SvPortTwo, sv_port_two, 0, 0, 0, CFGFLAG_SAVE|CFGFLAG_SERVER, "Port to use for the second serverinfo in 0.7 server browser (0=disabled)", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvPortTwo, sv_port_two, 0, 0, 0, CFGFLAG_SAVE|CFGFLAG_SERVER, "Port to use for the second serverinfo in 0.7 server browser (0=disabled) (may cause delay)", AUTHED_ADMIN)
 
 // redirect server tiles
 MACRO_CONFIG_STR(SvRedirectServerTilePorts, sv_redirect_server_tile_ports, 128, "", CFGFLAG_SERVER, "Comma separated list of switch number to port mapping (e.g. 1:8305,2:8303)", AUTHED_ADMIN)
