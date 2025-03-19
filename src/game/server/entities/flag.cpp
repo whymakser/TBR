@@ -194,6 +194,10 @@ void CFlag::Tick()
 			if (pChr->m_Passive || pChr->IsSolo())
 				continue;
 
+			// Disallow flag pickup from other than team 0. should stay fun probably
+			if (pChr->Team() != TEAM_FLOCK)
+				continue;
+
 			// take the flag
 			Grab(pChr->GetPlayer()->GetCID());
 			break;
