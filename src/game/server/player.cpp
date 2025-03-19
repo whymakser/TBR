@@ -2376,11 +2376,19 @@ void CPlayer::ResetSkin(bool Unforce)
 		m_ForcedSkin = SKIN_NONE;
 
 	if (m_SpookyGhost)
+	{
 		SetSkin(SKIN_SPOOKY_GHOST);
+	}
 	else if (m_pCharacter && m_pCharacter->m_IsZombie)
-		GameServer()->SendSkinChange(m_CurrentInfo.m_TeeInfos, m_ClientID, -1);
+	{
+		CTeeInfo Info("cammo", 1, CGameControllerDDRace::ZombieBodyValue, CGameControllerDDRace::ZombieFeetValue);
+		Info.Translate(true);
+		GameServer()->SendSkinChange(Info, m_ClientID, -1);
+	}
 	else if (m_ForcedSkin != SKIN_NONE)
+	{
 		SetSkin(m_ForcedSkin, true);
+	}
 	else if (!m_DisableCustomColorsTick)
 	{
 		// dont send skin updates if its not needed
