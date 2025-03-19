@@ -619,7 +619,8 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 	}
 
 	int PlotID = GameServer()->GetPlotID(AccID);
-	if (DoLineCollapse(Page, pNumOptions, COLLAPSE_HEADER_ACC_STATS, m_aClients[ClientID].m_ShowAccountStats, 12))
+	bool BankEnabled = GameServer()->Config()->m_SvMoneyBankMode != 0;
+	if (DoLineCollapse(Page, pNumOptions, COLLAPSE_HEADER_ACC_STATS, m_aClients[ClientID].m_ShowAccountStats, 11 + (int)BankEnabled))
 	{
 		str_format(aBuf, sizeof(aBuf), "Level [%d]", pAccount->m_Level);
 		DoLineText(Page, pNumOptions, aBuf);
@@ -632,15 +633,25 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 			str_format(aBuf, sizeof(aBuf), "XP [%lld/%lld]", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level));
 			DoLineText(Page, pNumOptions, aBuf);
 		}
-		str_format(aBuf, sizeof(aBuf), "Bank [%lld]", pAccount->m_Money);
-		DoLineText(Page, pNumOptions, aBuf);
-		if (pChr && pChr->m_aLineMoney[0] != '\0')
+
+		bool IsInstantDeposit = GameServer()->Config()->m_SvMoneyBankMode == 2;
+		if (IsInstantDeposit && pChr && pChr->m_aLineMoney[0] != '\0')
+		{
+			DoLineText(Page, pNumOptions, pChr->m_aLineMoney);
+		}
+		else if (BankEnabled)
+		{
+			str_format(aBuf, sizeof(aBuf), "Bank [%lld]", pAccount->m_Money);
+			DoLineText(Page, pNumOptions, aBuf);
+		}
+
+		if (!IsInstantDeposit && pChr && pChr->m_aLineMoney[0] != '\0')
 		{
 			DoLineText(Page, pNumOptions, pChr->m_aLineMoney);
 		}
 		else
 		{
-			str_format(aBuf, sizeof(aBuf), "Wallet [%lld]", pPlayer->GetWalletMoney());
+			str_format(aBuf, sizeof(aBuf), "Wallet [%lld]", BankEnabled ? pPlayer->GetWalletMoney() : pAccount->m_Money);
 			DoLineText(Page, pNumOptions, aBuf);
 		}
 		str_format(aBuf, sizeof(aBuf), "Police [%d]", pAccount->m_PoliceLevel);

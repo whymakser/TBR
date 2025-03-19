@@ -1859,6 +1859,11 @@ void CPlayer::BankTransaction(float Amount, const char *pDescription, bool IsEur
 
 void CPlayer::WalletTransaction(int Amount, const char *pDescription)
 {
+	if (GameServer()->Config()->m_SvMoneyBankMode == 0 && GetAccID() >= ACC_START)
+	{
+		BankTransaction(Amount, pDescription);
+		return;
+	}
 	if (Amount == 0)
 		return;
 	m_WalletMoney += Amount;
@@ -1905,6 +1910,12 @@ void CPlayer::ApplyMoneyHistoryMsg(int Type, float Amount, const char *pDescript
 	{
 		dbg_msg("money", "error: failed to open '%s' for writing", aFilename);
 	}
+}
+
+int64 CPlayer::GetWalletOrBank()
+{
+	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[GetAccID()];
+	return GameServer()->Config()->m_SvMoneyBankMode == 0 ? pAccount->m_Money : GetWalletMoney();
 }
 
 void CPlayer::GiveXP(int64 Amount, const char *pMessage)
@@ -2077,6 +2088,14 @@ void CPlayer::OnLogin(bool ForceDesignLoad)
 		StartVoteQuestion(CPlayer::VOTE_QUESTION_DESIGN);
 
 	GameServer()->StartResendingVotes(m_ClientID, false);
+
+	if (GameServer()->Config()->m_SvMoneyBankMode == 0)
+	{
+		BankTransaction(m_WalletMoney, "automatic wallet to bank due to login and disabled bank");
+		// Manually set wallet money instead of using WalletTransaction, because SvMoneyBankMode 0 redirects walelttransactions to bank, which doesn't make any sense here
+		SetWalletMoney(0);
+		GameServer()->SendChatTarget(m_ClientID, "Your previously collected money got added to your account due to login");
+	}
 }
 
 void CPlayer::OnLogout()

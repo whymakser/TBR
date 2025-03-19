@@ -374,7 +374,7 @@ void CShop::BuyItem(int ClientID, int Item)
 
 	// check for the correct price
 	if ((m_aItems[ItemID].m_IsEuro && pAccount->m_Euros < Price)
-		|| (!m_aItems[ItemID].m_IsEuro && pPlayer->GetWalletMoney() < Price))
+		|| (!m_aItems[ItemID].m_IsEuro && pPlayer->GetWalletOrBank() < Price))
 	{
 		GameServer()->SendChatTarget(ClientID, "You don't have enough money");
 		return;

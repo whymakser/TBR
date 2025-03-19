@@ -3723,7 +3723,29 @@ void CGameContext::ConchainUpdateLocalChat(IConsole::IResult* pResult, void* pUs
 				if (pSelf->m_apPlayers[i] && pSelf->m_apPlayers[i]->m_LocalChat)
 				{
 					pSelf->m_apPlayers[i]->m_LocalChat = false;
-					pSelf->SendChatTarget(pResult->m_ClientID, "Local chat mode has been disabled, automatically entered public chat");
+					pSelf->SendChatTarget(i, "Local chat mode has been disabled, automatically entered public chat");
+				}
+			}
+		}
+	}
+}
+
+void CGameContext::ConchainUpdateBankMode(IConsole::IResult* pResult, void* pUserData, IConsole::FCommandCallback pfnCallback, void* pCallbackUserData)
+{
+	pfnCallback(pResult, pCallbackUserData);
+	if (pResult->NumArguments())
+	{
+		CGameContext* pSelf = (CGameContext*)pUserData;
+		if (!pSelf->Config()->m_SvMoneyBankMode)
+		{
+			for (int i = 0; i < MAX_CLIENTS; i++)
+			{
+				if (pSelf->m_apPlayers[i] && pSelf->m_apPlayers[i]->GetWalletMoney())
+				{
+					pSelf->m_apPlayers[i]->BankTransaction(pSelf->m_apPlayers[i]->GetWalletMoney(), "automatic wallet to bank due to bank disabling");
+					// Manually set wallet money instead of using WalletTransaction, because SvMoneyBankMode 0 redirects walelttransactions to bank, which doesn't make any sense here
+					pSelf->m_apPlayers[i]->SetWalletMoney(0);
+					pSelf->SendChatTarget(i, "Automatic wallet to bank due to bank disabling");
 				}
 			}
 		}
@@ -3820,6 +3842,7 @@ void CGameContext::OnConsoleInit()
 	Console()->Chain("sv_hide_minigame_players", ConchainUpdateHidePlayers, this);
 	Console()->Chain("sv_hide_dummies", ConchainUpdateHidePlayers, this);
 	Console()->Chain("sv_local_chat", ConchainUpdateLocalChat, this);
+	Console()->Chain("sv_money_bank_mode", ConchainUpdateBankMode, this);
 
 	#define CONSOLE_COMMAND(name, params, flags, callback, userdata, help, accesslevel) m_pConsole->Register(name, params, flags, callback, userdata, help, accesslevel);
 	#include <game/ddracecommands.h>

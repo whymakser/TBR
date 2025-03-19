@@ -328,6 +328,7 @@ public:
 	void WalletTransaction(int Amount, const char *pDescription = "");
 	void ApplyMoneyHistoryMsg(int Type, float Amount, const char *pDescription);
 	int64 GetWalletMoney() { return m_WalletMoney; }
+	int64 GetWalletOrBank();
 	void SetWalletMoney(int64 Amount) { m_WalletMoney = Amount; }
 
 	char m_aSecurityPin[5];

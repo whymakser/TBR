@@ -2865,7 +2865,15 @@ void CCharacter::HandleTiles(int Index)
 				}
 
 				// give money and xp
-				m_pPlayer->WalletTransaction(Money);
+				const int BankMode = Config()->m_SvMoneyBankMode;
+				if (BankMode == 2)
+				{
+					m_pPlayer->BankTransaction(Money);
+				}
+				else
+				{
+					m_pPlayer->WalletTransaction(Money);
+				}
 				m_pPlayer->GiveXP(XP);
 
 				// broadcast
@@ -2885,7 +2893,8 @@ void CCharacter::HandleTiles(int Index)
 				str_format(m_aLineExp, sizeof(m_aLineExp), "XP [%lld/%lld]%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level), aPlusXP);
 
 				str_format(aPolice, sizeof(aPolice), " +%dpolice", pAccount->m_PoliceLevel);
-				str_format(m_aLineMoney, sizeof(m_aLineMoney), "Wallet [%lld] +%d%s%s%s", m_pPlayer->GetWalletMoney(), TileMoney, (PoliceMoneyTile && pAccount->m_PoliceLevel) ? aPolice : "", pAccount->m_VIP ? " +2vip" : "", m_Permille ? " +1grog" : "");
+				str_format(m_aLineMoney, sizeof(m_aLineMoney), "%s [%lld] +%d%s%s%s", BankMode == 2 ? "Bank" : "Wallet", BankMode == 1 ? m_pPlayer->GetWalletMoney() : pAccount->m_Money,
+					TileMoney, (PoliceMoneyTile && pAccount->m_PoliceLevel) ? aPolice : "", pAccount->m_VIP ? " +2vip" : "", m_Permille ? " +1grog" : "");
 
 				if (!IsWeaponIndicator() && !m_pPlayer->m_HideBroadcasts)
 				{
@@ -4778,7 +4787,7 @@ bool CCharacter::AddGrog()
 
 void CCharacter::DropMoney(int64 Amount, int Dir, bool GlobalPickupDelay)
 {
-	if (Amount <= 0 || Amount > m_pPlayer->GetWalletMoney())
+	if (Amount <= 0 || Amount > m_pPlayer->GetWalletOrBank())
 		return;
 
 	if (Dir == -3)

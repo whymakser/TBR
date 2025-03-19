@@ -1357,20 +1357,24 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 		case MINIGAME_1VS1:
 		case MINIGAME_NONE:
 		{
+			bool BankEnabled = pSelf->Config()->m_SvMoneyBankMode != 0;
 			str_format(aBuf, sizeof(aBuf), "--- %s's Stats ---", pSelf->Server()->ClientName(ID));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			str_format(aBuf, sizeof(aBuf), "Level [%d]%s", pAccount->m_Level, pPlayer->GetAccID() < ACC_START ? " (not logged in)" : "");
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			str_format(aBuf, sizeof(aBuf), "XP [%lld/%lld]", pAccount->m_XP, pSelf->GetNeededXP(pAccount->m_Level));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "Bank [%lld]", pAccount->m_Money);
+			str_format(aBuf, sizeof(aBuf), "%s [%lld]", BankEnabled ? "Bank" : "Wallet", pAccount->m_Money);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 
 			// dont expose some info to other players than you
 			if (ID == pResult->m_ClientID)
 			{
-				str_format(aBuf, sizeof(aBuf), "Wallet [%lld]", pPlayer->GetWalletMoney());
-				pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+				if (BankEnabled)
+				{
+					str_format(aBuf, sizeof(aBuf), "Wallet [%lld]", pPlayer->GetWalletMoney());
+					pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+				}
 				if (pSelf->Config()->m_SvEuroMode || pAccount->m_Euros > 0)
 				{
 					str_format(aBuf, sizeof(aBuf), "Euros [%.2f]", pAccount->m_Euros);
@@ -1905,7 +1909,7 @@ void CGameContext::ConMoney(IConsole::IResult* pResult, void* pUserData)
 				pSelf->SendChatTarget(pResult->m_ClientID, "You can't drop money bags over 100.000");
 				return;
 			}
-			if (Amount > pPlayer->GetWalletMoney())
+			if (Amount > pPlayer->GetWalletOrBank())
 			{
 				pSelf->SendChatTarget(pResult->m_ClientID, "You don't have enough money in your wallet");
 				return;
@@ -1920,12 +1924,17 @@ void CGameContext::ConMoney(IConsole::IResult* pResult, void* pUserData)
 		return;
 	}
 
+	bool BankEnabled = pSelf->Config()->m_SvMoneyBankMode != 0;
+
 	char aBuf[256];
 	pSelf->SendChatTarget(pResult->m_ClientID, "~~~~~~~~~~");
-	str_format(aBuf, sizeof(aBuf), "Bank: %lld", pSelf->m_Accounts[pPlayer->GetAccID()].m_Money);
+	str_format(aBuf, sizeof(aBuf), "%s [%lld]", BankEnabled ? "Bank" : "Wallet", pSelf->m_Accounts[pPlayer->GetAccID()].m_Money);
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-	str_format(aBuf, sizeof(aBuf), "Wallet: %lld", pPlayer->GetWalletMoney());
-	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+	if (BankEnabled)
+	{
+		str_format(aBuf, sizeof(aBuf), "Wallet: %lld", pPlayer->GetWalletMoney());
+		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+	}
 	if (pSelf->Config()->m_SvEuroMode || pSelf->m_Accounts[pPlayer->GetAccID()].m_Euros > 0)
 	{
 		str_format(aBuf, sizeof(aBuf), "Euros: %.2f", pSelf->m_Accounts[pPlayer->GetAccID()].m_Euros);
@@ -2112,7 +2121,7 @@ void CGameContext::ConSpawn(IConsole::IResult* pResult, void* pUserData)
 		return;
 	}
 
-	if (pPlayer->GetWalletMoney() < 50000)
+	if (pPlayer->GetWalletOrBank() < 50000)
 	{
 		pSelf->SendChatTarget(pResult->m_ClientID, "You don't have enough money");
 		return;
@@ -2243,7 +2252,7 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 			return;
 		}
 
-		if (pPlayer->GetWalletMoney() < Price)
+		if (pPlayer->GetWalletOrBank() < Price)
 		{
 			pSelf->SendChatTarget(pResult->m_ClientID, "You don't have enough money");
 			return;
