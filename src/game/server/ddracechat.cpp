@@ -1364,7 +1364,7 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			str_format(aBuf, sizeof(aBuf), "XP [%lld/%lld]", pAccount->m_XP, pSelf->GetNeededXP(pAccount->m_Level));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s [%lld]", BankEnabled ? "Bank" : "Wallet", pAccount->m_Money);
+			str_format(aBuf, sizeof(aBuf), "%s [%lld]", BankEnabled ? "Bank" : "Wallet", pPlayer->GetWalletOrBank());
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 
 			// dont expose some info to other players than you
@@ -1928,7 +1928,7 @@ void CGameContext::ConMoney(IConsole::IResult* pResult, void* pUserData)
 
 	char aBuf[256];
 	pSelf->SendChatTarget(pResult->m_ClientID, "~~~~~~~~~~");
-	str_format(aBuf, sizeof(aBuf), "%s [%lld]", BankEnabled ? "Bank" : "Wallet", pSelf->m_Accounts[pPlayer->GetAccID()].m_Money);
+	str_format(aBuf, sizeof(aBuf), "%s [%lld]", BankEnabled ? "Bank" : "Wallet", pPlayer->GetWalletOrBank());
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	if (BankEnabled)
 	{

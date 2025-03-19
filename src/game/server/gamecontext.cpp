@@ -3740,7 +3740,7 @@ void CGameContext::ConchainUpdateBankMode(IConsole::IResult* pResult, void* pUse
 		{
 			for (int i = 0; i < MAX_CLIENTS; i++)
 			{
-				if (pSelf->m_apPlayers[i] && pSelf->m_apPlayers[i]->GetWalletMoney())
+				if (pSelf->m_apPlayers[i] && pSelf->m_apPlayers[i]->GetWalletMoney() && pSelf->m_apPlayers[i]->GetAccID() >= ACC_START)
 				{
 					pSelf->m_apPlayers[i]->BankTransaction(pSelf->m_apPlayers[i]->GetWalletMoney(), "automatic wallet to bank due to bank disabling");
 					// Manually set wallet money instead of using WalletTransaction, because SvMoneyBankMode 0 redirects walelttransactions to bank, which doesn't make any sense here
