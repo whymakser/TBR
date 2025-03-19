@@ -28,6 +28,7 @@ private:
 		float m_LastTime;
 	} m_Snap;
 
+	bool m_GlobalPickupDelay;
 	int64 m_Amount;
 	int64 m_StartTick;
 	int m_aID[NUM_DOTS_BIG];
@@ -39,7 +40,7 @@ private:
 	int GetNumDots() { return (m_Amount < SMALL_MONEY_AMOUNT) ? NUM_DOTS_SMALL : NUM_DOTS_BIG; }
 
 public:
-	CMoney(CGameWorld *pGameWorld, vec2 Pos, int64 Amount, int Owner = -1, float Direction = 0);
+	CMoney(CGameWorld *pGameWorld, vec2 Pos, int64 Amount, int Owner = -1, float Direction = 0, bool GlobalPickupDelay = false);
 	virtual ~CMoney();
 
 	int GetAmount() { return m_Amount; }

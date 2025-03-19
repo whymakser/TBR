@@ -5,11 +5,12 @@
 #include <game/server/teams.h>
 #include "money.h"
 
-CMoney::CMoney(CGameWorld *pGameWorld, vec2 Pos, int64 Amount, int Owner, float Direction)
+CMoney::CMoney(CGameWorld *pGameWorld, vec2 Pos, int64 Amount, int Owner, float Direction, bool GlobalPickupDelay)
 : CAdvancedEntity(pGameWorld, CGameWorld::ENTTYPE_MONEY, Pos, vec2(GetRadius(Amount)*2, GetRadius(Amount)*2), Owner, false)
 {
 	m_Pos = Pos;
 	m_Amount = Amount;
+	m_GlobalPickupDelay = GlobalPickupDelay;
 	m_Vel = vec2(5*Direction, Direction == 0 ? 0 : -5);
 	m_StartTick = Server()->Tick();
 	
@@ -50,25 +51,29 @@ void CMoney::Tick()
 
 	m_Gravity = true;
 
-	CCharacter *pClosest = GameWorld()->ClosestCharacter(m_Pos, RADIUS_FIND_PLAYERS, SecondsPassed(2) ? 0 : GetOwner(), -1, false, true, false, m_DDTeam);
-	if (pClosest)
+	bool TwoSecondsPassed = SecondsPassed(2);
+	if (!m_GlobalPickupDelay || TwoSecondsPassed)
 	{
-		if (distance(m_Pos, pClosest->GetPos()) < GetRadius() + pClosest->GetProximityRadius())
+		CCharacter *pClosest = GameWorld()->ClosestCharacter(m_Pos, RADIUS_FIND_PLAYERS, TwoSecondsPassed ? 0 : GetOwner(), -1, false, true, false, m_DDTeam);
+		if (pClosest)
 		{
-			char aBuf[64];
-			str_format(aBuf, sizeof(aBuf), "Collected %lld money", m_Amount);
-			GameServer()->SendChatTarget(pClosest->GetPlayer()->GetCID(), aBuf);
-			pClosest->GetPlayer()->WalletTransaction(m_Amount, "collected");
+			if (distance(m_Pos, pClosest->GetPos()) < GetRadius() + pClosest->GetProximityRadius())
+			{
+				char aBuf[64];
+				str_format(aBuf, sizeof(aBuf), "Collected %lld money", m_Amount);
+				GameServer()->SendChatTarget(pClosest->GetPlayer()->GetCID(), aBuf);
+				pClosest->GetPlayer()->WalletTransaction(m_Amount, "collected");
 
-			str_format(aBuf, sizeof(aBuf), "+%lld", m_Amount);
-			GameServer()->CreateLaserText(m_Pos, pClosest->GetPlayer()->GetCID(), aBuf, GameServer()->MoneyLaserTextTime(m_Amount));
-			GameServer()->CreateSound(m_Pos, SOUND_HOOK_LOOP, pClosest->TeamMask());
+				str_format(aBuf, sizeof(aBuf), "+%lld", m_Amount);
+				GameServer()->CreateLaserText(m_Pos, pClosest->GetPlayer()->GetCID(), aBuf, GameServer()->MoneyLaserTextTime(m_Amount));
+				GameServer()->CreateSound(m_Pos, SOUND_HOOK_LOOP, pClosest->TeamMask());
 
-			Reset();
-			return;
+				Reset();
+				return;
+			}
+			else
+				MoveTo(pClosest->GetPos(), RADIUS_FIND_PLAYERS);
 		}
-		else
-			MoveTo(pClosest->GetPos(), RADIUS_FIND_PLAYERS);
 	}
 
 	CMoney *pMoney = (CMoney *)GameWorld()->ClosestEntity(m_Pos, RADIUS_FIND_MONEY, CGameWorld::ENTTYPE_MONEY, this, true, m_DDTeam);
