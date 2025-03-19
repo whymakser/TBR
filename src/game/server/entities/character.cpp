@@ -2772,6 +2772,11 @@ void CCharacter::HandleTiles(int Index)
 		if ((MoneyTile || PoliceMoneyTile || ExtraMoneyTile) && !m_ProcessedMoneyTile)
 		{
 			m_ProcessedMoneyTile = true; // when multiple speedups on a moneytile face into each other the player skips multiple tiles in one tick leading to doubled xp and money
+
+			// Disallow money farm in ddrace team
+			if (Config()->m_SvMoneyFarmTeam == 0 && Team() != TEAM_FLOCK)
+				return;
+
 			if (MoneyTile)
 			{
 				m_MoneyTile = MONEYTILE_NORMAL;
