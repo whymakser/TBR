@@ -324,7 +324,7 @@ public:
 	bool IsExpiredItem(int Item);
 	void ExpireItems();
 
-	void BankCurrTransaction(float Amount, const char* pDescription = "");
+	void BankCurrTransaction(float Amount, const char* pDescription);
 	void BankTransaction(int Amount, const char *pDescription = "");
 	void WalletTransaction(int Amount, const char *pDescription = "");
 	void ApplyMoneyHistoryMsg(int Type, float Amount, const char *pDescription);
