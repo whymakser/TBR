@@ -94,7 +94,6 @@ Things such as money drops and plots are saved and loaded upon server start so y
 The inventory has been extended to support more than the regular weapons. If not placed in the map, most of the extra weapons are admin-only.
 
 * **Many settings & commands** <br>
-
 [Configuration/Settings](https://github.com/fokkonaut/F-DDrace?tab=readme-ov-file#configurationsettings)<br>
 [Commands](https://github.com/fokkonaut/F-DDrace?tab=readme-ov-file#commands)<br>
 [Chat commands](https://github.com/fokkonaut/F-DDrace?tab=readme-ov-file#chat-commands)<br>
