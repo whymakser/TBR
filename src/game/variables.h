@@ -277,7 +277,7 @@ MACRO_CONFIG_INT(SvWhisperLog, sv_whisper_log, 0, 0, 1, CFGFLAG_SERVER, "Whether
 MACRO_CONFIG_INT(SvJoinMsgDelay, sv_join_msg_delay, 0, 0, 60, CFGFLAG_SERVER, "The time in seconds the player join message get's delayed (and sv_chat_initial_delay is imitated)", AUTHED_MOD)
 
 // status recent
-MACRO_CONFIG_INT(SvRecentlyLeftSaveTime, sv_recently_left_save_time, 120, 1, 300, CFGFLAG_SERVER, "The time in seconds a recently left player is stored for moderating", AUTHED_HELPER)
+MACRO_CONFIG_INT(SvRecentlyLeftSaveTime, sv_recently_left_save_time, 120, 5, 300, CFGFLAG_SERVER, "The time in seconds a recently left player is stored for moderating", AUTHED_HELPER)
 
 // admin highlight
 MACRO_CONFIG_INT(SvAuthedHighlighted, sv_authed_highlighted, 1, 0, 1, CFGFLAG_SERVER, "Whether authed players are highlighted in the scoreboard (deactivated by sv_local_chat)", AUTHED_ADMIN)
