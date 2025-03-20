@@ -1293,7 +1293,6 @@ void CGameContext::OnTick()
 		else
 		{
 			int Total = 0, Yes = 0, No = 0;
-			bool Veto = false, VetoStop = false;
 			if(m_VoteUpdate)
 			{
 				// count votes
