@@ -3769,7 +3769,7 @@ void CServer::RegisterCommands()
 	// register console commands
 	Console()->Register("kick", "i[id] ?r[reason]", CFGFLAG_SERVER, ConKick, this, "Kick player with specified id for any reason", AUTHED_ADMIN);
 	Console()->Register("status", "?r[name]", CFGFLAG_SERVER, ConStatus, this, "List players containing name or all players", AUTHED_HELPER);
-	Console()->Register("status_recently_left", "?r[name]", CFGFLAG_SERVER, ConStatusRecentlyLeft, this, "List players that left within last minute", AUTHED_HELPER);
+	Console()->Register("status_recently_left", "?r[name]", CFGFLAG_SERVER, ConStatusRecentlyLeft, this, "List players that left within 'sv_recently_left_save_time' seconds", AUTHED_HELPER);
 	Console()->Register("shutdown", "?r[message]", CFGFLAG_SERVER, ConShutdown, this, "Shut down", AUTHED_ADMIN);
 	Console()->Register("logout", "", CFGFLAG_SERVER, ConLogout, this, "Logout of rcon", AUTHED_HELPER);
 	Console()->Register("show_ips", "?i[show]", CFGFLAG_SERVER, ConShowIps, this, "Show IP addresses in rcon commands (1 = on, 0 = off)", AUTHED_ADMIN);
@@ -4062,7 +4062,7 @@ void CServer::AddRecentlyLeft(int ClientID)
 			str_copy(pEntry->m_aName, ClientName(ClientID), sizeof(pEntry->m_aName));
 			str_copy(pEntry->m_aVersion, GetClientVersionStr(ClientID), sizeof(pEntry->m_aVersion));
 			net_addr_str(m_NetServer.ClientAddr(ClientID), pEntry->m_aAddress, sizeof(pEntry->m_aAddress), true);
-			pEntry->m_RemoveTick = Tick() + TickSpeed() * 60;
+			pEntry->m_RemoveTick = Tick() + TickSpeed() * Config()->m_SvRecentlyLeftSaveTime;
 		}
 	}
 }
