@@ -1857,7 +1857,12 @@ void CPlayer::BankTransaction(float Amount, const char *pDescription, bool IsEur
 	ApplyMoneyHistoryMsg(TRANSACTION_BANK, Amount, pDescription);
 }
 
-int64 CPlayer::GetWalletOrBank()
+int64 CPlayer::GetUsableMoney()
+{
+	return GameServer()->Config()->m_SvMoneyBankMode == 0 && GetAccID() >= ACC_START ? GameServer()->m_Accounts[GetAccID()].m_Money : GetWalletMoney();
+}
+
+int64 CPlayer::GetWalletOrBankDisplay()
 {
 	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[GetAccID()];
 	if (GetAccID() >= ACC_START || GameServer()->Config()->m_SvMoneyBankMode != 0)

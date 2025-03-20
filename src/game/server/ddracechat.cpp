@@ -1364,7 +1364,7 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			str_format(aBuf, sizeof(aBuf), "XP [%lld/%lld]", pAccount->m_XP, pSelf->GetNeededXP(pAccount->m_Level));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s [%lld]", BankEnabled ? "Bank" : "Wallet", pPlayer->GetWalletOrBank());
+			str_format(aBuf, sizeof(aBuf), "%s [%lld]", BankEnabled ? "Bank" : "Wallet", pPlayer->GetWalletOrBankDisplay());
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 
 			// dont expose some info to other players than you
@@ -1909,7 +1909,7 @@ void CGameContext::ConMoney(IConsole::IResult* pResult, void* pUserData)
 				pSelf->SendChatTarget(pResult->m_ClientID, "You can't drop money bags over 100.000");
 				return;
 			}
-			if (Amount > pPlayer->GetWalletOrBank())
+			if (Amount > pPlayer->GetUsableMoney())
 			{
 				pSelf->SendChatTarget(pResult->m_ClientID, "You don't have enough money in your wallet");
 				return;
@@ -1928,7 +1928,7 @@ void CGameContext::ConMoney(IConsole::IResult* pResult, void* pUserData)
 
 	char aBuf[256];
 	pSelf->SendChatTarget(pResult->m_ClientID, "~~~~~~~~~~");
-	str_format(aBuf, sizeof(aBuf), "%s [%lld]", BankEnabled ? "Bank" : "Wallet", pPlayer->GetWalletOrBank());
+	str_format(aBuf, sizeof(aBuf), "%s [%lld]", BankEnabled ? "Bank" : "Wallet", pPlayer->GetWalletOrBankDisplay());
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	if (BankEnabled)
 	{
@@ -2121,7 +2121,7 @@ void CGameContext::ConSpawn(IConsole::IResult* pResult, void* pUserData)
 		return;
 	}
 
-	if (pPlayer->GetWalletOrBank() < 50000)
+	if (pPlayer->GetUsableMoney() < 50000)
 	{
 		pSelf->SendChatTarget(pResult->m_ClientID, "You don't have enough money");
 		return;
@@ -2252,7 +2252,7 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 			return;
 		}
 
-		if (pPlayer->GetWalletOrBank() < Price)
+		if (pPlayer->GetUsableMoney() < Price)
 		{
 			pSelf->SendChatTarget(pResult->m_ClientID, "You don't have enough money");
 			return;

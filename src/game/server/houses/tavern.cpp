@@ -28,7 +28,7 @@ void CTavern::OnSuccess(int ClientID)
 {
 	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 	int GrogPrice = GameServer()->Config()->m_SvGrogPrice;
-	if (pPlayer->GetWalletOrBank() < GrogPrice)
+	if (pPlayer->GetUsableMoney() < GrogPrice)
 	{
 		GameServer()->SendChatTarget(ClientID, "You don't have enough money in your wallet to buy a grog.");
 		return;

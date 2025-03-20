@@ -4792,7 +4792,7 @@ bool CCharacter::AddGrog()
 
 void CCharacter::DropMoney(int64 Amount, int Dir, bool GlobalPickupDelay)
 {
-	if (Amount <= 0 || Amount > m_pPlayer->GetWalletOrBank())
+	if (Amount <= 0 || Amount > m_pPlayer->GetUsableMoney())
 		return;
 
 	if (Dir == -3)
