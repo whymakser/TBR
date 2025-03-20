@@ -406,7 +406,7 @@ void CShop::BuyItem(int ClientID, int Item)
 		str_format(aDiscountMsg, sizeof(aDiscountMsg), " (-%d%% discount)", m_CurrentDiscount);
 	str_format(aMsg, sizeof(aMsg), "%s, bought '%s'%s", m_aItems[ItemID].m_IsEuro ? "euros" : "money", aDescription, aDiscountMsg);
 	if (m_aItems[ItemID].m_IsEuro)
-		pPlayer->BankTransaction(-Price, aMsg, true);
+		pPlayer->BankCurrTransaction(-Price, aMsg);
 	else
 		pPlayer->WalletTransaction(-Price, aMsg);
 

@@ -1836,24 +1836,27 @@ int CPlayer::GetAccID()
 	return 0;
 }
 
-void CPlayer::BankTransaction(float Amount, const char *pDescription, bool IsEuro)
+void CPlayer::BankCurrTransaction(float Amount, const char *pDescription)
 {
 	if (GetAccID() < ACC_START || Amount == 0)
 		return;
 
 	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[GetAccID()];
+	pAccount->m_Euros += Amount;
 
-	if (IsEuro)
-	{
-		pAccount->m_Euros += Amount;
+	char aDescription[256];
+	str_format(aDescription, sizeof(aDescription), "%.2f %s", Amount, pDescription);
+	GameServer()->WriteDonationFile(TYPE_PURCHASE, Amount, GetAccID(), aDescription);
+	ApplyMoneyHistoryMsg(TRANSACTION_BANK, Amount, pDescription);
+}
 
-		char aDescription[256];
-		str_format(aDescription, sizeof(aDescription), "%.2f %s", Amount, pDescription);
-		GameServer()->WriteDonationFile(TYPE_PURCHASE, Amount, GetAccID(), aDescription);
-	}
-	else
-		pAccount->m_Money += Amount;
+void CPlayer::BankTransaction(int Amount, const char *pDescription)
+{
+	if (GetAccID() < ACC_START || Amount == 0)
+		return;
 
+	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[GetAccID()];
+	pAccount->m_Money += Amount;
 	ApplyMoneyHistoryMsg(TRANSACTION_BANK, Amount, pDescription);
 }
 
