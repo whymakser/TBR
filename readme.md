@@ -584,9 +584,8 @@ The inventory has been extended to support more than the regular weapons. If not
 
 <br><br>
 # Chat commands
-<br>
 Note: It might be helpful to simply write a chat command ingame without any parameter to see what it requests you to do, then follow those steps.
-<br>
+<br><br>
 
 
 ## Score
