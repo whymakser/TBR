@@ -120,7 +120,14 @@ void CBank::OnPageChange(int ClientID)
 	if (m_aClients[ClientID].m_Page <= PAGE_MAIN)
 	{
 		m_aAssignmentMode[ClientID] = ASSIGNMENT_NONE;
-		str_format(aMsg, sizeof(aMsg), "Welcome to the bank!\n\nPlease select your option:\nF3: Deposit (+)\nF4: Withdraw (-).\n\nOnce you selected an option, shoot to the right to go one step forward, and shoot left to go one step back.");
+		if (GameServer()->Config()->m_SvMoneyBankMode == 0)
+		{
+			str_format(aMsg, sizeof(aMsg), "Welcome to the bank!\n\nThis feature is currently disabled and your money is instantly saved.");
+		}
+		else
+		{
+			str_format(aMsg, sizeof(aMsg), "Welcome to the bank!\n\nPlease select your option:\nF3: Deposit (+)\nF4: Withdraw (-).\n\nOnce you selected an option, shoot to the right to go one step forward, and shoot left to go one step back.");
+		}
 	}
 	else
 	{

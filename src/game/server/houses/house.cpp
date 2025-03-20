@@ -121,8 +121,12 @@ void CHouse::OnKeyPress(int ClientID, int Dir)
 {
 	if (m_Type == HOUSE_BANK && m_aClients[ClientID].m_State == STATE_OPENED_WINDOW)
 	{
-		m_aClients[ClientID].m_State = STATE_CHOSE_ASSIGNMENT;
-		SetAssignment(ClientID, Dir);
+		// Bank feature is disabled
+		if (GameServer()->Config()->m_SvMoneyBankMode != 0)
+		{
+			m_aClients[ClientID].m_State = STATE_CHOSE_ASSIGNMENT;
+			SetAssignment(ClientID, Dir);
+		}
 		return;
 	}
 
