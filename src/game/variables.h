@@ -171,7 +171,7 @@ MACRO_CONFIG_STR(SvExpMsgColorValue, sv_exp_msg_color_value, 4, "595", CFGFLAG_S
 
 MACRO_CONFIG_STR(SvMoneyDropsFilePath, sv_money_drops_file_path, 128, "data/money_drops", CFGFLAG_SERVER, "The path where the server searches the money drops file (relative to binary)", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvMoneyHistoryFilePath, sv_money_history_file_path, 128, "money_history", CFGFLAG_SAVE|CFGFLAG_SERVER, "The path to money history files (relative to dumps dir)", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvMoneyBankMode, sv_money_bank_mode, 1, 0, 2, CFGFLAG_SERVER|CFGFLAG_GAME, "Bank mode (0=no bank; bank=wallet, 1=normal bank, 2=instant deposit from farm)", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvMoneyBankMode, sv_money_bank_mode, 0, 0, 2, CFGFLAG_SERVER|CFGFLAG_GAME, "Bank mode (0=no bank; bank=wallet, 1=normal bank, 2=instant deposit from farm)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvMoneyFarmTeam, sv_money_farm_team, 1, 0, 1, CFGFLAG_SERVER|CFGFLAG_GAME, "Whether a player can farm money on a money tile while being in a ddrace team", AUTHED_ADMIN)
 
 // account system ban
