@@ -7407,7 +7407,7 @@ void CGameContext::ConnectDefaultDummies()
 {
 	if (!str_comp(Server()->GetMapName(), "ChillBlock5"))
 	{
-		ConnectDummy(DUMMYMODE_CHILLBLOCK5_POLICE);
+		ConnectDummy(DUMMYMODE_CHILLBLOCK5_POLICE, vec2(485*32.f, 235*32.f));
 		ConnectDummy(DUMMYMODE_CHILLBLOCK5_BLOCKER);
 		ConnectDummy(DUMMYMODE_CHILLBLOCK5_BLOCKER);
 		ConnectDummy(DUMMYMODE_CHILLBLOCK5_RACER);
