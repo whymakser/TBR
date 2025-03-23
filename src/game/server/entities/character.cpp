@@ -2913,9 +2913,9 @@ void CCharacter::HandleTiles(int Index)
 		// taser shield
 		if (m_TileIndex == TILE_TASER_SHIELD_PLUS || m_TileFIndex == TILE_TASER_SHIELD_PLUS)
 		{
-			m_pPlayer->m_TaserShield = min(m_pPlayer->m_TaserShield + 25, 100);
+			m_pPlayer->m_TaserShield = min(m_pPlayer->m_TaserShield + 20, 100);
 			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), "Congratulations, +25%% taser shield, current: %d%%. Use '/taser' to check later.", m_pPlayer->m_TaserShield);
+			str_format(aBuf, sizeof(aBuf), "Congratulations, +20%% taser shield, current: %d%%. Use '/taser' to check later.", m_pPlayer->m_TaserShield);
 			GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
 		}
 
