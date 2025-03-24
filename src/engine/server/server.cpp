@@ -4767,11 +4767,11 @@ void CServer::DummyJoin(int DummyID)
 	const char* pNames[] = {
 		"flappy", /*0*/ "Chillingo", "ZillyDreck", "Fluffy", "MLG_PRO", "Enzym", "ciliDR[HUN]", "fuzzle", "Piko", "chilliger", "fokkonautt", "GubbaFubba", "fuZZle", "<bot>", "<noob>", "<police>", //16th name
 		"<train>", "<boat>", "<blocker>", "<racer>", "<hyper>", "$heeP", "b3ep", "chilluminatee", "auftragschiller", "abcJuhee", "BANANA", "POTATO", "<cucumber>", "fokkoNUT", "<_BoT__>", "NotMyName", //32nd name
-		"NotChiller", "NotChiIIer", "NotChlIer", "fuckmesoon", "DataNub", "5.196.132.14", "<hacker>", "<cheater>", "<glitcher>", "__ERROR", "404_kein_tier", "ZitrusFRUCHT", "BAUMKIND", "KELLERKIND", "KINDERKIND", "einZug-", //48th name
+		"NotChiller", "NotChiIIer", "NotChlIer", "fuckmesoon", "DataNub", "45.141.57.154", "<hacker>", "<cheater>", "<glitcher>", "__ERROR", "404_kein_tier", "ZitrusFRUCHT", "BAUMKIND", "KELLERKIND", "KINDERKIND", "einZug-", //48th name
 		"<bob>",  "BezzyHill", "BeckySkill", "Skilli.*", "UltraVa.", "DONATE!", "SUBSCRIBE!", "SHARE!", "#like", "<#name_>", "KRISTIAN-.", ".,-,08/524", "3113pimml34", "NotAB0t", "Hurman", "xxlddnnet64", "flappy2", //64th name
 		"steeeve", "naki", "tuba", "higge", "linux_uzer3k", "hubbat.*", "Proviet-", "7h89", "1276", "SchinKKKen", "FOSSIELamKIEL", "apfelFUZ", "cron_tabur", "hinter_c_dur", "equariator", "deckztinator", //80th name
 		"intezinatoha", "defquirlibaor", "enmuhinakur", "wooknazitur", "demnatura", "intranuza", "eggspikuza", "finaluba", "denkrikator", "nihilatur", "Goethe[HUN]", "RightIsRight", "Egg_user_xd", "avucadur", "NoeeoN", "wuuuzzZZZa", //96th name
-		"JezzicaP", "Jeqqicaqua", "analyticus", "haspiclecane", "nameus", "tahdequz", "rostBEULEH", "regenwurm674", "mc_cm", "blockddrace", "BlockDDrace", "pidgin.,a", "bibubablbl", "randomNAME2", "Mircaduzla", "zer0_brain", //112th name
+		"JezzicaP", "Jeqqicaqua", "analyticus", "haspiclecane", "nameus", "tahdequz", "rostBEULEH", "regenwurm674", "mc_cm", "fddr", "F-DDrace", "pidgin.,a", "bibubablbl", "randomNAME2", "Mircaduzla", "zer0_brain", //112th name
 		"haxxor-420", "fok-me-fok", "fok-fee-san", "denzulat", "epsilat", "destructat", "hinzuckat", "penZilin", "deszilin", "VogelFisch7", "Dont4sk", "i_fokmen_i", "noobScout24", "geneticual", "trollface" //128th name
 	};
 	const char* pClans[] = {
