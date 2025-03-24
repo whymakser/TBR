@@ -1899,6 +1899,28 @@ void CGameContext::OnClientAuth(int ClientID, int Level)
 			m_TeeHistorian.RecordAuthLogout(ClientID);
 		}
 	}
+
+	if (Level == AUTHED_NO)
+		return;
+
+	// Unmute on rcon auth, to skip initial chat delay
+	NETADDR Addr;
+	Server()->GetClientAddr(ClientID, &Addr);
+	for (int i = 0; i < m_NumMutes; i++)
+	{
+		if (net_addr_comp(&m_aMutes[i].m_Addr, &Addr, 0) == 0)
+		{
+			char aBuf[128];
+			char aIpBuf[NETADDR_MAXSTRSIZE];
+			net_addr_str(&Addr, aIpBuf, sizeof(aIpBuf), false);
+			str_format(aBuf, sizeof(aBuf), "Unmuted \"<{%s}>\" (%s) by rcon auth", aIpBuf, Server()->ClientName(ClientID));
+			Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "mutes", aBuf);
+			// Unmute
+			m_NumMutes--;
+			m_aMutes[i] = m_aMutes[m_NumMutes];
+			break;
+		}
+	}
 }
 
 const char *CGameContext::GetWhisper(char *pStr, int *pTarget)

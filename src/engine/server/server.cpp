@@ -1872,8 +1872,6 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 						if(m_aClients[ClientID].m_Version >= MIN_MAPLIST_CLIENTVERSION && !m_aClients[ClientID].m_Sevendown)
 							m_aClients[ClientID].m_pMapListEntryToSend = m_pFirstMapEntry;
 
-						GameServer()->OnClientAuth(ClientID, AuthLevel);
-
 						char aBuf[256];
 						const char *pIdent = m_AuthManager.KeyIdent(KeySlot);
 						char aAddrStr[NETADDR_MAXSTRSIZE];
@@ -1900,6 +1898,9 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 							}
 						}
 						Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
+
+						// Call this after printing auth message, so that other prints get below it
+						GameServer()->OnClientAuth(ClientID, AuthLevel);
 					}
 				}
 				else if(Config()->m_SvRconMaxTries && m_ServerBan.IsBannable(m_NetServer.ClientAddr(ClientID)))
