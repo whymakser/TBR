@@ -41,37 +41,6 @@ public:
 		}
 	}
 
-	int m_Number;
-	vec2 m_TablePos;
-	int64 m_Stake;
-	int64 m_GameStartTick;
-	bool m_Running;
-	int m_InitialAttackerIndex;
-	int m_DefenderIndex;
-
-	struct SSeat
-	{
-		int m_MapIndex;
-		struct SPlayer
-		{
-			void Reset()
-			{
-				m_ClientID = -1;
-				m_Stake = -1;
-			}
-			int m_ClientID;
-			int64 m_Stake;
-		} m_Player;
-	} m_aSeats[MAX_DURAK_PLAYERS];
-
-	SSeat *GetSeatByClient(int ClientID)
-	{
-		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
-			if (m_aSeats[i].m_Player.m_ClientID == ClientID)
-				return &m_aSeats[i];
-		return 0;
-	}
-
 	int NumDeployedStakes()
 	{
 		int Num = 0;
@@ -91,6 +60,37 @@ public:
 	}
 
 	//void OnPlayerLeave(int Seat) {}
+
+	struct SSeat
+	{
+		int m_MapIndex;
+		struct SPlayer
+		{
+			void Reset()
+			{
+				m_ClientID = -1;
+				m_Stake = -1;
+			}
+			int m_ClientID;
+			int64 m_Stake;
+		} m_Player;
+	};
+	SSeat m_aSeats[MAX_DURAK_PLAYERS];
+	SSeat *GetSeatByClient(int ClientID)
+	{
+		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+			if (m_aSeats[i].m_Player.m_ClientID == ClientID)
+				return &m_aSeats[i];
+		return 0;
+	}
+
+	int m_Number;
+	vec2 m_TablePos;
+	int64 m_Stake;
+	int64 m_GameStartTick;
+	bool m_Running;
+	int m_InitialAttackerIndex;
+	int m_DefenderIndex;
 };
 
 class CCard
