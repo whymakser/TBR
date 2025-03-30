@@ -287,7 +287,6 @@ bool CDurak::StartGame(int Game)
 		return false;
 
 	CGameTeams *pTeams = &((CGameControllerDDRace *)GameServer()->m_pController)->m_Teams;
-
 	int FirstFreeTeam = -1;
 	for (int i = 1; i < VANILLA_MAX_CLIENTS; i++)
 	{
@@ -298,9 +297,8 @@ bool CDurak::StartGame(int Game)
 		}
 	}
 
-	// New game for other players, since we move to a new team
+	// New game for other players at this table, since we move to a new team or this gets deleted if no team was free
 	m_vpGames.push_back(new CDurakGame(pGame));
-
 	if (FirstFreeTeam == -1)
 	{
 		SendChatToParticipants(Game, "Couldn't start game, no empty team found");
@@ -315,6 +313,9 @@ bool CDurak::StartGame(int Game)
 	{
 		CDurakGame::SSeat *pSeat = &pGame->m_aSeats[i];
 		int ClientID = pSeat->m_Player.m_ClientID;
+		if (ClientID == -1)
+			continue;
+
 		if (pSeat->m_Player.m_Stake != pGame->m_Stake)
 		{
 			GameServer()->SendChatTarget(ClientID, "You didn't deploy your stake in time, game started without you");
@@ -419,7 +420,8 @@ void CDurak::Tick()
 				else if (pGame->m_GameStartTick > Server()->Tick() && Server()->Tick() % Server()->TickSpeed() == 0)
 				{
 					char aBuf[128];
-					str_format(aBuf, sizeof(aBuf), "Players [%d/%d]\nGame start [%d]", NumParticipants, (int)MAX_DURAK_PLAYERS, (pGame->m_GameStartTick - Server()->Tick()) / Server()->TickSpeed());
+					str_format(aBuf, sizeof(aBuf), "Players [%d/%d]\nStake [%d]\nGame start [%d]", NumParticipants, (int)MAX_DURAK_PLAYERS,
+						pGame->m_Stake, (pGame->m_GameStartTick - Server()->Tick()) / Server()->TickSpeed());
 					GameServer()->SendBroadcast(aBuf, ClientID);
 				}
 				continue;
