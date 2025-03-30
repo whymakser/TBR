@@ -347,6 +347,7 @@ bool CDurak::EndGame(int Game)
 		if (ClientID == -1)
 			continue;
 		GameServer()->SetMinigame(ClientID, MINIGAME_NONE);
+		GameServer()->m_apPlayers[ClientID]->m_ForceSpawnPos = vec2(-1, -1);
 		pTeams->SetForceCharacterTeam(ClientID, 0);
 	}
 
