@@ -2751,6 +2751,12 @@ void CGameContext::ConJoinFNG(IConsole::IResult *pResult, void *pUserData)
 	pSelf->SetMinigame(pResult->m_ClientID, MINIGAME_INSTAGIB_FNG);
 }
 
+void CGameContext::ConJoinDurak(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	pSelf->SetMinigame(pResult->m_ClientID, MINIGAME_DURAK);
+}
+
 void CGameContext::Con1VS1(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;

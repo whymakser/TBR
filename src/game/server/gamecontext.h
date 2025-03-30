@@ -927,6 +927,7 @@ private:
 	static void ConJoinBoomFNG(IConsole::IResult* pResult, void* pUserData);
 	static void ConJoinFNG(IConsole::IResult* pResult, void* pUserData);
 	static void Con1VS1(IConsole::IResult* pResult, void* pUserData);
+	static void ConJoinDurak(IConsole::IResult* pResult, void* pUserData);
 
 	static void ConResumeMoved(IConsole::IResult* pResult, void* pUserData);
 	static void ConMutePlayer(IConsole::IResult* pResult, void* pUserData);

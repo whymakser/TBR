@@ -1,4 +1,4 @@
-﻿/* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
+/* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/math.h>
 
@@ -4314,12 +4314,10 @@ void CGameContext::FDDraceInit()
 	REQUIRED_TILE(TILE_SURVIVAL_SPAWN);
 	REQUIRED_TILE(TILE_SURVIVAL_DEATHMATCH);
 	REQUIRED_TILE(TILE_1VS1_LOBBY);
+	REQUIRED_TILE(TILE_DURAK_LOBBY);
 	// jail
 	REQUIRED_TILE(TILE_JAIL);
 	REQUIRED_TILE(TILE_JAIL_RELEASE);
-	// durak
-	REQUIRED_TILE(TILE_DURAK_TABLE);
-	REQUIRED_TILE(TILE_DURAK_SEAT);
 	#undef REQUIRED_TILE
 	for (int i = 0; i < NUM_INDICES; i++)
 	{
@@ -7971,7 +7969,7 @@ const char *CGameContext::GetMinigameName(int Minigame)
 	case MINIGAME_1VS1:
 		return "1vs1";
 	case MINIGAME_DURAK:
-		return "Durak"; // vote menu doesn't like 'á'
+		return "Durák";
 	}
 	return "Unknown";
 }
@@ -8028,6 +8026,12 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force, bool DoCh
 				SendChatTarget(ClientID, aMsg);
 			}
 		}
+		return;
+	}
+
+	if (Minigame == MINIGAME_DURAK && !Collision()->TileUsed(TILE_DURAK_LOBBY))
+	{
+		SendChatTarget(ClientID, "This map has no Durák lobby, you have to find your way to the table yourself");
 		return;
 	}
 

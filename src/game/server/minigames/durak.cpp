@@ -247,7 +247,10 @@ void CDurak::OnPlayerLeave(int ClientID)
 				//m_vpGames[g]->OnPlayerLeave(i);
 				m_vpGames[g]->m_aSeats[i].m_Player.Reset();
 
-				GameServer()->SetMinigame(ClientID, MINIGAME_NONE, false, false);
+				if (!GameServer()->Collision()->TileUsed(TILE_DURAK_LOBBY))
+				{
+					GameServer()->SetMinigame(ClientID, MINIGAME_NONE, false, false);
+				}
 				GameServer()->m_apPlayers[ClientID]->m_ForceSpawnPos = vec2(-1, -1);
 				pTeams->SetForceCharacterTeam(ClientID, 0);
 				m_aInDurakGame[ClientID] = false;

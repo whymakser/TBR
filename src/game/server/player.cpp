@@ -1475,6 +1475,11 @@ void CPlayer::TryRespawn()
 		else
 			Index = TILE_1VS1_LOBBY;
 	}
+	else if (m_Minigame == MINIGAME_DURAK)
+	{
+		// overriden by m_ForceSpawnPos while in an active game
+		Index = TILE_DURAK_LOBBY;
+	}
 	else if (m_JailTime == 1)
 	{
 		m_JailTime = 0;
