@@ -369,87 +369,97 @@ bool CDurak::EndGame(int Game)
 
 void CDurak::Tick()
 {
-	for (unsigned int g = 0; g < m_vpGames.size(); g++)
+	for (int g = (int)m_vpGames.size() - 1; g >= 0; g--)
 	{
-		CDurakGame *pGame = m_vpGames[g];
-		bool CancelledTimer = false;
-		int NumParticipants = pGame->NumParticipants();
-		if (NumParticipants < MIN_DURAK_PLAYERS)
+		if (UpdateGame(g))
 		{
-			if (!pGame->m_Running && pGame->m_GameStartTick)
-			{
-				pGame->m_GameStartTick = 0;
-				CancelledTimer = true;
-			}
+			// no need to decrement g since we're iterating backwards
+			continue;
+		}
+	}
+}
 
-			// Reset stake when all players left the table and no round started
-			if (pGame->NumDeployedStakes() == 0)
-			{
-				pGame->m_Stake = -1;
-			}
-
-			if (EndGame(g))
-			{
-				// will only trigger if game is running and successfully ended
-				g--;
-				continue;
-			}
+bool CDurak::UpdateGame(int Game)
+{
+	CDurakGame *pGame = m_vpGames[Game];
+	bool CancelledTimer = false;
+	int NumParticipants = pGame->NumParticipants();
+	if (NumParticipants < MIN_DURAK_PLAYERS)
+	{
+		if (!pGame->m_Running && pGame->m_GameStartTick)
+		{
+			pGame->m_GameStartTick = 0;
+			CancelledTimer = true;
 		}
 
-		bool TimerUpGameStart = !pGame->m_Running && pGame->m_GameStartTick && pGame->m_GameStartTick <= Server()->Tick();
-		if (TimerUpGameStart && !StartGame(g))
+		// Reset stake when all players left the table and no round started
+		if (pGame->NumDeployedStakes() == 0)
 		{
-			// will only trigger when the timer is up and startgame fails, if no team is free
-			g--;
+			pGame->m_Stake = -1;
+		}
+
+		if (EndGame(Game))
+		{
+			// will only trigger if game is running and successfully ended
+			return true;
+		}
+	}
+
+	bool TimerUpGameStart = !pGame->m_Running && pGame->m_GameStartTick && pGame->m_GameStartTick <= Server()->Tick();
+	if (TimerUpGameStart && !StartGame(Game))
+	{
+		// will only trigger when the timer is up and startgame fails, if no team is free
+		return true;
+	}
+
+	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+	{
+		CDurakGame::SSeat *pSeat = &pGame->m_aSeats[i];
+		int ClientID = pSeat->m_Player.m_ClientID;
+		if (ClientID == -1)
+			continue;
+
+		CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
+
+		if (!pGame->m_Running)
+		{
+			CCharacter *pChr = pPlayer->GetCharacter();
+			if (!pChr || GameServer()->Collision()->GetMapIndex(pChr->GetPos()) != pSeat->m_MapIndex)
+			{
+				if (pChr && m_aUpdatedPassive[ClientID])
+				{
+					pChr->m_PassiveEndTick = 0;
+					pChr->Passive(false, -1, true);
+				}
+				m_aUpdatedPassive[ClientID] = false;
+				pSeat->m_Player.Reset();
+				continue;
+			}
+
+			if (CancelledTimer)
+			{
+				GameServer()->SendBroadcast("Game aborted, too few players...", ClientID);
+			}
+			else if (pGame->m_GameStartTick > Server()->Tick() && (pGame->m_GameStartTick - Server()->Tick() + 1) % Server()->TickSpeed() == 0)
+			{
+				char aBuf[128];
+				str_format(aBuf, sizeof(aBuf), "Players [%d/%d]\nStake [%d]\nGame start [%d]", NumParticipants, (int)MAX_DURAK_PLAYERS,
+					pGame->m_Stake, (pGame->m_GameStartTick - Server()->Tick()) / Server()->TickSpeed() + 1);
+				GameServer()->SendBroadcast(aBuf, ClientID);
+			}
 			continue;
 		}
 
-		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+		if (TimerUpGameStart)
 		{
-			CDurakGame::SSeat *pSeat = &pGame->m_aSeats[i];
-			int ClientID = pSeat->m_Player.m_ClientID;
-			if (ClientID == -1)
-				continue;
-
-			CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
-
-			if (!pGame->m_Running)
-			{
-				CCharacter *pChr = pPlayer->GetCharacter();
-				if (!pChr || GameServer()->Collision()->GetMapIndex(pChr->GetPos()) != pSeat->m_MapIndex)
-				{
-					if (pChr && m_aUpdatedPassive[ClientID])
-					{
-						pChr->m_PassiveEndTick = 0;
-						pChr->Passive(false, -1, true);
-					}
-					m_aUpdatedPassive[ClientID] = false;
-					pSeat->m_Player.Reset();
-					continue;
-				}
-
-				if (CancelledTimer)
-				{
-					GameServer()->SendBroadcast("Game aborted, too few players...", ClientID);
-				}
-				else if (pGame->m_GameStartTick > Server()->Tick() && (pGame->m_GameStartTick - Server()->Tick() + 1) % Server()->TickSpeed() == 0)
-				{
-					char aBuf[128];
-					str_format(aBuf, sizeof(aBuf), "Players [%d/%d]\nStake [%d]\nGame start [%d]", NumParticipants, (int)MAX_DURAK_PLAYERS,
-						pGame->m_Stake, (pGame->m_GameStartTick - Server()->Tick()) / Server()->TickSpeed() + 1);
-					GameServer()->SendBroadcast(aBuf, ClientID);
-				}
-				continue;
-			}
-
-			if (TimerUpGameStart)
-			{
-				GameServer()->SendBroadcast("Game started!", ClientID);
-			}
-
-			// game logic
+			GameServer()->SendBroadcast("Game started!", ClientID);
 		}
+
+		// game logic
 	}
+
+	// Safely return and let the tick function know we are still alive
+	return false;
 }
 
 void CDurak::Snap(int SnappingClient)

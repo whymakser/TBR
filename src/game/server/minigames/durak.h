@@ -125,6 +125,7 @@ class CDurak : public CMinigame
 	bool m_aUpdatedPassive[MAX_CLIENTS];
 	bool m_aInDurakGame[MAX_CLIENTS];
 
+	bool UpdateGame(int Game);
 	bool StartGame(int Game);
 	bool EndGame(int Game);
 
