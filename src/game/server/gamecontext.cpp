@@ -8029,14 +8029,18 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force, bool DoCh
 		return;
 	}
 
-	if (Minigame == MINIGAME_DURAK && !Collision()->TileUsed(TILE_DURAK_LOBBY))
+	if (!Force)
 	{
-		SendChatTarget(ClientID, "This map has no Durák lobby, you have to find your way to the table yourself");
-		return;
+		if (Minigame == MINIGAME_DURAK && !Collision()->TileUsed(TILE_DURAK_LOBBY))
+		{
+			SendChatTarget(ClientID, "This map has no Durák lobby, you have to find your way to the table yourself");
+			return;
+		}
+		else if (pPlayer->RequestMinigameChange(Minigame))
+		{
+			return;
+		}
 	}
-
-	if (!Force && pPlayer->RequestMinigameChange(Minigame))
-		return;
 
 	// leave minigame
 	if (Minigame == MINIGAME_NONE)

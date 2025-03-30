@@ -432,7 +432,7 @@ void CDurak::Tick()
 				{
 					GameServer()->SendBroadcast("Game aborted, too few players...", ClientID);
 				}
-				else if (pGame->m_GameStartTick > Server()->Tick() && Server()->Tick() % Server()->TickSpeed() == 0)
+				else if (pGame->m_GameStartTick > Server()->Tick() && (pGame->m_GameStartTick - Server()->Tick() + 1) % Server()->TickSpeed() == 0)
 				{
 					char aBuf[128];
 					str_format(aBuf, sizeof(aBuf), "Players [%d/%d]\nStake [%d]\nGame start [%d]", NumParticipants, (int)MAX_DURAK_PLAYERS,
