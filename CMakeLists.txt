@@ -1588,6 +1588,8 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   mask128.h
   minigames/arenas.cpp
   minigames/arenas.h
+  minigames/durak.cpp
+  minigames/durak.h
   minigames/minigame.cpp
   minigames/minigame.h
   player.cpp

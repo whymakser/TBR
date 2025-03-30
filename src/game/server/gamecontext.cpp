@@ -2286,8 +2286,12 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				return;
 
 			bool Command = pMsg->m_pMessage[0] == '/';
-			if (!Command && pPlayer->GetCharacter() && pPlayer->GetCharacter()->m_DrawEditor.TryEnterPresetName(pMsg->m_pMessage))
+			if (!Command)
+			{
+				if (Durak()->TryEnterBetStake(ClientID, pMsg->m_pMessage) ||
+					(pPlayer->GetCharacter() && pPlayer->GetCharacter()->m_DrawEditor.TryEnterPresetName(pMsg->m_pMessage)))
 				return;
+			}
 
 			// don't allow spectators to disturb players during a running game in tournament mode
 			int Mode = pMsg->m_Mode;
@@ -4208,6 +4212,7 @@ void CGameContext::OnInit()
 					m_Tuning.Set("player_hooking", 0);
 					dbg_msg("front layer", "found no player hooking tile");
 				}
+
 				if (Index > ENTITY_OFFSET)
 				{
 					m_pController->OnEntity(Index, Pos, LAYER_FRONT, pFront[y * pTileMap->m_Width + x].m_Flags);
@@ -4218,7 +4223,7 @@ void CGameContext::OnInit()
 				Index = pSwitch[y * pTileMap->m_Width + x].m_Type;
 				// TODO: Add off by default door here
 				// if (Index == TILE_DOOR_OFF)
-				if (Index > ENTITY_OFFSET)
+				if (Index > ENTITY_OFFSET || Index == TILE_DURAK_TABLE || Index == TILE_DURAK_SEAT)
 				{
 					m_pController->OnEntity(Index, Pos, LAYER_SWITCH, pSwitch[y * pTileMap->m_Width + x].m_Flags, pSwitch[y * pTileMap->m_Width + x].m_Number);
 				}
@@ -4266,33 +4271,56 @@ void CGameContext::FDDraceInitPreMapInit()
 		m_aPlots[i].m_DestroyEndTick = 0;
 		m_aPlots[i].m_DoorHealth = Config()->m_SvPlotDoorHealth;
 	}
+
+	// Durak has to be initialized before the map initialization
+	for (int i = 0; i < NUM_MINIGAMES; i++)
+		if (m_pMinigames[i])
+			delete m_pMinigames[i];
+	m_pMinigames[MINIGAME_BLOCK] = new CMinigame(this, MINIGAME_BLOCK);
+	m_pMinigames[MINIGAME_SURVIVAL] = new CMinigame(this, MINIGAME_SURVIVAL);
+	m_pMinigames[MINIGAME_1VS1] = new CArenas(this, MINIGAME_1VS1);
+	m_pMinigames[MINIGAME_DURAK] = new CDurak(this, MINIGAME_DURAK);
+	m_pMinigames[MINIGAME_INSTAGIB_BOOMFNG] = new CMinigame(this, MINIGAME_INSTAGIB_BOOMFNG);
+	m_pMinigames[MINIGAME_INSTAGIB_FNG] = new CMinigame(this, MINIGAME_INSTAGIB_FNG);
+
+	// check if there are minigame spawns available (survival and instagib are checked in their own ticks)
+	for (int i = 0; i < NUM_MINIGAMES; i++)
+		m_aMinigameDisabled[i] = false;
+	m_aMinigameDisabled[MINIGAME_BLOCK] = !Collision()->TileUsed(TILE_MINIGAME_BLOCK);
+	m_aMinigameDisabled[MINIGAME_1VS1] = !Collision()->TileUsed(TILE_1VS1_LOBBY);
+	m_aMinigameDisabled[MINIGAME_DURAK] = true; // Validate when adding table tiles
 }
 
 void CGameContext::FDDraceInit()
 {
 	// Save memory. Only save those few tiles we really use when calling CCollision::GetRandomTile or CGameworld::CanSpawn (due to calling getrandomtile)
 	bool aRequiredRandomTilePositions[NUM_INDICES] = { 0 };
-	aRequiredRandomTilePositions[ENTITY_SPAWN] = true;
-	aRequiredRandomTilePositions[ENTITY_SPAWN_RED] = true;
-	aRequiredRandomTilePositions[ENTITY_SPAWN_BLUE] = true;
+	#define REQUIRED_TILE(index) aRequiredRandomTilePositions[(index)] = true
+	REQUIRED_TILE(ENTITY_SPAWN);
+	REQUIRED_TILE(ENTITY_SPAWN_RED);
+	REQUIRED_TILE(ENTITY_SPAWN_BLUE);
 	// for dummy spawns
-	aRequiredRandomTilePositions[ENTITY_SHOP_DUMMY_SPAWN] = true;
-	aRequiredRandomTilePositions[ENTITY_PLOT_SHOP_DUMMY_SPAWN] = true;
-	aRequiredRandomTilePositions[ENTITY_BANK_DUMMY_SPAWN] = true;
-	aRequiredRandomTilePositions[ENTITY_TAVERN_DUMMY_SPAWN] = true;
-	aRequiredRandomTilePositions[TILE_SHOP] = true;
-	aRequiredRandomTilePositions[TILE_PLOT_SHOP] = true;
-	aRequiredRandomTilePositions[TILE_BANK] = true;
-	aRequiredRandomTilePositions[TILE_TAVERN] = true;
+	REQUIRED_TILE(ENTITY_SHOP_DUMMY_SPAWN);
+	REQUIRED_TILE(ENTITY_PLOT_SHOP_DUMMY_SPAWN);
+	REQUIRED_TILE(ENTITY_BANK_DUMMY_SPAWN);
+	REQUIRED_TILE(ENTITY_TAVERN_DUMMY_SPAWN);
+	REQUIRED_TILE(TILE_SHOP);
+	REQUIRED_TILE(TILE_PLOT_SHOP);
+	REQUIRED_TILE(TILE_BANK);
+	REQUIRED_TILE(TILE_TAVERN);
 	// minigames
-	aRequiredRandomTilePositions[TILE_MINIGAME_BLOCK] = true;
-	aRequiredRandomTilePositions[TILE_SURVIVAL_LOBBY] = true;
-	aRequiredRandomTilePositions[TILE_SURVIVAL_SPAWN] = true;
-	aRequiredRandomTilePositions[TILE_SURVIVAL_DEATHMATCH] = true;
-	aRequiredRandomTilePositions[TILE_1VS1_LOBBY] = true;
+	REQUIRED_TILE(TILE_MINIGAME_BLOCK);
+	REQUIRED_TILE(TILE_SURVIVAL_LOBBY);
+	REQUIRED_TILE(TILE_SURVIVAL_SPAWN);
+	REQUIRED_TILE(TILE_SURVIVAL_DEATHMATCH);
+	REQUIRED_TILE(TILE_1VS1_LOBBY);
 	// jail
-	aRequiredRandomTilePositions[TILE_JAIL] = true;
-	aRequiredRandomTilePositions[TILE_JAIL_RELEASE] = true;
+	REQUIRED_TILE(TILE_JAIL);
+	REQUIRED_TILE(TILE_JAIL_RELEASE);
+	// durak
+	REQUIRED_TILE(TILE_DURAK_TABLE);
+	REQUIRED_TILE(TILE_DURAK_SEAT);
+	#undef REQUIRED_TILE
 	for (int i = 0; i < NUM_INDICES; i++)
 	{
 		Collision()->m_aTileUsed[i] = Collision()->GetRandomTile(i) != vec2(-1, -1);
@@ -4360,15 +4388,6 @@ void CGameContext::FDDraceInit()
 	m_pHouses[HOUSE_BANK] = new CBank(this);
 	m_pHouses[HOUSE_TAVERN] = new CTavern(this);
 
-	for (int i = 0; i < NUM_MINIGAMES; i++)
-		if (m_pMinigames[i])
-			delete m_pMinigames[i];
-	m_pMinigames[MINIGAME_BLOCK] = new CMinigame(this, MINIGAME_BLOCK);
-	m_pMinigames[MINIGAME_SURVIVAL] = new CMinigame(this, MINIGAME_SURVIVAL);
-	m_pMinigames[MINIGAME_1VS1] = new CArenas(this, MINIGAME_1VS1);
-	m_pMinigames[MINIGAME_INSTAGIB_BOOMFNG] = new CMinigame(this, MINIGAME_INSTAGIB_BOOMFNG);
-	m_pMinigames[MINIGAME_INSTAGIB_FNG] = new CMinigame(this, MINIGAME_INSTAGIB_FNG);
-
 	m_WhoIs.Init(this);
 	m_RainbowName.Init(this);
 
@@ -4376,12 +4395,6 @@ void CGameContext::FDDraceInit()
 	m_SurvivalBackgroundState = SURVIVAL_OFFLINE;
 	m_SurvivalTick = 0;
 	m_SurvivalWinner = -1;
-
-	// check if there are minigame spawns available (survival and instagib are checked in their own ticks)
-	for (int i = 0; i < NUM_MINIGAMES; i++)
-		m_aMinigameDisabled[i] = false;
-	m_aMinigameDisabled[MINIGAME_BLOCK] = !Collision()->TileUsed(TILE_MINIGAME_BLOCK);
-	m_aMinigameDisabled[MINIGAME_1VS1] = !Collision()->TileUsed(TILE_1VS1_LOBBY);
 
 	SetMapSpecificOptions();
 	if (Config()->m_SvDefaultDummies)
@@ -7945,6 +7958,8 @@ const char *CGameContext::GetMinigameName(int Minigame)
 		return "Instagib FNG";
 	case MINIGAME_1VS1:
 		return "1vs1";
+	case MINIGAME_DURAK:
+		return "Durák";
 	}
 	return "Unknown";
 }
@@ -7965,6 +7980,8 @@ const char* CGameContext::GetMinigameCommand(int Minigame)
 		return "fng";
 	case MINIGAME_1VS1:
 		return "1vs1";
+	case MINIGAME_DURAK:
+		return "durak";
 	}
 	return "unknown";
 }

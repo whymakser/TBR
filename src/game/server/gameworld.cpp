@@ -368,6 +368,19 @@ int CGameWorld::PlayerMap::GetSpecSelectFlag(int SpecFlag)
 	return m_pGameWorld->Server()->GetMaxClients(m_ClientID) - SpecFlag;
 }
 
+void CGameWorld::PlayerMap::AddToNumReserved(int Summand)
+{
+	// Remove old players from map if we take more space at the end
+	if (m_NumReserved + Summand > m_NumReserved)
+	{
+		for (int i = GetMapSize()-1; i >= GetMapSize()-Summand; i--)
+		{
+			Remove(i);
+		}
+	}
+	m_NumReserved += Summand;
+}
+
 void CGameWorld::PlayerMap::UpdateSeeOthers()
 {
 	if (m_pGameWorld->Server()->IsSevendown(m_ClientID))
@@ -525,6 +538,8 @@ void CGameWorld::PlayerMap::InitPlayer(bool Rejoin)
 			m_pGameWorld->m_aMap[i].Add(NextFreeID, m_ClientID);
 		}
 	}
+
+	AddToNumReserved(7); // Todo: durak remove
 }
 
 CPlayer *CGameWorld::PlayerMap::GetPlayer()

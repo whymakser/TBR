@@ -252,6 +252,19 @@ bool IGameController::OnEntity(int Index, vec2 Pos, int Layer, int Flags, int Nu
 			}
 		}
 	}
+	else if (Layer == LAYER_SWITCH && Index == TILE_DURAK_TABLE)
+	{
+		GameServer()->Durak()->AddMapTableTile(Number, Pos);
+	}
+	else if (Layer == LAYER_SWITCH && Index == TILE_DURAK_SEAT)
+	{
+		int MapIndex = GameServer()->Collision()->GetMapIndex(Pos);
+		int Delay = GameServer()->Collision()->GetSwitchDelay(MapIndex);
+		if (Delay > 0)
+		{
+			GameServer()->Durak()->AddMapSeatTile(Number, MapIndex, Delay-1);
+		}
+	}
 	else if(Index == ENTITY_CRAZY_SHOTGUN_EX)
 	{
 		int Dir;

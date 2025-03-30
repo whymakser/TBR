@@ -4,6 +4,7 @@
 #define GAME_SERVER_MINIGAMES_MINIGAME_H
 
 #include <engine/shared/protocol.h>
+#include <base/vmath.h>
 
 class CGameContext;
 class IServer;
@@ -14,6 +15,7 @@ enum Minigames
 	MINIGAME_BLOCK,
 	MINIGAME_SURVIVAL,
 	MINIGAME_1VS1,
+	MINIGAME_DURAK,
 	MINIGAME_INSTAGIB_BOOMFNG,
 	MINIGAME_INSTAGIB_FNG,
 	NUM_MINIGAMES

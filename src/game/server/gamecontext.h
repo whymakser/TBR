@@ -19,6 +19,7 @@
 #include "houses/house.h"
 #include "minigames/minigame.h"
 #include "minigames/arenas.h"
+#include "minigames/durak.h"
 
 #include "eventhandler.h"
 #include "gameworld.h"
@@ -688,6 +689,7 @@ public:
 	class CHouse *m_pHouses[NUM_HOUSES];
 	class CMinigame *m_pMinigames[NUM_MINIGAMES];
 	CArenas *Arenas() { return ((CArenas *)m_pMinigames[MINIGAME_1VS1]); }
+	CDurak *Durak() { return ((CDurak *)m_pMinigames[MINIGAME_DURAK]); }
 	CWhoIs m_WhoIs;
 	CRainbowName m_RainbowName;
 	CVotingMenu m_VotingMenu;

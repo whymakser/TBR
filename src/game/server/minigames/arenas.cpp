@@ -51,7 +51,7 @@ void CArenas::Reset(int ClientID)
 int CArenas::GetFreeArena()
 {
 	for (int i = 0; i < MAX_FIGHTS; i++)
-		if (!m_aFights[i].m_Active)
+		if (!m_aFights[i].m_Active && ((CGameControllerDDRace *)GameServer()->m_pController)->m_Teams.Count(i) == 0)
 			return i;
 	return -1;
 }
@@ -244,8 +244,11 @@ void CArenas::FinishConfiguration(int Fight, int ClientID)
 	}
 }
 
-void CArenas::OnInput(int ClientID, CNetObj_PlayerInput *pNewInput)
+bool CArenas::OnInput(int ClientID, CNetObj_PlayerInput *pNewInput)
 {
+	if (!IsConfiguring(ClientID))
+		return false;
+
 	if (pNewInput->m_Jump && m_aLastJump[ClientID] == 0)
 	{
 		switch (m_aState[ClientID])
@@ -271,6 +274,7 @@ void CArenas::OnInput(int ClientID, CNetObj_PlayerInput *pNewInput)
 
 	m_aLastJump[ClientID] = pNewInput->m_Jump;
 	m_aLastDirection[ClientID] = pNewInput->m_Direction;
+	return true;
 }
 
 bool CArenas::ValidSpawnPos(vec2 Pos)

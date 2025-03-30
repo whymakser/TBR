@@ -125,6 +125,7 @@ private:
 		void UpdateSeeOthers();
 		void ResetSeeOthers();
 		int GetSpecSelectFlag(int SpecFlag);
+		void AddToNumReserved(int Summand);
 	} m_aMap[MAX_CLIENTS];
 	void UpdatePlayerMap(int ClientID);
 
@@ -148,6 +149,7 @@ public:
 	void InitPlayerMap(int ClientID, bool Rejoin = false) { m_aMap[ClientID].InitPlayer(Rejoin); }
 	void UpdateTeamsState(int ClientID) { m_aMap[ClientID].m_UpdateTeamsState = true; }
 	void ForceInsertPlayer(int Insert, int ClientID) { m_aMap[ClientID].InsertNextEmpty(Insert); }
+	void AddToNumReserved(int ClientID, int Summand) { m_aMap[ClientID].AddToNumReserved(Summand); }
 
 	enum
 	{

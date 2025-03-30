@@ -4,7 +4,6 @@
 #define GAME_SERVER_MINIGAMES_ARENAS_H
 
 #include "minigame.h"
-#include <base/vmath.h>
 #include <vector>
 
 class CPlayer;
@@ -142,7 +141,7 @@ public:
 	bool OnCharacterSpawn(int ClientID);
 	void OnPlayerLeave(int ClientID, bool Disconnect = false);
 	void OnPlayerDie(int ClientID);
-	void OnInput(int ClientID, CNetObj_PlayerInput *pNewInput);
+	bool OnInput(int ClientID, CNetObj_PlayerInput *pNewInput);
 	bool ClampViewPos(int ClientID);
 
 	void StartConfiguration(int ClientID, int Participant, int ScoreLimit, bool KillBorder);
