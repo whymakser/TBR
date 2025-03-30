@@ -82,10 +82,9 @@ void CMoney::Tick()
 	{
 		if (distance(m_Pos, pMoney->GetPos()) < GetRadius() + pMoney->GetRadius())
 		{
-			pMoney->m_Amount += m_Amount;
+			m_Amount += pMoney->m_Amount;
+			pMoney->Reset();
 			GameServer()->CreateDeath(m_Pos, m_Owner, m_TeamMask);
-			Reset();
-			return;
 		}
 		else if (!pClosest)
 			MoveTo(pMoney->GetPos(), RADIUS_FIND_MONEY);
