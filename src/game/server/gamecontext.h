@@ -741,7 +741,6 @@ public:
 	bool m_aMinigameDisabled[NUM_MINIGAMES];
 
 	void SetMinigame(int ClientID, int Minigame, bool Force = false);
-	void SetMinigameImpl(int ClientID, int Minigame, bool SaveCharacter);
 
 	//survival
 	void SurvivalTick();

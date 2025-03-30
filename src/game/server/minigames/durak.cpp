@@ -128,7 +128,7 @@ void CDurak::OnCharacterSeat(int ClientID, int Number, int SeatIndex)
 	CDurakGame::SSeat::SPlayer *pPlayer = &pGame->m_aSeats[SeatIndex].m_Player;
 	if (pPlayer->m_ClientID != -1)
 	{
-		if (pPlayer->m_ClientID != ClientID && m_LastSeatOccupiedMsg[ClientID] && m_LastSeatOccupiedMsg[ClientID] + Server()->TickSpeed() * 2 < Server()->Tick())
+		if (pPlayer->m_ClientID != ClientID && (!m_LastSeatOccupiedMsg[ClientID] || m_LastSeatOccupiedMsg[ClientID] + Server()->TickSpeed() * 4 < Server()->Tick()))
 		{
 			str_format(aBuf, sizeof(aBuf), "Welcome to the Durák table, %s! This seat is taken already, please try another one.", Server()->ClientName(ClientID));
 			GameServer()->SendChatTarget(ClientID, aBuf);
@@ -313,15 +313,17 @@ bool CDurak::StartGame(int Game)
 
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
-		int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
-		if (pGame->m_aSeats[i].m_Player.m_Stake != pGame->m_Stake)
+		CDurakGame::SSeat *pSeat = &pGame->m_aSeats[i];
+		int ClientID = pSeat->m_Player.m_ClientID;
+		if (pSeat->m_Player.m_Stake != pGame->m_Stake)
 		{
 			GameServer()->SendChatTarget(ClientID, "You didn't deploy your stake in time, game started without you");
-			pGame->m_aSeats[i].m_Player.Reset();
+			pSeat->m_Player.Reset();
 			continue;
 		}
 
-		GameServer()->SetMinigameImpl(ClientID, MINIGAME_DURAK, true);
+		GameServer()->SetMinigame(ClientID, MINIGAME_DURAK, true);
+		GameServer()->m_apPlayers[ClientID]->m_ForceSpawnPos = GameServer()->Collision()->GetPos(pSeat->m_MapIndex);
 		pTeams->SetForceCharacterTeam(ClientID, FirstFreeTeam);
 	}
 

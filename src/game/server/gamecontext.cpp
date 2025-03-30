@@ -8084,21 +8084,6 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force)
 	}
 
 	pPlayer->KillCharacter(WEAPON_MINIGAME_CHANGE);
-	SetMinigameImpl(ClientID, Minigame, false);
-}
-
-void CGameContext::SetMinigameImpl(int ClientID, int Minigame, bool SaveCharacter)
-{
-	CPlayer *pPlayer = m_apPlayers[ClientID];
-	if (!pPlayer)
-		return;
-
-	// Save character stats to reload them after leaving
-	if (SaveCharacter)
-	{
-		pPlayer->SaveMinigameTee();
-	}
-
 	pPlayer->m_Minigame = Minigame;
 	pPlayer->SetPlaying();
 	pPlayer->m_LastMovementTick = Server()->Tick();
