@@ -102,7 +102,7 @@ enum
 	MAX_PASSWORD_LENGTH = 128,
 
 	// update this one with every acc change you do
-	ACC_CURRENT_VERSION = 11,
+	ACC_CURRENT_VERSION = 12,
 
 	// vip
 	VIP_CLASSIC = 1,
@@ -575,6 +575,9 @@ public:
 		int m_PortalBattery;
 		int m_PortalBlocker;
 		int m_VoteMenuFlags;
+		int m_DurakWins;
+		int m_DurakTotalStake;
+		int m_DurakWinnings;
 	};
 	std::vector<AccountInfo> m_Accounts;
 
@@ -634,6 +637,9 @@ public:
 		ACC_PORTAL_BATTERY,
 		ACC_PORTAL_BLOCKER,
 		ACC_VOTE_MENU_FLAGS,
+		ACC_DURAK_WINS,
+		ACC_DURAK_TOTAL_STAKE,
+		ACC_DURAK_WINNINGS,
 		NUM_ACCOUNT_VARIABLES
 	};
 
@@ -735,6 +741,7 @@ public:
 	bool m_aMinigameDisabled[NUM_MINIGAMES];
 
 	void SetMinigame(int ClientID, int Minigame, bool Force = false);
+	void SetMinigameImpl(int ClientID, int Minigame, bool SaveCharacter);
 
 	//survival
 	void SurvivalTick();

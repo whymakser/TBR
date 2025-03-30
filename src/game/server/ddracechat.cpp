@@ -1411,6 +1411,18 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 		} break;
 
+		case MINIGAME_DURAK:
+		{
+			str_format(aBuf, sizeof(aBuf), "--- %s's Durák Stats ---", pSelf->Server()->ClientName(ID));
+			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+			str_format(aBuf, sizeof(aBuf), "Games won: %d", pAccount->m_DurakWins);
+			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+			str_format(aBuf, sizeof(aBuf), "Money winnings: %d", pAccount->m_DurakWinnings);
+			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+			str_format(aBuf, sizeof(aBuf), "Total stake: %d", pAccount->m_DurakTotalStake);
+			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+		} break;
+
 		case MINIGAME_SURVIVAL:
 		{
 			str_format(aBuf, sizeof(aBuf), "--- %s's Survival Stats ---", pSelf->Server()->ClientName(ID));

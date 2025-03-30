@@ -81,10 +81,9 @@ void CDurak::AddMapTableTile(int Number, vec2 Pos)
 	}
 	else
 	{
-		pGame = new CDurakGame(Number);
+		pGame = new CDurakGame(Number, Pos);
 		m_vpGames.push_back(pGame);
 	}
-	pGame->m_TablePos = Pos;
 	GameServer()->m_aMinigameDisabled[MINIGAME_DURAK] = false;
 }
 
@@ -109,7 +108,7 @@ void CDurak::AddMapSeatTile(int Number, int MapIndex, int SeatIndex)
 
 void CDurak::OnCharacterSeat(int ClientID, int Number, int SeatIndex)
 {
-	if (GameServer()->m_aMinigameDisabled[MINIGAME_DURAK])
+	if (GameServer()->m_aMinigameDisabled[MINIGAME_DURAK] || GameServer()->m_apPlayers[ClientID]->m_Minigame == MINIGAME_DURAK)
 		return;
 
 	int Game = GetGameByNumber(Number, false);
@@ -269,6 +268,14 @@ void CDurak::SendChatToParticipants(int Game, const char *pMessage)
 	}
 }
 
+void CDurak::OnPlayerLeave(int ClientID)
+{
+	int Game = GetGameByClient(ClientID);
+	if (Game < 0)
+		return;
+	m_vpGames[Game]->GetSeatByClient(ClientID)->m_Player.Reset();
+}
+
 bool CDurak::OnInput(int ClientID, CNetObj_PlayerInput *pNewInput)
 {
 	return false;
@@ -295,7 +302,7 @@ void CDurak::StartGame(int Game)
 	}
 
 	// New game for other players, since we move to a new team
-	m_vpGames.push_back(new CDurakGame(pGame->m_Number));
+	m_vpGames.push_back(new CDurakGame(pGame->m_Number, pGame->m_TablePos, pGame->m_aSeats));
 
 	if (FirstFreeTeam == -1)
 	{
@@ -317,7 +324,7 @@ void CDurak::StartGame(int Game)
 			continue;
 		}
 
-		GameServer()->SetMinigame(ClientID, MINIGAME_DURAK, true);
+		GameServer()->SetMinigameImpl(ClientID, MINIGAME_DURAK, true);
 		pTeams->SetForceCharacterTeam(ClientID, FirstFreeTeam);
 	}
 
@@ -331,6 +338,14 @@ void CDurak::EndGame(int Game)
 	CDurakGame* pGame = m_vpGames[Game];
 	if (!pGame->m_Running)
 		return;
+
+	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+	{
+		int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
+		if (ClientID == -1)
+			continue;
+		GameServer()->SetMinigame(ClientID, MINIGAME_NONE);
+	}
 
 	m_vpGames.erase(m_vpGames.begin() + Game);
 }

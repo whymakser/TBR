@@ -579,6 +579,8 @@ void CPlayer::Snap(int SnappingClient)
 			Score = GameServer()->m_Accounts[GetAccID()].m_Kills;
 		else if (pSnapping->m_Minigame == MINIGAME_SURVIVAL)
 			Score = GameServer()->m_Accounts[GetAccID()].m_SurvivalKills;
+		else if (pSnapping->m_Minigame == MINIGAME_DURAK)
+			Score = GameServer()->m_Accounts[GetAccID()].m_DurakWins;
 		else if (pSnapping->m_Minigame == MINIGAME_INSTAGIB_BOOMFNG || pSnapping->m_Minigame == MINIGAME_INSTAGIB_FNG)
 		{
 			Score = m_InstagibScore;
@@ -986,7 +988,7 @@ int CPlayer::GetHidePlayerTeam(int Asker)
 {
 	CPlayer *pAsker = GameServer()->m_apPlayers[Asker];
 	if (m_TeeControllerID != Asker && m_Team != TEAM_SPECTATORS && ((GameServer()->Config()->m_SvHideDummies && m_IsDummy)
-		|| (GameServer()->Config()->m_SvHideMinigamePlayers && (m_Minigame != MINIGAME_1VS1 || !GameServer()->Arenas()->FightStarted(m_ClientID)) && pAsker->m_Minigame != m_Minigame)))
+		|| (GameServer()->Config()->m_SvHideMinigamePlayers && m_Minigame != MINIGAME_DURAK && (m_Minigame != MINIGAME_1VS1 || !GameServer()->Arenas()->FightStarted(m_ClientID)) && pAsker->m_Minigame != m_Minigame)))
 		return TEAM_BLUE;
 	return m_Team;
 }
@@ -1006,7 +1008,7 @@ int CPlayer::GetAuthedHighlighted()
 bool CPlayer::RestrictZoom()
 {
 	// allow zoom in block and 1vs1
-	return IsMinigame() && m_Minigame != MINIGAME_BLOCK && m_Minigame != MINIGAME_1VS1;
+	return IsMinigame() && m_Minigame != MINIGAME_BLOCK && m_Minigame != MINIGAME_1VS1 && m_Minigame != MINIGAME_DURAK;
 }
 
 float CPlayer::GetZoomLevel()
@@ -2661,7 +2663,7 @@ bool CPlayer::ShowDDraceHud()
 	CPlayer *pPlayer = this;
 	if ((m_Team == TEAM_SPECTATORS || m_Paused) && m_SpectatorID >= 0 && GameServer()->m_apPlayers[m_SpectatorID])
 		pPlayer = GameServer()->m_apPlayers[m_SpectatorID];
-	return !pPlayer->IsMinigame() || pPlayer->m_Minigame == MINIGAME_BLOCK || pPlayer->m_Minigame == MINIGAME_1VS1;
+	return !pPlayer->IsMinigame() || pPlayer->m_Minigame == MINIGAME_BLOCK || pPlayer->m_Minigame == MINIGAME_1VS1 || pPlayer->m_Minigame == MINIGAME_DURAK;
 }
 
 void CPlayer::UpdateDoubleXpLifes()

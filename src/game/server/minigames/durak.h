@@ -16,31 +16,6 @@ enum
 class CDurakGame
 {
 public:
-	~CDurakGame() {} // move players back out of the game, or call endgame everywhere, or idk yet
-	CDurakGame(int Number)
-	{
-		m_Number = Number;
-		m_TablePos = vec2(-1, -1);
-		m_Stake = -1;
-		m_GameStartTick = 0;
-		m_Running = false;
-		m_InitialAttackerIndex = -1;
-		m_DefenderIndex = -1;
-		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
-		{
-			m_aSeats[i].m_SeatMapIndex = -1;
-			m_aSeats[i].m_Player.Reset();
-		}
-	}
-
-	int m_Number;
-	vec2 m_TablePos;
-	int64 m_Stake;
-	int64 m_GameStartTick;
-	bool m_Running;
-	int m_InitialAttackerIndex;
-	int m_DefenderIndex;
-
 	struct SSeat
 	{
 		int m_SeatMapIndex;
@@ -55,6 +30,31 @@ public:
 			int64 m_Stake;
 		} m_Player;
 	} m_aSeats[MAX_DURAK_PLAYERS];
+
+	~CDurakGame() {} // move players back out of the game, or call endgame everywhere, or idk yet
+	CDurakGame(int Number, vec2 TablePos = vec2(-1, -1), SSeat *pSeats = 0)
+	{
+		m_Number = Number;
+		m_TablePos = TablePos;
+		m_Stake = -1;
+		m_GameStartTick = 0;
+		m_Running = false;
+		m_InitialAttackerIndex = -1;
+		m_DefenderIndex = -1;
+		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+		{
+			m_aSeats[i].m_SeatMapIndex = pSeats ? pSeats[i].m_SeatMapIndex : -1;
+			m_aSeats[i].m_Player.Reset();
+		}
+	}
+
+	int m_Number;
+	vec2 m_TablePos;
+	int64 m_Stake;
+	int64 m_GameStartTick;
+	bool m_Running;
+	int m_InitialAttackerIndex;
+	int m_DefenderIndex;
 
 	SSeat *GetSeatByClient(int ClientID)
 	{
@@ -128,6 +128,8 @@ public:
 
 	void OnCharacterSeat(int ClientID, int Number, int SeatIndex);
 	bool TryEnterBetStake(int ClientID, const char *pMessage);
+
+	void OnPlayerLeave(int ClientID);
 
 	bool OnInput(int ClientID, CNetObj_PlayerInput *pNewInput);
 

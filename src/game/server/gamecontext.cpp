@@ -5860,6 +5860,9 @@ int CGameContext::AddAccount()
 	Account.m_PortalBattery = 0;
 	Account.m_PortalBlocker = 0;
 	Account.m_VoteMenuFlags = 0;
+	Account.m_DurakWins = 0;
+	Account.m_DurakTotalStake = 0;
+	Account.m_DurakWinnings = 0;
 
 	m_Accounts.push_back(Account);
 	return m_Accounts.size()-1;
@@ -5954,6 +5957,9 @@ void CGameContext::SetAccVar(int ID, int VariableID, const char *pData)
 	case ACC_PORTAL_BATTERY:			m_Accounts[ID].m_PortalBattery = atoi(pData); break;
 	case ACC_PORTAL_BLOCKER:			m_Accounts[ID].m_PortalBlocker = atoi(pData); break;
 	case ACC_VOTE_MENU_FLAGS:			m_Accounts[ID].m_VoteMenuFlags = atoi(pData); break;
+	case ACC_DURAK_WINS:				m_Accounts[ID].m_DurakWins = atoi(pData); break;
+	case ACC_DURAK_TOTAL_STAKE:			m_Accounts[ID].m_DurakTotalStake = atoi(pData); break;
+	case ACC_DURAK_WINNINGS:			m_Accounts[ID].m_DurakWinnings = atoi(pData); break;
 	}
 }
 
@@ -6013,6 +6019,9 @@ const char *CGameContext::GetAccVarName(int VariableID)
 	case ACC_PORTAL_BATTERY:			return "portal_battery";
 	case ACC_PORTAL_BLOCKER:			return "portal_blocker";
 	case ACC_VOTE_MENU_FLAGS:			return "vote_menu_flags";
+	case ACC_DURAK_WINS:				return "durak_wins";
+	case ACC_DURAK_TOTAL_STAKE:			return "durak_total_stake";
+	case ACC_DURAK_WINNINGS:			return "durak_winnings";
 	}
 	return "Unknown";
 }
@@ -6076,6 +6085,9 @@ const char *CGameContext::GetAccVarValue(int ID, int VariableID)
 	case ACC_PORTAL_BATTERY:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_PortalBattery); break;
 	case ACC_PORTAL_BLOCKER:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_PortalBlocker); break;
 	case ACC_VOTE_MENU_FLAGS:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_VoteMenuFlags); break;
+	case ACC_DURAK_WINS:				str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_DurakWins); break;
+	case ACC_DURAK_TOTAL_STAKE:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_DurakTotalStake); break;
+	case ACC_DURAK_WINNINGS:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_DurakWinnings); break;
 	}
 	return aBuf;
 }
@@ -8035,6 +8047,10 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force)
 		{
 			Arenas()->OnPlayerLeave(ClientID);
 		}
+		else if (pPlayer->m_Minigame == MINIGAME_DURAK)
+		{
+			Durak()->OnPlayerLeave(ClientID);
+		}
 	}
 	// join minigame
 	else if (!pPlayer->IsMinigame())
@@ -8068,6 +8084,21 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force)
 	}
 
 	pPlayer->KillCharacter(WEAPON_MINIGAME_CHANGE);
+	SetMinigameImpl(ClientID, Minigame, false);
+}
+
+void CGameContext::SetMinigameImpl(int ClientID, int Minigame, bool SaveCharacter)
+{
+	CPlayer *pPlayer = m_apPlayers[ClientID];
+	if (!pPlayer)
+		return;
+
+	// Save character stats to reload them after leaving
+	if (SaveCharacter)
+	{
+		pPlayer->SaveMinigameTee();
+	}
+
 	pPlayer->m_Minigame = Minigame;
 	pPlayer->SetPlaying();
 	pPlayer->m_LastMovementTick = Server()->Tick();
