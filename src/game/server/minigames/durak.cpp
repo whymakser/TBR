@@ -30,6 +30,7 @@ CDurak::CDurak(CGameContext *pGameServer, int Type) : CMinigame(pGameServer, Typ
 		m_aStaticCards[i].m_TableOffset = vec2(aOffsets[i].x * 32.f, aOffsets[i].y * 32.f);
 		str_copy(m_aStaticCards[i].m_aName, apNames[i], sizeof(m_aStaticCards[i].m_aName));
 	}
+
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
 		m_LastSeatOccupiedMsg[i] = 0;
@@ -72,7 +73,6 @@ void CDurak::AddMapTableTile(int Number, vec2 Pos)
 {
 	if (Number <= 0)
 		return;
-
 	CDurakGame *pGame = 0;
 	int Game = GetGameByNumber(Number);
 	if (Game != -1)
@@ -81,9 +81,10 @@ void CDurak::AddMapTableTile(int Number, vec2 Pos)
 	}
 	else
 	{
-		pGame = new CDurakGame(Number, Pos);
+		pGame = new CDurakGame(Number);
 		m_vpGames.push_back(pGame);
 	}
+	pGame->m_TablePos = Pos;
 	GameServer()->m_aMinigameDisabled[MINIGAME_DURAK] = false;
 }
 
@@ -103,7 +104,14 @@ void CDurak::AddMapSeatTile(int Number, int MapIndex, int SeatIndex)
 		pGame = new CDurakGame(Number);
 		m_vpGames.push_back(pGame);
 	}
-	pGame->m_aSeats[SeatIndex].m_SeatMapIndex = MapIndex;
+	pGame->m_aSeats[SeatIndex].m_MapIndex = MapIndex;
+}
+
+void CDurak::UpdatePassive(int ClientID, int Seconds)
+{
+	CCharacter* pChr = GameServer()->GetPlayerChar(ClientID);
+	if (pChr && pChr->UpdatePassiveEndTick(Server()->Tick() + Server()->TickSpeed() * Seconds))
+		m_aUpdatedPassive[ClientID] = true;
 }
 
 void CDurak::OnCharacterSeat(int ClientID, int Number, int SeatIndex)
@@ -128,38 +136,24 @@ void CDurak::OnCharacterSeat(int ClientID, int Number, int SeatIndex)
 		}
 		return;
 	}
+
+	// occupy seat
+	pPlayer->m_ClientID = ClientID;
+	UpdatePassive(ClientID, 5);
+
+	if (pGame->m_Stake == -1)
+	{
+		str_format(aBuf, sizeof(aBuf), "Welcome to Durák, %s! You are first, please enter a stake in the chat.", Server()->ClientName(ClientID));
+	}
+	else if (pGame->NumParticipants() == 1)
+	{
+		str_format(aBuf, sizeof(aBuf), "Welcome to Durák, %s! You are second, please enter the current stake of '%d' or propose a new one in the chat.", Server()->ClientName(ClientID), pGame->m_Stake);
+	}
 	else
 	{
-		// occupy seat
-		pPlayer->m_ClientID = ClientID;
-		UpdatePassive(ClientID, 5);
-
-		if (pGame->m_Stake == -1)
-		{
-			str_format(aBuf, sizeof(aBuf), "Welcome to Durák, %s! You are first, please enter a stake in the chat.", Server()->ClientName(ClientID));
-			GameServer()->SendChatTarget(ClientID, aBuf);
-		}
-		else if (pGame->NumDeployedStakes() == 1)
-		{
-			str_format(aBuf, sizeof(aBuf), "Welcome to Durák, %s! You are second, please enter the current stake of '%d' or propose a new one in the chat.", Server()->ClientName(ClientID), pGame->m_Stake);
-			GameServer()->SendChatTarget(ClientID, aBuf);
-		}
-		else
-		{
-			str_format(aBuf, sizeof(aBuf), "Welcome to Durák, %s! In order to participate, please enter the current stake of '%d' in the chat.",
-				Server()->ClientName(ClientID), pGame->m_Stake);
-			GameServer()->SendChatTarget(ClientID, aBuf);
-		}
+		str_format(aBuf, sizeof(aBuf), "Welcome to Durák, %s! In order to participate, please enter the current stake of '%d' in the chat.", Server()->ClientName(ClientID), pGame->m_Stake);
 	}
-}
-
-void CDurak::UpdatePassive(int ClientID, int Seconds)
-{
-	CCharacter* pChr = GameServer()->GetPlayerChar(ClientID);
-	if (!pChr)
-		return;
-	if (pChr->UpdatePassiveEndTick(Server()->Tick() + Server()->TickSpeed() * Seconds))
-		m_aUpdatedPassive[ClientID] = true;
+	GameServer()->SendChatTarget(ClientID, aBuf);
 }
 
 bool CDurak::TryEnterBetStake(int ClientID, const char *pMessage)
@@ -167,16 +161,12 @@ bool CDurak::TryEnterBetStake(int ClientID, const char *pMessage)
 	int Game = GetGameByClient(ClientID);
 	if (Game < 0)
 		return false;
-
 	CDurakGame *pGame = m_vpGames[Game];
 	if (pGame->m_Running)
 		return false;
-
 	int64 Stake = atoll(pMessage);
-	if (Stake < 0)
-	{
+	if (Stake <= 0 && pMessage[0] != '0')
 		return false;
-	}
 
 	#define VALIDATE_WALLET() do { \
 			if (Stake > GameServer()->m_apPlayers[ClientID]->GetUsableMoney()) \
@@ -193,7 +183,8 @@ bool CDurak::TryEnterBetStake(int ClientID, const char *pMessage)
 	{
 		VALIDATE_WALLET();
 
-		pGame->m_Stake = pPlayer->m_Stake = Stake;
+		pGame->m_Stake = Stake;
+		pPlayer->m_Stake = Stake;
 		UpdatePassive(ClientID, 30);
 
 		str_format(aBuf, sizeof(aBuf), "Successfully set the stake for the current round to '%d'.", Stake);
@@ -211,25 +202,26 @@ bool CDurak::TryEnterBetStake(int ClientID, const char *pMessage)
 
 			GameServer()->SendChatTarget(ClientID, "Successfully deployed your stake.");
 
-			int NumDeployedStakes = pGame->NumDeployedStakes();
-			if (NumDeployedStakes == MAX_DURAK_PLAYERS)
+			int NumPlayers = pGame->NumParticipants();
+			if (NumPlayers == MAX_DURAK_PLAYERS)
 			{
 				StartGame(Game);
 			}
-			else if (NumDeployedStakes >= MIN_DURAK_PLAYERS)
+			else if (NumPlayers >= MIN_DURAK_PLAYERS)
 			{
 				pGame->m_GameStartTick = Server()->Tick() + Server()->TickSpeed() * 15;
 			}
 			return true;
 		}
-		else if (pGame->NumDeployedStakes() == 1)
+		else if (pGame->NumParticipants() <= 1)
 		{
 			VALIDATE_WALLET();
 
 			str_format(aBuf, sizeof(aBuf), "'%s' proposed a new stake, please enter the current stake of '%d' or propose a new one in the chat.", Server()->ClientName(ClientID), Stake);
 			SendChatToDeployedStakePlayers(Game, aBuf, ClientID);
 
-			pGame->m_Stake = pPlayer->m_Stake = Stake;
+			pGame->m_Stake = Stake;
+			pPlayer->m_Stake = Stake;
 			UpdatePassive(ClientID, 30);
 
 			str_format(aBuf, sizeof(aBuf), "Successfully updated the stake for the current round to '%d'.", Stake);
@@ -239,6 +231,24 @@ bool CDurak::TryEnterBetStake(int ClientID, const char *pMessage)
 	}
 
 	#undef VALIDATE_WALLET
+	return false;
+}
+
+void CDurak::OnPlayerLeave(int ClientID)
+{
+	for (unsigned int g = 0; g < m_vpGames.size(); g++)
+		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+		{
+			if (m_vpGames[g]->m_aSeats[i].m_Player.m_ClientID == ClientID)
+			{
+				//m_vpGames[g]->OnPlayerLeave(i);
+				m_vpGames[g]->m_aSeats[i].m_Player.Reset();
+			}
+		}
+}
+
+bool CDurak::OnInput(int ClientID, CNetObj_PlayerInput *pNewInput)
+{
 	return false;
 }
 
@@ -268,31 +278,18 @@ void CDurak::SendChatToParticipants(int Game, const char *pMessage)
 	}
 }
 
-void CDurak::OnPlayerLeave(int ClientID)
-{
-	int Game = GetGameByClient(ClientID);
-	if (Game < 0)
-		return;
-	m_vpGames[Game]->GetSeatByClient(ClientID)->m_Player.Reset();
-}
-
-bool CDurak::OnInput(int ClientID, CNetObj_PlayerInput *pNewInput)
-{
-	return false;
-}
-
-void CDurak::StartGame(int Game)
+bool CDurak::StartGame(int Game)
 {
 	if (Game < 0 || Game >= m_vpGames.size())
-		return;
+		return false;
 	CDurakGame *pGame = m_vpGames[Game];
 	if (pGame->m_Running)
-		return;
+		return false;
 
 	CGameTeams *pTeams = &((CGameControllerDDRace *)GameServer()->m_pController)->m_Teams;
 
 	int FirstFreeTeam = -1;
-	for (int i = 1; i < VANILLA_MAX_CLIENTS / 2; i++)
+	for (int i = 1; i < VANILLA_MAX_CLIENTS; i++)
 	{
 		if (pTeams->Count(i) == 0)
 		{
@@ -302,13 +299,13 @@ void CDurak::StartGame(int Game)
 	}
 
 	// New game for other players, since we move to a new team
-	m_vpGames.push_back(new CDurakGame(pGame->m_Number, pGame->m_TablePos, pGame->m_aSeats));
+	m_vpGames.push_back(new CDurakGame(pGame));
 
 	if (FirstFreeTeam == -1)
 	{
 		SendChatToParticipants(Game, "Couldn't start game, no empty team found");
 		m_vpGames.erase(m_vpGames.begin() + Game);
-		return;
+		return false;
 	}
 
 	pGame->m_GameStartTick = Server()->Tick();
@@ -329,15 +326,16 @@ void CDurak::StartGame(int Game)
 	}
 
 	SendChatToParticipants(Game, "Game started lul");
+	return true;
 }
 
-void CDurak::EndGame(int Game)
+bool CDurak::EndGame(int Game)
 {
 	if (Game < 0 || Game >= m_vpGames.size())
-		return;
+		return false;
 	CDurakGame* pGame = m_vpGames[Game];
 	if (!pGame->m_Running)
-		return;
+		return false;
 
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
@@ -348,6 +346,7 @@ void CDurak::EndGame(int Game)
 	}
 
 	m_vpGames.erase(m_vpGames.begin() + Game);
+	return true;
 }
 
 void CDurak::Tick()
@@ -355,20 +354,9 @@ void CDurak::Tick()
 	for (unsigned int g = 0; g < m_vpGames.size(); g++)
 	{
 		CDurakGame *pGame = m_vpGames[g];
-		if (pGame->m_Number <= 0)
-		{
-			m_vpGames.erase(m_vpGames.begin() + g--);
-			continue;
-		}
-
 		bool CancelledTimer = false;
-		int NumDeployedStakes = pGame->NumDeployedStakes(true);
-		// Reset stake when all players left the table and no round started
-		if (NumDeployedStakes == 0)
-		{
-			pGame->m_Stake = -1;
-		}
-		else if (NumDeployedStakes < MIN_DURAK_PLAYERS)
+		int NumParticipants = pGame->NumParticipants();
+		if (NumParticipants < MIN_DURAK_PLAYERS)
 		{
 			if (!pGame->m_Running && pGame->m_GameStartTick)
 			{
@@ -376,14 +364,26 @@ void CDurak::Tick()
 				CancelledTimer = true;
 			}
 
-			// will only trigger if game is running
-			EndGame(g);
+			// Reset stake when all players left the table and no round started
+			if (pGame->NumDeployedStakes() == 0)
+			{
+				pGame->m_Stake = -1;
+			}
+
+			if (EndGame(g))
+			{
+				// will only trigger if game is running and successfully ended
+				g--;
+				continue;
+			}
 		}
 
 		bool TimerUpGameStart = !pGame->m_Running && pGame->m_GameStartTick && pGame->m_GameStartTick <= Server()->Tick();
-		if (TimerUpGameStart)
+		if (TimerUpGameStart && !StartGame(g))
 		{
-			StartGame(g);
+			// will only trigger when the timer is up and startgame fails, if no team is free
+			g--;
+			continue;
 		}
 
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
@@ -394,16 +394,11 @@ void CDurak::Tick()
 				continue;
 
 			CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
-			if (!pPlayer || pPlayer->GetTeam() == TEAM_SPECTATORS)
-			{
-				pSeat->m_Player.Reset();
-				continue;
-			}
 
 			if (!pGame->m_Running)
 			{
 				CCharacter *pChr = pPlayer->GetCharacter();
-				if (!pChr || GameServer()->Collision()->GetMapIndex(pChr->GetPos()) != pSeat->m_SeatMapIndex)
+				if (!pChr || GameServer()->Collision()->GetMapIndex(pChr->GetPos()) != pSeat->m_MapIndex)
 				{
 					if (pChr && m_aUpdatedPassive[ClientID])
 					{
@@ -422,7 +417,7 @@ void CDurak::Tick()
 				else if (pGame->m_GameStartTick > Server()->Tick() && Server()->Tick() % Server()->TickSpeed() == 0)
 				{
 					char aBuf[128];
-					str_format(aBuf, sizeof(aBuf), "Players [%d/%d]\nGame start [%d]", pGame->NumDeployedStakes(), (int)MAX_DURAK_PLAYERS, (pGame->m_GameStartTick - Server()->Tick()) / Server()->TickSpeed() + 1);
+					str_format(aBuf, sizeof(aBuf), "Players [%d/%d]\nGame start [%d]", NumParticipants, (int)MAX_DURAK_PLAYERS, (pGame->m_GameStartTick - Server()->Tick()) / Server()->TickSpeed());
 					GameServer()->SendBroadcast(aBuf, ClientID);
 				}
 				continue;
@@ -431,12 +426,6 @@ void CDurak::Tick()
 			if (TimerUpGameStart)
 			{
 				GameServer()->SendBroadcast("Game started!", ClientID);
-			}
-
-			if (pPlayer->m_Minigame != MINIGAME_DURAK)
-			{
-				pSeat->m_Player.Reset();
-				continue;
 			}
 
 			// game logic

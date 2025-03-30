@@ -244,11 +244,8 @@ void CArenas::FinishConfiguration(int Fight, int ClientID)
 	}
 }
 
-bool CArenas::OnInput(int ClientID, CNetObj_PlayerInput *pNewInput)
+void CArenas::OnInput(int ClientID, CNetObj_PlayerInput *pNewInput)
 {
-	if (!IsConfiguring(ClientID))
-		return false;
-
 	if (pNewInput->m_Jump && m_aLastJump[ClientID] == 0)
 	{
 		switch (m_aState[ClientID])
@@ -274,7 +271,6 @@ bool CArenas::OnInput(int ClientID, CNetObj_PlayerInput *pNewInput)
 
 	m_aLastJump[ClientID] = pNewInput->m_Jump;
 	m_aLastDirection[ClientID] = pNewInput->m_Direction;
-	return true;
 }
 
 bool CArenas::ValidSpawnPos(vec2 Pos)

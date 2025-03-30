@@ -1294,8 +1294,9 @@ void CCharacter::SetEmote(int Emote, int Tick)
 void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 {
 	int ResetInput = 0;
-	if (GameServer()->Arenas()->OnInput(m_pPlayer->GetCID(), pNewInput))
+	if (GameServer()->Arenas()->IsConfiguring(m_pPlayer->GetCID()))
 	{
+		GameServer()->Arenas()->OnInput(m_pPlayer->GetCID(), pNewInput);
 		ResetInput |= 2;
 	}
 	else if (GameServer()->Durak()->OnInput(m_pPlayer->GetCID(), pNewInput))

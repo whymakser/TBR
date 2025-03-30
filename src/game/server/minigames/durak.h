@@ -16,26 +16,19 @@ enum
 class CDurakGame
 {
 public:
-	struct SSeat
-	{
-		int m_SeatMapIndex;
-		struct SPlayer
-		{
-			void Reset()
-			{
-				m_ClientID = -1;
-				m_Stake = -1;
-			}
-			int m_ClientID;
-			int64 m_Stake;
-		} m_Player;
-	} m_aSeats[MAX_DURAK_PLAYERS];
-
 	~CDurakGame() {} // move players back out of the game, or call endgame everywhere, or idk yet
-	CDurakGame(int Number, vec2 TablePos = vec2(-1, -1), SSeat *pSeats = 0)
+	CDurakGame(CDurakGame *pDurakBase) : CDurakGame(pDurakBase->m_Number)
+	{
+		m_TablePos = pDurakBase->m_TablePos;
+		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+		{
+			m_aSeats[i].m_MapIndex = pDurakBase->m_aSeats[i].m_MapIndex;
+		}
+	}
+	CDurakGame(int Number)
 	{
 		m_Number = Number;
-		m_TablePos = TablePos;
+		m_TablePos = vec2(-1, -1);
 		m_Stake = -1;
 		m_GameStartTick = 0;
 		m_Running = false;
@@ -43,7 +36,7 @@ public:
 		m_DefenderIndex = -1;
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 		{
-			m_aSeats[i].m_SeatMapIndex = pSeats ? pSeats[i].m_SeatMapIndex : -1;
+			m_aSeats[i].m_MapIndex = -1;
 			m_aSeats[i].m_Player.Reset();
 		}
 	}
@@ -56,6 +49,21 @@ public:
 	int m_InitialAttackerIndex;
 	int m_DefenderIndex;
 
+	struct SSeat
+	{
+		int m_MapIndex;
+		struct SPlayer
+		{
+			void Reset()
+			{
+				m_ClientID = -1;
+				m_Stake = -1;
+			}
+			int m_ClientID;
+			int64 m_Stake;
+		} m_Player;
+	} m_aSeats[MAX_DURAK_PLAYERS];
+
 	SSeat *GetSeatByClient(int ClientID)
 	{
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
@@ -64,19 +72,25 @@ public:
 		return 0;
 	}
 
-	int NumDeployedStakes(bool AllowMismatch = false)
+	int NumDeployedStakes()
 	{
 		int Num = 0;
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
-			if (m_aSeats[i].m_Player.m_ClientID != -1 && m_aSeats[i].m_Player.m_Stake >= 0 && (AllowMismatch || m_aSeats[i].m_Player.m_Stake == m_Stake))
+			if (m_aSeats[i].m_Player.m_ClientID != -1 && m_aSeats[i].m_Player.m_Stake >= 0)
 				Num++;
 		return Num;
 	}
 
-	/*void OnPlayerLeave(int Seat)
+	int NumParticipants()
 	{
-		m_aSeats[Seat].m_Player.Reset();
-	}*/
+		int Num = 0;
+		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+			if (m_aSeats[i].m_Player.m_ClientID != -1 && m_Stake != -1 && m_aSeats[i].m_Player.m_Stake == m_Stake)
+				Num++;
+		return Num;
+	}
+
+	//void OnPlayerLeave(int Seat) {}
 };
 
 class CCard
@@ -110,8 +124,8 @@ class CDurak : public CMinigame
 	int64 m_LastSeatOccupiedMsg[MAX_CLIENTS];
 	bool m_aUpdatedPassive[MAX_CLIENTS];
 
-	void StartGame(int Game);
-	void EndGame(int Game);
+	bool StartGame(int Game);
+	bool EndGame(int Game);
 
 public:
 	CDurak(CGameContext *pGameServer, int Type);

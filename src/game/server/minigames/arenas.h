@@ -141,7 +141,7 @@ public:
 	bool OnCharacterSpawn(int ClientID);
 	void OnPlayerLeave(int ClientID, bool Disconnect = false);
 	void OnPlayerDie(int ClientID);
-	bool OnInput(int ClientID, CNetObj_PlayerInput *pNewInput);
+	void OnInput(int ClientID, CNetObj_PlayerInput *pNewInput);
 	bool ClampViewPos(int ClientID);
 
 	void StartConfiguration(int ClientID, int Participant, int ScoreLimit, bool KillBorder);
