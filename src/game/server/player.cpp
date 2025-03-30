@@ -988,7 +988,7 @@ int CPlayer::GetHidePlayerTeam(int Asker)
 {
 	CPlayer *pAsker = GameServer()->m_apPlayers[Asker];
 	if (m_TeeControllerID != Asker && m_Team != TEAM_SPECTATORS && ((GameServer()->Config()->m_SvHideDummies && m_IsDummy)
-		|| (GameServer()->Config()->m_SvHideMinigamePlayers && m_Minigame != MINIGAME_DURAK && (m_Minigame != MINIGAME_1VS1 || !GameServer()->Arenas()->FightStarted(m_ClientID)) && pAsker->m_Minigame != m_Minigame)))
+		|| (GameServer()->Config()->m_SvHideMinigamePlayers && !GameServer()->Durak()->InDurakGame(m_ClientID) && !GameServer()->Arenas()->FightStarted(m_ClientID) && pAsker->m_Minigame != m_Minigame)))
 		return TEAM_BLUE;
 	return m_Team;
 }

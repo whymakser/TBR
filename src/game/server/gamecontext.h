@@ -740,7 +740,7 @@ public:
 	//minigames disabled
 	bool m_aMinigameDisabled[NUM_MINIGAMES];
 
-	void SetMinigame(int ClientID, int Minigame, bool Force = false);
+	void SetMinigame(int ClientID, int Minigame, bool Force = false, bool DoChatMsg = true);
 
 	//survival
 	void SurvivalTick();

@@ -121,8 +121,9 @@ class CDurak : public CMinigame
 
 	std::vector<CDurakGame *> m_vpGames;
 
-	int64 m_LastSeatOccupiedMsg[MAX_CLIENTS];
+	int64 m_aLastSeatOccupiedMsg[MAX_CLIENTS];
 	bool m_aUpdatedPassive[MAX_CLIENTS];
+	bool m_aInDurakGame[MAX_CLIENTS];
 
 	bool StartGame(int Game);
 	bool EndGame(int Game);
@@ -133,6 +134,8 @@ public:
 
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);
+
+	bool InDurakGame(int ClientID) { return m_aInDurakGame[ClientID]; }
 
 	int GetGameByNumber(int Number, bool AllowRunning = false);
 	int GetGameByClient(int ClientID);

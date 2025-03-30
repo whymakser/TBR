@@ -33,8 +33,9 @@ CDurak::CDurak(CGameContext *pGameServer, int Type) : CMinigame(pGameServer, Typ
 
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
-		m_LastSeatOccupiedMsg[i] = 0;
+		m_aLastSeatOccupiedMsg[i] = 0;
 		m_aUpdatedPassive[i] = false;
+		m_aInDurakGame[i] = false;
 	}
 	for (auto& Game : m_vpGames)
 		delete Game;
@@ -116,7 +117,7 @@ void CDurak::UpdatePassive(int ClientID, int Seconds)
 
 void CDurak::OnCharacterSeat(int ClientID, int Number, int SeatIndex)
 {
-	if (GameServer()->m_aMinigameDisabled[MINIGAME_DURAK] || GameServer()->m_apPlayers[ClientID]->m_Minigame == MINIGAME_DURAK)
+	if (GameServer()->m_aMinigameDisabled[MINIGAME_DURAK] || InDurakGame(ClientID))
 		return;
 
 	int Game = GetGameByNumber(Number, false);
@@ -128,11 +129,11 @@ void CDurak::OnCharacterSeat(int ClientID, int Number, int SeatIndex)
 	CDurakGame::SSeat::SPlayer *pPlayer = &pGame->m_aSeats[SeatIndex].m_Player;
 	if (pPlayer->m_ClientID != -1)
 	{
-		if (pPlayer->m_ClientID != ClientID && (!m_LastSeatOccupiedMsg[ClientID] || m_LastSeatOccupiedMsg[ClientID] + Server()->TickSpeed() * 5 < Server()->Tick()))
+		if (pPlayer->m_ClientID != ClientID && (!m_aLastSeatOccupiedMsg[ClientID] || m_aLastSeatOccupiedMsg[ClientID] + Server()->TickSpeed() * 5 < Server()->Tick()))
 		{
 			str_format(aBuf, sizeof(aBuf), "Welcome to the Durák table, %s! This seat is taken already, please try another one.", Server()->ClientName(ClientID));
 			GameServer()->SendChatTarget(ClientID, aBuf);
-			m_LastSeatOccupiedMsg[ClientID] = Server()->Tick();
+			m_aLastSeatOccupiedMsg[ClientID] = Server()->Tick();
 		}
 		return;
 	}
@@ -236,15 +237,24 @@ bool CDurak::TryEnterBetStake(int ClientID, const char *pMessage)
 
 void CDurak::OnPlayerLeave(int ClientID)
 {
+	CGameTeams *pTeams = &((CGameControllerDDRace *)GameServer()->m_pController)->m_Teams;
 	for (unsigned int g = 0; g < m_vpGames.size(); g++)
+	{
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 		{
 			if (m_vpGames[g]->m_aSeats[i].m_Player.m_ClientID == ClientID)
 			{
 				//m_vpGames[g]->OnPlayerLeave(i);
 				m_vpGames[g]->m_aSeats[i].m_Player.Reset();
+
+				GameServer()->SetMinigame(ClientID, MINIGAME_NONE, false, false);
+				GameServer()->m_apPlayers[ClientID]->m_ForceSpawnPos = vec2(-1, -1);
+				pTeams->SetForceCharacterTeam(ClientID, 0);
+				m_aInDurakGame[ClientID] = false;
+				break;
 			}
 		}
+	}
 }
 
 bool CDurak::OnInput(int ClientID, CNetObj_PlayerInput *pNewInput)
@@ -323,8 +333,9 @@ bool CDurak::StartGame(int Game)
 			continue;
 		}
 
-		GameServer()->SetMinigame(ClientID, MINIGAME_DURAK, true);
+		GameServer()->SetMinigame(ClientID, MINIGAME_DURAK, true, false);
 		GameServer()->m_apPlayers[ClientID]->m_ForceSpawnPos = GameServer()->Collision()->GetPos(pSeat->m_MapIndex);
+		m_aInDurakGame[ClientID] = true;
 		pTeams->SetForceCharacterTeam(ClientID, FirstFreeTeam);
 	}
 
@@ -346,9 +357,7 @@ bool CDurak::EndGame(int Game)
 		int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
 		if (ClientID == -1)
 			continue;
-		GameServer()->SetMinigame(ClientID, MINIGAME_NONE);
-		GameServer()->m_apPlayers[ClientID]->m_ForceSpawnPos = vec2(-1, -1);
-		pTeams->SetForceCharacterTeam(ClientID, 0);
+		OnPlayerLeave(ClientID);
 	}
 
 	m_vpGames.erase(m_vpGames.begin() + Game);
@@ -424,7 +433,7 @@ void CDurak::Tick()
 				{
 					char aBuf[128];
 					str_format(aBuf, sizeof(aBuf), "Players [%d/%d]\nStake [%d]\nGame start [%d]", NumParticipants, (int)MAX_DURAK_PLAYERS,
-						pGame->m_Stake, (pGame->m_GameStartTick - Server()->Tick()) / Server()->TickSpeed());
+						pGame->m_Stake, (pGame->m_GameStartTick - Server()->Tick()) / Server()->TickSpeed() + 1);
 					GameServer()->SendBroadcast(aBuf, ClientID);
 				}
 				continue;

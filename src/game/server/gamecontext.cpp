@@ -7971,7 +7971,7 @@ const char *CGameContext::GetMinigameName(int Minigame)
 	case MINIGAME_1VS1:
 		return "1vs1";
 	case MINIGAME_DURAK:
-		return "Durák";
+		return "Durak"; // vote menu doesn't like 'á'
 	}
 	return "Unknown";
 }
@@ -7998,7 +7998,7 @@ const char* CGameContext::GetMinigameCommand(int Minigame)
 	return "unknown";
 }
 
-void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force)
+void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force, bool DoChatMsg)
 {
 	CPlayer *pPlayer = m_apPlayers[ClientID];
 	if (!pPlayer)
@@ -8009,7 +8009,8 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force)
 	// check whether minigame is disabled
 	if (Minigame != MINIGAME_NONE && m_aMinigameDisabled[Minigame])
 	{
-		SendChatTarget(ClientID, "This minigame is disabled");
+		if (DoChatMsg)
+			SendChatTarget(ClientID, "This minigame is disabled");
 		return;
 	}
 
@@ -8017,12 +8018,15 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force)
 	if (pPlayer->m_Minigame == Minigame)
 	{
 		// you can't leave when you're not in a minigame
-		if (Minigame == MINIGAME_NONE)
-			SendChatTarget(ClientID, "You are not in a minigame");
-		else
+		if (DoChatMsg)
 		{
-			str_format(aMsg, sizeof(aMsg), "You are already in minigame '%s'", GetMinigameName(Minigame));
-			SendChatTarget(ClientID, aMsg);
+			if (Minigame == MINIGAME_NONE)
+				SendChatTarget(ClientID, "You are not in a minigame");
+			else
+			{
+				str_format(aMsg, sizeof(aMsg), "You are already in minigame '%s'", GetMinigameName(Minigame));
+				SendChatTarget(ClientID, aMsg);
+			}
 		}
 		return;
 	}
@@ -8033,8 +8037,11 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force)
 	// leave minigame
 	if (Minigame == MINIGAME_NONE)
 	{
-		str_format(aMsg, sizeof(aMsg), "'%s' left the minigame '%s'", Server()->ClientName(ClientID), GetMinigameName(pPlayer->m_Minigame));
-		SendChat(-1, CHAT_ALL, -1, aMsg);
+		if (DoChatMsg)
+		{
+			str_format(aMsg, sizeof(aMsg), "'%s' left the minigame '%s'", Server()->ClientName(ClientID), GetMinigameName(pPlayer->m_Minigame));
+			SendChat(-1, CHAT_ALL, -1, aMsg);
+		}
 
 		//reset everything
 		if (pPlayer->m_Minigame == MINIGAME_SURVIVAL)
@@ -8055,9 +8062,12 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force)
 	// join minigame
 	else if (!pPlayer->IsMinigame())
 	{
-		str_format(aMsg, sizeof(aMsg), "'%s' joined the minigame '%s', use '/%s' to join aswell", Server()->ClientName(ClientID), GetMinigameName(Minigame), GetMinigameCommand(Minigame));
-		SendChat(-1, CHAT_ALL, -1, aMsg);
-		SendChatTarget(ClientID, "Say '/leave' to join the normal area again");
+		if (DoChatMsg)
+		{
+			str_format(aMsg, sizeof(aMsg), "'%s' joined the minigame '%s', use '/%s' to join aswell", Server()->ClientName(ClientID), GetMinigameName(Minigame), GetMinigameCommand(Minigame));
+			SendChat(-1, CHAT_ALL, -1, aMsg);
+			SendChatTarget(ClientID, "Say '/leave' to join the normal area again");
+		}
 
 		// Save character stats to reload them after leaving
 		pPlayer->SaveMinigameTee();
