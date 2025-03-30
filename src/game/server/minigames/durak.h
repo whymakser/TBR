@@ -137,6 +137,7 @@ public:
 	virtual void Snap(int SnappingClient);
 
 	bool InDurakGame(int ClientID) { return m_aInDurakGame[ClientID]; }
+	bool OnDropMoney(int ClientID, int Amount);
 
 	int GetGameByNumber(int Number, bool AllowRunning = false);
 	int GetGameByClient(int ClientID);

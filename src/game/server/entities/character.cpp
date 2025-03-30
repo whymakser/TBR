@@ -4803,7 +4803,7 @@ bool CCharacter::AddGrog()
 
 void CCharacter::DropMoney(int64 Amount, int Dir, bool GlobalPickupDelay)
 {
-	if (Amount <= 0 || Amount > m_pPlayer->GetUsableMoney())
+	if (Amount <= 0 || Amount > m_pPlayer->GetUsableMoney() || GameServer()->Durak()->OnDropMoney(m_pPlayer->GetCID(), Amount))
 		return;
 
 	if (Dir == -3)

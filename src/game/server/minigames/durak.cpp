@@ -170,7 +170,7 @@ bool CDurak::TryEnterBetStake(int ClientID, const char *pMessage)
 		return false;
 
 	#define VALIDATE_WALLET() do { \
-			if (Stake > GameServer()->m_apPlayers[ClientID]->GetUsableMoney()) \
+			if (GameServer()->m_apPlayers[ClientID]->GetUsableMoney() < Stake) \
 			{ \
 				GameServer()->SendChatTarget(ClientID, "You don't have enough money in your wallet"); \
 				return true; \
@@ -260,6 +260,21 @@ void CDurak::OnPlayerLeave(int ClientID)
 	}
 }
 
+bool CDurak::OnDropMoney(int ClientID, int Amount)
+{
+	int Game = GetGameByClient(ClientID);
+	// If the game is running already, the money has been subtracted already
+	if (Game < 0 || m_vpGames[Game]->m_Running)
+		return false;
+	bool CanDrop = GameServer()->m_apPlayers[ClientID]->GetUsableMoney() - Amount >= m_vpGames[Game]->GetSeatByClient(ClientID)->m_Player.m_Stake;
+	if (!CanDrop)
+	{
+		GameServer()->SendChatTarget(ClientID, "You can't currently drop that much money due to your stake");
+		return true;
+	}
+	return false;
+}
+
 bool CDurak::OnInput(int ClientID, CNetObj_PlayerInput *pNewInput)
 {
 	return false;
@@ -336,8 +351,13 @@ bool CDurak::StartGame(int Game)
 			continue;
 		}
 
+		CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
+		char aBuf[64];
+		str_format(aBuf, sizeof(aBuf), "Durák stake");
+		pPlayer->WalletTransaction(-pGame->m_Stake, aBuf);
+
 		GameServer()->SetMinigame(ClientID, MINIGAME_DURAK, true, false);
-		GameServer()->m_apPlayers[ClientID]->m_ForceSpawnPos = GameServer()->Collision()->GetPos(pSeat->m_MapIndex);
+		pPlayer->m_ForceSpawnPos = GameServer()->Collision()->GetPos(pSeat->m_MapIndex);
 		m_aInDurakGame[ClientID] = true;
 		pTeams->SetForceCharacterTeam(ClientID, FirstFreeTeam);
 	}
@@ -373,7 +393,7 @@ void CDurak::Tick()
 	{
 		if (UpdateGame(g))
 		{
-			// no need to decrement g since we're iterating backwards
+			// no need to decrement g even though m_vpGames[g] got erased, since we're iterating backwards
 			continue;
 		}
 	}
