@@ -8063,7 +8063,10 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force)
 		pPlayer->SaveMinigameTee();
 
 		//set minigame required stuff
-		((CGameControllerDDRace *)m_pController)->m_Teams.SetForceCharacterTeam(ClientID, 0);
+		if (Minigame != MINIGAME_DURAK)
+		{
+			((CGameControllerDDRace *)m_pController)->m_Teams.SetForceCharacterTeam(ClientID, 0);
+		}
 
 		if (Minigame == MINIGAME_SURVIVAL)
 		{

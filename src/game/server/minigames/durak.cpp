@@ -128,7 +128,7 @@ void CDurak::OnCharacterSeat(int ClientID, int Number, int SeatIndex)
 	CDurakGame::SSeat::SPlayer *pPlayer = &pGame->m_aSeats[SeatIndex].m_Player;
 	if (pPlayer->m_ClientID != -1)
 	{
-		if (pPlayer->m_ClientID != ClientID && (!m_LastSeatOccupiedMsg[ClientID] || m_LastSeatOccupiedMsg[ClientID] + Server()->TickSpeed() * 4 < Server()->Tick()))
+		if (pPlayer->m_ClientID != ClientID && (!m_LastSeatOccupiedMsg[ClientID] || m_LastSeatOccupiedMsg[ClientID] + Server()->TickSpeed() * 5 < Server()->Tick()))
 		{
 			str_format(aBuf, sizeof(aBuf), "Welcome to the Durák table, %s! This seat is taken already, please try another one.", Server()->ClientName(ClientID));
 			GameServer()->SendChatTarget(ClientID, aBuf);
@@ -340,12 +340,14 @@ bool CDurak::EndGame(int Game)
 	if (!pGame->m_Running)
 		return false;
 
+	CGameTeams *pTeams = &((CGameControllerDDRace *)GameServer()->m_pController)->m_Teams;
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
 		int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
 		if (ClientID == -1)
 			continue;
 		GameServer()->SetMinigame(ClientID, MINIGAME_NONE);
+		pTeams->SetForceCharacterTeam(ClientID, 0);
 	}
 
 	m_vpGames.erase(m_vpGames.begin() + Game);
