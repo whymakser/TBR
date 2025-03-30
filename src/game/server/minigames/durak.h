@@ -5,6 +5,8 @@
 
 #include "minigame.h"
 #include <vector>
+#include <algorithm>
+#include <random>
 
 enum
 {
@@ -91,18 +93,75 @@ public:
 	bool m_Running;
 	int m_InitialAttackerIndex;
 	int m_DefenderIndex;
+	CDeck m_Deck;
 };
 
 class CCard
 {
 public:
-	char m_aName[MAX_NAME_LENGTH];
+	CCard(int Suit, int Rank) : m_Suit(Suit), m_Rank(Rank)
+	{
+		m_TableOffset = vec2(-1, -1);
+	}
+
+	int m_Suit;
+	int m_Rank;
 	vec2 m_TableOffset;
+
+	bool MouseOver(vec2 Target) // Target - m_TablePos
+	{
+		vec2 CardPos = vec2(m_TableOffset.x, m_TableOffset.y - 48.f);
+		return (CardPos.x - 16.f < Target.x && CardPos.x + 16.f > Target.x && CardPos.y - 16.f < Target.y && CardPos.y + 16.f > Target.y);
+	}
+
+	bool IsStrongerThan(const CCard &Other, int TrumpSuit) const
+    {
+        if (m_Suit == TrumpSuit && Other.m_Suit != TrumpSuit)
+            return true;
+        if (m_Suit != TrumpSuit && Other.m_Suit == TrumpSuit)
+            return false;
+        return m_Suit == Other.m_Suit && m_Rank > Other.m_Rank;
+    }
+};
+
+class CDeck
+{
+	std::vector<CCard> m_vDeck;
+	int m_TrumpSuit;
+
+public:
+    CDeck()
+	{
+        for (int suit = 0; suit < 4; suit++)
+            for (int rank = 6; rank <= 14; rank++)
+                m_vDeck.emplace_back(suit, rank);
+    }
+
+    void Shuffle() {
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(m_vDeck.begin(), m_vDeck.end(), g);
+    }
+
+	CCard DrawCard()
+    {
+        if (IsEmpty()) // Invalid card if deck is empty
+			return CCard(-1, -1);
+        CCard topCard = m_vDeck.back();
+        m_vDeck.pop_back();
+        return topCard;
+    }
+
+    bool IsEmpty() const { return m_vDeck.empty(); }
+    int Size() const { return m_vDeck.size(); }
+
+	void SetTrumpSuit(int Suit) { m_TrumpSuit = Suit; }
+    int GetTrumpSuit() const { return m_TrumpSuit; }
 };
 
 class CDurak : public CMinigame
 {
-	enum
+	/*enum
 	{
 		// max 3 cards per name
 		DURAK_TEXT_STACK_AND_TRUMP = 0,
@@ -110,24 +169,39 @@ class CDurak : public CMinigame
 		DURAK_TEXT_DEFENSE_2,
 		DURAK_TEXT_OFFENSE_1,
 		DURAK_TEXT_OFFENSE_2,
-		DURAK_TEXT_HAND_CARDS_1,
-		DURAK_TEXT_HAND_CARDS_2,
 		DURAK_TEXT_CURSOR_TOOLTIP,
 		NUM_DURAK_FAKE_TEES
 	};
 
-	CCard m_aStaticCards[NUM_DURAK_FAKE_TEES];
+	CCard m_aStaticCards[NUM_DURAK_FAKE_TEES];*/
 	void SnapFakeTee(int SnappingClient, int ID, vec2 Pos, const char *pName);
-
-	std::vector<CDurakGame *> m_vpGames;
 
 	int64 m_aLastSeatOccupiedMsg[MAX_CLIENTS];
 	bool m_aUpdatedPassive[MAX_CLIENTS];
 	bool m_aInDurakGame[MAX_CLIENTS];
 
+	std::vector<CDurakGame *> m_vpGames;
 	bool UpdateGame(int Game);
 	bool StartGame(int Game);
 	bool EndGame(int Game);
+
+	const char *GetCardSymbol(int Suit, int Rank)
+	{
+		if (Suit == -1 && Rank == -1) {
+			static const char *pBackCard = "🂠";
+			return pBackCard;
+		}
+		if (Suit < 0 || Suit > 3 || Rank < 6 || Rank > 14) {
+			return "??";
+		}
+		static const char *aapCards[4][9] = {
+			{"🂦", "🂧", "🂨", "🂩", "🂪", "🂫", "🂭", "🂬", "🂡"}, // Spades
+			{"🂶", "🂷", "🂸", "🂹", "🂺", "🂻", "🂽", "🂼", "🂱"}, // Hearts
+			{"🃆", "🃇", "🃈", "🃉", "🃊", "🃋", "🃍", "🃌", "🃁"}, // Diamonds
+			{"🃖", "🃗", "🃘", "🃙", "🃚", "🃛", "🃝", "🃜", "🃑"}  // Clubs
+		};
+		return aapCards[Suit][Rank - 6];
+	}
 
 public:
 	CDurak(CGameContext *pGameServer, int Type);

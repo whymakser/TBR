@@ -6519,13 +6519,12 @@ int CGameContext::LoadSavedPlayersCallback(const char *pName, int IsDir, int Sto
 
 void CGameContext::ExpireSavedIdentities()
 {
-	for (int i = 0; i < (int)m_vSavedIdentities.size(); i++)
+	for (int i = (int)m_vSavedIdentities.size() - 1; i >= 0; i--)
 	{
 		if (IsExpired(m_vSavedIdentities[i].m_ExpireDate))
 		{
 			RemoveSavedIdentityFile(m_vSavedIdentities[i]);
 			m_vSavedIdentities.erase(m_vSavedIdentities.begin() + i);
-			i--;
 		}
 	}
 }

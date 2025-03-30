@@ -8,29 +8,28 @@
 
 CDurak::CDurak(CGameContext *pGameServer, int Type) : CMinigame(pGameServer, Type)
 {
-	vec2 aOffsets[NUM_DURAK_FAKE_TEES] = {
+	/*vec2 aOffsets[NUM_DURAK_FAKE_TEES] = {
 		vec2(4, 0),
 		vec2(-3, 0.66f),
 		vec2(0.5f, 0.66f),
 		vec2(-3, 0),
 		vec2(0.5f, 0),
-		vec2(-1.75f, 3.8f),
-		vec2(1.75f, 3.8f),
+		//vec2(-1.75f, 3.8f),
+		//vec2(1.75f, 3.8f),
 		vec2(0, -3.5f),
 	};
 	const char *apNames[NUM_DURAK_FAKE_TEES] = {
 		"🂠🃞",
 		"🂹 🂹 🂹", "🂽 🂽 🂽",
 		"🂡 🂡 🂡", "🂡 🃂 🃂",
-		"🂪 🂪 🂪", "🃚 🃚 🃚",
+		//"🂪 🂪 🂪", "🃚 🃚 🃚",
 		"Cursor"
 	};
 	for (int i = 0; i < NUM_DURAK_FAKE_TEES; i++)
 	{
 		m_aStaticCards[i].m_TableOffset = vec2(aOffsets[i].x * 32.f, aOffsets[i].y * 32.f);
 		str_copy(m_aStaticCards[i].m_aName, apNames[i], sizeof(m_aStaticCards[i].m_aName));
-	}
-
+	}*/
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
 		m_aLastSeatOccupiedMsg[i] = 0;
@@ -117,7 +116,7 @@ void CDurak::UpdatePassive(int ClientID, int Seconds)
 
 void CDurak::OnCharacterSeat(int ClientID, int Number, int SeatIndex)
 {
-	if (GameServer()->m_aMinigameDisabled[MINIGAME_DURAK] || InDurakGame(ClientID))
+	if (InDurakGame(ClientID) || GameServer()->m_aMinigameDisabled[MINIGAME_DURAK])
 		return;
 
 	int Game = GetGameByNumber(Number, false);
