@@ -523,13 +523,20 @@ bool CDurak::UpdateGame(int Game)
 			continue;
 
 		{
-			float Gap = 4.f;
 			unsigned int NumCards = pSeat->m_Player.m_vpHandCards.size();
 			if (NumCards > 0)
 			{
+				float Gap = 4.f;
 				float RequiredSpace = min(NumCards * (CCard::s_CardSize.x + Gap) - Gap, 10.f * 32.f);
-				Gap = RequiredSpace / (NumCards - 1);
 				float PosX = -RequiredSpace / 2.f;
+				if (NumCards > 1)
+				{
+					Gap = RequiredSpace / (NumCards - 1);
+				}
+				if (NumCards % 2 != 0)
+				{
+					PosX += CCard::s_CardSize.x / 2;
+				}
 
 				for (unsigned int c = 0; c < NumCards; c++)
 				{

@@ -25,7 +25,7 @@ public:
 
 	CCard(int Suit, int Rank) : m_Suit(Suit), m_Rank(Rank)
 	{
-		m_TableOffset = vec2(-1, -1);
+		m_TableOffset = vec2(0, 0);
 		m_Hovered = false;
 	}
 
@@ -150,6 +150,7 @@ public:
 				if (m_aSeats[s].m_Player.m_ClientID != -1)
 				{
 					CCard Card = m_Deck.DrawCard();
+					Card.m_TableOffset.y = 3.8f * 32.f;
 					m_aSeats[s].m_Player.m_vpHandCards.push_back(Card);
 					if (m_Deck.IsEmpty())
 					{
