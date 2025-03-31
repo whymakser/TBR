@@ -25,7 +25,7 @@ public:
 
 	CCard(int Suit, int Rank) : m_Suit(Suit), m_Rank(Rank)
 	{
-		m_TableOffset = vec2(0, 0);
+		m_TableOffset = vec2(-1, -1);
 		m_Hovered = false;
 	}
 
@@ -38,7 +38,7 @@ public:
 
 	bool MouseOver(vec2 Target) // Target - m_TablePos
 	{
-		vec2 CardPos = vec2(m_TableOffset.x, m_TableOffset.y-48.f - s_CardSize.y/4);
+		vec2 CardPos = vec2(m_TableOffset.x, m_TableOffset.y-48.f);
 		float HighY = s_CardSize.y / 2;
 		if (m_Hovered) // Avoid flickering
 			HighY += s_CardSize.y / 4;
@@ -143,7 +143,7 @@ public:
 
 	void DealHandCards()
 	{
-		for (int i = 0; i < NUM_DURAK_INITIAL_HAND_CARDS + 4; i++)
+		for (int i = 0; i < NUM_DURAK_INITIAL_HAND_CARDS; i++)
 		{
 			for (int s = 0; s < MAX_DURAK_PLAYERS; s++)
 			{
@@ -180,10 +180,14 @@ public:
 				m_ClientID = -1;
 				m_Stake = -1;
 				m_vpHandCards.clear();
+				m_HoveredCard = -1;
+				m_LastCursorX = -1.f;
 			}
 			int m_ClientID;
 			int64 m_Stake;
 			std::vector<CCard> m_vpHandCards;
+			int m_HoveredCard;
+			float m_LastCursorX;
 		} m_Player;
 	};
 	SSeat m_aSeats[MAX_DURAK_PLAYERS];

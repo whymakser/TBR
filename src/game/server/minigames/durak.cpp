@@ -426,6 +426,24 @@ void CDurak::Tick()
 
 bool CDurak::UpdateGame(int Game)
 {
+	auto &&HandleCardHover = [this](int Game, int Seat, int Card, vec2 CursorPos) {
+		CDurakGame::SSeat *pSeat = &m_vpGames[Game]->m_aSeats[Seat];
+		CCard *pCard = &pSeat->m_Player.m_vpHandCards[Card];
+		bool MouseOver = (pSeat->m_Player.m_HoveredCard == -1 || pSeat->m_Player.m_HoveredCard == Card) && pCard->MouseOver(CursorPos - m_vpGames[Game]->m_TablePos);
+		if (!pCard->m_Hovered && MouseOver)
+		{
+			pCard->m_TableOffset.y -= CCard::s_CardSize.y / 4;
+			pCard->m_Hovered = true;
+			pSeat->m_Player.m_HoveredCard = Card;
+		}
+		else if (pCard->m_Hovered && !MouseOver)
+		{
+			pCard->m_TableOffset.y += CCard::s_CardSize.y / 4;
+			pCard->m_Hovered = false;
+			pSeat->m_Player.m_HoveredCard = -1;
+		}
+	};
+
 	CDurakGame *pGame = m_vpGames[Game];
 	bool CancelledTimer = false;
 	int NumParticipants = pGame->NumParticipants();
@@ -504,37 +522,37 @@ bool CDurak::UpdateGame(int Game)
 		if (!pChr)
 			continue;
 
-		int HoverCard = -1;
-		for (unsigned int c = 0; c < pSeat->m_Player.m_vpHandCards.size(); c++)
 		{
-			CCard *pCard = &pSeat->m_Player.m_vpHandCards[c];
-			bool MouseOver = pCard->MouseOver(pChr->GetCursorPos() - pGame->m_TablePos);
-			if (!pCard->m_Hovered && MouseOver)
+			float Gap = 4.f;
+			unsigned int NumCards = pSeat->m_Player.m_vpHandCards.size();
+			if (NumCards > 0)
 			{
-				pCard->m_TableOffset.y -= CCard::s_CardSize.y / 4;
-				pCard->m_Hovered = true;
-				HoverCard = c;
-			}
-			else if (pCard->m_Hovered && !MouseOver)
-			{
-				pCard->m_TableOffset.y += CCard::s_CardSize.y / 4;
-				pCard->m_Hovered = false;
+				float RequiredSpace = min(NumCards * (CCard::s_CardSize.x + Gap) - Gap, 10.f * 32.f);
+				Gap = RequiredSpace / (NumCards - 1);
+				float PosX = -RequiredSpace / 2.f;
+
+				for (unsigned int c = 0; c < NumCards; c++)
+				{
+					CCard *pCard = &pSeat->m_Player.m_vpHandCards[c];
+					pCard->m_TableOffset.x = PosX;
+					PosX += Gap;
+				}
 			}
 		}
 
-		//if (HoverCard != -1)
+		vec2 CursorPos = pChr->GetCursorPos();
+		if (pSeat->m_Player.m_LastCursorX < CursorPos.x)
 		{
-			float RequiredSpace = min(pSeat->m_Player.m_vpHandCards.size() * (CCard::s_CardSize.x + 4.f), 11 * 32.f);
-			float PosX = (RequiredSpace / -2.f) + CCard::s_CardSize.x / 2;
-			float Gap = RequiredSpace / pSeat->m_Player.m_vpHandCards.size();
-
 			for (unsigned int c = 0; c < pSeat->m_Player.m_vpHandCards.size(); c++)
-			{
-				CCard *pCard = &pSeat->m_Player.m_vpHandCards[c];
-				pCard->m_TableOffset.x = PosX;
-				PosX += Gap;
-			}
+				HandleCardHover(Game, i, c, CursorPos);
 		}
+		else
+		{
+			// scrolling order is fucked up otherwise when moving mouse from left to right with too many cards
+			for (int c = (int)pSeat->m_Player.m_vpHandCards.size() - 1; c >= 0; c--)
+				HandleCardHover(Game, i, c, CursorPos);
+		}
+		pSeat->m_Player.m_LastCursorX = CursorPos.x;
 	}
 
 	// Safely return and let the tick function know we are still alive
