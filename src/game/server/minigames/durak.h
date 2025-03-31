@@ -12,7 +12,87 @@ enum
 {
 	MIN_DURAK_PLAYERS = 2,
 	MAX_DURAK_PLAYERS = 6,
+	NUM_DURAK_INITIAL_HAND_CARDS = 6,
+	MAX_DURAK_ATTACKS = 6,
+	MAX_DURAK_ATTACKS_BEFORE_FIRST_TEE = 5,
 	MAX_DURAK_GAMES = VANILLA_MAX_CLIENTS-1,
+};
+
+class CCard
+{
+public:
+	static const vec2 s_CardSize;
+
+	CCard(int Suit, int Rank) : m_Suit(Suit), m_Rank(Rank)
+	{
+		m_TableOffset = vec2(0, 0);
+		m_Hovered = false;
+	}
+
+	int m_Suit;
+	int m_Rank;
+	vec2 m_TableOffset;
+	bool m_Hovered;
+
+	bool Valid() { return m_Suit != -1 && m_Rank != -1; }
+
+	bool MouseOver(vec2 Target) // Target - m_TablePos
+	{
+		vec2 CardPos = vec2(m_TableOffset.x, m_TableOffset.y-48.f - s_CardSize.y/4);
+		float HighY = s_CardSize.y / 2;
+		if (m_Hovered) // Avoid flickering
+			HighY += s_CardSize.y / 4;
+		return (CardPos.x - s_CardSize.x/2 < Target.x && CardPos.x + s_CardSize.x/2 > Target.x && CardPos.y - s_CardSize.y/2 < Target.y && CardPos.y + HighY > Target.y);
+	}
+
+	bool IsStrongerThan(const CCard &Other, int TrumpSuit) const
+    {
+        if (m_Suit == TrumpSuit && Other.m_Suit != TrumpSuit)
+            return true;
+        if (m_Suit != TrumpSuit && Other.m_Suit == TrumpSuit)
+            return false;
+        return m_Suit == Other.m_Suit && m_Rank > Other.m_Rank;
+    }
+};
+
+class CDeck
+{
+	std::vector<CCard> m_vDeck;
+	int m_TrumpSuit;
+
+public:
+    CDeck()
+	{
+        for (int suit = 0; suit < 4; suit++)
+            for (int rank = 6; rank <= 14; rank++)
+                m_vDeck.emplace_back(suit, rank);
+    }
+
+    void Shuffle() {
+        std::random_device rd;
+        std::mt19937 g(rd());
+        std::shuffle(m_vDeck.begin(), m_vDeck.end(), g);
+    }
+
+	CCard DrawCard()
+    {
+        if (IsEmpty()) // Invalid card if deck is empty
+			return CCard(-1, -1);
+        CCard TopCard = m_vDeck.back();
+        m_vDeck.pop_back();
+        return TopCard;
+    }
+
+	void PushFrontTrumpCard(CCard TrumpCard)
+	{
+		m_vDeck.insert(m_vDeck.begin(), TrumpCard);
+	}
+
+    bool IsEmpty() const { return m_vDeck.empty(); }
+    int Size() const { return m_vDeck.size(); }
+
+	void SetTrumpSuit(int Suit) { m_TrumpSuit = Suit; }
+    int GetTrumpSuit() const { return m_TrumpSuit; }
 };
 
 class CDurakGame
@@ -61,6 +141,33 @@ public:
 		return Num;
 	}
 
+	void DealHandCards()
+	{
+		for (int i = 0; i < NUM_DURAK_INITIAL_HAND_CARDS + 4; i++)
+		{
+			for (int s = 0; s < MAX_DURAK_PLAYERS; s++)
+			{
+				if (m_aSeats[s].m_Player.m_ClientID != -1)
+				{
+					CCard Card = m_Deck.DrawCard();
+					m_aSeats[s].m_Player.m_vpHandCards.push_back(Card);
+					if (m_Deck.IsEmpty())
+					{
+						m_Deck.SetTrumpSuit(Card.m_Suit);
+						break; // Should be last card anyways, but better be sure xd
+					}
+				}
+			}
+		}
+
+		if (!m_Deck.IsEmpty())
+		{
+			CCard Card = m_Deck.DrawCard();
+			m_Deck.SetTrumpSuit(Card.m_Suit);
+			m_Deck.PushFrontTrumpCard(Card);
+		}
+	}
+
 	//void OnPlayerLeave(int Seat) {}
 
 	struct SSeat
@@ -72,9 +179,11 @@ public:
 			{
 				m_ClientID = -1;
 				m_Stake = -1;
+				m_vpHandCards.clear();
 			}
 			int m_ClientID;
 			int64 m_Stake;
+			std::vector<CCard> m_vpHandCards;
 		} m_Player;
 	};
 	SSeat m_aSeats[MAX_DURAK_PLAYERS];
@@ -96,69 +205,6 @@ public:
 	CDeck m_Deck;
 };
 
-class CCard
-{
-public:
-	CCard(int Suit, int Rank) : m_Suit(Suit), m_Rank(Rank)
-	{
-		m_TableOffset = vec2(-1, -1);
-	}
-
-	int m_Suit;
-	int m_Rank;
-	vec2 m_TableOffset;
-
-	bool MouseOver(vec2 Target) // Target - m_TablePos
-	{
-		vec2 CardPos = vec2(m_TableOffset.x, m_TableOffset.y - 48.f);
-		return (CardPos.x - 16.f < Target.x && CardPos.x + 16.f > Target.x && CardPos.y - 16.f < Target.y && CardPos.y + 16.f > Target.y);
-	}
-
-	bool IsStrongerThan(const CCard &Other, int TrumpSuit) const
-    {
-        if (m_Suit == TrumpSuit && Other.m_Suit != TrumpSuit)
-            return true;
-        if (m_Suit != TrumpSuit && Other.m_Suit == TrumpSuit)
-            return false;
-        return m_Suit == Other.m_Suit && m_Rank > Other.m_Rank;
-    }
-};
-
-class CDeck
-{
-	std::vector<CCard> m_vDeck;
-	int m_TrumpSuit;
-
-public:
-    CDeck()
-	{
-        for (int suit = 0; suit < 4; suit++)
-            for (int rank = 6; rank <= 14; rank++)
-                m_vDeck.emplace_back(suit, rank);
-    }
-
-    void Shuffle() {
-        std::random_device rd;
-        std::mt19937 g(rd());
-        std::shuffle(m_vDeck.begin(), m_vDeck.end(), g);
-    }
-
-	CCard DrawCard()
-    {
-        if (IsEmpty()) // Invalid card if deck is empty
-			return CCard(-1, -1);
-        CCard topCard = m_vDeck.back();
-        m_vDeck.pop_back();
-        return topCard;
-    }
-
-    bool IsEmpty() const { return m_vDeck.empty(); }
-    int Size() const { return m_vDeck.size(); }
-
-	void SetTrumpSuit(int Suit) { m_TrumpSuit = Suit; }
-    int GetTrumpSuit() const { return m_TrumpSuit; }
-};
-
 class CDurak : public CMinigame
 {
 	/*enum
@@ -174,7 +220,7 @@ class CDurak : public CMinigame
 	};
 
 	CCard m_aStaticCards[NUM_DURAK_FAKE_TEES];*/
-	void SnapFakeTee(int SnappingClient, int ID, vec2 Pos, const char *pName);
+	void SnapFakeTee(int SnappingClient, int ID, vec2 Pos, const char *pName, int Game);
 
 	int64 m_aLastSeatOccupiedMsg[MAX_CLIENTS];
 	bool m_aUpdatedPassive[MAX_CLIENTS];
@@ -195,10 +241,10 @@ class CDurak : public CMinigame
 			return "??";
 		}
 		static const char *aapCards[4][9] = {
-			{"🂦", "🂧", "🂨", "🂩", "🂪", "🂫", "🂭", "🂬", "🂡"}, // Spades
-			{"🂶", "🂷", "🂸", "🂹", "🂺", "🂻", "🂽", "🂼", "🂱"}, // Hearts
-			{"🃆", "🃇", "🃈", "🃉", "🃊", "🃋", "🃍", "🃌", "🃁"}, // Diamonds
-			{"🃖", "🃗", "🃘", "🃙", "🃚", "🃛", "🃝", "🃜", "🃑"}  // Clubs
+			{"🂦", "🂧", "🂨", "🂩", "🂪", "🂫", "🂭", "🂮", "🂡"}, // Spades
+			{"🂶", "🂷", "🂸", "🂹", "🂺", "🂻", "🂽", "🂾", "🂱"}, // Hearts
+			{"🃆", "🃇", "🃈", "🃉", "🃊", "🃋", "🃍", "🃎", "🃁"}, // Diamonds
+			{"🃖", "🃗", "🃘", "🃙", "🃚", "🃛", "🃝", "🃞", "🃑"}  // Clubs
 		};
 		return aapCards[Suit][Rank - 6];
 	}
@@ -231,3 +277,87 @@ public:
 	void UpdatePassive(int ClientID, int Seconds);
 };
 #endif // GAME_SERVER_MINIGAMES_DURAK_H
+
+/*
+* #include <iostream>
+#include <vector>
+#include <cmath>
+#include <thread>
+#include <chrono>
+
+struct Point {
+    float x;
+    bool hovered = false;
+};
+
+class PointSystem {
+public:
+    PointSystem(int count, float spacing)
+        : count(count), spacing(spacing) {
+        for (int i = 0; i < count; ++i) {
+            points.push_back({i * spacing});
+        }
+    }
+
+    void update(float mouseX) {
+        int closestIndex = -1;
+        float minDist = spacing;
+
+        // Finde den nächsten Punkt zur Maus
+        for (int i = 0; i < count; ++i) {
+            float dist = std::abs(points[i].x - mouseX);
+            if (dist < minDist) {
+                minDist = dist;
+                closestIndex = i;
+            }
+        }
+
+        // Setze die Punkte mit Verschiebung
+        for (int i = 0; i < count; ++i) {
+            if (i == closestIndex) {
+                points[i].hovered = true;
+                points[i].x = i * spacing + 10; // Etwas größerer Abstand
+            } else {
+                points[i].hovered = false;
+                points[i].x = i * spacing;
+            }
+        }
+    }
+
+    void tick(float mouseX) {
+        update(mouseX);
+    }
+
+    void print() {
+        for (const auto& p : points) {
+            std::cout << (p.hovered ? "[X]" : "[.]") << " ";
+        }
+        std::cout << std::endl;
+    }
+
+private:
+    int count;
+    float spacing;
+    std::vector<Point> points;
+};
+
+int main() {
+    PointSystem system(10, 20.0f);
+    float mouseX = 0.0f; 
+
+    const int TPS = 50; // 50 Ticks pro Sekunde
+    const int tickDelay = 1000 / TPS; // Millisekunden pro Tick
+
+    for (int tick = 0; tick < 500; ++tick) { // Simuliere 500 Ticks (~10 Sekunden)
+        // Simulierte Mausbewegung: Maus bewegt sich langsam nach rechts
+        mouseX = std::fmod(mouseX + 2, 200); 
+
+        system.tick(mouseX);
+        system.print();
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(tickDelay));
+    }
+
+    return 0;
+}
+*/

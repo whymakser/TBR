@@ -6,6 +6,8 @@
 #include <engine/shared/config.h>
 #include <game/server/gamemodes/DDRace.h>
 
+const vec2 CCard::s_CardSize = vec2(28.f, 32.f);
+
 CDurak::CDurak(CGameContext *pGameServer, int Type) : CMinigame(pGameServer, Type)
 {
 	/*vec2 aOffsets[NUM_DURAK_FAKE_TEES] = {
@@ -36,7 +38,7 @@ CDurak::CDurak(CGameContext *pGameServer, int Type) : CMinigame(pGameServer, Typ
 		m_aUpdatedPassive[i] = false;
 		m_aInDurakGame[i] = false;
 	}
-	for (auto& Game : m_vpGames)
+	for (auto &Game : m_vpGames)
 		delete Game;
 	m_vpGames.clear();
 }
@@ -335,6 +337,7 @@ bool CDurak::StartGame(int Game)
 
 	pGame->m_GameStartTick = Server()->Tick();
 	pGame->m_Running = true;
+	pGame->m_Deck.Shuffle();
 
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
@@ -361,7 +364,30 @@ bool CDurak::StartGame(int Game)
 		pTeams->SetForceCharacterTeam(ClientID, FirstFreeTeam);
 	}
 
-	SendChatToParticipants(Game, "Game started lul");
+	pGame->DealHandCards();
+	int LowestTrump = 15;
+	pGame->m_InitialAttackerIndex = -1;
+	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+	{
+		CDurakGame::SSeat::SPlayer *pPlayer = &pGame->m_aSeats[i].m_Player;
+		if (pPlayer->m_ClientID == -1)
+			continue;
+
+		for (unsigned int c = 0; c < pPlayer->m_vpHandCards.size(); c++)
+		{
+			int Rank = pPlayer->m_vpHandCards[c].m_Rank;
+			if (pPlayer->m_vpHandCards[c].m_Suit == pGame->m_Deck.GetTrumpSuit() && Rank < LowestTrump)
+			{
+				pGame->m_InitialAttackerIndex = i;
+				LowestTrump = Rank;
+			}
+		}
+	}
+
+	char aBuf[128];
+	int BeginnerID = pGame->m_aSeats[pGame->m_InitialAttackerIndex].m_Player.m_ClientID;
+	str_format(aBuf, sizeof(aBuf), "Beginner determined, '%s' starts as he has lowest trump: %d", Server()->ClientName(BeginnerID), LowestTrump);
+	SendChatToParticipants(Game, aBuf);
 	return true;
 }
 
@@ -439,10 +465,10 @@ bool CDurak::UpdateGame(int Game)
 			continue;
 
 		CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
+		CCharacter *pChr = pPlayer->GetCharacter();
 
 		if (!pGame->m_Running)
 		{
-			CCharacter *pChr = pPlayer->GetCharacter();
 			if (!pChr || GameServer()->Collision()->GetMapIndex(pChr->GetPos()) != pSeat->m_MapIndex)
 			{
 				if (pChr && m_aUpdatedPassive[ClientID])
@@ -475,6 +501,40 @@ bool CDurak::UpdateGame(int Game)
 		}
 
 		// game logic
+		if (!pChr)
+			continue;
+
+		int HoverCard = -1;
+		for (unsigned int c = 0; c < pSeat->m_Player.m_vpHandCards.size(); c++)
+		{
+			CCard *pCard = &pSeat->m_Player.m_vpHandCards[c];
+			bool MouseOver = pCard->MouseOver(pChr->GetCursorPos() - pGame->m_TablePos);
+			if (!pCard->m_Hovered && MouseOver)
+			{
+				pCard->m_TableOffset.y -= CCard::s_CardSize.y / 4;
+				pCard->m_Hovered = true;
+				HoverCard = c;
+			}
+			else if (pCard->m_Hovered && !MouseOver)
+			{
+				pCard->m_TableOffset.y += CCard::s_CardSize.y / 4;
+				pCard->m_Hovered = false;
+			}
+		}
+
+		//if (HoverCard != -1)
+		{
+			float RequiredSpace = min(pSeat->m_Player.m_vpHandCards.size() * (CCard::s_CardSize.x + 4.f), 11 * 32.f);
+			float PosX = (RequiredSpace / -2.f) + CCard::s_CardSize.x / 2;
+			float Gap = RequiredSpace / pSeat->m_Player.m_vpHandCards.size();
+
+			for (unsigned int c = 0; c < pSeat->m_Player.m_vpHandCards.size(); c++)
+			{
+				CCard *pCard = &pSeat->m_Player.m_vpHandCards[c];
+				pCard->m_TableOffset.x = PosX;
+				PosX += Gap;
+			}
+		}
 	}
 
 	// Safely return and let the tick function know we are still alive
@@ -498,6 +558,18 @@ void CDurak::Snap(int SnappingClient)
 		return;
 	}
 
+	CDurakGame *pGame = m_vpGames[Game];
+	CDurakGame::SSeat *pSeat = pGame->GetSeatByClient(ClientID);
+
+	// TODO: somehow manage this id stuff better and keep it in sync with AddToNumReserved
+	int FakeID = GameServer()->m_World.GetSeeOthersID(SnappingClient) - 1;
+	for (unsigned int i = 0; i < pSeat->m_Player.m_vpHandCards.size(); i++)
+	{
+		CCard *pCard = &pSeat->m_Player.m_vpHandCards[i];
+		vec2 Pos = pGame->m_TablePos + pCard->m_TableOffset;
+		SnapFakeTee(SnappingClient, FakeID--, Pos, GetCardSymbol(pCard->m_Suit, pCard->m_Rank), Game);
+	}
+
 	// render current round
 
 	/*int FakeID = GameServer()->m_World.GetSeeOthersID(SnappingClient) - 1;
@@ -508,7 +580,7 @@ void CDurak::Snap(int SnappingClient)
 	}*/
 }
 
-void CDurak::SnapFakeTee(int SnappingClient, int ID, vec2 Pos, const char *pName)
+void CDurak::SnapFakeTee(int SnappingClient, int ID, vec2 Pos, const char *pName, int Game)
 {
 	if (!Server()->IsSevendown(SnappingClient))
 	{
@@ -547,8 +619,8 @@ void CDurak::SnapFakeTee(int SnappingClient, int ID, vec2 Pos, const char *pName
 	pCharacter->m_X = Pos.x;
 	pCharacter->m_Y = Pos.y;
 	pCharacter->m_Weapon = WEAPON_GUN;
-	//if (Pos.x > m_TablePos.x)
-	//	pCharacter->m_Angle = 804;
+	if (Pos.x > m_vpGames[Game]->m_TablePos.x)
+		pCharacter->m_Angle = 804;
 
 	if(Server()->IsSevendown(SnappingClient))
 	{
