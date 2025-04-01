@@ -7,7 +7,7 @@
 #include <game/server/gamemodes/DDRace.h>
 
 const vec2 CCard::s_CardSizeRadius = vec2(14.f, 16.f);
-const vec2 CCard::s_TableSizeRadius = vec2(5.f * 32.f, 3.8f * 32.f);
+const vec2 CCard::s_TableSizeRadius = vec2(4.9f * 32.f, 3.8f * 32.f);
 
 CDurak::CDurak(CGameContext *pGameServer, int Type) : CMinigame(pGameServer, Type)
 {
