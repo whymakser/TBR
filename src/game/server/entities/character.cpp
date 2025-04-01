@@ -1299,7 +1299,7 @@ void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 		GameServer()->Arenas()->OnInput(m_pPlayer->GetCID(), pNewInput);
 		ResetInput |= 2;
 	}
-	else if (GameServer()->Durak()->OnInput(m_pPlayer->GetCID(), pNewInput))
+	else if (GameServer()->Durak()->OnInput(this, pNewInput))
 	{
 		ResetInput |= 1;
 	}

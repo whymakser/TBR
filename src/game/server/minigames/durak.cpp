@@ -7,6 +7,7 @@
 #include <game/server/gamemodes/DDRace.h>
 
 const vec2 CCard::s_CardSize = vec2(28.f, 32.f);
+const vec2 CCard::s_TableSize = vec2(5.f * 32.f, 3.8f * 32.f);
 
 CDurak::CDurak(CGameContext *pGameServer, int Type) : CMinigame(pGameServer, Type)
 {
@@ -37,6 +38,7 @@ CDurak::CDurak(CGameContext *pGameServer, int Type) : CMinigame(pGameServer, Typ
 		m_aLastSeatOccupiedMsg[i] = 0;
 		m_aUpdatedPassive[i] = false;
 		m_aInDurakGame[i] = false;
+		m_aKeyboardControl[i] = false;
 	}
 	for (auto &Game : m_vpGames)
 		delete Game;
@@ -276,8 +278,33 @@ bool CDurak::OnDropMoney(int ClientID, int Amount)
 	return false;
 }
 
-bool CDurak::OnInput(int ClientID, CNetObj_PlayerInput *pNewInput)
+bool CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 {
+	int ClientID = pCharacter ? pCharacter->GetPlayer()->GetCID() : -1;
+	if (!InDurakGame(ClientID))
+		return false;
+	int Game = GetGameByClient(ClientID);
+	if (Game < 0)
+		return false;
+
+	CDurakGame *pGame = m_vpGames[Game];
+	CDurakGame::SSeat *pSeat = pGame->GetSeatByClient(ClientID);
+	CCard *pCard = 0;
+	if (pSeat->m_Player.m_HoveredCard != -1)
+	{
+		pCard = &pSeat->m_Player.m_vpHandCards[pSeat->m_Player.m_HoveredCard];
+	}
+
+	CNetObj_PlayerInput *pInput = GameServer()->GetPlayerChar(ClientID)->Input();
+	if (pNewInput->m_Direction != pInput->m_Direction || pNewInput->m_Jump != pInput->m_Jump)
+	{
+		m_aKeyboardControl[ClientID] = true;
+		return true;
+	}
+	if (pNewInput->m_TargetX != pInput->m_TargetX || pNewInput->m_TargetY != pInput->m_TargetY)
+	{
+		m_aKeyboardControl[ClientID] = false;
+	}
 	return false;
 }
 
@@ -426,21 +453,40 @@ void CDurak::Tick()
 
 bool CDurak::UpdateGame(int Game)
 {
-	auto &&HandleCardHover = [this](int Game, int Seat, int Card, vec2 CursorPos) {
+	auto &&HandleCardHover = [this](int Game, int Seat, int Card, vec2 CursorPos, bool Dragging) {
 		CDurakGame::SSeat *pSeat = &m_vpGames[Game]->m_aSeats[Seat];
 		CCard *pCard = &pSeat->m_Player.m_vpHandCards[Card];
-		bool MouseOver = (pSeat->m_Player.m_HoveredCard == -1 || pSeat->m_Player.m_HoveredCard == Card) && pCard->MouseOver(CursorPos - m_vpGames[Game]->m_TablePos);
-		if (!pCard->m_Hovered && MouseOver)
+		vec2 RelativeCursorPos = CursorPos - m_vpGames[Game]->m_TablePos;
+		if (Dragging)
 		{
-			pCard->m_TableOffset.y -= CCard::s_CardSize.y / 4;
-			pCard->m_Hovered = true;
-			pSeat->m_Player.m_HoveredCard = Card;
+			if (pCard->m_HoverState > CCard::HOVERSTATE_NONE)
+			{
+				pCard->m_HoverState = CCard::HOVERSTATE_DRAGGING;
+				pCard->m_TableOffset.x = clamp(RelativeCursorPos.x, -CCard::s_TableSize.x, CCard::s_TableSize.x);
+				pCard->m_TableOffset.y = clamp(RelativeCursorPos.y + DURAK_CARD_NAME_OFFSET, -CCard::s_TableSize.y, CCard::s_TableSize.y);
+			}
 		}
-		else if (pCard->m_Hovered && !MouseOver)
+		else if (m_aKeyboardControl[pSeat->m_Player.m_ClientID] || pCard->m_HoverState == CCard::HOVERSTATE_DRAGGING)
 		{
-			pCard->m_TableOffset.y += CCard::s_CardSize.y / 4;
-			pCard->m_Hovered = false;
-			pSeat->m_Player.m_HoveredCard = -1;
+			if (pCard->m_HoverState > CCard::HOVERSTATE_NONE)
+			{
+				pCard->SetHovered(false);
+				pSeat->m_Player.m_HoveredCard = -1;
+			}
+		}
+		else
+		{
+			bool MouseOver = (pSeat->m_Player.m_HoveredCard == -1 || pSeat->m_Player.m_HoveredCard == Card) && pCard->MouseOver(RelativeCursorPos);
+			if (MouseOver && pCard->m_HoverState == CCard::HOVERSTATE_NONE)
+			{
+				pCard->SetHovered(true);
+				pSeat->m_Player.m_HoveredCard = Card;
+			}
+			else if (!MouseOver && pCard->m_HoverState == CCard::HOVERSTATE_MOUSEOVER)
+			{
+				pCard->SetHovered(false);
+				pSeat->m_Player.m_HoveredCard = -1;
+			}
 		}
 	};
 
@@ -527,7 +573,7 @@ bool CDurak::UpdateGame(int Game)
 			if (NumCards > 0)
 			{
 				float Gap = 4.f;
-				float RequiredSpace = min(NumCards * (CCard::s_CardSize.x + Gap) - Gap, 10.f * 32.f);
+				float RequiredSpace = min(NumCards * (CCard::s_CardSize.x + Gap) - Gap, 2 * CCard::s_TableSize.x);
 				float PosX = -RequiredSpace / 2.f;
 				if (NumCards > 1)
 				{
@@ -548,16 +594,17 @@ bool CDurak::UpdateGame(int Game)
 		}
 
 		vec2 CursorPos = pChr->GetCursorPos();
+		bool Dragging = pChr->Input()->m_Fire & 1;
 		if (pSeat->m_Player.m_LastCursorX < CursorPos.x)
 		{
 			for (unsigned int c = 0; c < pSeat->m_Player.m_vpHandCards.size(); c++)
-				HandleCardHover(Game, i, c, CursorPos);
+				HandleCardHover(Game, i, c, CursorPos, Dragging);
 		}
 		else
 		{
 			// scrolling order is fucked up otherwise when moving mouse from left to right with too many cards
 			for (int c = (int)pSeat->m_Player.m_vpHandCards.size() - 1; c >= 0; c--)
-				HandleCardHover(Game, i, c, CursorPos);
+				HandleCardHover(Game, i, c, CursorPos, Dragging);
 		}
 		pSeat->m_Player.m_LastCursorX = CursorPos.x;
 	}

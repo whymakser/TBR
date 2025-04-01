@@ -16,33 +16,57 @@ enum
 	MAX_DURAK_ATTACKS = 6,
 	MAX_DURAK_ATTACKS_BEFORE_FIRST_TEE = 5,
 	MAX_DURAK_GAMES = VANILLA_MAX_CLIENTS-1,
+	DURAK_CARD_NAME_OFFSET = 48,
 };
+
+#define DURAK_CARD_HOVER_OFFSET (CCard::s_CardSize.y / 4)
 
 class CCard
 {
 public:
 	static const vec2 s_CardSize;
+	static const vec2 s_TableSize;
 
 	CCard(int Suit, int Rank) : m_Suit(Suit), m_Rank(Rank)
 	{
 		m_TableOffset = vec2(0, 0);
-		m_Hovered = false;
+		m_HoverState = HOVERSTATE_NONE;
 	}
 
 	int m_Suit;
 	int m_Rank;
 	vec2 m_TableOffset;
-	bool m_Hovered;
+	enum
+	{
+		HOVERSTATE_NONE,
+		HOVERSTATE_MOUSEOVER,
+		HOVERSTATE_DRAGGING,
+	};
+	int m_HoverState;
 
 	bool Valid() { return m_Suit != -1 && m_Rank != -1; }
 
 	bool MouseOver(vec2 Target) // Target - m_TablePos
 	{
-		vec2 CardPos = vec2(m_TableOffset.x, m_TableOffset.y-48.f);
+		vec2 CardPos = vec2(m_TableOffset.x, m_TableOffset.y-DURAK_CARD_NAME_OFFSET);
 		float HighY = s_CardSize.y / 2;
-		if (m_Hovered) // Avoid flickering
-			HighY += s_CardSize.y / 4;
+		if (m_HoverState == HOVERSTATE_MOUSEOVER) // Avoid flickering
+			HighY += DURAK_CARD_HOVER_OFFSET;
 		return (CardPos.x - s_CardSize.x/2 < Target.x && CardPos.x + s_CardSize.x/2 > Target.x && CardPos.y - s_CardSize.y/2 < Target.y && CardPos.y + HighY > Target.y);
+	}
+
+	void SetHovered(bool Set)
+	{
+		if (Set)
+		{
+			m_TableOffset.y = CCard::s_TableSize.y - DURAK_CARD_HOVER_OFFSET;
+			m_HoverState = HOVERSTATE_MOUSEOVER;
+		}
+		else
+		{
+			m_TableOffset.y = CCard::s_TableSize.y;
+			m_HoverState = HOVERSTATE_NONE;
+		}
 	}
 
 	bool IsStrongerThan(const CCard &Other, int TrumpSuit) const
@@ -150,7 +174,7 @@ public:
 				if (m_aSeats[s].m_Player.m_ClientID != -1)
 				{
 					CCard Card = m_Deck.DrawCard();
-					Card.m_TableOffset.y = 3.8f * 32.f;
+					Card.m_TableOffset.y = CCard::s_TableSize.y;
 					m_aSeats[s].m_Player.m_vpHandCards.push_back(Card);
 					if (m_Deck.IsEmpty())
 					{
@@ -230,6 +254,7 @@ class CDurak : public CMinigame
 	int64 m_aLastSeatOccupiedMsg[MAX_CLIENTS];
 	bool m_aUpdatedPassive[MAX_CLIENTS];
 	bool m_aInDurakGame[MAX_CLIENTS];
+	bool m_aKeyboardControl[MAX_CLIENTS];
 
 	std::vector<CDurakGame *> m_vpGames;
 	bool UpdateGame(int Game);
@@ -261,7 +286,7 @@ public:
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);
 
-	bool InDurakGame(int ClientID) { return m_aInDurakGame[ClientID]; }
+	bool InDurakGame(int ClientID) { return ClientID >= 0 && m_aInDurakGame[ClientID]; }
 	bool OnDropMoney(int ClientID, int Amount);
 
 	int GetGameByNumber(int Number, bool AllowRunning = false);
@@ -275,7 +300,7 @@ public:
 
 	void OnPlayerLeave(int ClientID);
 
-	bool OnInput(int ClientID, CNetObj_PlayerInput *pNewInput);
+	bool OnInput(class CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput);
 
 	void SendChatToDeployedStakePlayers(int Game, const char *pMessage, int NotThisID);
 	void SendChatToParticipants(int Game, const char *pMessage);
