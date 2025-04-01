@@ -6,8 +6,8 @@
 #include <engine/shared/config.h>
 #include <game/server/gamemodes/DDRace.h>
 
-const vec2 CCard::s_CardSize = vec2(28.f, 32.f);
-const vec2 CCard::s_TableSize = vec2(5.f * 32.f, 3.8f * 32.f);
+const vec2 CCard::s_CardSizeRadius = vec2(14.f, 16.f);
+const vec2 CCard::s_TableSizeRadius = vec2(5.f * 32.f, 3.8f * 32.f);
 
 CDurak::CDurak(CGameContext *pGameServer, int Type) : CMinigame(pGameServer, Type)
 {
@@ -321,7 +321,7 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 	{
 		m_aKeyboardControl[ClientID] = true;
 	}
-	else if (pNewInput->m_TargetX != m_aLastInput[ClientID].m_TargetX || pNewInput->m_TargetY != m_aLastInput[ClientID].m_TargetY)
+	else if (abs(pNewInput->m_TargetX - m_aLastInput[ClientID].m_TargetX) > 1.f || abs(pNewInput->m_TargetY - m_aLastInput[ClientID].m_TargetY) > 1.f)
 	{
 		m_aKeyboardControl[ClientID] = false;
 	}
@@ -466,6 +466,24 @@ bool CDurak::EndGame(int Game)
 	return true;
 }
 
+const char *CDurak::GetCardSymbol(int Suit, int Rank)
+{
+	if (Suit == -1 && Rank == -1) {
+		static const char *pBackCard = "🂠";
+		return pBackCard;
+	}
+	if (Suit < 0 || Suit > 3 || Rank < 6 || Rank > 14) {
+		return "??";
+	}
+	static const char *aapCards[4][9] = {
+		{"🂦", "🂧", "🂨", "🂩", "🂪", "🂫", "🂭", "🂮", "🂡"}, // Spades
+		{"🂶", "🂷", "🂸", "🂹", "🂺", "🂻", "🂽", "🂾", "🂱"}, // Hearts
+		{"🃆", "🃇", "🃈", "🃉", "🃊", "🃋", "🃍", "🃎", "🃁"}, // Diamonds
+		{"🃖", "🃗", "🃘", "🃙", "🃚", "🃛", "🃝", "🃞", "🃑"}  // Clubs
+	};
+	return aapCards[Suit][Rank - 6];
+}
+
 void CDurak::Tick()
 {
 	for (int g = (int)m_vpGames.size() - 1; g >= 0; g--)
@@ -493,8 +511,8 @@ bool CDurak::UpdateGame(int Game)
 			if (pCard->m_HoverState > CCard::HOVERSTATE_NONE)
 			{
 				pCard->m_HoverState = CCard::HOVERSTATE_DRAGGING;
-				pCard->m_TableOffset.x = clamp(RelativeCursorPos.x, -CCard::s_TableSize.x, CCard::s_TableSize.x);
-				pCard->m_TableOffset.y = clamp(RelativeCursorPos.y + DURAK_CARD_NAME_OFFSET, -CCard::s_TableSize.y, CCard::s_TableSize.y);
+				pCard->m_TableOffset.x = clamp(RelativeCursorPos.x, -CCard::s_TableSizeRadius.x, CCard::s_TableSizeRadius.x);
+				pCard->m_TableOffset.y = clamp(RelativeCursorPos.y + DURAK_CARD_NAME_OFFSET, -CCard::s_TableSizeRadius.y + DURAK_CARD_NAME_OFFSET, CCard::s_TableSizeRadius.y);
 			}
 		}
 		else if (pCard->m_HoverState == CCard::HOVERSTATE_DRAGGING)
@@ -601,7 +619,7 @@ bool CDurak::UpdateGame(int Game)
 			if (NumCards > 0)
 			{
 				float Gap = 4.f;
-				float RequiredSpace = min(NumCards * (CCard::s_CardSize.x + Gap) - Gap, 2 * CCard::s_TableSize.x);
+				float RequiredSpace = min(NumCards * (CCard::s_CardSizeRadius.x*2 + Gap) - Gap, CCard::s_TableSizeRadius.x*2);
 				float PosX = -RequiredSpace / 2.f;
 				if (NumCards > 1)
 				{
@@ -609,7 +627,7 @@ bool CDurak::UpdateGame(int Game)
 				}
 				if (NumCards % 2 != 0)
 				{
-					PosX += CCard::s_CardSize.x / 2;
+					PosX += CCard::s_CardSizeRadius.x;
 				}
 
 				for (unsigned int c = 0; c < NumCards; c++)

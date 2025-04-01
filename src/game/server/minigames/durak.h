@@ -19,13 +19,13 @@ enum
 	DURAK_CARD_NAME_OFFSET = 48,
 };
 
-#define DURAK_CARD_HOVER_OFFSET (CCard::s_CardSize.y / 4)
+#define DURAK_CARD_HOVER_OFFSET (CCard::s_CardSizeRadius.y / 2)
 
 class CCard
 {
 public:
-	static const vec2 s_CardSize;
-	static const vec2 s_TableSize;
+	static const vec2 s_CardSizeRadius;
+	static const vec2 s_TableSizeRadius;
 
 	CCard(int Suit, int Rank) : m_Suit(Suit), m_Rank(Rank)
 	{
@@ -49,22 +49,22 @@ public:
 	bool MouseOver(vec2 Target) // Target - m_TablePos
 	{
 		vec2 CardPos = vec2(m_TableOffset.x, m_TableOffset.y-DURAK_CARD_NAME_OFFSET);
-		float HighY = s_CardSize.y / 2;
+		float HighY = s_CardSizeRadius.y;
 		if (m_HoverState == HOVERSTATE_MOUSEOVER) // Avoid flickering
 			HighY += DURAK_CARD_HOVER_OFFSET;
-		return (CardPos.x - s_CardSize.x/2 < Target.x && CardPos.x + s_CardSize.x/2 > Target.x && CardPos.y - s_CardSize.y/2 < Target.y && CardPos.y + HighY > Target.y);
+		return (CardPos.x - s_CardSizeRadius.x < Target.x && CardPos.x + s_CardSizeRadius.x > Target.x && CardPos.y - s_CardSizeRadius.y < Target.y && CardPos.y + HighY > Target.y);
 	}
 
 	void SetHovered(bool Set)
 	{
 		if (Set)
 		{
-			m_TableOffset.y = CCard::s_TableSize.y - DURAK_CARD_HOVER_OFFSET;
+			m_TableOffset.y = CCard::s_TableSizeRadius.y - DURAK_CARD_HOVER_OFFSET;
 			m_HoverState = HOVERSTATE_MOUSEOVER;
 		}
 		else
 		{
-			m_TableOffset.y = CCard::s_TableSize.y;
+			m_TableOffset.y = CCard::s_TableSizeRadius.y;
 			m_HoverState = HOVERSTATE_NONE;
 		}
 	}
@@ -122,7 +122,6 @@ public:
 class CDurakGame
 {
 public:
-	~CDurakGame() {} // move players back out of the game, or call endgame everywhere, or idk yet
 	CDurakGame(CDurakGame *pDurakBase) : CDurakGame(pDurakBase->m_Number)
 	{
 		m_TablePos = pDurakBase->m_TablePos;
@@ -174,7 +173,7 @@ public:
 				if (m_aSeats[s].m_Player.m_ClientID != -1)
 				{
 					CCard Card = m_Deck.DrawCard();
-					Card.m_TableOffset.y = CCard::s_TableSize.y;
+					Card.m_TableOffset.y = CCard::s_TableSizeRadius.y;
 					m_aSeats[s].m_Player.m_vpHandCards.push_back(Card);
 					if (m_Deck.IsEmpty())
 					{
@@ -192,8 +191,6 @@ public:
 			m_Deck.PushFrontTrumpCard(Card);
 		}
 	}
-
-	//void OnPlayerLeave(int Seat) {}
 
 	struct SSeat
 	{
@@ -214,8 +211,7 @@ public:
 			int m_HoveredCard;
 			float m_LastCursorX;
 		} m_Player;
-	};
-	SSeat m_aSeats[MAX_DURAK_PLAYERS];
+	} m_aSeats[MAX_DURAK_PLAYERS];
 	SSeat *GetSeatByClient(int ClientID)
 	{
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
@@ -268,23 +264,11 @@ class CDurak : public CMinigame
 	bool StartGame(int Game);
 	bool EndGame(int Game);
 
-	const char *GetCardSymbol(int Suit, int Rank)
-	{
-		if (Suit == -1 && Rank == -1) {
-			static const char *pBackCard = "🂠";
-			return pBackCard;
-		}
-		if (Suit < 0 || Suit > 3 || Rank < 6 || Rank > 14) {
-			return "??";
-		}
-		static const char *aapCards[4][9] = {
-			{"🂦", "🂧", "🂨", "🂩", "🂪", "🂫", "🂭", "🂮", "🂡"}, // Spades
-			{"🂶", "🂷", "🂸", "🂹", "🂺", "🂻", "🂽", "🂾", "🂱"}, // Hearts
-			{"🃆", "🃇", "🃈", "🃉", "🃊", "🃋", "🃍", "🃎", "🃁"}, // Diamonds
-			{"🃖", "🃗", "🃘", "🃙", "🃚", "🃛", "🃝", "🃞", "🃑"}  // Clubs
-		};
-		return aapCards[Suit][Rank - 6];
-	}
+	void SendChatToDeployedStakePlayers(int Game, const char *pMessage, int NotThisID);
+	void SendChatToParticipants(int Game, const char *pMessage);
+
+	const char *GetCardSymbol(int Suit, int Rank);
+	void UpdatePassive(int ClientID, int Seconds);
 
 public:
 	CDurak(CGameContext *pGameServer, int Type);
@@ -293,109 +277,19 @@ public:
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);
 
-	bool InDurakGame(int ClientID) { return ClientID >= 0 && m_aInDurakGame[ClientID]; }
-	bool ActivelyPlaying(int ClientID);
-	bool OnDropMoney(int ClientID, int Amount);
+	void AddMapTableTile(int Number, vec2 Pos);
+	void AddMapSeatTile(int Number, int MapIndex, int SeatIndex);
 
 	int GetGameByNumber(int Number, bool AllowRunning = false);
 	int GetGameByClient(int ClientID);
 
-	void AddMapTableTile(int Number, vec2 Pos);
-	void AddMapSeatTile(int Number, int MapIndex, int SeatIndex);
+	bool InDurakGame(int ClientID) { return ClientID >= 0 && m_aInDurakGame[ClientID]; }
+	bool ActivelyPlaying(int ClientID);
+	bool OnDropMoney(int ClientID, int Amount);
 
 	void OnCharacterSeat(int ClientID, int Number, int SeatIndex);
 	bool TryEnterBetStake(int ClientID, const char *pMessage);
-
-	void OnPlayerLeave(int ClientID);
-
 	void OnInput(class CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput);
-
-	void SendChatToDeployedStakePlayers(int Game, const char *pMessage, int NotThisID);
-	void SendChatToParticipants(int Game, const char *pMessage);
-	void UpdatePassive(int ClientID, int Seconds);
+	void OnPlayerLeave(int ClientID);
 };
 #endif // GAME_SERVER_MINIGAMES_DURAK_H
-
-/*
-* #include <iostream>
-#include <vector>
-#include <cmath>
-#include <thread>
-#include <chrono>
-
-struct Point {
-    float x;
-    bool hovered = false;
-};
-
-class PointSystem {
-public:
-    PointSystem(int count, float spacing)
-        : count(count), spacing(spacing) {
-        for (int i = 0; i < count; ++i) {
-            points.push_back({i * spacing});
-        }
-    }
-
-    void update(float mouseX) {
-        int closestIndex = -1;
-        float minDist = spacing;
-
-        // Finde den nächsten Punkt zur Maus
-        for (int i = 0; i < count; ++i) {
-            float dist = std::abs(points[i].x - mouseX);
-            if (dist < minDist) {
-                minDist = dist;
-                closestIndex = i;
-            }
-        }
-
-        // Setze die Punkte mit Verschiebung
-        for (int i = 0; i < count; ++i) {
-            if (i == closestIndex) {
-                points[i].hovered = true;
-                points[i].x = i * spacing + 10; // Etwas größerer Abstand
-            } else {
-                points[i].hovered = false;
-                points[i].x = i * spacing;
-            }
-        }
-    }
-
-    void tick(float mouseX) {
-        update(mouseX);
-    }
-
-    void print() {
-        for (const auto& p : points) {
-            std::cout << (p.hovered ? "[X]" : "[.]") << " ";
-        }
-        std::cout << std::endl;
-    }
-
-private:
-    int count;
-    float spacing;
-    std::vector<Point> points;
-};
-
-int main() {
-    PointSystem system(10, 20.0f);
-    float mouseX = 0.0f; 
-
-    const int TPS = 50; // 50 Ticks pro Sekunde
-    const int tickDelay = 1000 / TPS; // Millisekunden pro Tick
-
-    for (int tick = 0; tick < 500; ++tick) { // Simuliere 500 Ticks (~10 Sekunden)
-        // Simulierte Mausbewegung: Maus bewegt sich langsam nach rechts
-        mouseX = std::fmod(mouseX + 2, 200); 
-
-        system.tick(mouseX);
-        system.print();
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(tickDelay));
-    }
-
-    return 0;
-}
-*/
