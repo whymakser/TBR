@@ -1299,8 +1299,9 @@ void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 		GameServer()->Arenas()->OnInput(m_pPlayer->GetCID(), pNewInput);
 		ResetInput |= 2;
 	}
-	else if (GameServer()->Durak()->OnInput(this, pNewInput))
+	else if (GameServer()->Durak()->ActivelyPlaying(m_pPlayer->GetCID()))
 	{
+		GameServer()->Durak()->OnInput(this, pNewInput);
 		ResetInput |= 1;
 	}
 	else if (m_DrawEditor.Active())

@@ -257,6 +257,7 @@ void CDurak::OnPlayerLeave(int ClientID)
 				GameServer()->m_apPlayers[ClientID]->m_ForceSpawnPos = vec2(-1, -1);
 				pTeams->SetForceCharacterTeam(ClientID, 0);
 				m_aInDurakGame[ClientID] = false;
+				GameServer()->SendTuningParams(ClientID);
 				break;
 			}
 		}
@@ -278,14 +279,17 @@ bool CDurak::OnDropMoney(int ClientID, int Amount)
 	return false;
 }
 
-bool CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
+bool CDurak::ActivelyPlaying(int ClientID)
 {
-	int ClientID = pCharacter ? pCharacter->GetPlayer()->GetCID() : -1;
-	if (!InDurakGame(ClientID))
-		return false;
+	return InDurakGame(ClientID);
+}
+
+void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
+{
+	int ClientID = pCharacter->GetPlayer()->GetCID();
 	int Game = GetGameByClient(ClientID);
 	if (Game < 0)
-		return false;
+		return;
 
 	CDurakGame *pGame = m_vpGames[Game];
 	CDurakGame::SSeat *pSeat = pGame->GetSeatByClient(ClientID);
@@ -295,17 +299,37 @@ bool CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 		pCard = &pSeat->m_Player.m_vpHandCards[pSeat->m_Player.m_HoveredCard];
 	}
 
-	CNetObj_PlayerInput *pInput = GameServer()->GetPlayerChar(ClientID)->Input();
-	if (pNewInput->m_Direction != pInput->m_Direction || pNewInput->m_Jump != pInput->m_Jump)
+	if (m_aLastInput[ClientID].m_Direction == 0 && pNewInput->m_Direction != 0)
 	{
 		m_aKeyboardControl[ClientID] = true;
-		return true;
+		if (pSeat->m_Player.m_HoveredCard == -1)
+		{
+			pSeat->m_Player.m_HoveredCard = 0;
+		}
+		else if (pCard)
+		{
+			pCard->SetHovered(false);
+			pSeat->m_Player.m_HoveredCard = mod(pSeat->m_Player.m_HoveredCard + pNewInput->m_Direction, pSeat->m_Player.m_vpHandCards.size());
+		}
+		pCard = &pSeat->m_Player.m_vpHandCards[pSeat->m_Player.m_HoveredCard];
+		if (pCard->m_HoverState == CCard::HOVERSTATE_NONE)
+		{
+			pSeat->m_Player.m_vpHandCards[pSeat->m_Player.m_HoveredCard].SetHovered(true);
+		}
 	}
-	if (pNewInput->m_TargetX != pInput->m_TargetX || pNewInput->m_TargetY != pInput->m_TargetY)
+	else if (m_aLastInput[ClientID].m_Jump == 0 && pNewInput->m_Jump != 0)
+	{
+		m_aKeyboardControl[ClientID] = true;
+	}
+	else if (pNewInput->m_TargetX != m_aLastInput[ClientID].m_TargetX || pNewInput->m_TargetY != m_aLastInput[ClientID].m_TargetY)
 	{
 		m_aKeyboardControl[ClientID] = false;
 	}
-	return false;
+
+	m_aLastInput[ClientID].m_Direction = pNewInput->m_Direction;
+	m_aLastInput[ClientID].m_Jump = pNewInput->m_Jump;
+	m_aLastInput[ClientID].m_TargetX = pNewInput->m_TargetX;
+	m_aLastInput[ClientID].m_TargetY = pNewInput->m_TargetY;
 }
 
 void CDurak::SendChatToDeployedStakePlayers(int Game, const char *pMessage, int NotThisID)
@@ -389,6 +413,9 @@ bool CDurak::StartGame(int Game)
 		pPlayer->m_ForceSpawnPos = GameServer()->Collision()->GetPos(pSeat->m_MapIndex);
 		m_aInDurakGame[ClientID] = true;
 		pTeams->SetForceCharacterTeam(ClientID, FirstFreeTeam);
+
+		// Todo: send tuning params only when actively playing and reset inbetween so non-actively-playing players can move around maybe
+		GameServer()->SendTuningParams(ClientID);
 	}
 
 	pGame->DealHandCards();
@@ -455,6 +482,10 @@ bool CDurak::UpdateGame(int Game)
 {
 	auto &&HandleCardHover = [this](int Game, int Seat, int Card, vec2 CursorPos, bool Dragging) {
 		CDurakGame::SSeat *pSeat = &m_vpGames[Game]->m_aSeats[Seat];
+		if (m_aKeyboardControl[pSeat->m_Player.m_ClientID])
+		{
+			return;
+		}
 		CCard *pCard = &pSeat->m_Player.m_vpHandCards[Card];
 		vec2 RelativeCursorPos = CursorPos - m_vpGames[Game]->m_TablePos;
 		if (Dragging)
@@ -466,13 +497,10 @@ bool CDurak::UpdateGame(int Game)
 				pCard->m_TableOffset.y = clamp(RelativeCursorPos.y + DURAK_CARD_NAME_OFFSET, -CCard::s_TableSize.y, CCard::s_TableSize.y);
 			}
 		}
-		else if (m_aKeyboardControl[pSeat->m_Player.m_ClientID] || pCard->m_HoverState == CCard::HOVERSTATE_DRAGGING)
+		else if (pCard->m_HoverState == CCard::HOVERSTATE_DRAGGING)
 		{
-			if (pCard->m_HoverState > CCard::HOVERSTATE_NONE)
-			{
-				pCard->SetHovered(false);
-				pSeat->m_Player.m_HoveredCard = -1;
-			}
+			pCard->SetHovered(false);
+			pSeat->m_Player.m_HoveredCard = -1;
 		}
 		else
 		{

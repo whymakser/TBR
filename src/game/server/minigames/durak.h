@@ -255,6 +255,13 @@ class CDurak : public CMinigame
 	bool m_aUpdatedPassive[MAX_CLIENTS];
 	bool m_aInDurakGame[MAX_CLIENTS];
 	bool m_aKeyboardControl[MAX_CLIENTS];
+	struct
+	{
+		int m_Direction = 0;
+		int m_Jump = 0;
+		int m_TargetX = 0;
+		int m_TargetY = 0;
+	} m_aLastInput[MAX_CLIENTS];
 
 	std::vector<CDurakGame *> m_vpGames;
 	bool UpdateGame(int Game);
@@ -287,6 +294,7 @@ public:
 	virtual void Snap(int SnappingClient);
 
 	bool InDurakGame(int ClientID) { return ClientID >= 0 && m_aInDurakGame[ClientID]; }
+	bool ActivelyPlaying(int ClientID);
 	bool OnDropMoney(int ClientID, int Amount);
 
 	int GetGameByNumber(int Number, bool AllowRunning = false);
@@ -300,7 +308,7 @@ public:
 
 	void OnPlayerLeave(int ClientID);
 
-	bool OnInput(class CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput);
+	void OnInput(class CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput);
 
 	void SendChatToDeployedStakePlayers(int Game, const char *pMessage, int NotThisID);
 	void SendChatToParticipants(int Game, const char *pMessage);
