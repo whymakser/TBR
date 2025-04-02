@@ -614,42 +614,40 @@ bool CDurak::UpdateGame(int Game)
 		if (!pChr)
 			continue;
 
-		{
-			unsigned int NumCards = pSeat->m_Player.m_vpHandCards.size();
-			if (NumCards > 0)
-			{
-				float Gap = 4.f;
-				float RequiredSpace = min(NumCards * (CCard::s_CardSizeRadius.x*2 + Gap) - Gap, CCard::s_TableSizeRadius.x*2);
-				float PosX = -RequiredSpace / 2.f;
-				if (NumCards > 1)
-				{
-					Gap = RequiredSpace / (NumCards - 1);
-				}
-				if (NumCards % 2 != 0)
-				{
-					PosX += CCard::s_CardSizeRadius.x;
-				}
+		unsigned int NumCards = pSeat->m_Player.m_vpHandCards.size();
+		if (NumCards <= 0)
+			continue;
 
-				for (unsigned int c = 0; c < NumCards; c++)
-				{
-					CCard *pCard = &pSeat->m_Player.m_vpHandCards[c];
-					pCard->m_TableOffset.x = PosX;
-					PosX += Gap;
-				}
-			}
+		// Dynamically sort hand cards
+		float Gap = 4.f;
+		const float RequiredSpace = min(NumCards * (CCard::s_CardSizeRadius.x*2 + Gap) - Gap, CCard::s_TableSizeRadius.x*2);
+		float PosX = -RequiredSpace / 2.f;
+		if (NumCards > 1)
+		{
+			Gap = RequiredSpace / (NumCards - 1);
+		}
+		if (NumCards % 2 != 0)
+		{
+			PosX += CCard::s_CardSizeRadius.x;
+		}
+		for (unsigned int c = 0; c < NumCards; c++)
+		{
+			CCard *pCard = &pSeat->m_Player.m_vpHandCards[c];
+			pCard->m_TableOffset.x = PosX;
+			PosX += Gap;
 		}
 
+		// scrolling order is fucked up otherwise when moving mouse from left to right with too many cards
 		vec2 CursorPos = pChr->GetCursorPos();
 		bool Dragging = pChr->Input()->m_Fire & 1;
 		if (pSeat->m_Player.m_LastCursorX < CursorPos.x)
 		{
-			for (unsigned int c = 0; c < pSeat->m_Player.m_vpHandCards.size(); c++)
+			for (unsigned int c = 0; c < NumCards; c++)
 				HandleCardHover(Game, i, c, CursorPos, Dragging);
 		}
 		else
 		{
-			// scrolling order is fucked up otherwise when moving mouse from left to right with too many cards
-			for (int c = (int)pSeat->m_Player.m_vpHandCards.size() - 1; c >= 0; c--)
+			for (int c = (int)NumCards - 1; c >= 0; c--)
 				HandleCardHover(Game, i, c, CursorPos, Dragging);
 		}
 		pSeat->m_Player.m_LastCursorX = CursorPos.x;
