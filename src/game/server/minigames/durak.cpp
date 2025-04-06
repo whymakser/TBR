@@ -219,7 +219,7 @@ bool CDurak::TryEnterBetStake(int ClientID, const char *pMessage)
 	return false;
 }
 
-void CDurak::OnPlayerLeave(int ClientID)
+void CDurak::OnPlayerLeave(int ClientID, bool Disconnect)
 {
 	CGameTeams *pTeams = &((CGameControllerDDRace *)GameServer()->m_pController)->m_Teams;
 	for (unsigned int g = 0; g < m_vpGames.size(); g++)
@@ -241,6 +241,11 @@ void CDurak::OnPlayerLeave(int ClientID)
 				break;
 			}
 		}
+	}
+
+	if (Disconnect)
+	{
+		m_aDurakNumReserved[ClientID] = 0;
 	}
 }
 

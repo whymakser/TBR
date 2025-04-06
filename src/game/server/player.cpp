@@ -1041,7 +1041,7 @@ void CPlayer::OnDisconnect()
 	KillCharacter();
 
 	GameServer()->Arenas()->OnPlayerLeave(m_ClientID, true);
-	GameServer()->Durak()->OnPlayerLeave(m_ClientID);
+	GameServer()->Durak()->OnPlayerLeave(m_ClientID, true);
 	GameServer()->Logout(GetAccID());
 
 	CGameControllerDDRace* Controller = (CGameControllerDDRace*)GameServer()->m_pController;

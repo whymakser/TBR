@@ -349,6 +349,6 @@ public:
 	void OnCharacterSeat(int ClientID, int Number, int SeatIndex);
 	bool TryEnterBetStake(int ClientID, const char *pMessage);
 	void OnInput(class CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput);
-	void OnPlayerLeave(int ClientID);
+	void OnPlayerLeave(int ClientID, bool Disconnect = false);
 };
 #endif // GAME_SERVER_MINIGAMES_DURAK_H
