@@ -158,6 +158,8 @@ public:
 		SEE_OTHERS_IND_BUTTON,
 	};
 
+	// We start after the seeother indicator/button, and can take all the ids up to m_NumReserved, we may not interfere with GetMapSize()
+	int GetFirstDurakID(int ClientID) { return GetSeeOthersID(ClientID) - 1; }
 	int GetSeeOthersID(int ClientID);
 	void DoSeeOthers(int ClientID);
 	void ResetSeeOthers(int ClientID);

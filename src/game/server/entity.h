@@ -136,8 +136,8 @@ public:
 		Returns:
 			Non-zero if the entity doesn't have to be in the snapshot.
 	*/
-	int NetworkClipped(int SnappingClient, bool CheckShowAll = false, bool DefaultRange = false);
-	int NetworkClipped(int SnappingClient, vec2 CheckPos, bool CheckShowAll = false, bool DefaultRange = false);
+	bool NetworkClipped(int SnappingClient, bool CheckShowAll = false, bool DefaultRange = false);
+	bool NetworkClipped(int SnappingClient, vec2 CheckPos, bool CheckShowAll = false, bool DefaultRange = false);
 	bool NetworkClippedLine(int SnappingClient, vec2 StartPos, vec2 EndPos, bool CheckShowAll = false);
 
 	bool GameLayerClipped(vec2 CheckPos);
@@ -168,5 +168,8 @@ public:
 	bool m_Collision;
 	virtual void ResetCollision(bool Remove = false) {}
 };
+
+bool NetworkClipped(const CGameContext *pGameServer, int SnappingClient, vec2 CheckPos, int PlotID = -1, bool CheckShowAll = false, bool DefaultRange = false);
+bool NetworkClippedLine(const CGameContext *pGameServer, int SnappingClient, vec2 StartPos, vec2 EndPos, int PlotID = -1, bool CheckShowAll = false);
 
 #endif

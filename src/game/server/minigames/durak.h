@@ -5,6 +5,7 @@
 
 #include "minigame.h"
 #include <vector>
+#include <map>
 #include <algorithm>
 #include <random>
 
@@ -19,18 +20,22 @@ enum
 	DURAK_CARD_NAME_OFFSET = 48,
 };
 
-#define DURAK_CARD_HOVER_OFFSET (CCard::s_CardSizeRadius.y / 2)
+#define DURAK_CARD_HOVER_OFFSET (CCard::ms_CardSizeRadius.y / 2)
 
 class CCard
 {
 public:
-	static const vec2 s_CardSizeRadius;
-	static const vec2 s_TableSizeRadius;
+	static const vec2 ms_CardSizeRadius;
+	static const vec2 ms_TableSizeRadius;
+	static const vec2 ms_AttackAreaRadius;
 
+	CCard() : CCard(-1, -1) {}
 	CCard(int Suit, int Rank) : m_Suit(Suit), m_Rank(Rank)
 	{
 		m_TableOffset = vec2(0, 0);
 		m_HoverState = HOVERSTATE_NONE;
+		m_SnapID = -1;
+		m_Active = false;
 	}
 
 	int m_Suit;
@@ -43,28 +48,30 @@ public:
 		HOVERSTATE_DRAGGING,
 	};
 	int m_HoverState;
+	int m_SnapID;
+	bool m_Active;
 
 	bool Valid() { return m_Suit != -1 && m_Rank != -1; }
 
 	bool MouseOver(vec2 Target) // Target - m_TablePos
 	{
 		vec2 CardPos = vec2(m_TableOffset.x, m_TableOffset.y-DURAK_CARD_NAME_OFFSET);
-		float HighY = s_CardSizeRadius.y;
+		float HighY = ms_CardSizeRadius.y;
 		if (m_HoverState == HOVERSTATE_MOUSEOVER) // Avoid flickering
 			HighY += DURAK_CARD_HOVER_OFFSET;
-		return (CardPos.x - s_CardSizeRadius.x < Target.x && CardPos.x + s_CardSizeRadius.x > Target.x && CardPos.y - s_CardSizeRadius.y < Target.y && CardPos.y + HighY > Target.y);
+		return (CardPos.x - ms_CardSizeRadius.x < Target.x && CardPos.x + ms_CardSizeRadius.x > Target.x && CardPos.y - ms_CardSizeRadius.y < Target.y && CardPos.y + HighY > Target.y);
 	}
 
 	void SetHovered(bool Set)
 	{
 		if (Set)
 		{
-			m_TableOffset.y = CCard::s_TableSizeRadius.y - DURAK_CARD_HOVER_OFFSET;
+			m_TableOffset.y = CCard::ms_TableSizeRadius.y - DURAK_CARD_HOVER_OFFSET;
 			m_HoverState = HOVERSTATE_MOUSEOVER;
 		}
 		else
 		{
-			m_TableOffset.y = CCard::s_TableSizeRadius.y;
+			m_TableOffset.y = CCard::ms_TableSizeRadius.y;
 			m_HoverState = HOVERSTATE_NONE;
 		}
 	}
@@ -92,7 +99,8 @@ public:
                 m_vDeck.emplace_back(suit, rank);
     }
 
-    void Shuffle() {
+    void Shuffle()
+	{
         std::random_device rd;
         std::mt19937 g(rd());
         std::shuffle(m_vDeck.begin(), m_vDeck.end(), g);
@@ -173,8 +181,8 @@ public:
 				if (m_aSeats[s].m_Player.m_ClientID != -1)
 				{
 					CCard Card = m_Deck.DrawCard();
-					Card.m_TableOffset.y = CCard::s_TableSizeRadius.y;
-					m_aSeats[s].m_Player.m_vpHandCards.push_back(Card);
+					Card.m_TableOffset.y = CCard::ms_TableSizeRadius.y;
+					m_aSeats[s].m_Player.m_vHandCards.push_back(Card);
 					if (m_Deck.IsEmpty())
 					{
 						m_Deck.SetTrumpSuit(Card.m_Suit);
@@ -190,6 +198,42 @@ public:
 			m_Deck.SetTrumpSuit(Card.m_Suit);
 			m_Deck.PushFrontTrumpCard(Card);
 		}
+
+		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+		{
+			SortHand(m_aSeats[i].m_Player.m_vHandCards, m_Deck.GetTrumpSuit());
+		}
+	}
+
+	void SortHand(std::vector<CCard> &vHandCards, int TrumpSuit) {
+		// Card count per suit
+		int aSuitCount[4] = { 0 };
+		for (const CCard &Card : vHandCards)
+			aSuitCount[Card.m_Suit]++;
+
+		// Highest rank within each suit
+		int aSuitMaxRank[4] = { 0 };
+		for (const CCard &Card : vHandCards)
+			aSuitMaxRank[Card.m_Suit] = max(aSuitMaxRank[Card.m_Suit], Card.m_Rank);
+
+		std::sort(vHandCards.begin(), vHandCards.end(), [&](const CCard &a, const CCard &b) {
+			// Trump cards first
+			if (a.m_Suit == TrumpSuit && b.m_Suit != TrumpSuit)
+				return true;
+			if (a.m_Suit != TrumpSuit && b.m_Suit == TrumpSuit)
+				return false;
+
+			// Both cards same suit, sort by rank (higher = left)
+			if (a.m_Suit == b.m_Suit)
+				return a.m_Rank > b.m_Rank;
+
+			// Sort by count of cards per suit (more = left)
+			if (aSuitCount[a.m_Suit] != aSuitCount[b.m_Suit])
+				return aSuitCount[a.m_Suit] > aSuitCount[b.m_Suit];
+
+			// If everything is same, sort by highest rank of suit
+			return aSuitMaxRank[a.m_Suit] > aSuitMaxRank[b.m_Suit];
+		});
 	}
 
 	struct SSeat
@@ -201,13 +245,13 @@ public:
 			{
 				m_ClientID = -1;
 				m_Stake = -1;
-				m_vpHandCards.clear();
+				m_vHandCards.clear();
 				m_HoveredCard = -1;
 				m_LastCursorX = -1.f;
 			}
 			int m_ClientID;
 			int64 m_Stake;
-			std::vector<CCard> m_vpHandCards;
+			std::vector<CCard> m_vHandCards;
 			int m_HoveredCard;
 			float m_LastCursorX;
 		} m_Player;
@@ -232,21 +276,34 @@ public:
 
 class CDurak : public CMinigame
 {
-	/*enum
+	enum
 	{
-		// max 3 cards per name
-		DURAK_TEXT_STACK_AND_TRUMP = 0,
-		DURAK_TEXT_DEFENSE_1,
+		DURAK_TEXT_CURSOR_TOOLTIP = 0,
+		DURAK_TEXT_KEYBOARD_CONTROL,
+		DURAK_TEXT_STACK_AND_TRUMP,
+		DURAK_TEXT_OFFSET_DEFENSE,
+		DURAK_TEXT_DEFENSE_1 = DURAK_TEXT_OFFSET_DEFENSE,
 		DURAK_TEXT_DEFENSE_2,
-		DURAK_TEXT_OFFENSE_1,
+		DURAK_TEXT_DEFENSE_3,
+		DURAK_TEXT_DEFENSE_4,
+		DURAK_TEXT_DEFENSE_5,
+		DURAK_TEXT_DEFENSE_6,
+		DURAK_TEXT_OFFSET_OFFENSE,
+		DURAK_TEXT_OFFENSE_1 = DURAK_TEXT_OFFSET_OFFENSE,
 		DURAK_TEXT_OFFENSE_2,
-		DURAK_TEXT_CURSOR_TOOLTIP,
-		NUM_DURAK_FAKE_TEES
+		DURAK_TEXT_OFFENSE_3,
+		DURAK_TEXT_OFFENSE_4,
+		DURAK_TEXT_OFFENSE_5,
+		DURAK_TEXT_OFFENSE_6,
+		NUM_DURAK_STATIC_CARDS
 	};
+	CCard m_aStaticCards[NUM_DURAK_STATIC_CARDS];
+	void SnapDurakCard(int SnappingClient, int Game, CCard *pCard);
+	std::map<int, std::map<CCard*, int>> m_aLastSnapID; // [ClientID][Card] = SnapID
+	void PrepareDurakSnap(int SnappingClient, CDurakGame::SSeat *pSeat);
+	void UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, int> &NewMap);
 
-	CCard m_aStaticCards[NUM_DURAK_FAKE_TEES];*/
-	void SnapFakeTee(int SnappingClient, int ID, vec2 Pos, const char *pName, int Game);
-
+	int m_aDurakNumReserved[MAX_CLIENTS];
 	int64 m_aLastSeatOccupiedMsg[MAX_CLIENTS];
 	bool m_aUpdatedPassive[MAX_CLIENTS];
 	bool m_aInDurakGame[MAX_CLIENTS];
@@ -269,6 +326,8 @@ class CDurak : public CMinigame
 
 	const char *GetCardSymbol(int Suit, int Rank);
 	void UpdatePassive(int ClientID, int Seconds);
+
+	CDurakGame *GetOrAddGame(int Number);
 
 public:
 	CDurak(CGameContext *pGameServer, int Type);

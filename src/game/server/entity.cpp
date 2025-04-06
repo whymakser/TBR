@@ -33,55 +33,19 @@ CEntity::~CEntity()
 	Server()->SnapFreeID(m_ID);
 }
 
-int CEntity::NetworkClipped(int SnappingClient, bool CheckShowAll, bool DefaultRange)
+bool CEntity::NetworkClipped(int SnappingClient, bool CheckShowAll, bool DefaultRange)
 {
-	return NetworkClipped(SnappingClient, m_Pos, CheckShowAll, DefaultRange);
+	return ::NetworkClipped(GameServer(), SnappingClient, m_Pos, m_PlotID, CheckShowAll, DefaultRange);
 }
 
-int CEntity::NetworkClipped(int SnappingClient, vec2 CheckPos, bool CheckShowAll, bool DefaultRange)
+bool CEntity::NetworkClipped(int SnappingClient, vec2 CheckPos, bool CheckShowAll, bool DefaultRange)
 {
-	if (SnappingClient == -1 || (CheckShowAll && GameServer()->m_apPlayers[SnappingClient]->m_ShowAll))
-		return 0;
-
-	// Border to also receive objects a bit off the screen so they dont pop up, 10 blocks should be okay
-	float Border = 32.f * (m_PlotID >= PLOT_START ? 6.f : 10.f);
-	vec2 ShowDistance = GameServer()->m_apPlayers[SnappingClient]->m_ShowDistance;
-	if (m_PlotID >= PLOT_START || DefaultRange)
-		ShowDistance = GameServer()->m_apPlayers[SnappingClient]->m_StandardShowDistance;
-
-	float dx = GameServer()->m_apPlayers[SnappingClient]->m_ViewPos.x-CheckPos.x;
-	if(absolute(dx) > ShowDistance.x/2.f + Border)
-		return 1;
-
-	float dy = GameServer()->m_apPlayers[SnappingClient]->m_ViewPos.y-CheckPos.y;
-	if(absolute(dy) > ShowDistance.y/2.f + Border)
-		return 1;
-
-	return 0;
+	return ::NetworkClipped(GameServer(), SnappingClient, CheckPos, m_PlotID, CheckShowAll, DefaultRange);
 }
 
 bool CEntity::NetworkClippedLine(int SnappingClient, vec2 StartPos, vec2 EndPos, bool CheckShowAll)
 {
-	if(SnappingClient == -1 || (CheckShowAll && GameServer()->m_apPlayers[SnappingClient]->m_ShowAll))
-		return false;
-
-	vec2 &ViewPos = GameServer()->m_apPlayers[SnappingClient]->m_ViewPos;
-	vec2 &ShowDistance = GameServer()->m_apPlayers[SnappingClient]->m_ShowDistance;
-
-	vec2 DistanceToLine, ClosestPoint;
-	if(closest_point_on_line(StartPos, EndPos, ViewPos, ClosestPoint))
-	{
-		DistanceToLine = ViewPos - ClosestPoint;
-	}
-	else
-	{
-		// No line section was passed but two equal points
-		DistanceToLine = ViewPos - StartPos;
-	}
-	// Border to also receive objects a bit off the screen so they dont pop up, 10 blocks should be okay
-	float Border = 32.f * (m_PlotID >= PLOT_START ? 6.f : 10.f);
-	float ClippDistance = max(ShowDistance.x, ShowDistance.y) / 2.f + Border;
-	return (absolute(DistanceToLine.x) > ClippDistance || absolute(DistanceToLine.y) > ClippDistance);
+	return ::NetworkClippedLine(GameServer(), SnappingClient, StartPos, EndPos, m_PlotID, CheckShowAll);
 }
 
 bool CEntity::GameLayerClipped(vec2 CheckPos)
@@ -129,6 +93,52 @@ bool CEntity::GetNearestAirPosPlayer(vec2 PlayerPos, vec2* OutPos)
 		}
 	}
 	return false;
+}
+
+bool NetworkClipped(const CGameContext *pGameServer, int SnappingClient, vec2 CheckPos, int PlotID, bool CheckShowAll, bool DefaultRange)
+{
+	if (SnappingClient == -1 || (CheckShowAll && pGameServer->m_apPlayers[SnappingClient]->m_ShowAll))
+		return 0;
+
+	// Border to also receive objects a bit off the screen so they dont pop up, 10 blocks should be okay
+	float Border = 32.f * (PlotID >= PLOT_START ? 6.f : 10.f);
+	vec2 ShowDistance = pGameServer->m_apPlayers[SnappingClient]->m_ShowDistance;
+	if (PlotID >= PLOT_START || DefaultRange)
+		ShowDistance = pGameServer->m_apPlayers[SnappingClient]->m_StandardShowDistance;
+
+	float dx = pGameServer->m_apPlayers[SnappingClient]->m_ViewPos.x-CheckPos.x;
+	if(absolute(dx) > ShowDistance.x/2.f + Border)
+		return 1;
+
+	float dy = pGameServer->m_apPlayers[SnappingClient]->m_ViewPos.y-CheckPos.y;
+	if(absolute(dy) > ShowDistance.y/2.f + Border)
+		return 1;
+
+	return 0;
+}
+
+bool NetworkClippedLine(const CGameContext *pGameServer, int SnappingClient, vec2 StartPos, vec2 EndPos, int PlotID, bool CheckShowAll)
+{
+	if(SnappingClient == -1 || (CheckShowAll && pGameServer->m_apPlayers[SnappingClient]->m_ShowAll))
+		return false;
+
+	vec2 &ViewPos = pGameServer->m_apPlayers[SnappingClient]->m_ViewPos;
+	vec2 &ShowDistance = pGameServer->m_apPlayers[SnappingClient]->m_ShowDistance;
+
+	vec2 DistanceToLine, ClosestPoint;
+	if(closest_point_on_line(StartPos, EndPos, ViewPos, ClosestPoint))
+	{
+		DistanceToLine = ViewPos - ClosestPoint;
+	}
+	else
+	{
+		// No line section was passed but two equal points
+		DistanceToLine = ViewPos - StartPos;
+	}
+	// Border to also receive objects a bit off the screen so they dont pop up, 10 blocks should be okay
+	float Border = 32.f * (PlotID >= PLOT_START ? 6.f : 10.f);
+	float ClippDistance = max(ShowDistance.x, ShowDistance.y) / 2.f + Border;
+	return (absolute(DistanceToLine.x) > ClippDistance || absolute(DistanceToLine.y) > ClippDistance);
 }
 
 bool CEntity::IsPlotDoor()

@@ -6,39 +6,19 @@
 #include <engine/shared/config.h>
 #include <game/server/gamemodes/DDRace.h>
 
-const vec2 CCard::s_CardSizeRadius = vec2(14.f, 16.f);
-const vec2 CCard::s_TableSizeRadius = vec2(4.9f * 32.f, 3.8f * 32.f);
+const vec2 CCard::ms_CardSizeRadius = vec2(14.f, 16.f);
+const vec2 CCard::ms_TableSizeRadius = vec2(4.9f * 32.f, 3.8f * 32.f); // 11*9 blocks around table center tile (all 4 corner tiles can be cut-out)
+const vec2 CCard::ms_AttackAreaRadius = vec2(3.5f * 32.f, 32.f); // 7x2
 
 CDurak::CDurak(CGameContext *pGameServer, int Type) : CMinigame(pGameServer, Type)
 {
-	/*vec2 aOffsets[NUM_DURAK_FAKE_TEES] = {
-		vec2(4, 0),
-		vec2(-3, 0.66f),
-		vec2(0.5f, 0.66f),
-		vec2(-3, 0),
-		vec2(0.5f, 0),
-		//vec2(-1.75f, 3.8f),
-		//vec2(1.75f, 3.8f),
-		vec2(0, -3.5f),
-	};
-	const char *apNames[NUM_DURAK_FAKE_TEES] = {
-		"🂠🃞",
-		"🂹 🂹 🂹", "🂽 🂽 🂽",
-		"🂡 🂡 🂡", "🂡 🃂 🃂",
-		//"🂪 🂪 🂪", "🃚 🃚 🃚",
-		"Cursor"
-	};
-	for (int i = 0; i < NUM_DURAK_FAKE_TEES; i++)
-	{
-		m_aStaticCards[i].m_TableOffset = vec2(aOffsets[i].x * 32.f, aOffsets[i].y * 32.f);
-		str_copy(m_aStaticCards[i].m_aName, apNames[i], sizeof(m_aStaticCards[i].m_aName));
-	}*/
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
 		m_aLastSeatOccupiedMsg[i] = 0;
 		m_aUpdatedPassive[i] = false;
 		m_aInDurakGame[i] = false;
 		m_aKeyboardControl[i] = false;
+		m_aDurakNumReserved[i] = 0;
 	}
 	for (auto &Game : m_vpGames)
 		delete Game;
@@ -73,10 +53,8 @@ int CDurak::GetGameByClient(int ClientID)
 	return -1;
 }
 
-void CDurak::AddMapTableTile(int Number, vec2 Pos)
+CDurakGame *CDurak::GetOrAddGame(int Number)
 {
-	if (Number <= 0)
-		return;
 	CDurakGame *pGame = 0;
 	int Game = GetGameByNumber(Number);
 	if (Game != -1)
@@ -88,27 +66,30 @@ void CDurak::AddMapTableTile(int Number, vec2 Pos)
 		pGame = new CDurakGame(Number);
 		m_vpGames.push_back(pGame);
 	}
-	pGame->m_TablePos = Pos;
-	GameServer()->m_aMinigameDisabled[MINIGAME_DURAK] = false;
+	return pGame;
+}
+
+void CDurak::AddMapTableTile(int Number, vec2 Pos)
+{
+	if (Number <= 0)
+		return;
+	CDurakGame *pGame = GetOrAddGame(Number);
+	if (pGame)
+	{
+		pGame->m_TablePos = Pos;
+		GameServer()->m_aMinigameDisabled[MINIGAME_DURAK] = false;
+	}
 }
 
 void CDurak::AddMapSeatTile(int Number, int MapIndex, int SeatIndex)
 {
 	if (Number <= 0 || SeatIndex < 0 || SeatIndex >= MAX_DURAK_PLAYERS)
 		return;
-
-	CDurakGame *pGame = 0;
-	int Game = GetGameByNumber(Number);
-	if (Game != -1)
+	CDurakGame *pGame = GetOrAddGame(Number);
+	if (pGame)
 	{
-		pGame = m_vpGames[Game];
+		pGame->m_aSeats[SeatIndex].m_MapIndex = MapIndex;
 	}
-	else
-	{
-		pGame = new CDurakGame(Number);
-		m_vpGames.push_back(pGame);
-	}
-	pGame->m_aSeats[SeatIndex].m_MapIndex = MapIndex;
 }
 
 void CDurak::UpdatePassive(int ClientID, int Seconds)
@@ -296,7 +277,7 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 	CCard *pCard = 0;
 	if (pSeat->m_Player.m_HoveredCard != -1)
 	{
-		pCard = &pSeat->m_Player.m_vpHandCards[pSeat->m_Player.m_HoveredCard];
+		pCard = &pSeat->m_Player.m_vHandCards[pSeat->m_Player.m_HoveredCard];
 	}
 
 	if (m_aLastInput[ClientID].m_Direction == 0 && pNewInput->m_Direction != 0)
@@ -309,12 +290,12 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 		else if (pCard)
 		{
 			pCard->SetHovered(false);
-			pSeat->m_Player.m_HoveredCard = mod(pSeat->m_Player.m_HoveredCard + pNewInput->m_Direction, pSeat->m_Player.m_vpHandCards.size());
+			pSeat->m_Player.m_HoveredCard = mod(pSeat->m_Player.m_HoveredCard + pNewInput->m_Direction, pSeat->m_Player.m_vHandCards.size());
 		}
-		pCard = &pSeat->m_Player.m_vpHandCards[pSeat->m_Player.m_HoveredCard];
+		pCard = &pSeat->m_Player.m_vHandCards[pSeat->m_Player.m_HoveredCard];
 		if (pCard->m_HoverState == CCard::HOVERSTATE_NONE)
 		{
-			pSeat->m_Player.m_vpHandCards[pSeat->m_Player.m_HoveredCard].SetHovered(true);
+			pSeat->m_Player.m_vHandCards[pSeat->m_Player.m_HoveredCard].SetHovered(true);
 		}
 	}
 	else if (m_aLastInput[ClientID].m_Jump == 0 && pNewInput->m_Jump != 0)
@@ -382,10 +363,11 @@ bool CDurak::StartGame(int Game)
 	if (FirstFreeTeam == -1)
 	{
 		SendChatToParticipants(Game, "Couldn't start game, no empty team found");
+		delete m_vpGames[Game];
 		m_vpGames.erase(m_vpGames.begin() + Game);
 		return false;
 	}
-
+	
 	pGame->m_GameStartTick = Server()->Tick();
 	pGame->m_Running = true;
 	pGame->m_Deck.Shuffle();
@@ -427,10 +409,10 @@ bool CDurak::StartGame(int Game)
 		if (pPlayer->m_ClientID == -1)
 			continue;
 
-		for (unsigned int c = 0; c < pPlayer->m_vpHandCards.size(); c++)
+		for (unsigned int c = 0; c < pPlayer->m_vHandCards.size(); c++)
 		{
-			int Rank = pPlayer->m_vpHandCards[c].m_Rank;
-			if (pPlayer->m_vpHandCards[c].m_Suit == pGame->m_Deck.GetTrumpSuit() && Rank < LowestTrump)
+			int Rank = pPlayer->m_vHandCards[c].m_Rank;
+			if (pPlayer->m_vHandCards[c].m_Suit == pGame->m_Deck.GetTrumpSuit() && Rank < LowestTrump)
 			{
 				pGame->m_InitialAttackerIndex = i;
 				LowestTrump = Rank;
@@ -440,7 +422,7 @@ bool CDurak::StartGame(int Game)
 
 	char aBuf[128];
 	int BeginnerID = pGame->m_aSeats[pGame->m_InitialAttackerIndex].m_Player.m_ClientID;
-	str_format(aBuf, sizeof(aBuf), "Beginner determined, '%s' starts as he has lowest trump: %d", Server()->ClientName(BeginnerID), LowestTrump);
+	str_format(aBuf, sizeof(aBuf), "Beginner determined, '%s' starts as he has lowest trump: %s", Server()->ClientName(BeginnerID), GetCardSymbol(pGame->m_Deck.GetTrumpSuit(), LowestTrump));
 	SendChatToParticipants(Game, aBuf);
 	return true;
 }
@@ -462,6 +444,7 @@ bool CDurak::EndGame(int Game)
 		OnPlayerLeave(ClientID);
 	}
 
+	delete m_vpGames[Game];
 	m_vpGames.erase(m_vpGames.begin() + Game);
 	return true;
 }
@@ -504,15 +487,23 @@ bool CDurak::UpdateGame(int Game)
 		{
 			return;
 		}
-		CCard *pCard = &pSeat->m_Player.m_vpHandCards[Card];
+		CCard *pCard = &pSeat->m_Player.m_vHandCards[Card];
 		vec2 RelativeCursorPos = CursorPos - m_vpGames[Game]->m_TablePos;
 		if (Dragging)
 		{
 			if (pCard->m_HoverState > CCard::HOVERSTATE_NONE)
 			{
 				pCard->m_HoverState = CCard::HOVERSTATE_DRAGGING;
-				pCard->m_TableOffset.x = clamp(RelativeCursorPos.x, -CCard::s_TableSizeRadius.x, CCard::s_TableSizeRadius.x);
-				pCard->m_TableOffset.y = clamp(RelativeCursorPos.y + DURAK_CARD_NAME_OFFSET, -CCard::s_TableSizeRadius.y + DURAK_CARD_NAME_OFFSET, CCard::s_TableSizeRadius.y);
+				float CornerY = 0.f;
+				if ((RelativeCursorPos.x < -CCard::ms_TableSizeRadius.x + 32.f) ||
+					RelativeCursorPos.x > CCard::ms_TableSizeRadius.x - 32.f)
+				{
+					CornerY = 32.f;
+				}
+				pCard->m_TableOffset.x = clamp(RelativeCursorPos.x, -CCard::ms_TableSizeRadius.x, CCard::ms_TableSizeRadius.x);
+				pCard->m_TableOffset.y = clamp(RelativeCursorPos.y + DURAK_CARD_NAME_OFFSET,
+					-CCard::ms_TableSizeRadius.y + DURAK_CARD_NAME_OFFSET + 4.f + CornerY,
+					CCard::ms_TableSizeRadius.y - CornerY);
 			}
 		}
 		else if (pCard->m_HoverState == CCard::HOVERSTATE_DRAGGING)
@@ -614,13 +605,13 @@ bool CDurak::UpdateGame(int Game)
 		if (!pChr)
 			continue;
 
-		unsigned int NumCards = pSeat->m_Player.m_vpHandCards.size();
+		unsigned int NumCards = pSeat->m_Player.m_vHandCards.size();
 		if (NumCards <= 0)
 			continue;
 
 		// Dynamically sort hand cards
 		float Gap = 4.f;
-		const float RequiredSpace = min(NumCards * (CCard::s_CardSizeRadius.x*2 + Gap) - Gap, CCard::s_TableSizeRadius.x*2);
+		const float RequiredSpace = min(NumCards * (CCard::ms_CardSizeRadius.x*2 + Gap) - Gap, (CCard::ms_TableSizeRadius.x - 32.f) * 2);
 		float PosX = -RequiredSpace / 2.f;
 		if (NumCards > 1)
 		{
@@ -628,11 +619,11 @@ bool CDurak::UpdateGame(int Game)
 		}
 		if (NumCards % 2 != 0)
 		{
-			PosX += CCard::s_CardSizeRadius.x;
+			PosX += CCard::ms_CardSizeRadius.x;
 		}
 		for (unsigned int c = 0; c < NumCards; c++)
 		{
-			CCard *pCard = &pSeat->m_Player.m_vpHandCards[c];
+			CCard *pCard = &pSeat->m_Player.m_vHandCards[c];
 			pCard->m_TableOffset.x = PosX;
 			PosX += Gap;
 		}
@@ -677,27 +668,111 @@ void CDurak::Snap(int SnappingClient)
 	CDurakGame *pGame = m_vpGames[Game];
 	CDurakGame::SSeat *pSeat = pGame->GetSeatByClient(ClientID);
 
-	// TODO: somehow manage this id stuff better and keep it in sync with AddToNumReserved
-	int FakeID = GameServer()->m_World.GetSeeOthersID(SnappingClient) - 1;
-	for (unsigned int i = 0; i < pSeat->m_Player.m_vpHandCards.size(); i++)
+	// Prepare snap ids..
+	PrepareDurakSnap(SnappingClient, pSeat);
+
+	// Static cards
+	for (int i = 0; i < NUM_DURAK_STATIC_CARDS; i++)
 	{
-		CCard *pCard = &pSeat->m_Player.m_vpHandCards[i];
-		vec2 Pos = pGame->m_TablePos + pCard->m_TableOffset;
-		SnapFakeTee(SnappingClient, FakeID--, Pos, GetCardSymbol(pCard->m_Suit, pCard->m_Rank), Game);
+		CCard *pCard = &m_aStaticCards[i];
+		if (pCard->m_Active)
+			SnapDurakCard(SnappingClient, Game, pCard);
 	}
 
-	// render current round
-
-	/*int FakeID = GameServer()->m_World.GetSeeOthersID(SnappingClient) - 1;
-	for (int i = 0; i < NUM_DURAK_FAKE_TEES; i++)
+	// Hand cards
+	if (pSeat)
 	{
-		SnapFakeTee(SnappingClient, FakeID, m_TablePos + m_aStaticCards[i].m_TableOffset, m_aStaticCards[i].m_aName);
-		FakeID--;
-	}*/
+		for (unsigned int i = 0; i < pSeat->m_Player.m_vHandCards.size(); i++)
+			SnapDurakCard(SnappingClient, Game, &pSeat->m_Player.m_vHandCards[i]);
+	}
 }
 
-void CDurak::SnapFakeTee(int SnappingClient, int ID, vec2 Pos, const char *pName, int Game)
+void CDurak::PrepareDurakSnap(int SnappingClient, CDurakGame::SSeat *pSeat)
 {
+	int NumStatic = 0;
+	for (int i = 0; i < NUM_DURAK_STATIC_CARDS; i++)
+		if (m_aStaticCards[i].m_SnapID != -1)
+			NumStatic++;
+
+	int NumHand = 0;
+	if (pSeat)
+		NumHand = pSeat->m_Player.m_vHandCards.size();
+
+	int NumNeeded = NumStatic + NumHand;
+	int Diff = NumNeeded - m_aDurakNumReserved[SnappingClient];
+	if (Diff != 0)
+	{
+		GameServer()->m_World.AddToNumReserved(SnappingClient, Diff);
+		m_aDurakNumReserved[SnappingClient] += Diff;
+	}
+
+	std::map<CCard *, int> NewSnapMap;
+	int SnapID = GameServer()->m_World.GetFirstDurakID(SnappingClient);
+
+	// Static cards
+	for (int i = 0; i < NUM_DURAK_STATIC_CARDS; i++)
+	{
+		CCard *pCard = &m_aStaticCards[i];
+		if (pCard->m_Active)
+		{
+			pCard->m_SnapID = NewSnapMap[pCard] = SnapID--;
+		}
+	}
+
+	// Hand cards
+	if (pSeat)
+	{
+		for (unsigned int i = 0; i < pSeat->m_Player.m_vHandCards.size(); i++)
+		{
+			CCard *pCard = &pSeat->m_Player.m_vHandCards[i];
+			pCard->m_SnapID = NewSnapMap[pCard] = SnapID--;
+		}
+	}
+
+	// 0.7
+	UpdateCardSnapMapping(SnappingClient, NewSnapMap);
+}
+
+void CDurak::UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, int> &NewMap)
+{
+	auto &OldMap = m_aLastSnapID[SnappingClient];
+	for (auto &[pOldCard, OldID] : OldMap)
+		if (NewMap.find(pOldCard) == NewMap.end())
+			GameServer()->m_apPlayers[SnappingClient]->SendDisconnect(OldID);
+	for (auto &[pCard, NewID] : NewMap)
+	{
+		auto it = OldMap.find(pCard);
+		if (it == OldMap.end() || it->second != NewID)
+		{
+			if (it != OldMap.end())
+			{
+				GameServer()->m_apPlayers[SnappingClient]->SendDisconnect(it->second);
+			}
+			CNetMsg_Sv_ClientInfo NewClientInfoMsg;
+			NewClientInfoMsg.m_ClientID = NewID;
+			NewClientInfoMsg.m_Local = 0;
+			NewClientInfoMsg.m_Team = TEAM_BLUE;
+			NewClientInfoMsg.m_pName = GetCardSymbol(pCard->m_Suit, pCard->m_Rank);
+			NewClientInfoMsg.m_pClan = "";
+			NewClientInfoMsg.m_Country = -1;
+			NewClientInfoMsg.m_Silent = 1;
+
+			for (int p = 0; p < NUM_SKINPARTS; p++)
+			{
+				NewClientInfoMsg.m_apSkinPartNames[p] = "default";
+				NewClientInfoMsg.m_aUseCustomColors[p] = 1;
+				NewClientInfoMsg.m_aSkinPartColors[p] = 255;
+			}
+
+			Server()->SendPackMsg(&NewClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD|MSGFLAG_NOTRANSLATE, SnappingClient);
+		}
+	}
+	OldMap = NewMap;
+}
+
+void CDurak::SnapDurakCard(int SnappingClient, int Game, CCard *pCard)
+{
+	int ID = pCard->m_SnapID;
 	if (!Server()->IsSevendown(SnappingClient))
 	{
 		// todo 0.7: add clientinfo update, like CGameWorld::PlayerMap::UpdateSeeOthers()
@@ -713,7 +788,7 @@ void CDurak::SnapFakeTee(int SnappingClient, int ID, vec2 Pos, const char *pName
 		int *pClientInfo = (int*)Server()->SnapNewItem(11 + NUM_NETOBJTYPES, ID, 17*4); // NETOBJTYPE_CLIENTINFO
 		if(!pClientInfo)
 			return;
-		StrToInts(&pClientInfo[0], 4, pName);
+		StrToInts(&pClientInfo[0], 4, GetCardSymbol(pCard->m_Suit, pCard->m_Rank));
 		StrToInts(&pClientInfo[4], 3, "");
 		StrToInts(&pClientInfo[8], 6, "default");
 		pClientInfo[14] = 1;
@@ -732,6 +807,7 @@ void CDurak::SnapFakeTee(int SnappingClient, int ID, vec2 Pos, const char *pName
 	CNetObj_Character *pCharacter = static_cast<CNetObj_Character *>(Server()->SnapNewItem(NETOBJTYPE_CHARACTER, ID, sizeof(CNetObj_Character)));
 	if(!pCharacter)
 		return;
+	vec2 Pos = m_vpGames[Game]->m_TablePos + pCard->m_TableOffset;
 	pCharacter->m_X = Pos.x;
 	pCharacter->m_Y = Pos.y;
 	pCharacter->m_Weapon = WEAPON_GUN;

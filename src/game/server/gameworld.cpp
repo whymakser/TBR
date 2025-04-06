@@ -538,8 +538,6 @@ void CGameWorld::PlayerMap::InitPlayer(bool Rejoin)
 			m_pGameWorld->m_aMap[i].Add(NextFreeID, m_ClientID);
 		}
 	}
-
-	AddToNumReserved(7); // Todo: durak remove
 }
 
 CPlayer *CGameWorld::PlayerMap::GetPlayer()
