@@ -121,8 +121,6 @@ public:
 	}
 
     bool IsEmpty() const { return m_vDeck.empty(); }
-    int Size() const { return m_vDeck.size(); }
-
 	void SetTrumpSuit(int Suit) { m_TrumpSuit = Suit; }
     int GetTrumpSuit() const { return m_TrumpSuit; }
 };
@@ -272,6 +270,12 @@ public:
 	int m_InitialAttackerIndex;
 	int m_DefenderIndex;
 	CDeck m_Deck;
+
+	struct
+	{
+		CCard m_Offense;
+		CCard m_Defense;
+	} m_Attacks[MAX_DURAK_ATTACKS];
 };
 
 class CDurak : public CMinigame
@@ -280,7 +284,8 @@ class CDurak : public CMinigame
 	{
 		DURAK_TEXT_CURSOR_TOOLTIP = 0,
 		DURAK_TEXT_KEYBOARD_CONTROL,
-		DURAK_TEXT_STACK_AND_TRUMP,
+		DURAK_TEXT_CARDS_STACK,
+		DURAK_TEXT_TRUMP_CARD,
 		DURAK_TEXT_OFFSET_DEFENSE,
 		DURAK_TEXT_DEFENSE_1 = DURAK_TEXT_OFFSET_DEFENSE,
 		DURAK_TEXT_DEFENSE_2,
@@ -297,6 +302,7 @@ class CDurak : public CMinigame
 		DURAK_TEXT_OFFENSE_6,
 		NUM_DURAK_STATIC_CARDS
 	};
+
 	CCard m_aStaticCards[NUM_DURAK_STATIC_CARDS];
 	void SnapDurakCard(int SnappingClient, vec2 TablePos, CCard *pCard);
 	std::map<int, std::map<CCard*, int>> m_aLastSnapID; // [ClientID][Card] = SnapID

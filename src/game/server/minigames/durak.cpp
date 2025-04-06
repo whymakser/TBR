@@ -695,7 +695,7 @@ void CDurak::PrepareDurakSnap(int SnappingClient, CDurakGame::SSeat *pSeat)
 {
 	int NumStatic = 0;
 	for (int i = 0; i < NUM_DURAK_STATIC_CARDS; i++)
-		if (m_aStaticCards[i].m_SnapID != -1)
+		if (m_aStaticCards[i].m_Active)
 			NumStatic++;
 
 	int NumHand = 0;
@@ -779,7 +779,7 @@ void CDurak::SnapDurakCard(int SnappingClient, vec2 TablePos, CCard *pCard)
 	int ID = pCard->m_SnapID;
 	if (!Server()->IsSevendown(SnappingClient))
 	{
-		// todo 0.7: add clientinfo update, like CGameWorld::PlayerMap::UpdateSeeOthers()
+		// 0.7 uses UpdateCardSnapMapping()
 		CNetObj_PlayerInfo *pPlayerInfo = static_cast<CNetObj_PlayerInfo *>(Server()->SnapNewItem(NETOBJTYPE_PLAYERINFO, ID, sizeof(CNetObj_PlayerInfo)));
 		if(!pPlayerInfo)
 			return;
