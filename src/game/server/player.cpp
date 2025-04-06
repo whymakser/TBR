@@ -225,7 +225,7 @@ void CPlayer::Reset()
 	m_ViewCursorID = -2;
 	m_ViewCursorZoomed = false;
 
-	m_ZoomCursor = false;
+	m_ZoomCursor = true;
 	m_StandardShowDistance = m_ShowDistance;
 	m_SentShowDistance = false;
 	m_CameraInfo.Reset();

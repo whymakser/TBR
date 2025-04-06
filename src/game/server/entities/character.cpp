@@ -4292,6 +4292,10 @@ void CCharacter::HandleCursor()
 	{
 		m_DynamicCamera = CameraLength > 632.0f && CameraLength < 634.0f;
 		m_CameraMaxLength = CameraLength;
+		if (m_DynamicCamera)
+		{
+			m_pPlayer->m_ZoomCursor = false;
+		}
 	}
 
 	// normal cusor position for zoom 1.0 (level 10)
