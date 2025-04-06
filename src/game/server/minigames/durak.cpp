@@ -228,7 +228,6 @@ void CDurak::OnPlayerLeave(int ClientID)
 		{
 			if (m_vpGames[g]->m_aSeats[i].m_Player.m_ClientID == ClientID)
 			{
-				//m_vpGames[g]->OnPlayerLeave(i);
 				m_vpGames[g]->m_aSeats[i].m_Player.Reset();
 
 				if (!GameServer()->Collision()->TileUsed(TILE_DURAK_LOBBY))
@@ -676,14 +675,14 @@ void CDurak::Snap(int SnappingClient)
 	{
 		CCard *pCard = &m_aStaticCards[i];
 		if (pCard->m_Active)
-			SnapDurakCard(SnappingClient, Game, pCard);
+			SnapDurakCard(SnappingClient, pGame->m_TablePos, pCard);
 	}
 
 	// Hand cards
 	if (pSeat)
 	{
 		for (unsigned int i = 0; i < pSeat->m_Player.m_vHandCards.size(); i++)
-			SnapDurakCard(SnappingClient, Game, &pSeat->m_Player.m_vHandCards[i]);
+			SnapDurakCard(SnappingClient, pGame->m_TablePos, &pSeat->m_Player.m_vHandCards[i]);
 	}
 }
 
@@ -770,7 +769,7 @@ void CDurak::UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, i
 	OldMap = NewMap;
 }
 
-void CDurak::SnapDurakCard(int SnappingClient, int Game, CCard *pCard)
+void CDurak::SnapDurakCard(int SnappingClient, vec2 TablePos, CCard *pCard)
 {
 	int ID = pCard->m_SnapID;
 	if (!Server()->IsSevendown(SnappingClient))
@@ -807,42 +806,16 @@ void CDurak::SnapDurakCard(int SnappingClient, int Game, CCard *pCard)
 	CNetObj_Character *pCharacter = static_cast<CNetObj_Character *>(Server()->SnapNewItem(NETOBJTYPE_CHARACTER, ID, sizeof(CNetObj_Character)));
 	if(!pCharacter)
 		return;
-	vec2 Pos = m_vpGames[Game]->m_TablePos + pCard->m_TableOffset;
+	vec2 Pos = TablePos + pCard->m_TableOffset;
 	pCharacter->m_X = Pos.x;
 	pCharacter->m_Y = Pos.y;
 	pCharacter->m_Weapon = WEAPON_GUN;
-	if (Pos.x > m_vpGames[Game]->m_TablePos.x)
+	if (Pos.x > TablePos.x)
+	{
 		pCharacter->m_Angle = 804;
-
-	if(Server()->IsSevendown(SnappingClient))
-	{
-		int PlayerFlags = 0;
-		/*if (m_pPlayer->m_PlayerFlags & PLAYERFLAG_CHATTING) PlayerFlags |= 4;
-		if (m_pPlayer->m_PlayerFlags&PLAYERFLAG_SCOREBOARD) PlayerFlags |= 8;
-		if (m_pPlayer->m_PlayerFlags&PLAYERFLAG_AIM) PlayerFlags |= 16;
-		if (m_pPlayer->m_PlayerFlags&PLAYERFLAG_SPEC_CAM) PlayerFlags |= 32;*/
-
-		int Health = pCharacter->m_Health;
-		int Armor = pCharacter->m_Armor;
-		int AmmoCount = pCharacter->m_AmmoCount;
-		int Weapon = pCharacter->m_Weapon;
-		int Emote = pCharacter->m_Emote;
-		int AttackTick = pCharacter->m_AttackTick;
-
-		int Offset = sizeof(CNetObj_CharacterCore) / 4;
-		((int*)pCharacter)[Offset+0] = PlayerFlags;
-		((int*)pCharacter)[Offset+1] = Health;
-		((int*)pCharacter)[Offset+2] = Armor;
-		((int*)pCharacter)[Offset+3] = AmmoCount;
-		((int*)pCharacter)[Offset+4] = Weapon;
-		((int*)pCharacter)[Offset+5] = Emote;
-		((int*)pCharacter)[Offset+6] = AttackTick;
 	}
-	else
+	if (!Server()->IsSevendown(SnappingClient) && pCharacter->m_Angle > (int)(pi * 256.0f))
 	{
-		if(pCharacter->m_Angle > (int)(pi * 256.0f))
-		{
-			pCharacter->m_Angle -= (int)(2.0f * pi * 256.0f);
-		}
+		pCharacter->m_Angle -= (int)(2.0f * pi * 256.0f);
 	}
 }

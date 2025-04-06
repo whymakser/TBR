@@ -298,7 +298,7 @@ class CDurak : public CMinigame
 		NUM_DURAK_STATIC_CARDS
 	};
 	CCard m_aStaticCards[NUM_DURAK_STATIC_CARDS];
-	void SnapDurakCard(int SnappingClient, int Game, CCard *pCard);
+	void SnapDurakCard(int SnappingClient, vec2 TablePos, CCard *pCard);
 	std::map<int, std::map<CCard*, int>> m_aLastSnapID; // [ClientID][Card] = SnapID
 	void PrepareDurakSnap(int SnappingClient, CDurakGame::SSeat *pSeat);
 	void UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, int> &NewMap);
