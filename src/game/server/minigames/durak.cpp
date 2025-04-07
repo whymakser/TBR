@@ -9,7 +9,7 @@
 const vec2 CCard::ms_CardSizeRadius = vec2(14.f, 16.f);
 const vec2 CCard::ms_TableSizeRadius = vec2(4.9f * 32.f, 3.8f * 32.f); // 11*9 blocks around table center tile (all 4 corner tiles can be cut-out)
 const vec2 CCard::ms_AttackAreaRadius = vec2(4.f * 32.f, 1.5f * 32.f); // 8x3
-const vec2 CCard::ms_AttackAreaCenterOffset = vec2(-32.f, 32.f);
+const vec2 CCard::ms_AttackAreaCenterOffset = vec2(-32.f, 16.f);
 
 CDurak::CDurak(CGameContext *pGameServer, int Type) : CMinigame(pGameServer, Type)
 {
@@ -310,6 +310,9 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 	else if (m_aLastInput[ClientID].m_Jump == 0 && pNewInput->m_Jump != 0)
 	{
 		m_aKeyboardControl[ClientID] = true;
+		CCard Card = pGame->m_Deck.DrawCard();
+		Card.m_TableOffset.y = CCard::ms_TableSizeRadius.y;
+		pSeat->m_Player.m_vHandCards.push_back(Card);
 	}
 	else if (abs(pNewInput->m_TargetX - m_aLastInput[ClientID].m_TargetX) > 1.f || abs(pNewInput->m_TargetY - m_aLastInput[ClientID].m_TargetY) > 1.f)
 	{
@@ -321,6 +324,7 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 	m_aLastInput[ClientID].m_TargetX = pNewInput->m_TargetX;
 	m_aLastInput[ClientID].m_TargetY = pNewInput->m_TargetY;
 }
+
 
 void CDurak::SendChatToDeployedStakePlayers(int Game, const char *pMessage, int NotThisID)
 {
@@ -600,6 +604,8 @@ bool CDurak::UpdateGame(int Game)
 		return false;
 	};
 
+	// UpdateGame start
+
 	CDurakGame *pGame = m_vpGames[Game];
 	bool CancelledTimer = false;
 	int NumParticipants = pGame->NumParticipants();
@@ -677,13 +683,35 @@ bool CDurak::UpdateGame(int Game)
 			continue;
 		}
 
+		// game logic
 		if (TimerUpGameStart)
 		{
 			GameServer()->SendBroadcast("Game started!", ClientID);
 		}
 
-		// game logic
-		if (!pChr)
+		for (unsigned int w = 0; w < pGame->m_vWinners.size(); w++)
+		{
+			if (pGame->m_vWinners[w] == i && pSeat->m_Player.m_Stake >= 0)
+			{
+				pPlayer->WalletTransaction(pSeat->m_Player.m_Stake, "Durák stake return");
+				// First winner get's the stake of the loser, plus the stake of those who left inbetween
+				if (w == 0)
+				{
+					pPlayer->WalletTransaction(pGame->m_Stake, "Durák win");
+					// Reset game stake to the agreed stake for the last guy
+					pGame->m_Stake = pSeat->m_Player.m_Stake;
+				}
+				// Reset stake as we have been processed now
+				pSeat->m_Player.m_Stake = -1;
+
+				char aBuf[128];
+				str_format(aBuf, sizeof(aBuf), "'%s' won the game (#%d)", Server()->ClientName(pSeat->m_Player.m_ClientID), w + 1);
+				SendChatToParticipants(Game, aBuf);
+				break;
+			}
+		}
+
+		if (!pChr || pSeat->m_Player.m_Stake == -1)
 			continue;
 		
 		if (DefenseOngoing && pGame->GetStateBySeat(i) != DURAK_PLAYERSTATE_NONE)
@@ -704,14 +732,30 @@ bool CDurak::UpdateGame(int Game)
 		{
 			Gap = RequiredSpace / (NumCards - 1);
 		}
-		if (NumCards % 2 != 0)
-		{
-			PosX += CCard::ms_CardSizeRadius.x;
-		}
+		int Hovered = pSeat->m_Player.m_HoveredCard;
+		float PushStrength = 0.5f + min((int)NumCards - 16, 10) * 0.1f;
 		for (unsigned int c = 0; c < NumCards; c++)
 		{
 			CCard *pCard = &pSeat->m_Player.m_vHandCards[c];
-			pCard->m_TableOffset.x = PosX;
+			float Offset = 0.f;
+			if (Hovered != -1 && NumCards > 10)
+			{
+				 int Diff = c - Hovered;
+				if (Diff != 0 && abs(Diff) <= 3)
+				{
+					float Falloff = 1.f / abs(Diff);
+					if (NumCards < 15)
+						Falloff *= 0.5f;
+					float Multiplier = (float)(Diff) / abs(Diff); // -1 or +1
+					Offset = (Gap * PushStrength * Falloff) * Multiplier;
+
+					bool IsLeftMost = (c == 0);
+					bool IsRightMost = (c == NumCards - 1);
+					if ((IsLeftMost && Offset < 0) || (IsRightMost && Offset > 0))
+						Offset = 0.f;
+				}
+			}
+			pCard->m_TableOffset.x = PosX + Offset;
 			PosX += Gap;
 		}
 
@@ -760,16 +804,14 @@ bool CDurak::UpdateGame(int Game)
 			SendChatToParticipants(Game, "Game over, no Durák found");
 		}
 
-		// Dont just end here immediately
-		return EndGame(Game);
+		if (pGame->ProcessNextMove(Server()->Tick()))
+		{
+			EndGame(Game);
+		}
+		return true;
 	}
 
-	if (!pGame->m_NextMove)
-	{
-		pGame->m_NextMove = Server()->Tick() + Server()->TickSpeed() * 30;
-	}
-
-	if (pGame->m_NextMove <= Server()->Tick())
+	if (pGame->ProcessNextMove(Server()->Tick()))
 	{
 		bool AllAttacksDefended = true;
 		bool HasUndefendedAttacks = false;

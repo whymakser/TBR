@@ -1163,14 +1163,15 @@ void CGameContext::SendTuningParams(int ClientID, int Zone)
 		if ((pChr->m_Passive && !pChr->m_Super) || pChr->m_Snake.Active())
 			Tunings.m_PlayerHooking = 0.f;
 
-		if (pChr->m_DrawEditor.Active() || pChr->m_pHelicopter || pChr->m_Snake.Active())
+		bool IsDurakPlaying = Durak()->ActivelyPlaying(ClientID);
+		if (pChr->m_DrawEditor.Active() || pChr->m_pHelicopter || pChr->m_Snake.Active() || IsDurakPlaying)
 			Tunings.m_HookFireSpeed = 0.f;
 		if (pChr->m_pHelicopter || pChr->m_Snake.Active())
 			Tunings.m_HookDragAccel = 0.f;
 		if (pChr->m_pHelicopter || pChr->m_InSnake)
 			Tunings.m_HookDragSpeed = 0.f;
 
-		if (pChr->m_DrawEditor.Active() || pChr->m_pHelicopter|| pChr->m_InSnake || Durak()->ActivelyPlaying(ClientID)
+		if (pChr->m_DrawEditor.Active() || pChr->m_pHelicopter|| pChr->m_InSnake || IsDurakPlaying
 			|| (!Server()->IsSevendown(ClientID) && ((pChr->m_FreezeTime && Config()->m_SvFreezePrediction) || pChr->GetPlayer()->m_TeeControllerID != -1)))
 		{
 			Tunings.m_GroundControlSpeed = 0.f;

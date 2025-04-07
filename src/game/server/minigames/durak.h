@@ -183,7 +183,7 @@ public:
 		for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
 		{
 			m_Attacks[i].m_Offense.m_TableOffset = vec2(PosX, CCard::ms_AttackAreaCenterOffset.y);
-			m_Attacks[i].m_Defense.m_TableOffset = vec2(PosX, CCard::ms_AttackAreaCenterOffset.y + CCard::ms_CardSizeRadius.y * 1.7f);
+			m_Attacks[i].m_Defense.m_TableOffset = vec2(PosX, CCard::ms_AttackAreaCenterOffset.y + CCard::ms_CardSizeRadius.y * 1.5f);
 			PosX += CardSize;
 		}
 	}
@@ -235,7 +235,7 @@ public:
 	CDeck m_Deck;
 	int m_RoundCount;
 	int64 m_NextMove;
-	int m_NumWinners;
+	std::vector<int> m_vWinners;
 
 	SSeat *GetSeatByClient(int ClientID)
 	{
@@ -339,17 +339,6 @@ public:
 		});
 	}
 
-	bool IsGameOver()
-	{
-		int PlayersLeft = 0;
-		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
-		{
-			if (m_aSeats[i].m_Player.m_ClientID != -1 && !m_aSeats[i].m_Player.m_vHandCards.empty())
-				PlayersLeft++;
-		}
-		return PlayersLeft <= 1;
-	}
-
 	int GetNextPlayer(int CurrentIndex)
 	{
 		for (int i = 1; i < MAX_DURAK_PLAYERS; i++)
@@ -359,6 +348,13 @@ public:
 				return NextIndex;
 		}
 		return -1;
+	}
+
+	bool ProcessNextMove(int CurrentTick)
+	{
+		if (!m_NextMove)
+			m_NextMove = CurrentTick + SERVER_TICK_SPEED * 20;
+		return m_NextMove <= CurrentTick;
 	}
 
 	int NextRound(bool SuccessfulDefense = false)
@@ -444,15 +440,37 @@ public:
 			int Index = vDrawOrder[i];
 			if (m_aSeats[Index].m_Player.m_ClientID != -1)
 			{
-				while (!m_Deck.IsEmpty() && (int)m_aSeats[Index].m_Player.m_vHandCards.size() < NUM_DURAK_INITIAL_HAND_CARDS)
+				while ((int)m_aSeats[Index].m_Player.m_vHandCards.size() < NUM_DURAK_INITIAL_HAND_CARDS)
 				{
-					CCard Card = m_Deck.DrawCard();
-					Card.m_TableOffset.y = CCard::ms_TableSizeRadius.y;
-					m_aSeats[Index].m_Player.m_vHandCards.push_back(Card);
+					if (!m_Deck.IsEmpty())
+					{
+						CCard Card = m_Deck.DrawCard();
+						Card.m_TableOffset.y = CCard::ms_TableSizeRadius.y;
+						m_aSeats[Index].m_Player.m_vHandCards.push_back(Card);
+					}
+					else
+					{
+						if (m_aSeats[Index].m_Player.m_vHandCards.empty())
+						{
+							m_vWinners.push_back(Index);
+						}
+						break;
+					}
 				}
 				SortHand(m_aSeats[Index].m_Player.m_vHandCards, m_Deck.GetTrumpSuit());
 			}
 		}
+	}
+
+	bool IsGameOver()
+	{
+		int PlayersLeft = 0;
+		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+		{
+			if (m_aSeats[i].m_Player.m_ClientID != -1 && !m_aSeats[i].m_Player.m_vHandCards.empty())
+				PlayersLeft++;
+		}
+		return PlayersLeft <= 1 && m_Deck.IsEmpty();
 	}
 
 	bool TryAttack(int Seat, CCard *pCard)
@@ -570,12 +588,6 @@ public:
 		vHand.erase(std::remove_if(vHand.begin(), vHand.end(),
 			[&](const CCard &c) { return c.m_Suit == pCard->m_Suit && c.m_Rank == pCard->m_Rank; }),
 			vHand.end());
-		/* // Move to NextRound or smth, dont immediately leave
-		if (vHand.empty())
-		{
-			m_aSeats[Seat].m_Player.m_ClientID -> Wallet Transaction: m_Stake.
-			m_Stake = 0; // For next people, if anyone leaves, last guy gets it
-		}*/
 	}
 };
 
