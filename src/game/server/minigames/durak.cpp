@@ -268,11 +268,6 @@ bool CDurak::OnDropMoney(int ClientID, int Amount)
 	return false;
 }
 
-bool CDurak::ActivelyPlaying(int ClientID)
-{
-	return InDurakGame(ClientID);
-}
-
 void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 {
 	int ClientID = pCharacter->GetPlayer()->GetCID();
@@ -410,29 +405,7 @@ bool CDurak::StartGame(int Game)
 	}
 
 	pGame->DealHandCards();
-	int LowestTrump = 15;
-	pGame->m_InitialAttackerIndex = -1;
-	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
-	{
-		CDurakGame::SSeat::SPlayer *pPlayer = &pGame->m_aSeats[i].m_Player;
-		if (pPlayer->m_ClientID == -1)
-			continue;
-
-		for (unsigned int c = 0; c < pPlayer->m_vHandCards.size(); c++)
-		{
-			int Rank = pPlayer->m_vHandCards[c].m_Rank;
-			if (pPlayer->m_vHandCards[c].m_Suit == pGame->m_Deck.GetTrumpSuit() && Rank < LowestTrump)
-			{
-				pGame->m_InitialAttackerIndex = i;
-				LowestTrump = Rank;
-			}
-		}
-	}
-
-	char aBuf[128];
-	int BeginnerID = pGame->m_aSeats[pGame->m_InitialAttackerIndex].m_Player.m_ClientID;
-	str_format(aBuf, sizeof(aBuf), "Beginner determined, '%s' starts as he has lowest trump: %s", Server()->ClientName(BeginnerID), GetCardSymbol(pGame->m_Deck.GetTrumpSuit(), LowestTrump));
-	SendChatToParticipants(Game, aBuf);
+	pGame->StartRound();
 	return true;
 }
 
@@ -478,6 +451,36 @@ const char *CDurak::GetCardSymbol(int Suit, int Rank)
 		{"🃖", "🃗", "🃘", "🃙", "🃚", "🃛", "🃝", "🃞", "🃑"}  // Clubs
 	};
 	return aapCards[Suit][Rank - 6];
+}
+
+int CDurak::GetPlayerState(int ClientID)
+{
+	if (!InDurakGame(ClientID))
+		return 0;
+
+	int Game = GetGameByClient(ClientID);
+	if (Game < 0)
+		return 0;
+
+	CDurakGame *pGame = m_vpGames[Game];
+	if (!pGame->m_Running)
+		return 0;
+
+	int SeatIndex = -1;
+	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+	{
+		if (pGame->m_aSeats[i].m_Player.m_ClientID == ClientID)
+		{
+			SeatIndex = i;
+			break;
+		}
+	}
+
+	if (SeatIndex == pGame->m_AttackerIndex || SeatIndex == pGame->GetNextPlayer(pGame->m_DefenderIndex))
+		return 1;
+	if (SeatIndex == pGame->m_DefenderIndex)
+		return 2;
+	return 0;
 }
 
 void CDurak::Tick()
@@ -526,12 +529,17 @@ bool CDurak::UpdateGame(int Game)
 
 			if (CCard::InAttackArea(RelativeCursorPos))
 			{
-				if (Seat == m_vpGames[Game]->m_InitialAttackerIndex)
+				int PlayerState = GetPlayerState(pSeat->m_Player.m_ClientID);
+				if (PlayerState == DURAK_PLAYERSTATE_ATTACK)
 				{
 					if (m_vpGames[Game]->TryAttack(Seat, pCard))
+					{
+						pSeat->m_Player.m_Tooltip = CDurakGame::TOOLTIP_NONE;
 						return true;
+					}
+					pSeat->m_Player.m_Tooltip = CDurakGame::TOOLTIP_ATTACK;
 				}
-				else if (Seat == m_vpGames[Game]->m_DefenderIndex)
+				else if (PlayerState == DURAK_PLAYERSTATE_DEFEND)
 				{
 					bool TryingDefend = false;
 					for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
@@ -541,7 +549,12 @@ bool CDurak::UpdateGame(int Game)
 						{
 							TryingDefend = true;
 							if (m_vpGames[Game]->TryDefend(Seat, i, pCard))
+							{
+								pSeat->m_Player.m_Tooltip = CDurakGame::TOOLTIP_NONE;
 								return true;
+							}
+
+							pSeat->m_Player.m_Tooltip = CDurakGame::TOOLTIP_DEFEND;
 							break;
 						}
 					}
@@ -549,7 +562,12 @@ bool CDurak::UpdateGame(int Game)
 					if (!TryingDefend)
 					{
 						if (m_vpGames[Game]->TryPush(Seat, pCard))
+						{
+							pSeat->m_Player.m_Tooltip = CDurakGame::TOOLTIP_NONE;
 							return true;
+						}
+
+						pSeat->m_Player.m_Tooltip = CDurakGame::TOOLTIP_PUSH;
 					}
 				}
 			}
@@ -590,6 +608,7 @@ bool CDurak::UpdateGame(int Game)
 
 		if (EndGame(Game))
 		{
+			// todo: check endgame here or below? or both?
 			// will only trigger if game is running and successfully ended
 			return true;
 		}
@@ -690,6 +709,114 @@ bool CDurak::UpdateGame(int Game)
 		pSeat->m_Player.m_LastCursorX = CursorPos.x;
 	}
 
+	// Handle game logic
+	if (!pGame->m_Running)
+		return false;
+	
+	// Prüfe, ob Spielende erreicht wurde
+	if (pGame->IsGameOver())
+	{
+		// Finde den Durak (letzten Spieler mit Karten)
+		int durakClientID = -1;
+		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+		{
+			if (pGame->m_aSeats[i].m_Player.m_ClientID != -1 && !pGame->m_aSeats[i].m_Player.m_vHandCards.empty())
+			{
+				durakClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
+				break;
+			}
+		}
+
+		if (durakClientID != -1)
+		{
+			char aBuf[128];
+			str_format(aBuf, sizeof(aBuf), "Spieler %s ist der Durak!", Server()->ClientName(durakClientID));
+			SendChatToParticipants(Game, aBuf);
+		}
+		else
+		{
+			SendChatToParticipants(Game, "Spiel zu Ende, kein Durak gefunden!");
+		}
+
+		return EndGame(Game);
+	}
+
+	bool TimerUpOrAgreed = false;
+
+	// Prüfen, ob eine Runde abgeschlossen wurde:
+	// 1. Alle Angriffe wurden abgewehrt (Defense ist überall gültig wo Offense gültig ist)
+	// 2. Mindestens ein Angriff konnte nicht abgewehrt werden
+	// 3. Keine aktiven Angriffe mehr auf dem Tisch
+
+	bool allAttacksDefended = true;
+	bool hasUndefendedAttacks = false;
+	bool hasActiveAttacks = false;
+
+	for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
+	{
+		if (pGame->m_Attacks[i].m_Offense.Valid())
+		{
+			hasActiveAttacks = true;
+
+			if (!pGame->m_Attacks[i].m_Defense.Valid())
+			{
+				allAttacksDefended = false;
+				hasUndefendedAttacks = true;
+			}
+		}
+	}
+
+	// Rundenüberprüfungen:
+	// 1. Wenn alle Angriffe verteidigt wurden, beginnt eine neue Runde mit dem nächsten Spieler als Angreifer
+	if (hasActiveAttacks && allAttacksDefended && TimerUpOrAgreed)
+	{
+		// Eine neue Runde beginnen, wenn alle Angriffe abgewehrt wurden
+		pGame->StartRound(true);
+		return true;
+	}
+	// 2. Wenn der Verteidiger mindestens einen Angriff nicht abwehren konnte, muss er alle Karten aufnehmen
+	else if (hasUndefendedAttacks && TimerUpOrAgreed)
+	{
+		// Verteidiger nimmt alle Karten vom Tisch auf
+		for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
+		{
+			if (pGame->m_Attacks[i].m_Offense.Valid())
+			{
+				CCard OffenseCard = pGame->m_Attacks[i].m_Offense;
+				OffenseCard.m_TableOffset.y = CCard::ms_TableSizeRadius.y;
+				pGame->m_aSeats[pGame->m_DefenderIndex].m_Player.m_vHandCards.push_back(OffenseCard);
+
+				if (pGame->m_Attacks[i].m_Defense.Valid())
+				{
+					CCard DefenseCard = pGame->m_Attacks[i].m_Defense;
+					DefenseCard.m_TableOffset.y = CCard::ms_TableSizeRadius.y;
+					pGame->m_aSeats[pGame->m_DefenderIndex].m_Player.m_vHandCards.push_back(DefenseCard);
+				}
+
+				// Karten vom Tisch entfernen
+				pGame->m_Attacks[i].m_Offense.Invalidate();
+				pGame->m_Attacks[i].m_Defense.Invalidate();
+			}
+		}
+
+		// Sortiere die Handkarten des Spielers
+		pGame->SortHand(pGame->m_aSeats[pGame->m_DefenderIndex].m_Player.m_vHandCards, pGame->m_Deck.GetTrumpSuit());
+
+		// Karten nach der Runde ziehen
+		pGame->DrawCardsAfterRound();
+
+		char aBuf[128];
+		int DefenderID = pGame->m_aSeats[pGame->m_DefenderIndex].m_Player.m_ClientID;
+		str_format(aBuf, sizeof(aBuf), "Spieler %s konnte nicht alle Angriffe abwehren und muss die Karten nehmen!", Server()->ClientName(DefenderID));
+		SendChatToParticipants(Game, aBuf);
+
+		// Skipping defender as attacker
+		pGame->m_AttackerIndex = pGame->m_InitialAttackerIndex = pGame->GetNextPlayer(pGame->m_DefenderIndex);
+		pGame->m_DefenderIndex = pGame->GetNextPlayer(pGame->m_InitialAttackerIndex);
+		pGame->StartRound();
+		return true;
+	}
+
 	// Safely return and let the tick function know we are still alive
 	return false;
 }
@@ -728,10 +855,10 @@ void CDurak::Snap(int SnappingClient)
 	// Attack cards
 	for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
 	{
-		if (pGame->m_Attacks[i].m_Offense.Valid())
-			SnapDurakCard(SnappingClient, pGame->m_TablePos, &pGame->m_Attacks[i].m_Offense);
 		if (pGame->m_Attacks[i].m_Defense.Valid())
 			SnapDurakCard(SnappingClient, pGame->m_TablePos, &pGame->m_Attacks[i].m_Defense);
+		if (pGame->m_Attacks[i].m_Offense.Valid())
+			SnapDurakCard(SnappingClient, pGame->m_TablePos, &pGame->m_Attacks[i].m_Offense);
 	}
 
 	// Static cards
@@ -779,6 +906,15 @@ void CDurak::PrepareStaticCards(int SnappingClient, int Game, int ClientID)
 					pCard->SetKeyboardControl(m_aKeyboardControl[ClientID]);
 				}
 			} break;
+			case DURAK_TEXT_CURSOR_TOOLTIP:
+			{
+				if (InGame)
+				{
+					CDurakGame::SSeat *pSeat = pGame->GetSeatByClient(ClientID);
+					int Tooltip = pSeat->m_Player.m_Tooltip;
+					pCard->m_Active = Tooltip != CDurakGame::TOOLTIP_NONE;
+				}
+			} break;
 		}
 	}
 }
@@ -818,10 +954,10 @@ void CDurak::PrepareDurakSnap(int SnappingClient, CDurakGame *pGame, CDurakGame:
 	// Attack cards
 	for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
 	{
-		if (pGame->m_Attacks[i].m_Offense.Valid())
-			pGame->m_Attacks[i].m_Offense.m_SnapID = NewSnapMap[&pGame->m_Attacks[i].m_Offense] = SnapID--;
 		if (pGame->m_Attacks[i].m_Defense.Valid())
 			pGame->m_Attacks[i].m_Defense.m_SnapID = NewSnapMap[&pGame->m_Attacks[i].m_Defense] = SnapID--;
+		if (pGame->m_Attacks[i].m_Offense.Valid())
+			pGame->m_Attacks[i].m_Offense.m_SnapID = NewSnapMap[&pGame->m_Attacks[i].m_Offense] = SnapID--;
 	}
 
 	// Static cards
