@@ -2644,7 +2644,7 @@ bool CPlayer::MinigameRequestTick()
 
 void CPlayer::MinigameAfkCheck()
 {
-	if (!IsMinigame() || !GameServer()->Config()->m_SvMinigameAfkAutoLeave || m_IsDummy)
+	if (!IsMinigame() || !GameServer()->Config()->m_SvMinigameAfkAutoLeave || m_IsDummy || GameServer()->Durak()->InDurakGame(m_ClientID))
 		return;
 
 	int TimeLeft = ((m_LastMovementTick + Server()->TickSpeed() * GameServer()->Config()->m_SvMinigameAfkAutoLeave) - Server()->Tick()) / Server()->TickSpeed();
