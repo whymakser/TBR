@@ -235,6 +235,7 @@ public:
 	CDeck m_Deck;
 	int m_RoundCount;
 	int64 m_NextMove;
+	int m_NumWinners;
 
 	SSeat *GetSeatByClient(int ClientID)
 	{
@@ -266,8 +267,11 @@ public:
 	{
 		int Num = 0;
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
-			if (m_aSeats[i].m_Player.m_ClientID != -1 && m_Stake != -1 && m_aSeats[i].m_Player.m_Stake == m_Stake)
-				Num++;
+			if (m_aSeats[i].m_Player.m_ClientID != -1)
+			{
+				if (m_Running || (m_Stake != -1 && m_aSeats[i].m_Player.m_Stake == m_Stake))
+					Num++;
+			}
 		return Num;
 	}
 
@@ -488,12 +492,9 @@ public:
 		// Assign card to attack slot
 		m_Attacks[Used].m_Offense.m_Suit = pCard->m_Suit;
 		m_Attacks[Used].m_Offense.m_Rank = pCard->m_Rank;
-
 		// Remove card from hand
-		auto &vHand = m_aSeats[Seat].m_Player.m_vHandCards;
-		vHand.erase(std::remove_if(vHand.begin(), vHand.end(),
-			[&](const CCard &c) { return c.m_Suit == pCard->m_Suit && c.m_Rank == pCard->m_Rank; }),
-			vHand.end());
+		RemoveCard(Seat, pCard);
+
 		m_NextMove = 0;
 		return true;
 	}
@@ -515,11 +516,8 @@ public:
 
 		m_Attacks[Attack].m_Defense.m_Suit = pCard->m_Suit;
 		m_Attacks[Attack].m_Defense.m_Rank = pCard->m_Rank;
+		RemoveCard(Seat, pCard);
 
-		auto &vHand = m_aSeats[Seat].m_Player.m_vHandCards;
-		vHand.erase(std::remove_if(vHand.begin(), vHand.end(),
-			[&](const CCard &c) { return c.m_Suit == pCard->m_Suit && c.m_Rank == pCard->m_Rank; }),
-			vHand.end());
 		m_NextMove = 0;
 		return true;
 	}
@@ -554,11 +552,7 @@ public:
 			{
 				pair.m_Offense.m_Suit = pCard->m_Suit;
 				pair.m_Offense.m_Rank = pCard->m_Rank;
-
-				auto &vHand = m_aSeats[Seat].m_Player.m_vHandCards;
-				vHand.erase(std::remove_if(vHand.begin(), vHand.end(),
-					[&](const CCard &c) { return c.m_Suit == pCard->m_Suit && c.m_Rank == pCard->m_Rank; }),
-					vHand.end());
+				RemoveCard(Seat, pCard);
 
 				// Successfully moved
 				m_AttackerIndex = m_DefenderIndex;
@@ -568,6 +562,20 @@ public:
 			}
 		}
 		return false;
+	}
+
+	void RemoveCard(int Seat, CCard *pCard)
+	{
+		auto &vHand = m_aSeats[Seat].m_Player.m_vHandCards;
+		vHand.erase(std::remove_if(vHand.begin(), vHand.end(),
+			[&](const CCard &c) { return c.m_Suit == pCard->m_Suit && c.m_Rank == pCard->m_Rank; }),
+			vHand.end());
+		/* // Move to NextRound or smth, dont immediately leave
+		if (vHand.empty())
+		{
+			m_aSeats[Seat].m_Player.m_ClientID -> Wallet Transaction: m_Stake.
+			m_Stake = 0; // For next people, if anyone leaves, last guy gets it
+		}*/
 	}
 };
 

@@ -118,6 +118,7 @@ private:
 		// See others
 		int m_SeeOthersState;
 		int m_TotalOverhang;
+		int m_NumPages;
 		int m_NumSeeOthers;
 		bool m_aWasSeeOthers[MAX_CLIENTS];
 		void DoSeeOthers();

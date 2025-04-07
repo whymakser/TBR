@@ -232,6 +232,11 @@ void CDurak::OnPlayerLeave(int ClientID, bool Disconnect)
 		{
 			if (m_vpGames[g]->m_aSeats[i].m_Player.m_ClientID == ClientID)
 			{
+				if (m_vpGames[g]->m_Running)
+				{
+					// Add stake for the winner, or simply the next winner. if everybody leaves, last person gets the win
+					m_vpGames[g]->m_Stake += m_vpGames[g]->m_aSeats[i].m_Player.m_Stake;
+				}
 				m_vpGames[g]->m_aSeats[i].m_Player.Reset();
 
 				if (!GameServer()->Collision()->TileUsed(TILE_DURAK_LOBBY))
@@ -338,8 +343,14 @@ void CDurak::SendChatToParticipants(int Game, const char *pMessage)
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
 		int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
-		if (ClientID != -1 && pGame->m_Stake != -1 && pGame->m_aSeats[i].m_Player.m_Stake == pGame->m_Stake)
+		if (ClientID == -1)
+			continue;
+
+		// Stake can change as soon as players leave, so no money is removed. That means when the game is running, a player is automatically participant
+		if (pGame->m_Running || (pGame->m_Stake != -1 && pGame->m_aSeats[i].m_Player.m_Stake == pGame->m_Stake))
+		{
 			GameServer()->SendChatTarget(ClientID, pMessage);
+		}
 	}
 }
 
@@ -391,9 +402,7 @@ bool CDurak::StartGame(int Game)
 		}
 
 		CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
-		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "Durák stake");
-		pPlayer->WalletTransaction(-pGame->m_Stake, aBuf);
+		pPlayer->WalletTransaction(-pGame->m_Stake, "Durák stake");
 
 		GameServer()->SetMinigame(ClientID, MINIGAME_DURAK, true, false);
 		pPlayer->m_ForceSpawnPos = GameServer()->Collision()->GetPos(pSeat->m_MapIndex);
@@ -751,12 +760,13 @@ bool CDurak::UpdateGame(int Game)
 			SendChatToParticipants(Game, "Game over, no Durák found");
 		}
 
+		// Dont just end here immediately
 		return EndGame(Game);
 	}
 
 	if (!pGame->m_NextMove)
 	{
-		pGame->m_NextMove = Server()->Tick() + Server()->TickSpeed() * 20;
+		pGame->m_NextMove = Server()->Tick() + Server()->TickSpeed() * 30;
 	}
 
 	if (pGame->m_NextMove <= Server()->Tick())
@@ -827,8 +837,8 @@ bool CDurak::UpdateGame(int Game)
 			int AttackerID = pGame->m_aSeats[pGame->m_InitialAttackerIndex].m_Player.m_ClientID;
 			str_format(aBuf, sizeof(aBuf), "'%s' took too long and was skipped", Server()->ClientName(AttackerID));
 			SendChatToParticipants(Game, aBuf);
-			// Just skip this guy
-			pGame->NextRound();
+			// Just skip this guy // Emulate successful defense, so that the next guy's turn is now and he is not skipped.
+			pGame->NextRound(true);
 		}
 	}
 
