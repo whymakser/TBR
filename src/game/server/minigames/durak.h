@@ -28,6 +28,7 @@ public:
 	static const vec2 ms_CardSizeRadius;
 	static const vec2 ms_TableSizeRadius;
 	static const vec2 ms_AttackAreaRadius;
+	static const vec2 ms_AttackAreaCenterOffset;
 
 	CCard() : CCard(-1, -1) {}
 	CCard(int Suit, int Rank) : m_Suit(Suit), m_Rank(Rank)
@@ -52,6 +53,14 @@ public:
 	bool m_Active;
 
 	bool Valid() { return m_Suit != -1 && m_Rank != -1; }
+	void Invalidate() { m_Suit = m_Rank = -1; }
+
+	static bool InAttackArea(vec2 Target) // Target - m_TablePos
+	{
+		Target.y += DURAK_CARD_NAME_OFFSET;
+		return (ms_AttackAreaCenterOffset.x - ms_AttackAreaRadius.x < Target.x && ms_AttackAreaCenterOffset.x + ms_AttackAreaRadius.x > Target.x
+			&& ms_AttackAreaCenterOffset.y - ms_AttackAreaRadius.y < Target.y && ms_AttackAreaCenterOffset.y + ms_AttackAreaRadius.y > Target.y);
+	}
 
 	bool MouseOver(vec2 Target) // Target - m_TablePos
 	{
@@ -84,6 +93,11 @@ public:
             return false;
         return m_Suit == Other.m_Suit && m_Rank > Other.m_Rank;
     }
+
+	void SetKeyboardControl(bool Activated)
+	{
+		m_Suit = Activated ? -2 : -3;
+	}
 };
 
 class CDeck
@@ -121,8 +135,12 @@ public:
 	}
 
     bool IsEmpty() const { return m_vDeck.empty(); }
+	int Size() const { return m_vDeck.size(); }
+
 	void SetTrumpSuit(int Suit) { m_TrumpSuit = Suit; }
     int GetTrumpSuit() const { return m_TrumpSuit; }
+
+	CCard *GetTrumpCard() { return m_vDeck.size() ? &m_vDeck[0] : 0; }
 };
 
 class CDurakGame
@@ -149,6 +167,16 @@ public:
 		{
 			m_aSeats[i].m_MapIndex = -1;
 			m_aSeats[i].m_Player.Reset();
+		}
+		float CardSize = CCard::ms_CardSizeRadius.x + 4.f; // Gap
+		float PosX = CCard::ms_AttackAreaCenterOffset.x - (MAX_DURAK_ATTACKS / 2) * CardSize;
+		for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
+		{
+			m_Attacks[i].m_Offense.m_TableOffset.y = CCard::ms_AttackAreaCenterOffset.y;
+			m_Attacks[i].m_Offense.m_TableOffset.x = PosX;
+			m_Attacks[i].m_Defense.m_TableOffset.y = CCard::ms_AttackAreaCenterOffset.y + CCard::ms_CardSizeRadius.y;
+			m_Attacks[i].m_Defense.m_TableOffset.x = PosX;
+			PosX += CardSize;
 		}
 	}
 
@@ -234,6 +262,149 @@ public:
 		});
 	}
 
+	void DrawCardsAfterRound()
+	{
+		int Start = m_InitialAttackerIndex;
+		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+		{
+			int Index = (Start + i) % MAX_DURAK_PLAYERS;
+			auto &Player = m_aSeats[Index].m_Player;
+			if (Player.m_ClientID != -1)
+			{
+				while ((int)Player.m_vHandCards.size() < NUM_DURAK_INITIAL_HAND_CARDS && !m_Deck.IsEmpty())
+				{
+					CCard Card = m_Deck.DrawCard();
+					Card.m_TableOffset.y = CCard::ms_TableSizeRadius.y;
+					Player.m_vHandCards.push_back(Card);
+				}
+				SortHand(Player.m_vHandCards, m_Deck.GetTrumpSuit());
+			}
+		}
+	}
+
+	bool IsGameOver()
+	{
+		int PlayersLeft = 0;
+		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+		{
+			if (m_aSeats[i].m_Player.m_ClientID != -1 && !m_aSeats[i].m_Player.m_vHandCards.empty())
+				PlayersLeft++;
+		}
+		return PlayersLeft <= 1 && m_Deck.IsEmpty();
+	}
+
+	bool TryAttack(int Seat, CCard *pCard)
+	{
+		if (Seat != m_InitialAttackerIndex || !pCard->Valid())
+			return false;
+
+		int Used = 0;
+		for (auto &pair : m_Attacks)
+			if (pair.m_Offense.Valid())
+				Used++;
+
+		if (Used >= MAX_DURAK_ATTACKS)
+			return false;
+
+		// If not first attack, card has to match existing ranks on table
+		if (Used > 0)
+		{
+			bool Match = false;
+			for (auto &pair : m_Attacks)
+			{
+				if ((pair.m_Offense.Valid() && pair.m_Offense.m_Rank == pCard->m_Rank) ||
+					(pair.m_Defense.Valid() && pair.m_Defense.m_Rank == pCard->m_Rank))
+				{
+					Match = true;
+					break;
+				}
+			}
+			if (!Match)
+				return false;
+		}
+
+		// Assign card to attack slot
+		m_Attacks[Used].m_Offense.m_Suit = pCard->m_Suit;
+		m_Attacks[Used].m_Offense.m_Rank = pCard->m_Rank;
+
+		// Remove card from hand
+		auto &vHand = m_aSeats[Seat].m_Player.m_vHandCards;
+		vHand.erase(std::remove_if(vHand.begin(), vHand.end(),
+			[&](const CCard &c) { return c.m_Suit == pCard->m_Suit && c.m_Rank == pCard->m_Rank; }),
+			vHand.end());
+
+		return true;
+	}
+
+	bool TryDefend(int Seat, int Attack, CCard *pCard)
+	{
+		if (Seat != m_DefenderIndex || !pCard->Valid())
+			return false;
+
+		if (Attack < 0 || Attack >= MAX_DURAK_ATTACKS)
+			return false;
+
+		CCard &AttackCard = m_Attacks[Attack].m_Offense;
+		if (!AttackCard.Valid() || m_Attacks[Attack].m_Defense.Valid())
+			return false;
+
+		if (!pCard->IsStrongerThan(AttackCard, m_Deck.GetTrumpSuit()))
+			return false;
+
+		m_Attacks[Attack].m_Defense.m_Suit = pCard->m_Suit;
+		m_Attacks[Attack].m_Defense.m_Rank = pCard->m_Rank;
+
+		auto &vHand = m_aSeats[Seat].m_Player.m_vHandCards;
+		vHand.erase(std::remove_if(vHand.begin(), vHand.end(),
+			[&](const CCard &c) { return c.m_Suit == pCard->m_Suit && c.m_Rank == pCard->m_Rank; }),
+			vHand.end());
+
+		return true;
+	}
+
+	bool TryPush(int Seat, CCard *pCard)
+	{
+		if (!pCard->Valid())
+			return false;
+
+		int TargetRank = -1;
+		for (auto &pair : m_Attacks)
+		{
+			if (pair.m_Offense.Valid())
+			{
+				if (pair.m_Defense.Valid()) // No defense has happened already
+					return false;
+
+				if (TargetRank == -1)
+					TargetRank = pair.m_Offense.m_Rank;
+				else if (pair.m_Offense.m_Rank != TargetRank)
+					return false; // Can only push on same ranks
+			}
+		}
+
+		if (TargetRank == -1 || pCard->m_Rank != TargetRank)
+			return false;
+
+		// Find first free attack slot
+		for (auto &pair : m_Attacks)
+		{
+			if (!pair.m_Offense.Valid())
+			{
+				pair.m_Offense.m_Suit = pCard->m_Suit;
+				pair.m_Offense.m_Rank = pCard->m_Rank;
+
+				auto &vHand = m_aSeats[Seat].m_Player.m_vHandCards;
+				vHand.erase(std::remove_if(vHand.begin(), vHand.end(),
+					[&](const CCard &c) { return c.m_Suit == pCard->m_Suit && c.m_Rank == pCard->m_Rank; }),
+					vHand.end());
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	struct SSeat
 	{
 		int m_MapIndex;
@@ -282,32 +453,19 @@ class CDurak : public CMinigame
 {
 	enum
 	{
-		DURAK_TEXT_CURSOR_TOOLTIP = 0,
-		DURAK_TEXT_KEYBOARD_CONTROL,
-		DURAK_TEXT_CARDS_STACK,
+		DURAK_TEXT_CARDS_STACK = 0,
 		DURAK_TEXT_TRUMP_CARD,
-		DURAK_TEXT_OFFSET_DEFENSE,
-		DURAK_TEXT_DEFENSE_1 = DURAK_TEXT_OFFSET_DEFENSE,
-		DURAK_TEXT_DEFENSE_2,
-		DURAK_TEXT_DEFENSE_3,
-		DURAK_TEXT_DEFENSE_4,
-		DURAK_TEXT_DEFENSE_5,
-		DURAK_TEXT_DEFENSE_6,
-		DURAK_TEXT_OFFSET_OFFENSE,
-		DURAK_TEXT_OFFENSE_1 = DURAK_TEXT_OFFSET_OFFENSE,
-		DURAK_TEXT_OFFENSE_2,
-		DURAK_TEXT_OFFENSE_3,
-		DURAK_TEXT_OFFENSE_4,
-		DURAK_TEXT_OFFENSE_5,
-		DURAK_TEXT_OFFENSE_6,
+		DURAK_TEXT_KEYBOARD_CONTROL,
+		DURAK_TEXT_CURSOR_TOOLTIP,
 		NUM_DURAK_STATIC_CARDS
 	};
 
 	CCard m_aStaticCards[NUM_DURAK_STATIC_CARDS];
-	void SnapDurakCard(int SnappingClient, vec2 TablePos, CCard *pCard);
+	void PrepareStaticCards(int SnappingClient, int Game, int ClientID);
 	std::map<int, std::map<CCard*, int>> m_aLastSnapID; // [ClientID][Card] = SnapID
-	void PrepareDurakSnap(int SnappingClient, CDurakGame::SSeat *pSeat);
+	void PrepareDurakSnap(int SnappingClient, CDurakGame *pGame, CDurakGame::SSeat *pSeat);
 	void UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, int> &NewMap);
+	void SnapDurakCard(int SnappingClient, vec2 TablePos, CCard *pCard);
 
 	int m_aDurakNumReserved[MAX_CLIENTS];
 	int64 m_aLastSeatOccupiedMsg[MAX_CLIENTS];

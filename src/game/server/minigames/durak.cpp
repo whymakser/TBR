@@ -9,6 +9,7 @@
 const vec2 CCard::ms_CardSizeRadius = vec2(14.f, 16.f);
 const vec2 CCard::ms_TableSizeRadius = vec2(4.9f * 32.f, 3.8f * 32.f); // 11*9 blocks around table center tile (all 4 corner tiles can be cut-out)
 const vec2 CCard::ms_AttackAreaRadius = vec2(3.5f * 32.f, 32.f); // 7x2
+const vec2 CCard::ms_AttackAreaCenterOffset = vec2(-32.f, 32.f);
 
 CDurak::CDurak(CGameContext *pGameServer, int Type) : CMinigame(pGameServer, Type)
 {
@@ -20,6 +21,9 @@ CDurak::CDurak(CGameContext *pGameServer, int Type) : CMinigame(pGameServer, Typ
 		m_aKeyboardControl[i] = false;
 		m_aDurakNumReserved[i] = 0;
 	}
+	m_aStaticCards[DURAK_TEXT_CARDS_STACK].m_TableOffset = vec2(3.9f * 32.f, 32.f);
+	m_aStaticCards[DURAK_TEXT_TRUMP_CARD].m_TableOffset = vec2(4.9f * 32.f, 32.f);
+	m_aStaticCards[DURAK_TEXT_KEYBOARD_CONTROL].m_TableOffset = vec2(3.f * 32.f, -2.f * 32.f);
 	for (auto &Game : m_vpGames)
 		delete Game;
 	m_vpGames.clear();
@@ -296,10 +300,11 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 			pCard->SetHovered(false);
 			pSeat->m_Player.m_HoveredCard = mod(pSeat->m_Player.m_HoveredCard + pNewInput->m_Direction, pSeat->m_Player.m_vHandCards.size());
 		}
+		// Update pCard
 		pCard = &pSeat->m_Player.m_vHandCards[pSeat->m_Player.m_HoveredCard];
 		if (pCard->m_HoverState == CCard::HOVERSTATE_NONE)
 		{
-			pSeat->m_Player.m_vHandCards[pSeat->m_Player.m_HoveredCard].SetHovered(true);
+			pCard->SetHovered(true);
 		}
 	}
 	else if (m_aLastInput[ClientID].m_Jump == 0 && pNewInput->m_Jump != 0)
@@ -459,6 +464,10 @@ const char *CDurak::GetCardSymbol(int Suit, int Rank)
 		static const char *pBackCard = "🂠";
 		return pBackCard;
 	}
+	if (Suit == -2)
+		return "⌨☒";
+	if (Suit == -3)
+		return "⌨☐";
 	if (Suit < 0 || Suit > 3 || Rank < 6 || Rank > 14) {
 		return "??";
 	}
@@ -489,7 +498,7 @@ bool CDurak::UpdateGame(int Game)
 		CDurakGame::SSeat *pSeat = &m_vpGames[Game]->m_aSeats[Seat];
 		if (m_aKeyboardControl[pSeat->m_Player.m_ClientID])
 		{
-			return;
+			return false;
 		}
 		CCard *pCard = &pSeat->m_Player.m_vHandCards[Card];
 		vec2 RelativeCursorPos = CursorPos - m_vpGames[Game]->m_TablePos;
@@ -514,6 +523,36 @@ bool CDurak::UpdateGame(int Game)
 		{
 			pCard->SetHovered(false);
 			pSeat->m_Player.m_HoveredCard = -1;
+
+			if (CCard::InAttackArea(RelativeCursorPos))
+			{
+				if (Seat == m_vpGames[Game]->m_InitialAttackerIndex)
+				{
+					if (m_vpGames[Game]->TryAttack(Seat, pCard))
+						return true;
+				}
+				else if (Seat == m_vpGames[Game]->m_DefenderIndex)
+				{
+					bool TryingDefend = false;
+					for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
+					{
+						CCard *pOffense = &m_vpGames[Game]->m_Attacks[i].m_Offense;
+						if (pOffense->MouseOver(RelativeCursorPos))
+						{
+							TryingDefend = true;
+							if (m_vpGames[Game]->TryDefend(Seat, i, pCard))
+								return true;
+							break;
+						}
+					}
+
+					if (!TryingDefend)
+					{
+						if (m_vpGames[Game]->TryPush(Seat, pCard))
+							return true;
+					}
+				}
+			}
 		}
 		else
 		{
@@ -529,6 +568,7 @@ bool CDurak::UpdateGame(int Game)
 				pSeat->m_Player.m_HoveredCard = -1;
 			}
 		}
+		return false;
 	};
 
 	CDurakGame *pGame = m_vpGames[Game];
@@ -638,12 +678,14 @@ bool CDurak::UpdateGame(int Game)
 		if (pSeat->m_Player.m_LastCursorX < CursorPos.x)
 		{
 			for (unsigned int c = 0; c < NumCards; c++)
-				HandleCardHover(Game, i, c, CursorPos, Dragging);
+				if (HandleCardHover(Game, i, c, CursorPos, Dragging))
+					break;
 		}
 		else
 		{
 			for (int c = (int)NumCards - 1; c >= 0; c--)
-				HandleCardHover(Game, i, c, CursorPos, Dragging);
+				if (HandleCardHover(Game, i, c, CursorPos, Dragging))
+					break;
 		}
 		pSeat->m_Player.m_LastCursorX = CursorPos.x;
 	}
@@ -663,6 +705,7 @@ void CDurak::Snap(int SnappingClient)
 		ClientID = pSnap->GetSpectatorID();
 
 	int Game = GetGameByClient(ClientID);
+	PrepareStaticCards(SnappingClient, Game, ClientID);
 	if (Game < 0)
 	{
 		// render default fallback tabledesign
@@ -670,10 +713,26 @@ void CDurak::Snap(int SnappingClient)
 	}
 
 	CDurakGame *pGame = m_vpGames[Game];
-	CDurakGame::SSeat *pSeat = pGame->GetSeatByClient(ClientID);
+	CDurakGame::SSeat *pSeat = pGame->GetSeatByClient(ClientID); // Maybe put SnappingClient in here to avoid checking other cards in pause
 
 	// Prepare snap ids..
-	PrepareDurakSnap(SnappingClient, pSeat);
+	PrepareDurakSnap(SnappingClient, pGame, pSeat);
+
+	// Hand cards
+	if (pSeat)
+	{
+		for (unsigned int i = 0; i < pSeat->m_Player.m_vHandCards.size(); i++)
+			SnapDurakCard(SnappingClient, pGame->m_TablePos, &pSeat->m_Player.m_vHandCards[i]);
+	}
+
+	// Attack cards
+	for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
+	{
+		if (pGame->m_Attacks[i].m_Offense.Valid())
+			SnapDurakCard(SnappingClient, pGame->m_TablePos, &pGame->m_Attacks[i].m_Offense);
+		if (pGame->m_Attacks[i].m_Defense.Valid())
+			SnapDurakCard(SnappingClient, pGame->m_TablePos, &pGame->m_Attacks[i].m_Defense);
+	}
 
 	// Static cards
 	for (int i = 0; i < NUM_DURAK_STATIC_CARDS; i++)
@@ -682,16 +741,49 @@ void CDurak::Snap(int SnappingClient)
 		if (pCard->m_Active)
 			SnapDurakCard(SnappingClient, pGame->m_TablePos, pCard);
 	}
+}
 
-	// Hand cards
-	if (pSeat)
+void CDurak::PrepareStaticCards(int SnappingClient, int Game, int ClientID)
+{
+	bool InGame = Game >= 0 && m_vpGames[Game]->m_Running;
+	CDurakGame *pGame = InGame ? m_vpGames[Game] : 0;
+	for (int i = 0; i < NUM_DURAK_STATIC_CARDS; i++)
 	{
-		for (unsigned int i = 0; i < pSeat->m_Player.m_vHandCards.size(); i++)
-			SnapDurakCard(SnappingClient, pGame->m_TablePos, &pSeat->m_Player.m_vHandCards[i]);
+		CCard *pCard = &m_aStaticCards[i];
+		pCard->m_Active = false;
+		switch (i)
+		{
+			case DURAK_TEXT_CARDS_STACK:
+			{
+				if (InGame && pGame->m_Deck.Size() > 1)
+				{
+					pCard->m_Active = true;
+					pCard->Invalidate();
+				}
+			} break;
+			case DURAK_TEXT_TRUMP_CARD:
+			{
+				if (InGame && !pGame->m_Deck.IsEmpty())
+				{
+					CCard *pTrumpCard = pGame->m_Deck.GetTrumpCard();
+					pCard->m_Suit = pTrumpCard->m_Suit;
+					pCard->m_Rank = pTrumpCard->m_Rank;
+					pCard->m_Active = true;
+				}
+			} break;
+			case DURAK_TEXT_KEYBOARD_CONTROL:
+			{
+				if (InGame)
+				{
+					pCard->m_Active = true;
+					pCard->SetKeyboardControl(m_aKeyboardControl[ClientID]);
+				}
+			} break;
+		}
 	}
 }
 
-void CDurak::PrepareDurakSnap(int SnappingClient, CDurakGame::SSeat *pSeat)
+void CDurak::PrepareDurakSnap(int SnappingClient, CDurakGame *pGame, CDurakGame::SSeat *pSeat)
 {
 	int NumStatic = 0;
 	for (int i = 0; i < NUM_DURAK_STATIC_CARDS; i++)
@@ -713,22 +805,31 @@ void CDurak::PrepareDurakSnap(int SnappingClient, CDurakGame::SSeat *pSeat)
 	std::map<CCard *, int> NewSnapMap;
 	int SnapID = GameServer()->m_World.GetFirstDurakID(SnappingClient);
 
-	// Static cards
-	for (int i = 0; i < NUM_DURAK_STATIC_CARDS; i++)
-	{
-		CCard *pCard = &m_aStaticCards[i];
-		if (pCard->m_Active)
-		{
-			pCard->m_SnapID = NewSnapMap[pCard] = SnapID--;
-		}
-	}
-
 	// Hand cards
 	if (pSeat)
 	{
 		for (unsigned int i = 0; i < pSeat->m_Player.m_vHandCards.size(); i++)
 		{
 			CCard *pCard = &pSeat->m_Player.m_vHandCards[i];
+			pCard->m_SnapID = NewSnapMap[pCard] = SnapID--;
+		}
+	}
+
+	// Attack cards
+	for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
+	{
+		if (pGame->m_Attacks[i].m_Offense.Valid())
+			pGame->m_Attacks[i].m_Offense.m_SnapID = NewSnapMap[&pGame->m_Attacks[i].m_Offense] = SnapID--;
+		if (pGame->m_Attacks[i].m_Defense.Valid())
+			pGame->m_Attacks[i].m_Defense.m_SnapID = NewSnapMap[&pGame->m_Attacks[i].m_Defense] = SnapID--;
+	}
+
+	// Static cards
+	for (int i = 0; i < NUM_DURAK_STATIC_CARDS; i++)
+	{
+		CCard *pCard = &m_aStaticCards[i];
+		if (pCard->m_Active)
+		{
 			pCard->m_SnapID = NewSnapMap[pCard] = SnapID--;
 		}
 	}
@@ -811,6 +912,7 @@ void CDurak::SnapDurakCard(int SnappingClient, vec2 TablePos, CCard *pCard)
 	CNetObj_Character *pCharacter = static_cast<CNetObj_Character *>(Server()->SnapNewItem(NETOBJTYPE_CHARACTER, ID, sizeof(CNetObj_Character)));
 	if(!pCharacter)
 		return;
+
 	vec2 Pos = TablePos + pCard->m_TableOffset;
 	pCharacter->m_X = Pos.x;
 	pCharacter->m_Y = Pos.y;
@@ -819,8 +921,31 @@ void CDurak::SnapDurakCard(int SnappingClient, vec2 TablePos, CCard *pCard)
 	{
 		pCharacter->m_Angle = 804;
 	}
-	if (!Server()->IsSevendown(SnappingClient) && pCharacter->m_Angle > (int)(pi * 256.0f))
+
+	if(Server()->IsSevendown(SnappingClient))
 	{
-		pCharacter->m_Angle -= (int)(2.0f * pi * 256.0f);
+		int PlayerFlags = 0;
+		int Health = pCharacter->m_Health;
+		int Armor = pCharacter->m_Armor;
+		int AmmoCount = pCharacter->m_AmmoCount;
+		int Weapon = pCharacter->m_Weapon;
+		int Emote = pCharacter->m_Emote;
+		int AttackTick = pCharacter->m_AttackTick;
+
+		int Offset = sizeof(CNetObj_CharacterCore) / 4;
+		((int*)pCharacter)[Offset+0] = PlayerFlags;
+		((int*)pCharacter)[Offset+1] = Health;
+		((int*)pCharacter)[Offset+2] = Armor;
+		((int*)pCharacter)[Offset+3] = AmmoCount;
+		((int*)pCharacter)[Offset+4] = Weapon;
+		((int*)pCharacter)[Offset+5] = Emote;
+		((int*)pCharacter)[Offset+6] = AttackTick;
+	}
+	else
+	{
+		if(pCharacter->m_Angle > (int)(pi * 256.0f))
+		{
+			pCharacter->m_Angle -= (int)(2.0f * pi * 256.0f);
+		}
 	}
 }
