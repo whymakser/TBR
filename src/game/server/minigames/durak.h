@@ -173,6 +173,8 @@ public:
 		m_DefenderIndex = -1;
 		m_RoundCount = 0;
 		m_NextMove = 0;
+		m_GameOverTick = 0;
+		m_LeftPlayersStake = 0;
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 		{
 			m_aSeats[i].m_MapIndex = -1;
@@ -183,7 +185,7 @@ public:
 		for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
 		{
 			m_Attacks[i].m_Offense.m_TableOffset = vec2(PosX, CCard::ms_AttackAreaCenterOffset.y);
-			m_Attacks[i].m_Defense.m_TableOffset = vec2(PosX, CCard::ms_AttackAreaCenterOffset.y + CCard::ms_CardSizeRadius.y * 1.5f);
+			m_Attacks[i].m_Defense.m_TableOffset = vec2(PosX - CCard::ms_CardSizeRadius.x, CCard::ms_AttackAreaCenterOffset.y + CCard::ms_CardSizeRadius.y * 1.5f);
 			PosX += CardSize;
 		}
 	}
@@ -236,6 +238,8 @@ public:
 	int m_RoundCount;
 	int64 m_NextMove;
 	std::vector<int> m_vWinners;
+	int64 m_GameOverTick;
+	int64 m_LeftPlayersStake;
 
 	SSeat *GetSeatByClient(int ClientID)
 	{
@@ -268,10 +272,8 @@ public:
 		int Num = 0;
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 			if (m_aSeats[i].m_Player.m_ClientID != -1)
-			{
-				if (m_Running || (m_Stake != -1 && m_aSeats[i].m_Player.m_Stake == m_Stake))
+				if (m_Stake != -1 && m_aSeats[i].m_Player.m_Stake == m_Stake)
 					Num++;
-			}
 		return Num;
 	}
 
@@ -462,15 +464,30 @@ public:
 		}
 	}
 
-	bool IsGameOver()
+	bool IsGameOver(int *pDurakClientID = 0)
 	{
 		int PlayersLeft = 0;
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 		{
 			if (m_aSeats[i].m_Player.m_ClientID != -1 && !m_aSeats[i].m_Player.m_vHandCards.empty())
+			{
 				PlayersLeft++;
+				if (pDurakClientID)
+					*pDurakClientID = m_aSeats[i].m_Player.m_ClientID;
+			}
 		}
-		return PlayersLeft <= 1 && m_Deck.IsEmpty();
+		if (PlayersLeft >= MIN_DURAK_PLAYERS || !m_Deck.IsEmpty())
+		{
+			if (pDurakClientID)
+				*pDurakClientID = -1;
+			return false;
+		}
+		return true;
+	}
+
+	bool CanProcessWin(int Seat)
+	{
+		return m_Running && m_aSeats[Seat].m_Player.m_Stake >= 0;
 	}
 
 	bool TryAttack(int Seat, CCard *pCard)
@@ -588,6 +605,11 @@ public:
 		vHand.erase(std::remove_if(vHand.begin(), vHand.end(),
 			[&](const CCard &c) { return c.m_Suit == pCard->m_Suit && c.m_Rank == pCard->m_Rank; }),
 			vHand.end());
+
+		if (m_Deck.IsEmpty() && m_aSeats[Seat].m_Player.m_vHandCards.empty())
+		{
+			m_vWinners.push_back(Seat);
+		}
 	}
 };
 
@@ -625,7 +647,8 @@ class CDurak : public CMinigame
 	std::vector<CDurakGame *> m_vpGames;
 	bool UpdateGame(int Game);
 	bool StartGame(int Game);
-	bool EndGame(int Game);
+	void EndGame(int Game);
+	void ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos);
 
 	void SendChatToDeployedStakePlayers(int Game, const char *pMessage, int NotThisID);
 	void SendChatToParticipants(int Game, const char *pMessage);

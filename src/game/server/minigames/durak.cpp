@@ -235,7 +235,7 @@ void CDurak::OnPlayerLeave(int ClientID, bool Disconnect)
 				if (m_vpGames[g]->m_Running)
 				{
 					// Add stake for the winner, or simply the next winner. if everybody leaves, last person gets the win
-					m_vpGames[g]->m_Stake += m_vpGames[g]->m_aSeats[i].m_Player.m_Stake;
+					m_vpGames[g]->m_LeftPlayersStake += m_vpGames[g]->m_aSeats[i].m_Player.m_Stake;
 				}
 				m_vpGames[g]->m_aSeats[i].m_Player.Reset();
 
@@ -391,6 +391,7 @@ bool CDurak::StartGame(int Game)
 	pGame->m_Running = true;
 	pGame->m_Deck.Shuffle();
 
+	char aBuf[128];
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
 		CDurakGame::SSeat *pSeat = &pGame->m_aSeats[i];
@@ -406,7 +407,12 @@ bool CDurak::StartGame(int Game)
 		}
 
 		CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
-		pPlayer->WalletTransaction(-pGame->m_Stake, "Durák stake");
+		if (pGame->m_Stake >= 0)
+		{
+			pPlayer->WalletTransaction(-pGame->m_Stake, "Durák stake");
+			str_format(aBuf, sizeof(aBuf), "Your stake got collected: -%d money.", pGame->m_Stake);
+			GameServer()->SendChatTarget(ClientID, aBuf);
+		}
 
 		GameServer()->SetMinigame(ClientID, MINIGAME_DURAK, true, false);
 		pPlayer->m_ForceSpawnPos = GameServer()->Collision()->GetPos(pSeat->m_MapIndex);
@@ -420,23 +426,22 @@ bool CDurak::StartGame(int Game)
 	pGame->DealHandCards();
 	int LowestBeginTrump = pGame->NextRound();
 
-	char aBuf[128];
 	int BeginnerID = pGame->m_aSeats[pGame->m_InitialAttackerIndex].m_Player.m_ClientID;
 	if (LowestBeginTrump != -1)
-		str_format(aBuf, sizeof(aBuf), "Beginner determined: '%s' (Lowest trump card: %s)", Server()->ClientName(BeginnerID), GetCardSymbol(pGame->m_Deck.GetTrumpSuit(), LowestBeginTrump));
+		str_format(aBuf, sizeof(aBuf), "Beginner determined: '%s' (Lowest trump: %s)", Server()->ClientName(BeginnerID), GetCardSymbol(pGame->m_Deck.GetTrumpSuit(), LowestBeginTrump));
 	else
 		str_format(aBuf, sizeof(aBuf), "Beginner chosen: '%s' (No trump cards dealt)", Server()->ClientName(BeginnerID));
 	SendChatToParticipants(Game, aBuf);
 	return true;
 }
 
-bool CDurak::EndGame(int Game)
+void CDurak::EndGame(int Game)
 {
 	if (Game < 0 || Game >= m_vpGames.size())
-		return false;
+		return;
 	CDurakGame* pGame = m_vpGames[Game];
 	if (!pGame->m_Running)
-		return false;
+		return;
 
 	CGameTeams *pTeams = &((CGameControllerDDRace *)GameServer()->m_pController)->m_Teams;
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
@@ -449,7 +454,6 @@ bool CDurak::EndGame(int Game)
 
 	delete m_vpGames[Game];
 	m_vpGames.erase(m_vpGames.begin() + Game);
-	return true;
 }
 
 const char *CDurak::GetCardSymbol(int Suit, int Rank)
@@ -611,21 +615,36 @@ bool CDurak::UpdateGame(int Game)
 	int NumParticipants = pGame->NumParticipants();
 	if (NumParticipants < MIN_DURAK_PLAYERS)
 	{
-		if (!pGame->m_Running && pGame->m_GameStartTick)
+		if (!pGame->m_Running)
 		{
-			pGame->m_GameStartTick = 0;
-			CancelledTimer = true;
+			if (pGame->m_GameStartTick)
+			{
+				pGame->m_GameStartTick = 0;
+				CancelledTimer = true;
+			}
+			// Reset stake when all players left the table and no round started
+			if (pGame->NumDeployedStakes() == 0)
+			{
+				pGame->m_Stake = -1;
+			}
 		}
-
-		// Reset stake when all players left the table and no round started
-		if (pGame->NumDeployedStakes() == 0)
+		else
 		{
-			pGame->m_Stake = -1;
-		}
+			for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+			{
+				CDurakGame::SSeat *pSeat = &pGame->m_aSeats[i];
+				if (pSeat->m_Player.m_ClientID != -1 && pGame->CanProcessWin(i))
+				{
+					// Forcefully process win on last player, we do not want any money glitched away.
+					// In this case the "Durak", or simply last player, will benefit from other's leaving the round
+					// If anyone has won before, the durak/losers stake has been given to the winner already. Again: No money dupe xD
+					// If nobody won before, we enter WinPos = 0, to receive our own stake as we didn't lose, but also the money of people who left.
+					ProcessPlayerWin(Game, pSeat, pGame->m_vWinners.size() ? -1 : 0);
+					break;
+				}
+			}
 
-		if (EndGame(Game))
-		{
-			// Will only trigger if game is running and everyone left
+			EndGame(Game);
 			return true;
 		}
 	}
@@ -689,24 +708,12 @@ bool CDurak::UpdateGame(int Game)
 			GameServer()->SendBroadcast("Game started!", ClientID);
 		}
 
+		// Process wins
 		for (unsigned int w = 0; w < pGame->m_vWinners.size(); w++)
 		{
-			if (pGame->m_vWinners[w] == i && pSeat->m_Player.m_Stake >= 0)
+			if (pGame->m_vWinners[w] == i && pGame->CanProcessWin(i))
 			{
-				pPlayer->WalletTransaction(pSeat->m_Player.m_Stake, "Durák stake return");
-				// First winner get's the stake of the loser, plus the stake of those who left inbetween
-				if (w == 0)
-				{
-					pPlayer->WalletTransaction(pGame->m_Stake, "Durák win");
-					// Reset game stake to the agreed stake for the last guy
-					pGame->m_Stake = pSeat->m_Player.m_Stake;
-				}
-				// Reset stake as we have been processed now
-				pSeat->m_Player.m_Stake = -1;
-
-				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), "'%s' won the game (#%d)", Server()->ClientName(pSeat->m_Player.m_ClientID), w + 1);
-				SendChatToParticipants(Game, aBuf);
+				ProcessPlayerWin(Game, pSeat, w);
 				break;
 			}
 		}
@@ -732,15 +739,14 @@ bool CDurak::UpdateGame(int Game)
 		{
 			Gap = RequiredSpace / (NumCards - 1);
 		}
-		int Hovered = pSeat->m_Player.m_HoveredCard;
 		float PushStrength = 0.5f + min((int)NumCards - 16, 10) * 0.1f;
 		for (unsigned int c = 0; c < NumCards; c++)
 		{
 			CCard *pCard = &pSeat->m_Player.m_vHandCards[c];
 			float Offset = 0.f;
-			if (Hovered != -1 && NumCards > 10)
+			if (pSeat->m_Player.m_HoveredCard != -1 && NumCards > 10)
 			{
-				 int Diff = c - Hovered;
+				int Diff = c - pSeat->m_Player.m_HoveredCard;
 				if (Diff != 0 && abs(Diff) <= 3)
 				{
 					float Falloff = 1.f / abs(Diff);
@@ -781,33 +787,23 @@ bool CDurak::UpdateGame(int Game)
 	if (!pGame->m_Running)
 		return false;
 
-	if (pGame->IsGameOver())
+	int DurakClientID;
+	if (pGame->IsGameOver(&DurakClientID))
 	{
-		int DurakClientID = -1;
-		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+		if (pGame->m_GameOverTick)
 		{
-			if (pGame->m_aSeats[i].m_Player.m_ClientID != -1 && !pGame->m_aSeats[i].m_Player.m_vHandCards.empty())
+			if (pGame->m_GameOverTick < Server()->Tick() - Server()->TickSpeed() * 10)
 			{
-				DurakClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
-				break;
+				EndGame(Game);
 			}
+			return true;
 		}
 
-		if (DurakClientID != -1)
-		{
-			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), "'%s' is the Durák!", Server()->ClientName(DurakClientID));
-			SendChatToParticipants(Game, aBuf);
-		}
-		else
-		{
-			SendChatToParticipants(Game, "Game over, no Durák found");
-		}
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "'%s' is the Durák!", Server()->ClientName(DurakClientID));
+		SendChatToParticipants(Game, aBuf);
 
-		if (pGame->ProcessNextMove(Server()->Tick()))
-		{
-			EndGame(Game);
-		}
+		pGame->m_GameOverTick = Server()->Tick();
 		return true;
 	}
 
@@ -865,7 +861,7 @@ bool CDurak::UpdateGame(int Game)
 
 			char aBuf[128];
 			int DefenderID = pGame->m_aSeats[pGame->m_DefenderIndex].m_Player.m_ClientID;
-			str_format(aBuf, sizeof(aBuf), "'%s' couldn't defend all attacks and has to take all cards", Server()->ClientName(DefenderID));
+			str_format(aBuf, sizeof(aBuf), "'%s' couldn't defend all attacks and takes all cards", Server()->ClientName(DefenderID));
 			SendChatToParticipants(Game, aBuf);
 
 			// Sort hand cards after taking
@@ -886,6 +882,65 @@ bool CDurak::UpdateGame(int Game)
 
 	// Safely return and let the tick function know we are still alive
 	return false;
+}
+
+void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos)
+{
+	CDurakGame *pGame = m_vpGames[Game];
+	int ClientID = pSeat->m_Player.m_ClientID;
+	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
+
+	// WinPos == -1: Force last player, if somebody won before, 0: nobody won before
+	int ReturnStake = 0;
+	if (WinPos >= 0)
+	{
+		ReturnStake = pSeat->m_Player.m_Stake;
+		pPlayer->WalletTransaction(pSeat->m_Player.m_Stake, "Durák stake return");
+	}
+
+	// First winner get's the stake of the loser, plus the stake of those who left inbetween
+	int WinStake = 0;
+	if (WinPos <= 0)
+	{
+		WinStake = max(pGame->m_Stake, pGame->m_LeftPlayersStake);
+		pPlayer->WalletTransaction(WinStake, "Durák win");
+		// Reset m_LeftPlayersStake, no money dupe
+		pGame->m_LeftPlayersStake = 0;
+	}
+	// Reset stake as we have been processed now
+	pSeat->m_Player.m_Stake = -1;
+
+	char aBuf[128];
+	char aTemp[128];
+	// Chat message for participants
+	str_format(aBuf, sizeof(aBuf), "'%s' won the game!", Server()->ClientName(ClientID));
+	if (WinPos >= 0)
+	{
+		str_format(aTemp, sizeof(aTemp), " (#%d)", WinPos + 1);
+		str_append(aBuf, aTemp, sizeof(aBuf));
+	}
+	SendChatToParticipants(Game, aBuf);
+
+	// Feedback for winner
+	if (WinPos <= 0)
+	{
+		str_format(aBuf, sizeof(aBuf), "Congratulations, you win this Durák game!");
+		if (WinStake)
+		{
+			str_format(aTemp, sizeof(aTemp), " Your earnings: +%d money.", WinStake);
+			str_append(aBuf, aTemp, sizeof(aBuf));
+		}
+	}
+	else if (WinPos > 0)
+	{
+		str_format(aBuf, sizeof(aBuf), "Congratulations, you are not the Durák!");
+	}
+	if (ReturnStake)
+	{
+		str_format(aTemp, sizeof(aTemp), " Your stake got returned: +%d money.", ReturnStake);
+		str_append(aBuf, aTemp, sizeof(aBuf));
+	}
+	GameServer()->SendChatTarget(ClientID, aBuf);
 }
 
 void CDurak::Snap(int SnappingClient)
