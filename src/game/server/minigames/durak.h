@@ -592,7 +592,7 @@ public:
 				RemoveCard(Seat, pCard);
 
 				int NewDefender = GetNextPlayer(m_DefenderIndex);
-				if (m_aSeats[NewDefender].m_Player.m_vHandCards.size() < NumAttacks + 1)
+				if ((int)m_aSeats[NewDefender].m_Player.m_vHandCards.size() < NumAttacks + 1)
 					return false;
 
 				// Successfully moved
