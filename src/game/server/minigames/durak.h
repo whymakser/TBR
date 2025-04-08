@@ -185,7 +185,7 @@ public:
 		for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
 		{
 			m_Attacks[i].m_Offense.m_TableOffset = vec2(PosX, CCard::ms_AttackAreaCenterOffset.y);
-			m_Attacks[i].m_Defense.m_TableOffset = vec2(PosX - CCard::ms_CardSizeRadius.x, CCard::ms_AttackAreaCenterOffset.y + CCard::ms_CardSizeRadius.y * 1.5f);
+			m_Attacks[i].m_Defense.m_TableOffset = vec2(PosX - CCard::ms_CardSizeRadius.x / 3.f, CCard::ms_AttackAreaCenterOffset.y + CCard::ms_CardSizeRadius.y * 1.25f);
 			PosX += CardSize;
 		}
 	}
@@ -504,7 +504,7 @@ public:
 		if (Seat != m_AttackerIndex && (!Used || GetStateBySeat(Seat) != DURAK_PLAYERSTATE_ATTACK))
 			return false;
 
-		if (Used >= MAX_DURAK_ATTACKS)
+		if (Used >= min((int)m_aSeats[m_DefenderIndex].m_Player.m_vHandCards.size(), (int)MAX_DURAK_ATTACKS))
 			return false;
 
 		// If not first attack, card has to match existing ranks on table
@@ -562,6 +562,7 @@ public:
 		if (Seat != m_DefenderIndex || !pCard->Valid())
 			return false;
 
+		int NumAttacks = 0;
 		int TargetRank = -1;
 		for (auto &pair : m_Attacks)
 		{
@@ -570,6 +571,7 @@ public:
 				if (pair.m_Defense.Valid()) // No defense has happened already
 					return false;
 
+				NumAttacks++;
 				if (TargetRank == -1)
 					TargetRank = pair.m_Offense.m_Rank;
 				else if (pair.m_Offense.m_Rank != TargetRank)
@@ -589,9 +591,13 @@ public:
 				pair.m_Offense.m_Rank = pCard->m_Rank;
 				RemoveCard(Seat, pCard);
 
+				int NewDefender = GetNextPlayer(m_AttackerIndex);
+				if (m_aSeats[NewDefender].m_Player.m_vHandCards.size() < NumAttacks + 1)
+					return false;
+
 				// Successfully moved
 				m_AttackerIndex = m_DefenderIndex;
-				m_DefenderIndex = GetNextPlayer(m_AttackerIndex);
+				m_DefenderIndex = NewDefender;
 				m_NextMove = 0;
 				return true;
 			}

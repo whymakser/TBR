@@ -310,9 +310,6 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 	else if (m_aLastInput[ClientID].m_Jump == 0 && pNewInput->m_Jump != 0)
 	{
 		m_aKeyboardControl[ClientID] = true;
-		CCard Card = pGame->m_Deck.DrawCard();
-		Card.m_TableOffset.y = CCard::ms_TableSizeRadius.y;
-		pSeat->m_Player.m_vHandCards.push_back(Card);
 	}
 	else if (abs(pNewInput->m_TargetX - m_aLastInput[ClientID].m_TargetX) > 1.f || abs(pNewInput->m_TargetY - m_aLastInput[ClientID].m_TargetY) > 1.f)
 	{
@@ -443,7 +440,6 @@ void CDurak::EndGame(int Game)
 	if (!pGame->m_Running)
 		return;
 
-	CGameTeams *pTeams = &((CGameControllerDDRace *)GameServer()->m_pController)->m_Teams;
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
 		int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
@@ -628,7 +624,8 @@ bool CDurak::UpdateGame(int Game)
 				pGame->m_Stake = -1;
 			}
 		}
-		else
+		// Only process when the game has not ended yet
+		else if (!pGame->m_GameOverTick)
 		{
 			for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 			{
@@ -941,6 +938,8 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos)
 		str_append(aBuf, aTemp, sizeof(aBuf));
 	}
 	GameServer()->SendChatTarget(ClientID, aBuf);
+
+	pPlayer->m_ConfettiWinEffectTick = Server()->Tick();
 }
 
 void CDurak::Snap(int SnappingClient)
