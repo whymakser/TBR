@@ -487,7 +487,6 @@ int CDurak::GetPlayerState(int ClientID)
 	if (!pGame->m_Running)
 		return DURAK_PLAYERSTATE_NONE;
 
-	int SeatIndex = -1;
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
 		if (pGame->m_aSeats[i].m_Player.m_ClientID == ClientID)
