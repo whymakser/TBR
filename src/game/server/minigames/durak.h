@@ -591,7 +591,7 @@ public:
 				pair.m_Offense.m_Rank = pCard->m_Rank;
 				RemoveCard(Seat, pCard);
 
-				int NewDefender = GetNextPlayer(m_AttackerIndex);
+				int NewDefender = GetNextPlayer(m_DefenderIndex);
 				if (m_aSeats[NewDefender].m_Player.m_vHandCards.size() < NumAttacks + 1)
 					return false;
 
