@@ -136,11 +136,11 @@ void CDurak::OnCharacterSeat(int ClientID, int Number, int SeatIndex)
 	}
 	else if (pGame->NumParticipants() == 1)
 	{
-		str_format(aBuf, sizeof(aBuf), "Welcome to Durák, %s! You are second, please enter the current stake of 'll%d' or propose a new one in the chat.", Server()->ClientName(ClientID), pGame->m_Stake);
+		str_format(aBuf, sizeof(aBuf), "Welcome to Durák, %s! You are second, please enter the current stake of '%lld' or propose a new one in the chat.", Server()->ClientName(ClientID), pGame->m_Stake);
 	}
 	else
 	{
-		str_format(aBuf, sizeof(aBuf), "Welcome to Durák, %s! In order to participate, please enter the current stake of 'll%d' in the chat.", Server()->ClientName(ClientID), pGame->m_Stake);
+		str_format(aBuf, sizeof(aBuf), "Welcome to Durák, %s! In order to participate, please enter the current stake of '%lld' in the chat.", Server()->ClientName(ClientID), pGame->m_Stake);
 	}
 	GameServer()->SendChatTarget(ClientID, aBuf);
 }
@@ -692,7 +692,7 @@ bool CDurak::UpdateGame(int Game)
 			else if (pGame->m_GameStartTick > Server()->Tick() && (pGame->m_GameStartTick - Server()->Tick() + 1) % Server()->TickSpeed() == 0)
 			{
 				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), "Players [%d/%d]\nStake [%lld]\nGame start [%d]", NumParticipants, (int)MAX_DURAK_PLAYERS,
+				str_format(aBuf, sizeof(aBuf), "Players [%d/%d]\nStake [%lld]\nGame start [%lld]", NumParticipants, (int)MAX_DURAK_PLAYERS,
 					pGame->m_Stake, (pGame->m_GameStartTick - Server()->Tick()) / Server()->TickSpeed() + 1);
 				GameServer()->SendBroadcast(aBuf, ClientID);
 			}
