@@ -136,11 +136,11 @@ void CDurak::OnCharacterSeat(int ClientID, int Number, int SeatIndex)
 	}
 	else if (pGame->NumParticipants() == 1)
 	{
-		str_format(aBuf, sizeof(aBuf), "Welcome to Durák, %s! You are second, please enter the current stake of '%d' or propose a new one in the chat.", Server()->ClientName(ClientID), pGame->m_Stake);
+		str_format(aBuf, sizeof(aBuf), "Welcome to Durák, %s! You are second, please enter the current stake of 'll%d' or propose a new one in the chat.", Server()->ClientName(ClientID), pGame->m_Stake);
 	}
 	else
 	{
-		str_format(aBuf, sizeof(aBuf), "Welcome to Durák, %s! In order to participate, please enter the current stake of '%d' in the chat.", Server()->ClientName(ClientID), pGame->m_Stake);
+		str_format(aBuf, sizeof(aBuf), "Welcome to Durák, %s! In order to participate, please enter the current stake of 'll%d' in the chat.", Server()->ClientName(ClientID), pGame->m_Stake);
 	}
 	GameServer()->SendChatTarget(ClientID, aBuf);
 }
@@ -176,7 +176,7 @@ bool CDurak::TryEnterBetStake(int ClientID, const char *pMessage)
 		pPlayer->m_Stake = Stake;
 		UpdatePassive(ClientID, 30);
 
-		str_format(aBuf, sizeof(aBuf), "Successfully set the stake for the current round to '%d'.", Stake);
+		str_format(aBuf, sizeof(aBuf), "Successfully set the stake for the current round to '%lld'.", Stake);
 		GameServer()->SendChatTarget(ClientID, aBuf);
 		return true;
 	}
@@ -206,14 +206,14 @@ bool CDurak::TryEnterBetStake(int ClientID, const char *pMessage)
 		{
 			VALIDATE_WALLET();
 
-			str_format(aBuf, sizeof(aBuf), "'%s' proposed a new stake, please enter the current stake of '%d' or propose a new one in the chat.", Server()->ClientName(ClientID), Stake);
+			str_format(aBuf, sizeof(aBuf), "'%s' proposed a new stake, please enter the current stake of '%lld' or propose a new one in the chat.", Server()->ClientName(ClientID), Stake);
 			SendChatToDeployedStakePlayers(Game, aBuf, ClientID);
 
 			pGame->m_Stake = Stake;
 			pPlayer->m_Stake = Stake;
 			UpdatePassive(ClientID, 30);
 
-			str_format(aBuf, sizeof(aBuf), "Successfully updated the stake for the current round to '%d'.", Stake);
+			str_format(aBuf, sizeof(aBuf), "Successfully updated the stake for the current round to '%lld'.", Stake);
 			GameServer()->SendChatTarget(ClientID, aBuf);
 			return true;
 		}
@@ -325,7 +325,7 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 
 void CDurak::SendChatToDeployedStakePlayers(int Game, const char *pMessage, int NotThisID)
 {
-	if (Game < 0 || Game >= m_vpGames.size())
+	if (Game < 0 || Game >= (int)m_vpGames.size())
 		return;
 	CDurakGame *pGame = m_vpGames[Game];
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
@@ -338,7 +338,7 @@ void CDurak::SendChatToDeployedStakePlayers(int Game, const char *pMessage, int 
 
 void CDurak::SendChatToParticipants(int Game, const char *pMessage)
 {
-	if (Game < 0 || Game >= m_vpGames.size())
+	if (Game < 0 || Game >= (int)m_vpGames.size())
 		return;
 	CDurakGame *pGame = m_vpGames[Game];
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
@@ -357,7 +357,7 @@ void CDurak::SendChatToParticipants(int Game, const char *pMessage)
 
 bool CDurak::StartGame(int Game)
 {
-	if (Game < 0 || Game >= m_vpGames.size())
+	if (Game < 0 || Game >= (int)m_vpGames.size())
 		return false;
 	CDurakGame *pGame = m_vpGames[Game];
 	if (pGame->m_Running)
@@ -407,7 +407,7 @@ bool CDurak::StartGame(int Game)
 		if (pGame->m_Stake >= 0)
 		{
 			pPlayer->WalletTransaction(-pGame->m_Stake, "Durák stake");
-			str_format(aBuf, sizeof(aBuf), "Your stake got collected: -%d money.", pGame->m_Stake);
+			str_format(aBuf, sizeof(aBuf), "Your stake got collected: -%lld money.", pGame->m_Stake);
 			GameServer()->SendChatTarget(ClientID, aBuf);
 		}
 
@@ -434,7 +434,7 @@ bool CDurak::StartGame(int Game)
 
 void CDurak::EndGame(int Game)
 {
-	if (Game < 0 || Game >= m_vpGames.size())
+	if (Game < 0 || Game >= (int)m_vpGames.size())
 		return;
 	CDurakGame* pGame = m_vpGames[Game];
 	if (!pGame->m_Running)
@@ -692,7 +692,7 @@ bool CDurak::UpdateGame(int Game)
 			else if (pGame->m_GameStartTick > Server()->Tick() && (pGame->m_GameStartTick - Server()->Tick() + 1) % Server()->TickSpeed() == 0)
 			{
 				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), "Players [%d/%d]\nStake [%d]\nGame start [%d]", NumParticipants, (int)MAX_DURAK_PLAYERS,
+				str_format(aBuf, sizeof(aBuf), "Players [%d/%d]\nStake [%lld]\nGame start [%d]", NumParticipants, (int)MAX_DURAK_PLAYERS,
 					pGame->m_Stake, (pGame->m_GameStartTick - Server()->Tick()) / Server()->TickSpeed() + 1);
 				GameServer()->SendBroadcast(aBuf, ClientID);
 			}
@@ -888,7 +888,7 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos)
 	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 
 	// WinPos == -1: Force last player, if somebody won before, 0: nobody won before
-	int ReturnStake = 0;
+	int64 ReturnStake = 0;
 	if (WinPos >= 0)
 	{
 		ReturnStake = pSeat->m_Player.m_Stake;
@@ -896,7 +896,7 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos)
 	}
 
 	// First winner get's the stake of the loser, plus the stake of those who left inbetween
-	int WinStake = 0;
+	int64 WinStake = 0;
 	if (WinPos <= 0)
 	{
 		WinStake = max(pGame->m_Stake, pGame->m_LeftPlayersStake);
@@ -924,7 +924,7 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos)
 		str_format(aBuf, sizeof(aBuf), "Congratulations, you win this Durák game!");
 		if (WinStake)
 		{
-			str_format(aTemp, sizeof(aTemp), " Your earnings: +%d money.", WinStake);
+			str_format(aTemp, sizeof(aTemp), " Your earnings: +%lld money.", WinStake);
 			str_append(aBuf, aTemp, sizeof(aBuf));
 		}
 	}
@@ -934,7 +934,7 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos)
 	}
 	if (ReturnStake)
 	{
-		str_format(aTemp, sizeof(aTemp), " Your stake got returned: +%d money.", ReturnStake);
+		str_format(aTemp, sizeof(aTemp), " Your stake got returned: +%lld money.", ReturnStake);
 		str_append(aBuf, aTemp, sizeof(aBuf));
 	}
 	GameServer()->SendChatTarget(ClientID, aBuf);
