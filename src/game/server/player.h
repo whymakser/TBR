@@ -325,8 +325,8 @@ public:
 	void ExpireItems();
 
 	void BankCurrTransaction(float Amount, const char* pDescription);
-	void BankTransaction(int Amount, const char *pDescription = "");
-	void WalletTransaction(int Amount, const char *pDescription = "");
+	bool BankTransaction(int Amount, const char *pDescription = "");
+	bool WalletTransaction(int Amount, const char *pDescription = "");
 	void ApplyMoneyHistoryMsg(int Type, float Amount, const char *pDescription);
 	int64 GetWalletMoney() { return m_WalletMoney; }
 	int64 GetUsableMoney();

@@ -4556,6 +4556,8 @@ void CGameContext::OnPreShutdown()
 		if (!pPlayer)
 			continue;
 
+		Durak()->OnPlayerLeave(i, false, true);
+
 		// Move all money from wallet to bank
 		if (pPlayer->GetAccID() >= ACC_START)
 		{

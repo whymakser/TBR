@@ -93,13 +93,13 @@ public:
 	}
 
 	bool IsStrongerThan(const CCard &Other, int TrumpSuit) const
-    {
-        if (m_Suit == TrumpSuit && Other.m_Suit != TrumpSuit)
-            return true;
-        if (m_Suit != TrumpSuit && Other.m_Suit == TrumpSuit)
-            return false;
-        return m_Suit == Other.m_Suit && m_Rank > Other.m_Rank;
-    }
+	{
+		if (m_Suit == TrumpSuit && Other.m_Suit != TrumpSuit)
+			return true;
+		if (m_Suit != TrumpSuit && Other.m_Suit == TrumpSuit)
+			return false;
+		return m_Suit == Other.m_Suit && m_Rank > Other.m_Rank;
+	}
 
 	void SetKeyboardControl(bool Activated)
 	{
@@ -113,39 +113,39 @@ class CDeck
 	int m_TrumpSuit;
 
 public:
-    CDeck()
+	CDeck()
 	{
-        for (int suit = 0; suit < 4; suit++)
-            for (int rank = 6; rank <= 14; rank++)
-                m_vDeck.emplace_back(suit, rank);
-    }
+		for (int suit = 0; suit < 4; suit++)
+			for (int rank = 6; rank <= 14; rank++)
+				m_vDeck.emplace_back(suit, rank);
+	}
 
-    void Shuffle()
+	void Shuffle()
 	{
-        std::random_device rd;
-        std::mt19937 g(rd());
-        std::shuffle(m_vDeck.begin(), m_vDeck.end(), g);
-    }
+		std::random_device rd;
+		std::mt19937 g(rd());
+		std::shuffle(m_vDeck.begin(), m_vDeck.end(), g);
+	}
 
 	CCard DrawCard()
-    {
-        if (IsEmpty()) // Invalid card if deck is empty
+	{
+		if (IsEmpty()) // Invalid card if deck is empty
 			return CCard();
-        CCard TopCard = m_vDeck.back();
-        m_vDeck.pop_back();
-        return TopCard;
-    }
+		CCard TopCard = m_vDeck.back();
+		m_vDeck.pop_back();
+		return TopCard;
+	}
 
 	void PushFrontTrumpCard(CCard TrumpCard)
 	{
 		m_vDeck.insert(m_vDeck.begin(), TrumpCard);
 	}
 
-    bool IsEmpty() const { return m_vDeck.empty(); }
+	bool IsEmpty() const { return m_vDeck.empty(); }
 	int Size() const { return m_vDeck.size(); }
 
 	void SetTrumpSuit(int Suit) { m_TrumpSuit = Suit; }
-    int GetTrumpSuit() const { return m_TrumpSuit; }
+	int GetTrumpSuit() const { return m_TrumpSuit; }
 
 	CCard *GetTrumpCard() { return m_vDeck.size() ? &m_vDeck[0] : 0; }
 };
@@ -654,7 +654,8 @@ class CDurak : public CMinigame
 	bool UpdateGame(int Game);
 	bool StartGame(int Game);
 	void EndGame(int Game);
-	void ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos);
+	void ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bool ForceEnd = false);
+	void HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg);
 
 	void SendChatToDeployedStakePlayers(int Game, const char *pMessage, int NotThisID);
 	void SendChatToParticipants(int Game, const char *pMessage);
@@ -685,6 +686,6 @@ public:
 	void OnCharacterSeat(int ClientID, int Number, int SeatIndex);
 	bool TryEnterBetStake(int ClientID, const char *pMessage);
 	void OnInput(class CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput);
-	void OnPlayerLeave(int ClientID, bool Disconnect = false);
+	void OnPlayerLeave(int ClientID, bool Disconnect = false, bool Shutdown = false);
 };
 #endif // GAME_SERVER_MINIGAMES_DURAK_H

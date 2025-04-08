@@ -1859,14 +1859,15 @@ void CPlayer::BankCurrTransaction(float Amount, const char *pDescription)
 	ApplyMoneyHistoryMsg(TRANSACTION_BANK, Amount, pDescription);
 }
 
-void CPlayer::BankTransaction(int Amount, const char *pDescription)
+bool CPlayer::BankTransaction(int Amount, const char *pDescription)
 {
 	if (GetAccID() < ACC_START || Amount == 0)
-		return;
+		return false;
 
 	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[GetAccID()];
 	pAccount->m_Money += Amount;
 	ApplyMoneyHistoryMsg(TRANSACTION_BANK, Amount, pDescription);
+	return true;
 }
 
 int64 CPlayer::GetUsableMoney()
@@ -1882,17 +1883,18 @@ int64 CPlayer::GetWalletOrBankDisplay()
 	return GetWalletMoney();
 }
 
-void CPlayer::WalletTransaction(int Amount, const char *pDescription)
+bool CPlayer::WalletTransaction(int Amount, const char *pDescription)
 {
 	if (GameServer()->Config()->m_SvMoneyBankMode == 0 && GetAccID() >= ACC_START)
 	{
-		BankTransaction(Amount, pDescription);
-		return;
+		return BankTransaction(Amount, pDescription);
 	}
 	if (Amount == 0)
-		return;
+		return false;
+
 	m_WalletMoney += Amount;
 	ApplyMoneyHistoryMsg(TRANSACTION_WALLET, Amount, pDescription);
+	return true;
 }
 
 void CPlayer::ApplyMoneyHistoryMsg(int Type, float Amount, const char *pDescription)
