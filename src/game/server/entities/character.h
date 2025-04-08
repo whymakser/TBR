@@ -471,6 +471,7 @@ public:
 	int m_MoneyTile;
 	bool m_LastPoliceFarmActive;
 	bool m_ProcessedMoneyTile;
+	bool m_ProcessedDurakSeatTile;
 	int64 m_RoomAntiSpamTick;
 	CSnake m_Snake;
 	bool m_InSnake;
@@ -568,6 +569,7 @@ public:
 	bool LoadRedirectTile(int Port);
 	int m_RedirectTilePort;
 	int64 m_PassiveEndTick;
+	bool UpdatePassiveEndTick(int64 NewEndTick);
 
 	std::vector< std::pair<int, int> > m_vCheckpoints;
 	void AddCheckpointList(int Port, int Checkpoint);

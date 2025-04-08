@@ -225,7 +225,7 @@ void CPlayer::Reset()
 	m_ViewCursorID = -2;
 	m_ViewCursorZoomed = false;
 
-	m_ZoomCursor = false;
+	m_ZoomCursor = true;
 	m_StandardShowDistance = m_ShowDistance;
 	m_SentShowDistance = false;
 	m_CameraInfo.Reset();
@@ -579,6 +579,8 @@ void CPlayer::Snap(int SnappingClient)
 			Score = GameServer()->m_Accounts[GetAccID()].m_Kills;
 		else if (pSnapping->m_Minigame == MINIGAME_SURVIVAL)
 			Score = GameServer()->m_Accounts[GetAccID()].m_SurvivalKills;
+		else if (pSnapping->m_Minigame == MINIGAME_DURAK)
+			Score = GameServer()->m_Accounts[GetAccID()].m_DurakWins;
 		else if (pSnapping->m_Minigame == MINIGAME_INSTAGIB_BOOMFNG || pSnapping->m_Minigame == MINIGAME_INSTAGIB_FNG)
 		{
 			Score = m_InstagibScore;
@@ -986,7 +988,7 @@ int CPlayer::GetHidePlayerTeam(int Asker)
 {
 	CPlayer *pAsker = GameServer()->m_apPlayers[Asker];
 	if (m_TeeControllerID != Asker && m_Team != TEAM_SPECTATORS && ((GameServer()->Config()->m_SvHideDummies && m_IsDummy)
-		|| (GameServer()->Config()->m_SvHideMinigamePlayers && (m_Minigame != MINIGAME_1VS1 || !GameServer()->Arenas()->FightStarted(m_ClientID)) && pAsker->m_Minigame != m_Minigame)))
+		|| (GameServer()->Config()->m_SvHideMinigamePlayers && !GameServer()->Durak()->InDurakGame(m_ClientID) && !GameServer()->Arenas()->FightStarted(m_ClientID) && pAsker->m_Minigame != m_Minigame)))
 		return TEAM_BLUE;
 	return m_Team;
 }
@@ -1006,7 +1008,7 @@ int CPlayer::GetAuthedHighlighted()
 bool CPlayer::RestrictZoom()
 {
 	// allow zoom in block and 1vs1
-	return IsMinigame() && m_Minigame != MINIGAME_BLOCK && m_Minigame != MINIGAME_1VS1;
+	return IsMinigame() && m_Minigame != MINIGAME_BLOCK && m_Minigame != MINIGAME_1VS1 && m_Minigame != MINIGAME_DURAK;
 }
 
 float CPlayer::GetZoomLevel()
@@ -1039,6 +1041,7 @@ void CPlayer::OnDisconnect()
 	KillCharacter();
 
 	GameServer()->Arenas()->OnPlayerLeave(m_ClientID, true);
+	GameServer()->Durak()->OnPlayerLeave(m_ClientID, true);
 	GameServer()->Logout(GetAccID());
 
 	CGameControllerDDRace* Controller = (CGameControllerDDRace*)GameServer()->m_pController;
@@ -1366,6 +1369,7 @@ void CPlayer::SetTeam(int Team, bool DoChatMsg)
 	if (Team == TEAM_SPECTATORS)
 	{
 		GameServer()->Arenas()->OnPlayerLeave(m_ClientID);
+		GameServer()->Durak()->OnPlayerLeave(m_ClientID);
 
 		CGameControllerDDRace* Controller = (CGameControllerDDRace*)GameServer()->m_pController;
 		Controller->m_Teams.SetForceCharacterTeam(m_ClientID, 0);
@@ -1470,6 +1474,11 @@ void CPlayer::TryRespawn()
 			SpawnPos = GameServer()->Arenas()->GetSpawnPos(m_ClientID);
 		else
 			Index = TILE_1VS1_LOBBY;
+	}
+	else if (m_Minigame == MINIGAME_DURAK)
+	{
+		// overriden by m_ForceSpawnPos while in an active game
+		Index = TILE_DURAK_LOBBY;
 	}
 	else if (m_JailTime == 1)
 	{
@@ -2635,7 +2644,7 @@ bool CPlayer::MinigameRequestTick()
 
 void CPlayer::MinigameAfkCheck()
 {
-	if (!IsMinigame() || !GameServer()->Config()->m_SvMinigameAfkAutoLeave || m_IsDummy)
+	if (!IsMinigame() || !GameServer()->Config()->m_SvMinigameAfkAutoLeave || m_IsDummy || GameServer()->Durak()->InDurakGame(m_ClientID))
 		return;
 
 	int TimeLeft = ((m_LastMovementTick + Server()->TickSpeed() * GameServer()->Config()->m_SvMinigameAfkAutoLeave) - Server()->Tick()) / Server()->TickSpeed();
@@ -2661,7 +2670,7 @@ bool CPlayer::ShowDDraceHud()
 	CPlayer *pPlayer = this;
 	if ((m_Team == TEAM_SPECTATORS || m_Paused) && m_SpectatorID >= 0 && GameServer()->m_apPlayers[m_SpectatorID])
 		pPlayer = GameServer()->m_apPlayers[m_SpectatorID];
-	return !pPlayer->IsMinigame() || pPlayer->m_Minigame == MINIGAME_BLOCK || pPlayer->m_Minigame == MINIGAME_1VS1;
+	return !pPlayer->IsMinigame() || pPlayer->m_Minigame == MINIGAME_BLOCK || pPlayer->m_Minigame == MINIGAME_1VS1 || pPlayer->m_Minigame == MINIGAME_DURAK;
 }
 
 void CPlayer::UpdateDoubleXpLifes()

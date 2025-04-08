@@ -1,4 +1,4 @@
-﻿/* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
+/* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
 /* If you are missing that file, acquire a complete release at teeworlds.com.                */
 #include <base/math.h>
 
@@ -1163,14 +1163,15 @@ void CGameContext::SendTuningParams(int ClientID, int Zone)
 		if ((pChr->m_Passive && !pChr->m_Super) || pChr->m_Snake.Active())
 			Tunings.m_PlayerHooking = 0.f;
 
-		if (pChr->m_DrawEditor.Active() || pChr->m_pHelicopter || pChr->m_Snake.Active())
+		bool IsDurakPlaying = Durak()->ActivelyPlaying(ClientID);
+		if (pChr->m_DrawEditor.Active() || pChr->m_pHelicopter || pChr->m_Snake.Active() || IsDurakPlaying)
 			Tunings.m_HookFireSpeed = 0.f;
 		if (pChr->m_pHelicopter || pChr->m_Snake.Active())
 			Tunings.m_HookDragAccel = 0.f;
 		if (pChr->m_pHelicopter || pChr->m_InSnake)
 			Tunings.m_HookDragSpeed = 0.f;
 
-		if (pChr->m_DrawEditor.Active() || pChr->m_pHelicopter|| pChr->m_InSnake
+		if (pChr->m_DrawEditor.Active() || pChr->m_pHelicopter|| pChr->m_InSnake || IsDurakPlaying
 			|| (!Server()->IsSevendown(ClientID) && ((pChr->m_FreezeTime && Config()->m_SvFreezePrediction) || pChr->GetPlayer()->m_TeeControllerID != -1)))
 		{
 			Tunings.m_GroundControlSpeed = 0.f;
@@ -2286,8 +2287,12 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				return;
 
 			bool Command = pMsg->m_pMessage[0] == '/';
-			if (!Command && pPlayer->GetCharacter() && pPlayer->GetCharacter()->m_DrawEditor.TryEnterPresetName(pMsg->m_pMessage))
+			if (!Command)
+			{
+				if (Durak()->TryEnterBetStake(ClientID, pMsg->m_pMessage) ||
+					(pPlayer->GetCharacter() && pPlayer->GetCharacter()->m_DrawEditor.TryEnterPresetName(pMsg->m_pMessage)))
 				return;
+			}
 
 			// don't allow spectators to disturb players during a running game in tournament mode
 			int Mode = pMsg->m_Mode;
@@ -4208,6 +4213,7 @@ void CGameContext::OnInit()
 					m_Tuning.Set("player_hooking", 0);
 					dbg_msg("front layer", "found no player hooking tile");
 				}
+
 				if (Index > ENTITY_OFFSET)
 				{
 					m_pController->OnEntity(Index, Pos, LAYER_FRONT, pFront[y * pTileMap->m_Width + x].m_Flags);
@@ -4218,7 +4224,7 @@ void CGameContext::OnInit()
 				Index = pSwitch[y * pTileMap->m_Width + x].m_Type;
 				// TODO: Add off by default door here
 				// if (Index == TILE_DOOR_OFF)
-				if (Index > ENTITY_OFFSET)
+				if (Index > ENTITY_OFFSET || Index == TILE_DURAK_TABLE || Index == TILE_DURAK_SEAT)
 				{
 					m_pController->OnEntity(Index, Pos, LAYER_SWITCH, pSwitch[y * pTileMap->m_Width + x].m_Flags, pSwitch[y * pTileMap->m_Width + x].m_Number);
 				}
@@ -4266,33 +4272,54 @@ void CGameContext::FDDraceInitPreMapInit()
 		m_aPlots[i].m_DestroyEndTick = 0;
 		m_aPlots[i].m_DoorHealth = Config()->m_SvPlotDoorHealth;
 	}
+
+	// Durak has to be initialized before the map initialization
+	for (int i = 0; i < NUM_MINIGAMES; i++)
+		if (m_pMinigames[i])
+			delete m_pMinigames[i];
+	m_pMinigames[MINIGAME_BLOCK] = new CMinigame(this, MINIGAME_BLOCK);
+	m_pMinigames[MINIGAME_SURVIVAL] = new CMinigame(this, MINIGAME_SURVIVAL);
+	m_pMinigames[MINIGAME_1VS1] = new CArenas(this, MINIGAME_1VS1);
+	m_pMinigames[MINIGAME_DURAK] = new CDurak(this, MINIGAME_DURAK);
+	m_pMinigames[MINIGAME_INSTAGIB_BOOMFNG] = new CMinigame(this, MINIGAME_INSTAGIB_BOOMFNG);
+	m_pMinigames[MINIGAME_INSTAGIB_FNG] = new CMinigame(this, MINIGAME_INSTAGIB_FNG);
+
+	// check if there are minigame spawns available (survival and instagib are checked in their own ticks)
+	for (int i = 0; i < NUM_MINIGAMES; i++)
+		m_aMinigameDisabled[i] = false;
+	m_aMinigameDisabled[MINIGAME_BLOCK] = !Collision()->TileUsed(TILE_MINIGAME_BLOCK);
+	m_aMinigameDisabled[MINIGAME_1VS1] = !Collision()->TileUsed(TILE_1VS1_LOBBY);
+	m_aMinigameDisabled[MINIGAME_DURAK] = true; // Validate when adding table tiles
 }
 
 void CGameContext::FDDraceInit()
 {
 	// Save memory. Only save those few tiles we really use when calling CCollision::GetRandomTile or CGameworld::CanSpawn (due to calling getrandomtile)
 	bool aRequiredRandomTilePositions[NUM_INDICES] = { 0 };
-	aRequiredRandomTilePositions[ENTITY_SPAWN] = true;
-	aRequiredRandomTilePositions[ENTITY_SPAWN_RED] = true;
-	aRequiredRandomTilePositions[ENTITY_SPAWN_BLUE] = true;
+	#define REQUIRED_TILE(index) aRequiredRandomTilePositions[(index)] = true
+	REQUIRED_TILE(ENTITY_SPAWN);
+	REQUIRED_TILE(ENTITY_SPAWN_RED);
+	REQUIRED_TILE(ENTITY_SPAWN_BLUE);
 	// for dummy spawns
-	aRequiredRandomTilePositions[ENTITY_SHOP_DUMMY_SPAWN] = true;
-	aRequiredRandomTilePositions[ENTITY_PLOT_SHOP_DUMMY_SPAWN] = true;
-	aRequiredRandomTilePositions[ENTITY_BANK_DUMMY_SPAWN] = true;
-	aRequiredRandomTilePositions[ENTITY_TAVERN_DUMMY_SPAWN] = true;
-	aRequiredRandomTilePositions[TILE_SHOP] = true;
-	aRequiredRandomTilePositions[TILE_PLOT_SHOP] = true;
-	aRequiredRandomTilePositions[TILE_BANK] = true;
-	aRequiredRandomTilePositions[TILE_TAVERN] = true;
+	REQUIRED_TILE(ENTITY_SHOP_DUMMY_SPAWN);
+	REQUIRED_TILE(ENTITY_PLOT_SHOP_DUMMY_SPAWN);
+	REQUIRED_TILE(ENTITY_BANK_DUMMY_SPAWN);
+	REQUIRED_TILE(ENTITY_TAVERN_DUMMY_SPAWN);
+	REQUIRED_TILE(TILE_SHOP);
+	REQUIRED_TILE(TILE_PLOT_SHOP);
+	REQUIRED_TILE(TILE_BANK);
+	REQUIRED_TILE(TILE_TAVERN);
 	// minigames
-	aRequiredRandomTilePositions[TILE_MINIGAME_BLOCK] = true;
-	aRequiredRandomTilePositions[TILE_SURVIVAL_LOBBY] = true;
-	aRequiredRandomTilePositions[TILE_SURVIVAL_SPAWN] = true;
-	aRequiredRandomTilePositions[TILE_SURVIVAL_DEATHMATCH] = true;
-	aRequiredRandomTilePositions[TILE_1VS1_LOBBY] = true;
+	REQUIRED_TILE(TILE_MINIGAME_BLOCK);
+	REQUIRED_TILE(TILE_SURVIVAL_LOBBY);
+	REQUIRED_TILE(TILE_SURVIVAL_SPAWN);
+	REQUIRED_TILE(TILE_SURVIVAL_DEATHMATCH);
+	REQUIRED_TILE(TILE_1VS1_LOBBY);
+	REQUIRED_TILE(TILE_DURAK_LOBBY);
 	// jail
-	aRequiredRandomTilePositions[TILE_JAIL] = true;
-	aRequiredRandomTilePositions[TILE_JAIL_RELEASE] = true;
+	REQUIRED_TILE(TILE_JAIL);
+	REQUIRED_TILE(TILE_JAIL_RELEASE);
+	#undef REQUIRED_TILE
 	for (int i = 0; i < NUM_INDICES; i++)
 	{
 		Collision()->m_aTileUsed[i] = Collision()->GetRandomTile(i) != vec2(-1, -1);
@@ -4360,15 +4387,6 @@ void CGameContext::FDDraceInit()
 	m_pHouses[HOUSE_BANK] = new CBank(this);
 	m_pHouses[HOUSE_TAVERN] = new CTavern(this);
 
-	for (int i = 0; i < NUM_MINIGAMES; i++)
-		if (m_pMinigames[i])
-			delete m_pMinigames[i];
-	m_pMinigames[MINIGAME_BLOCK] = new CMinigame(this, MINIGAME_BLOCK);
-	m_pMinigames[MINIGAME_SURVIVAL] = new CMinigame(this, MINIGAME_SURVIVAL);
-	m_pMinigames[MINIGAME_1VS1] = new CArenas(this, MINIGAME_1VS1);
-	m_pMinigames[MINIGAME_INSTAGIB_BOOMFNG] = new CMinigame(this, MINIGAME_INSTAGIB_BOOMFNG);
-	m_pMinigames[MINIGAME_INSTAGIB_FNG] = new CMinigame(this, MINIGAME_INSTAGIB_FNG);
-
 	m_WhoIs.Init(this);
 	m_RainbowName.Init(this);
 
@@ -4376,12 +4394,6 @@ void CGameContext::FDDraceInit()
 	m_SurvivalBackgroundState = SURVIVAL_OFFLINE;
 	m_SurvivalTick = 0;
 	m_SurvivalWinner = -1;
-
-	// check if there are minigame spawns available (survival and instagib are checked in their own ticks)
-	for (int i = 0; i < NUM_MINIGAMES; i++)
-		m_aMinigameDisabled[i] = false;
-	m_aMinigameDisabled[MINIGAME_BLOCK] = !Collision()->TileUsed(TILE_MINIGAME_BLOCK);
-	m_aMinigameDisabled[MINIGAME_1VS1] = !Collision()->TileUsed(TILE_1VS1_LOBBY);
 
 	SetMapSpecificOptions();
 	if (Config()->m_SvDefaultDummies)
@@ -5847,6 +5859,9 @@ int CGameContext::AddAccount()
 	Account.m_PortalBattery = 0;
 	Account.m_PortalBlocker = 0;
 	Account.m_VoteMenuFlags = 0;
+	Account.m_DurakWins = 0;
+	Account.m_DurakTotalStake = 0;
+	Account.m_DurakWinnings = 0;
 
 	m_Accounts.push_back(Account);
 	return m_Accounts.size()-1;
@@ -5941,6 +5956,9 @@ void CGameContext::SetAccVar(int ID, int VariableID, const char *pData)
 	case ACC_PORTAL_BATTERY:			m_Accounts[ID].m_PortalBattery = atoi(pData); break;
 	case ACC_PORTAL_BLOCKER:			m_Accounts[ID].m_PortalBlocker = atoi(pData); break;
 	case ACC_VOTE_MENU_FLAGS:			m_Accounts[ID].m_VoteMenuFlags = atoi(pData); break;
+	case ACC_DURAK_WINS:				m_Accounts[ID].m_DurakWins = atoi(pData); break;
+	case ACC_DURAK_TOTAL_STAKE:			m_Accounts[ID].m_DurakTotalStake = atoi(pData); break;
+	case ACC_DURAK_WINNINGS:			m_Accounts[ID].m_DurakWinnings = atoi(pData); break;
 	}
 }
 
@@ -6000,6 +6018,9 @@ const char *CGameContext::GetAccVarName(int VariableID)
 	case ACC_PORTAL_BATTERY:			return "portal_battery";
 	case ACC_PORTAL_BLOCKER:			return "portal_blocker";
 	case ACC_VOTE_MENU_FLAGS:			return "vote_menu_flags";
+	case ACC_DURAK_WINS:				return "durak_wins";
+	case ACC_DURAK_TOTAL_STAKE:			return "durak_total_stake";
+	case ACC_DURAK_WINNINGS:			return "durak_winnings";
 	}
 	return "Unknown";
 }
@@ -6063,6 +6084,9 @@ const char *CGameContext::GetAccVarValue(int ID, int VariableID)
 	case ACC_PORTAL_BATTERY:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_PortalBattery); break;
 	case ACC_PORTAL_BLOCKER:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_PortalBlocker); break;
 	case ACC_VOTE_MENU_FLAGS:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_VoteMenuFlags); break;
+	case ACC_DURAK_WINS:				str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_DurakWins); break;
+	case ACC_DURAK_TOTAL_STAKE:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_DurakTotalStake); break;
+	case ACC_DURAK_WINNINGS:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_DurakWinnings); break;
 	}
 	return aBuf;
 }
@@ -6496,13 +6520,12 @@ int CGameContext::LoadSavedPlayersCallback(const char *pName, int IsDir, int Sto
 
 void CGameContext::ExpireSavedIdentities()
 {
-	for (int i = 0; i < (int)m_vSavedIdentities.size(); i++)
+	for (int i = (int)m_vSavedIdentities.size() - 1; i >= 0; i--)
 	{
 		if (IsExpired(m_vSavedIdentities[i].m_ExpireDate))
 		{
 			RemoveSavedIdentityFile(m_vSavedIdentities[i]);
 			m_vSavedIdentities.erase(m_vSavedIdentities.begin() + i);
-			i--;
 		}
 	}
 }
@@ -7945,6 +7968,8 @@ const char *CGameContext::GetMinigameName(int Minigame)
 		return "Instagib FNG";
 	case MINIGAME_1VS1:
 		return "1vs1";
+	case MINIGAME_DURAK:
+		return "Durák";
 	}
 	return "Unknown";
 }
@@ -7965,11 +7990,13 @@ const char* CGameContext::GetMinigameCommand(int Minigame)
 		return "fng";
 	case MINIGAME_1VS1:
 		return "1vs1";
+	case MINIGAME_DURAK:
+		return "durak";
 	}
 	return "unknown";
 }
 
-void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force)
+void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force, bool DoChatMsg)
 {
 	CPlayer *pPlayer = m_apPlayers[ClientID];
 	if (!pPlayer)
@@ -7980,7 +8007,8 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force)
 	// check whether minigame is disabled
 	if (Minigame != MINIGAME_NONE && m_aMinigameDisabled[Minigame])
 	{
-		SendChatTarget(ClientID, "This minigame is disabled");
+		if (DoChatMsg)
+			SendChatTarget(ClientID, "This minigame is disabled");
 		return;
 	}
 
@@ -7988,24 +8016,40 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force)
 	if (pPlayer->m_Minigame == Minigame)
 	{
 		// you can't leave when you're not in a minigame
-		if (Minigame == MINIGAME_NONE)
-			SendChatTarget(ClientID, "You are not in a minigame");
-		else
+		if (DoChatMsg)
 		{
-			str_format(aMsg, sizeof(aMsg), "You are already in minigame '%s'", GetMinigameName(Minigame));
-			SendChatTarget(ClientID, aMsg);
+			if (Minigame == MINIGAME_NONE)
+				SendChatTarget(ClientID, "You are not in a minigame");
+			else
+			{
+				str_format(aMsg, sizeof(aMsg), "You are already in minigame '%s'", GetMinigameName(Minigame));
+				SendChatTarget(ClientID, aMsg);
+			}
 		}
 		return;
 	}
 
-	if (!Force && pPlayer->RequestMinigameChange(Minigame))
-		return;
+	if (!Force)
+	{
+		if (Minigame == MINIGAME_DURAK && !Collision()->TileUsed(TILE_DURAK_LOBBY))
+		{
+			SendChatTarget(ClientID, "This map has no Durák lobby, you have to find your way to the table yourself");
+			return;
+		}
+		else if (pPlayer->RequestMinigameChange(Minigame))
+		{
+			return;
+		}
+	}
 
 	// leave minigame
 	if (Minigame == MINIGAME_NONE)
 	{
-		str_format(aMsg, sizeof(aMsg), "'%s' left the minigame '%s'", Server()->ClientName(ClientID), GetMinigameName(pPlayer->m_Minigame));
-		SendChat(-1, CHAT_ALL, -1, aMsg);
+		if (DoChatMsg)
+		{
+			str_format(aMsg, sizeof(aMsg), "'%s' left the minigame '%s'", Server()->ClientName(ClientID), GetMinigameName(pPlayer->m_Minigame));
+			SendChat(-1, CHAT_ALL, -1, aMsg);
+		}
 
 		//reset everything
 		if (pPlayer->m_Minigame == MINIGAME_SURVIVAL)
@@ -8018,19 +8062,29 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force)
 		{
 			Arenas()->OnPlayerLeave(ClientID);
 		}
+		else if (pPlayer->m_Minigame == MINIGAME_DURAK)
+		{
+			Durak()->OnPlayerLeave(ClientID);
+		}
 	}
 	// join minigame
 	else if (!pPlayer->IsMinigame())
 	{
-		str_format(aMsg, sizeof(aMsg), "'%s' joined the minigame '%s', use '/%s' to join aswell", Server()->ClientName(ClientID), GetMinigameName(Minigame), GetMinigameCommand(Minigame));
-		SendChat(-1, CHAT_ALL, -1, aMsg);
-		SendChatTarget(ClientID, "Say '/leave' to join the normal area again");
+		if (DoChatMsg)
+		{
+			str_format(aMsg, sizeof(aMsg), "'%s' joined the minigame '%s', use '/%s' to join aswell", Server()->ClientName(ClientID), GetMinigameName(Minigame), GetMinigameCommand(Minigame));
+			SendChat(-1, CHAT_ALL, -1, aMsg);
+			SendChatTarget(ClientID, "Say '/leave' to join the normal area again");
+		}
 
 		// Save character stats to reload them after leaving
 		pPlayer->SaveMinigameTee();
 
 		//set minigame required stuff
-		((CGameControllerDDRace *)m_pController)->m_Teams.SetForceCharacterTeam(ClientID, 0);
+		if (Minigame != MINIGAME_DURAK)
+		{
+			((CGameControllerDDRace *)m_pController)->m_Teams.SetForceCharacterTeam(ClientID, 0);
+		}
 
 		if (Minigame == MINIGAME_SURVIVAL)
 		{

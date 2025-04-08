@@ -51,7 +51,7 @@ void CArenas::Reset(int ClientID)
 int CArenas::GetFreeArena()
 {
 	for (int i = 0; i < MAX_FIGHTS; i++)
-		if (!m_aFights[i].m_Active)
+		if (!m_aFights[i].m_Active && ((CGameControllerDDRace *)GameServer()->m_pController)->m_Teams.Count(i) == 0)
 			return i;
 	return -1;
 }

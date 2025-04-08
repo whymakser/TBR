@@ -19,6 +19,7 @@
 #include "houses/house.h"
 #include "minigames/minigame.h"
 #include "minigames/arenas.h"
+#include "minigames/durak.h"
 
 #include "eventhandler.h"
 #include "gameworld.h"
@@ -101,7 +102,7 @@ enum
 	MAX_PASSWORD_LENGTH = 128,
 
 	// update this one with every acc change you do
-	ACC_CURRENT_VERSION = 11,
+	ACC_CURRENT_VERSION = 12,
 
 	// vip
 	VIP_CLASSIC = 1,
@@ -574,6 +575,9 @@ public:
 		int m_PortalBattery;
 		int m_PortalBlocker;
 		int m_VoteMenuFlags;
+		int m_DurakWins;
+		int m_DurakTotalStake;
+		int m_DurakWinnings;
 	};
 	std::vector<AccountInfo> m_Accounts;
 
@@ -633,6 +637,9 @@ public:
 		ACC_PORTAL_BATTERY,
 		ACC_PORTAL_BLOCKER,
 		ACC_VOTE_MENU_FLAGS,
+		ACC_DURAK_WINS,
+		ACC_DURAK_TOTAL_STAKE,
+		ACC_DURAK_WINNINGS,
 		NUM_ACCOUNT_VARIABLES
 	};
 
@@ -688,6 +695,7 @@ public:
 	class CHouse *m_pHouses[NUM_HOUSES];
 	class CMinigame *m_pMinigames[NUM_MINIGAMES];
 	CArenas *Arenas() { return ((CArenas *)m_pMinigames[MINIGAME_1VS1]); }
+	CDurak *Durak() { return ((CDurak *)m_pMinigames[MINIGAME_DURAK]); }
 	CWhoIs m_WhoIs;
 	CRainbowName m_RainbowName;
 	CVotingMenu m_VotingMenu;
@@ -732,7 +740,7 @@ public:
 	//minigames disabled
 	bool m_aMinigameDisabled[NUM_MINIGAMES];
 
-	void SetMinigame(int ClientID, int Minigame, bool Force = false);
+	void SetMinigame(int ClientID, int Minigame, bool Force = false, bool DoChatMsg = true);
 
 	//survival
 	void SurvivalTick();
@@ -919,6 +927,7 @@ private:
 	static void ConJoinBoomFNG(IConsole::IResult* pResult, void* pUserData);
 	static void ConJoinFNG(IConsole::IResult* pResult, void* pUserData);
 	static void Con1VS1(IConsole::IResult* pResult, void* pUserData);
+	static void ConJoinDurak(IConsole::IResult* pResult, void* pUserData);
 
 	static void ConResumeMoved(IConsole::IResult* pResult, void* pUserData);
 	static void ConMutePlayer(IConsole::IResult* pResult, void* pUserData);

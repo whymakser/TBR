@@ -1299,6 +1299,11 @@ void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 		GameServer()->Arenas()->OnInput(m_pPlayer->GetCID(), pNewInput);
 		ResetInput |= 2;
 	}
+	else if (GameServer()->Durak()->ActivelyPlaying(m_pPlayer->GetCID()))
+	{
+		GameServer()->Durak()->OnInput(this, pNewInput);
+		ResetInput |= 1;
+	}
 	else if (m_DrawEditor.Active())
 	{
 		m_DrawEditor.OnInput(pNewInput);
@@ -3538,6 +3543,17 @@ void CCharacter::HandleTiles(int Index)
 			LoadRedirectTile(Port);
 		return;
 	}
+	else if (GameServer()->Collision()->IsSwitch(MapIndex) == TILE_DURAK_SEAT && SwitchNumber > 0 && GameServer()->Collision()->GetMapIndex(m_Pos) == MapIndex) // check for mapindex so m_Pos..m_PrevPos intersection doesnt trigger
+	{
+		if (FightStarted)
+		{
+			Die(WEAPON_SELF);
+			return;
+		}
+
+		int Delay = GameServer()->Collision()->GetSwitchDelay(MapIndex);
+		GameServer()->Durak()->OnCharacterSeat(m_pPlayer->GetCID(), SwitchNumber, Delay-1);
+	}
 
 	if (GameServer()->Collision()->IsSwitch(MapIndex) != TILE_PENALTY)
 	{
@@ -4276,6 +4292,10 @@ void CCharacter::HandleCursor()
 	{
 		m_DynamicCamera = CameraLength > 632.0f && CameraLength < 634.0f;
 		m_CameraMaxLength = CameraLength;
+		if (m_DynamicCamera)
+		{
+			m_pPlayer->m_ZoomCursor = false;
+		}
 	}
 
 	// normal cusor position for zoom 1.0 (level 10)
@@ -4718,11 +4738,7 @@ void CCharacter::IncreasePermille(int Permille)
 	if (m_Permille <= Config()->m_SvGrogMinPermilleLimit)
 	{
 		// 10 minutes passive, if you dont drink in this time, ur gonna have a ratio of 2/3, cuz 1 drink = passive + 0.3, so 15 min to decrease 0.3, but 10 min passive
-		if (!m_Passive || m_PassiveEndTick)
-		{
-			m_PassiveEndTick = Server()->Tick() + Server()->TickSpeed() * 60 * 10;
-			Passive(true, -1, true);
-		}
+		UpdatePassiveEndTick(Server()->Tick() + Server()->TickSpeed() * 60 * 10);
 	}
 	else
 	{
@@ -4792,7 +4808,7 @@ bool CCharacter::AddGrog()
 
 void CCharacter::DropMoney(int64 Amount, int Dir, bool GlobalPickupDelay)
 {
-	if (Amount <= 0 || Amount > m_pPlayer->GetUsableMoney())
+	if (Amount <= 0 || Amount > m_pPlayer->GetUsableMoney() || GameServer()->Durak()->OnDropMoney(m_pPlayer->GetCID(), Amount))
 		return;
 
 	if (Dir == -3)
@@ -5413,11 +5429,7 @@ bool CCharacter::LoadRedirectTile(int Port)
 				ForceSetPos(Pos);
 
 				int64 NewEndTick = Server()->Tick() + Server()->TickSpeed() * 3;
-				if (!m_Passive || (m_PassiveEndTick && m_PassiveEndTick < NewEndTick))
-				{
-					m_PassiveEndTick = NewEndTick;
-					Passive(true, -1, true);
-				}
+				UpdatePassiveEndTick(NewEndTick);
 				return true;
 			}
 		}
@@ -5431,6 +5443,16 @@ bool CCharacter::LoadRedirectTile(int Port)
 	if (GameServer()->m_pController->CanSpawn(&Pos, ENTITY_SPAWN, Team()))
 		ForceSetPos(Pos);
 	return false;
+}
+
+bool CCharacter::UpdatePassiveEndTick(int64 NewEndTick)
+{
+	if (m_Passive && (!m_PassiveEndTick || m_PassiveEndTick >= NewEndTick))
+		return false;
+
+	m_PassiveEndTick = NewEndTick;
+	Passive(true, -1, true);
+	return true;
 }
 
 void CCharacter::AddCheckpointList(int Port, int Checkpoint)
