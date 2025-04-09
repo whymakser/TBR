@@ -471,6 +471,14 @@ void CGameTeams::SendTeamsState(int ClientID)
 			}
 		}
 
+		// durak handling
+		int DurakTeam = GameServer()->Durak()->GetTeam(ClientID, i);
+		if (DurakTeam != -1)
+		{
+			Msg.AddInt(DurakTeam);
+			continue;
+		}
+
 		// see others selector
 		int Indicator = GameServer()->m_World.GetSeeOthersInd(ClientID, i);
 		if (Indicator != -1)
