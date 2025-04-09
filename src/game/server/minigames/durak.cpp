@@ -1109,6 +1109,9 @@ bool CDurak::UpdateGame(int Game)
 		str_format(aBuf, sizeof(aBuf), "'%s' is the Durák!", Server()->ClientName(DurakClientID));
 		SendChatToParticipants(Game, aBuf);
 
+		// Simulate ending move, so we end up in DURAK_PLAYERSTATE_NONE, so we can move after finishing
+		pGame->GetSeatByClient(DurakClientID)->m_Player.m_EndedMove = true;
+
 		pGame->m_GameOverTick = Server()->Tick();
 		return true;
 	}
