@@ -667,13 +667,13 @@ public:
 		{
 			if (!pair.m_Offense.Valid())
 			{
-				pair.m_Offense.m_Suit = pCard->m_Suit;
-				pair.m_Offense.m_Rank = pCard->m_Rank;
-				RemoveCard(Seat, pCard);
-
 				int NewDefender = GetNextPlayer(m_DefenderIndex);
 				if ((int)m_aSeats[NewDefender].m_Player.m_vHandCards.size() < NumAttacks + 1)
 					return false;
+
+				pair.m_Offense.m_Suit = pCard->m_Suit;
+				pair.m_Offense.m_Rank = pCard->m_Rank;
+				RemoveCard(Seat, pCard);
 
 				// Successfully moved
 				m_AttackerIndex = m_DefenderIndex;
