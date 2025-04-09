@@ -1099,22 +1099,30 @@ bool CDurak::UpdateGame(int Game)
 	if (!pGame->m_Running)
 		return false;
 
-	int DurakClientID = -1;
-	if (pGame->IsGameOver(&DurakClientID))
+	if (pGame->IsGameOver())
 	{
 		if (pGame->m_GameOverTick)
 		{
-			if (pGame->m_GameOverTick < Server()->Tick() - Server()->TickSpeed() * 30)
+			if (pGame->m_GameOverTick < Server()->Tick() - Server()->TickSpeed() * 15)
 			{
 				EndGame(Game);
 			}
 			return true;
 		}
 
+		for (unsigned int w = 0; w < pGame->m_vWinners.size(); w++)
+		{
+			if (pGame->CanProcessWin(pGame->m_vWinners[w]))
+			{
+				ProcessPlayerWin(Game, &pGame->m_aSeats[pGame->m_vWinners[w]], w);
+				break;
+			}
+		}
+
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "'%s' is the Durák!", Server()->ClientName(DurakClientID));
+		str_format(aBuf, sizeof(aBuf), "'%s' is the Durák!", Server()->ClientName(pGame->m_DurakClientID));
 		SendChatToParticipants(Game, aBuf);
-		EndMove(DurakClientID, Game, pGame->GetSeatByClient(DurakClientID));
+		EndMove(pGame->m_DurakClientID, Game, pGame->GetSeatByClient(pGame->m_DurakClientID));
 		pGame->m_GameOverTick = Server()->Tick();
 		return true;
 	}
@@ -1290,11 +1298,11 @@ void CDurak::SetShowAttackersTurn(int Game)
 void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bool ForceEnd)
 {
 	CDurakGame *pGame = m_vpGames[Game];
-	// A durak has been found already, do not dupe money, even if he places his last card. Do not process win
-	if (pGame->m_GameOverTick)
+	int ClientID = pSeat->m_Player.m_ClientID;
+	// Durak doesnt get any stake
+	if (!pGame->CanProcessWin(pSeat->m_ID))
 		return;
 
-	int ClientID = pSeat->m_Player.m_ClientID;
 	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 
 	// WinPos == -1: Force last player, if somebody won before, 0: nobody won before

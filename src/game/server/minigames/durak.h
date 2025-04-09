@@ -212,6 +212,7 @@ public:
 		m_LeftPlayersStake = 0;
 		m_ShowAttackersTurnUntil = 0;
 		m_IsDefenseOngoing = false;
+		m_DurakClientID = -1;
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 		{
 			m_aSeats[i].m_ID = i;
@@ -301,6 +302,7 @@ public:
 	int64 m_LeftPlayersStake;
 	int64 m_ShowAttackersTurnUntil;
 	bool m_IsDefenseOngoing;
+	int m_DurakClientID;
 
 	SSeat *GetSeatByClient(int ClientID)
 	{
@@ -511,7 +513,7 @@ public:
 					}
 					else
 					{
-						if (m_aSeats[Index].m_Player.m_vHandCards.empty())
+						if (m_aSeats[Index].m_Player.m_vHandCards.empty() && std::find(m_vWinners.begin(), m_vWinners.end(), Index) == m_vWinners.end())
 						{
 							m_vWinners.push_back(Index);
 						}
@@ -532,7 +534,7 @@ public:
 		return vOpenAttackIndices;
 	}
 
-	bool IsGameOver(int *pDurakClientID = 0)
+	bool IsGameOver()
 	{
 		int PlayersLeft = 0;
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
@@ -540,14 +542,12 @@ public:
 			if (m_aSeats[i].m_Player.m_ClientID != -1 && !m_aSeats[i].m_Player.m_vHandCards.empty())
 			{
 				PlayersLeft++;
-				if (pDurakClientID)
-					*pDurakClientID = m_aSeats[i].m_Player.m_ClientID;
+				m_DurakClientID = m_aSeats[i].m_Player.m_ClientID;
 			}
 		}
 		if (PlayersLeft >= MIN_DURAK_PLAYERS || !m_Deck.IsEmpty())
 		{
-			if (pDurakClientID)
-				*pDurakClientID = -1;
+			m_DurakClientID = -1;
 			return false;
 		}
 		return true;
@@ -555,7 +555,7 @@ public:
 
 	bool CanProcessWin(int Seat)
 	{
-		return m_Running && m_aSeats[Seat].m_Player.m_Stake >= 0;
+		return m_Running && m_aSeats[Seat].m_Player.m_Stake >= 0 && m_aSeats[Seat].m_Player.m_ClientID != m_DurakClientID;
 	}
 
 	bool TryAttack(int Seat, CCard *pCard)
@@ -690,7 +690,7 @@ public:
 			[&](const CCard &c) { return c.m_Suit == pCard->m_Suit && c.m_Rank == pCard->m_Rank; }),
 			vHand.end());
 
-		if (m_Deck.IsEmpty() && m_aSeats[Seat].m_Player.m_vHandCards.empty())
+		if (m_Deck.IsEmpty() && m_aSeats[Seat].m_Player.m_vHandCards.empty() && std::find(m_vWinners.begin(), m_vWinners.end(), Seat) == m_vWinners.end())
 		{
 			m_vWinners.push_back(Seat);
 		}
