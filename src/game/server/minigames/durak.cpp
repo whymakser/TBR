@@ -921,6 +921,7 @@ bool CDurak::UpdateGame(int Game)
 		}
 		
 		// Hide name of players who are not actively participating right now
+		pChr->EpicCircle(pGame->m_DefenderIndex == i, -1, true);
 		if (!pSeat->m_Player.m_EndedMove && pChr)
 		{
 			pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
@@ -1106,7 +1107,7 @@ bool CDurak::UpdateGame(int Game)
 	{
 		if (pGame->m_GameOverTick)
 		{
-			if (pGame->m_GameOverTick < Server()->Tick() - Server()->TickSpeed() * 10)
+			if (pGame->m_GameOverTick < Server()->Tick() - Server()->TickSpeed() * 30)
 			{
 				EndGame(Game);
 			}
@@ -1119,6 +1120,7 @@ bool CDurak::UpdateGame(int Game)
 
 		// Simulate ending move, so we end up in DURAK_PLAYERSTATE_NONE, so we can move after finishing
 		pGame->GetSeatByClient(DurakClientID)->m_Player.m_EndedMove = true;
+		GameServer()->SendTuningParams(DurakClientID);
 
 		pGame->m_GameOverTick = Server()->Tick();
 		return true;
@@ -1258,9 +1260,6 @@ void CDurak::SetShowAttackersTurn(int Game)
 		{
 			m_vpGames[Game]->m_aSeats[i].m_Player.m_Tooltip = CCard::TOOLTIP_ATTACKERS_TURN;
 			m_aCardUpdate[ClientID][&m_aStaticCards[DURAK_TEXT_TOOLTIP]] = true;
-
-			CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
-			if (pChr) pChr->EpicCircle(m_vpGames[Game]->m_DefenderIndex == i, -1, true);
 		}
 	}
 }
@@ -1334,6 +1333,7 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bo
 
 	// Simulate ending move, so we end up in DURAK_PLAYERSTATE_NONE, so we can move after finishing
 	pSeat->m_Player.m_EndedMove = true;
+	GameServer()->SendTuningParams(ClientID);
 }
 
 void CDurak::Snap(int SnappingClient)
