@@ -4296,6 +4296,8 @@ void CGameContext::FDDraceInitPreMapInit()
 
 	for (int i = 0; i < NUM_MINIGAMES; i++)
 		m_aMinigameDisabled[i] = false;
+	// Validate when adding table tiles
+	m_aMinigameDisabled[MINIGAME_DURAK] = true;
 }
 
 void CGameContext::FDDraceInit()
@@ -4336,7 +4338,6 @@ void CGameContext::FDDraceInit()
 	// check if there are minigame spawns available (survival and instagib are checked in their own ticks)
 	m_aMinigameDisabled[MINIGAME_BLOCK] = !Collision()->TileUsed(TILE_MINIGAME_BLOCK);
 	m_aMinigameDisabled[MINIGAME_1VS1] = !Collision()->TileUsed(TILE_1VS1_LOBBY);
-	m_aMinigameDisabled[MINIGAME_DURAK] = true; // Validate when adding table tiles
 
 	CreateFolders();
 
