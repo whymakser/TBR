@@ -919,10 +919,12 @@ bool CDurak::UpdateGame(int Game)
 				break;
 			}
 		}
-		
-		// Hide name of players who are not actively participating right now
+
+		if (!pChr || ProcessedWinAlready)
+			continue;
+
 		pChr->EpicCircle(pGame->m_DefenderIndex == i, -1, true);
-		if (!pSeat->m_Player.m_EndedMove && pChr)
+		if (!pSeat->m_Player.m_EndedMove)
 		{
 			pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
 			const int NumHands = (int)pSeat->m_Player.m_vHandCards.size();
@@ -935,9 +937,6 @@ bool CDurak::UpdateGame(int Game)
 				pSeat->m_Player.m_LastNumHandCards = NumHands;
 			}
 		}
-
-		if (!pChr || ProcessedWinAlready)
-			continue;
 
 		// Card sorting
 		unsigned int NumCards = pSeat->m_Player.m_vHandCards.size();
@@ -1152,6 +1151,7 @@ bool CDurak::UpdateGame(int Game)
 			int DefenderID = pGame->m_aSeats[pGame->m_DefenderIndex].m_Player.m_ClientID;
 			str_format(aBuf, sizeof(aBuf), "'%s' successfully defended", Server()->ClientName(DefenderID));
 			SendChatToParticipants(Game, aBuf);
+			GameServer()->CreateFinishConfetti(GameServer()->Collision()->GetPos(pGame->m_aSeats[pGame->m_DefenderIndex].m_MapIndex));
 			StartNextRound(Game, true);
 		}
 		else if (HasUndefendedAttacks && !Skip)
@@ -1438,7 +1438,8 @@ void CDurak::PrepareStaticCards(int SnappingClient, CDurakGame *pGame, CDurakGam
 				}
 				else if (pGame->m_Deck.Size() != 1)
 				{
-					if (i < (int)pGame->m_Deck.Size())
+					int Inversed = 5 - i - 1;
+					if (Inversed  < (int)pGame->m_Deck.Size())
 					{
 						pCard->m_Active = true;
 						pCard->Invalidate();
