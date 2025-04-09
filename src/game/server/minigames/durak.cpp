@@ -1466,7 +1466,7 @@ void CDurak::PrepareStaticCards(int SnappingClient, CDurakGame *pGame, CDurakGam
 						}
 					}
 
-					if (pSeat->m_Player.m_LastCursorMove < Server()->Tick() - Server()->TickSpeed() / 3)
+					if (pSeat->m_Player.m_LastCursorMove < Server()->Tick() - Server()->TickSpeed() / 4)
 					{
 						pCard->SetTooltip(pSeat->m_Player.m_Tooltip);
 					}
