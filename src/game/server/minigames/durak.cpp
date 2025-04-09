@@ -1555,25 +1555,13 @@ void CDurak::PostSnap()
 void CDurak::UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, int> &NewMap, CDurakGame *pGame)
 {
 	auto &OldMap = m_aLastSnapID[SnappingClient];
-	std::vector<int> DisconnectIDs;
-	std::vector<std::pair<CCard*, int>> ConnectCards;
-
 	// First pass: identify disconnects
 	for (auto &[pOldCard, OldID] : OldMap)
 	{
 		auto it = NewMap.find(pOldCard);
-		bool NeedsDisconnect = false;
-	
-		if (it == NewMap.end()) // Card no longer exists
-			NeedsDisconnect = true;
-		else if (it->second != OldID) // ID changed
-			NeedsDisconnect = true;
-		else if (m_aCardUpdate[SnappingClient][pOldCard]) // Card needs update
-			NeedsDisconnect = true;
-	
-		if (NeedsDisconnect)
+		if (it == NewMap.end() || it->second != OldID || m_aCardUpdate[SnappingClient][pOldCard])
 		{
-			DisconnectIDs.push_back(OldID);
+			GameServer()->m_apPlayers[SnappingClient]->SendDisconnect(OldID);
 			m_aUpdateTeamsState[SnappingClient] = true;
 		}
 	}
@@ -1582,50 +1570,30 @@ void CDurak::UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, i
 	for (auto &[pCard, NewID] : NewMap)
 	{
 		auto it = OldMap.find(pCard);
-		bool NeedsConnect = false;
-	
-		if (it == OldMap.end()) // New card
-			NeedsConnect = true;
-		else if (it->second != NewID) // ID changed
-			NeedsConnect = true;
-		else if (m_aCardUpdate[SnappingClient][pCard]) // Card needs update
-			NeedsConnect = true;
-	
-		if (NeedsConnect)
+		
+		if (it == OldMap.end() || it->second != NewID || m_aCardUpdate[SnappingClient][pCard])
 		{
-			ConnectCards.push_back({pCard, NewID});
 			m_aUpdateTeamsState[SnappingClient] = true;
-		}
-	}
-
-	// Process all disconnects first
-	for (int id : DisconnectIDs)
-	{
-		GameServer()->m_apPlayers[SnappingClient]->SendDisconnect(id);
-	}
-
-	// Then process all connects
-	for (auto &[pCard, NewID] : ConnectCards)
-	{
-		if (!Server()->IsSevendown(SnappingClient))
-		{
-			CNetMsg_Sv_ClientInfo NewClientInfoMsg;
-			NewClientInfoMsg.m_ClientID = NewID;
-			NewClientInfoMsg.m_Local = 0;
-			NewClientInfoMsg.m_Team = TEAM_BLUE;
-			NewClientInfoMsg.m_pName = GetCardSymbol(pCard->m_Suit, pCard->m_Rank, pGame);
-			NewClientInfoMsg.m_pClan = "";
-			NewClientInfoMsg.m_Country = -1;
-			NewClientInfoMsg.m_Silent = 1;
-			for (int p = 0; p < NUM_SKINPARTS; p++)
+			if (!Server()->IsSevendown(SnappingClient))
 			{
-				NewClientInfoMsg.m_apSkinPartNames[p] = "default";
-				NewClientInfoMsg.m_aUseCustomColors[p] = 1;
-				NewClientInfoMsg.m_aSkinPartColors[p] = 255;
+				CNetMsg_Sv_ClientInfo NewClientInfoMsg;
+				NewClientInfoMsg.m_ClientID = NewID;
+				NewClientInfoMsg.m_Local = 0;
+				NewClientInfoMsg.m_Team = TEAM_BLUE;
+				NewClientInfoMsg.m_pName = GetCardSymbol(pCard->m_Suit, pCard->m_Rank, pGame);
+				NewClientInfoMsg.m_pClan = "";
+				NewClientInfoMsg.m_Country = -1;
+				NewClientInfoMsg.m_Silent = 1;
+				for (int p = 0; p < NUM_SKINPARTS; p++)
+				{
+					NewClientInfoMsg.m_apSkinPartNames[p] = "default";
+					NewClientInfoMsg.m_aUseCustomColors[p] = 1;
+					NewClientInfoMsg.m_aSkinPartColors[p] = 255;
+				}
+				Server()->SendPackMsg(&NewClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD|MSGFLAG_NOTRANSLATE, SnappingClient);
 			}
-			Server()->SendPackMsg(&NewClientInfoMsg, MSGFLAG_VITAL|MSGFLAG_NORECORD|MSGFLAG_NOTRANSLATE, SnappingClient);
+			m_aCardUpdate[SnappingClient][pCard] = false;
 		}
-		m_aCardUpdate[SnappingClient][pCard] = false;
 	}
 
 	// Update the old map with the new map
