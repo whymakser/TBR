@@ -5777,6 +5777,12 @@ int CGameContext::InitAccounts(const char *pName, int IsDir, int StorageType, vo
 		if (ID < ACC_START)
 			return 0;
 
+		if (pSelf->m_Accounts[ID].m_Version == 12)
+		{
+			pSelf->m_Accounts[ID].m_DurakProfit = pSelf->m_Accounts[ID].m_DurakWinnings - pSelf->m_Accounts[ID].m_DurakProfit;
+			pSelf->m_Accounts[ID].m_DurakWinnings = 0;
+		}
+
 		// load all accounts into the top account list too
 		pSelf->SetTopAccStats(ID);
 
@@ -5875,7 +5881,7 @@ int CGameContext::AddAccount()
 	Account.m_PortalBlocker = 0;
 	Account.m_VoteMenuFlags = 0;
 	Account.m_DurakWins = 0;
-	Account.m_DurakTotalStake = 0;
+	Account.m_DurakProfit = 0;
 	Account.m_DurakWinnings = 0;
 
 	m_Accounts.push_back(Account);
@@ -5972,7 +5978,7 @@ void CGameContext::SetAccVar(int ID, int VariableID, const char *pData)
 	case ACC_PORTAL_BLOCKER:			m_Accounts[ID].m_PortalBlocker = atoi(pData); break;
 	case ACC_VOTE_MENU_FLAGS:			m_Accounts[ID].m_VoteMenuFlags = atoi(pData); break;
 	case ACC_DURAK_WINS:				m_Accounts[ID].m_DurakWins = atoi(pData); break;
-	case ACC_DURAK_TOTAL_STAKE:			m_Accounts[ID].m_DurakTotalStake = atoll(pData); break;
+	case ACC_DURAK_PROFIT:				m_Accounts[ID].m_DurakProfit = atoll(pData); break;
 	case ACC_DURAK_WINNINGS:			m_Accounts[ID].m_DurakWinnings = atoll(pData); break;
 	}
 }
@@ -6034,7 +6040,7 @@ const char *CGameContext::GetAccVarName(int VariableID)
 	case ACC_PORTAL_BLOCKER:			return "portal_blocker";
 	case ACC_VOTE_MENU_FLAGS:			return "vote_menu_flags";
 	case ACC_DURAK_WINS:				return "durak_wins";
-	case ACC_DURAK_TOTAL_STAKE:			return "durak_total_stake";
+	case ACC_DURAK_PROFIT:				return "durak_profit";
 	case ACC_DURAK_WINNINGS:			return "durak_winnings";
 	}
 	return "Unknown";
@@ -6100,7 +6106,7 @@ const char *CGameContext::GetAccVarValue(int ID, int VariableID)
 	case ACC_PORTAL_BLOCKER:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_PortalBlocker); break;
 	case ACC_VOTE_MENU_FLAGS:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_VoteMenuFlags); break;
 	case ACC_DURAK_WINS:				str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_DurakWins); break;
-	case ACC_DURAK_TOTAL_STAKE:			str_format(aBuf, sizeof(aBuf), "%lld", m_Accounts[ID].m_DurakTotalStake); break;
+	case ACC_DURAK_PROFIT:				str_format(aBuf, sizeof(aBuf), "%lld", m_Accounts[ID].m_DurakProfit); break;
 	case ACC_DURAK_WINNINGS:			str_format(aBuf, sizeof(aBuf), "%lld", m_Accounts[ID].m_DurakWinnings); break;
 	}
 	return aBuf;

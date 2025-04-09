@@ -683,10 +683,7 @@ bool CDurak::HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg)
 		if (AccID >= ACC_START)
 		{
 			CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[AccID];
-			if (Amount > 0)
-				pAccount->m_DurakWinnings += Amount;
-			else
-				pAccount->m_DurakTotalStake += abs(Amount);
+			pAccount->m_DurakProfit += Amount;
 		}
 		return true;
 	}

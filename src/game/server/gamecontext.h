@@ -102,7 +102,7 @@ enum
 	MAX_PASSWORD_LENGTH = 128,
 
 	// update this one with every acc change you do
-	ACC_CURRENT_VERSION = 12,
+	ACC_CURRENT_VERSION = 13,
 
 	// vip
 	VIP_CLASSIC = 1,
@@ -576,7 +576,7 @@ public:
 		int m_PortalBlocker;
 		int m_VoteMenuFlags;
 		int m_DurakWins;
-		int64 m_DurakTotalStake;
+		int64 m_DurakProfit;
 		int64 m_DurakWinnings;
 	};
 	std::vector<AccountInfo> m_Accounts;
@@ -638,7 +638,7 @@ public:
 		ACC_PORTAL_BLOCKER,
 		ACC_VOTE_MENU_FLAGS,
 		ACC_DURAK_WINS,
-		ACC_DURAK_TOTAL_STAKE,
+		ACC_DURAK_PROFIT,
 		ACC_DURAK_WINNINGS,
 		NUM_ACCOUNT_VARIABLES
 	};

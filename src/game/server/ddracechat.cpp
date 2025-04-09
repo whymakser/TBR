@@ -1423,9 +1423,7 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			str_format(aBuf, sizeof(aBuf), "Games won: %d", pAccount->m_DurakWins);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "Money winnings: %lld", pAccount->m_DurakWinnings);
-			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "Total stake: %lld", pAccount->m_DurakTotalStake);
+			str_format(aBuf, sizeof(aBuf), "Profit: %s%lld", pAccount->m_DurakProfit > 0 ? "+" : "", pAccount->m_DurakProfit);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 		} break;
 
