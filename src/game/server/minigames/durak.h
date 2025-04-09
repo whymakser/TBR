@@ -115,7 +115,8 @@ public:
 		IND_TOOLTIP_PUSH = -12,
 		IND_TOOLTIP_END_MOVE = -13,
 		IND_TOOLTIP_TAKE_CARDS = -14,
-		IND_SELECT_ATTACK = -15,
+		IND_TOOLTIP_SELECT_ATTACK = -15,
+		IND_TOOLTIP_ATTACKERS_TURN = -16,
 	};
 	enum
 	{
@@ -126,6 +127,7 @@ public:
 		TOOLTIP_END_MOVE,
 		TOOLTIP_TAKE_CARDS,
 		TOOLTIP_SELECT_ATTACK,
+		TOOLTIP_ATTACKERS_TURN,
 		NUM_TOOLTIPS
 	};
 	void SetInd(EIndicatorSuit IndSuit)
@@ -208,6 +210,7 @@ public:
 		m_NextMove = 0;
 		m_GameOverTick = 0;
 		m_LeftPlayersStake = 0;
+		m_ShowAttackersTurnUntil = 0;
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 		{
 			m_aSeats[i].m_ID = i;
@@ -293,6 +296,7 @@ public:
 	std::vector<int> m_vWinners;
 	int64 m_GameOverTick;
 	int64 m_LeftPlayersStake;
+	int64 m_ShowAttackersTurnUntil;
 
 	SSeat *GetSeatByClient(int ClientID)
 	{
@@ -411,7 +415,7 @@ public:
 	{
 		bool AllPlayersEndedMove = true;
 		for (int i = 0; i < MAX_PLAYERS; i++)
-			if (m_aSeats[i].m_Player.m_ClientID != -1 && !m_aSeats[i].m_Player.m_EndedMove)
+			if (GetStateBySeat(i) == DURAK_PLAYERSTATE_ATTACK)
 			{
 				AllPlayersEndedMove = false;
 				break;
@@ -736,7 +740,11 @@ class CDurak : public CMinigame
 	bool UpdateGame(int Game);
 	bool StartGame(int Game);
 	void EndGame(int Game);
+	void StartNextRound(int Game, bool SuccessfulDefense = false);
+	void UpdateHandcards(int Game, CDurakGame::SSeat *pSeat);
 	void TakeCardsFromTable(int Game);
+	void EndMove(int ClientID, int Game, CDurakGame::SSeat *pSeat);
+	void SetShowAttackersTurn(int Game);
 	void ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bool ForceEnd = false);
 	bool HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg);
 

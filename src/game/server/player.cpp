@@ -662,6 +662,7 @@ void CPlayer::Snap(int SnappingClient)
 		{
 			if (m_LockSpecPosUntil && m_LockSpecPosUntil > Server()->Tick())
 			{
+				SpecMode = SPEC_PLAYER;
 				SpectatorID = m_ClientID;
 			}
 			else
