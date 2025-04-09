@@ -1265,7 +1265,7 @@ void CDurak::SetShowAttackersTurn(int Game)
 			m_aCardUpdate[ClientID][&m_aStaticCards[DURAK_TEXT_TOOLTIP]] = true;
 
 			CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
-			if (pChr) pChr->EpicCircle(m_vpGames[Game]->m_AttackerIndex == i, -1, true);
+			if (pChr) pChr->EpicCircle(m_vpGames[Game]->m_DefenderIndex == i, -1, true);
 		}
 	}
 }
