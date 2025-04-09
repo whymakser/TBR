@@ -2994,6 +2994,11 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				return;
 			}
 
+			if (Durak()->ActivelyPlaying(ClientID))
+			{
+				return;
+			}
+
 			pPlayer->m_LastKill = Server()->Tick();
 
 			int Fight = Arenas()->GetClientFight(ClientID);

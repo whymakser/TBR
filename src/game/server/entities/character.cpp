@@ -6201,6 +6201,8 @@ void CCharacter::RotatingBall(bool Set, int FromID, bool Silent)
 
 void CCharacter::EpicCircle(bool Set, int FromID, bool Silent)
 {
+	if (m_EpicCircle == Set)
+		return;
 	m_EpicCircle = Set;
 	if (m_EpicCircle)
 		new CEpicCircle(GameWorld(), m_Pos, m_pPlayer->GetCID());

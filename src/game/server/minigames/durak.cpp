@@ -935,6 +935,10 @@ bool CDurak::UpdateGame(int Game)
 				pSeat->m_Player.m_LastNumHandCards = NumHands;
 			}
 		}
+		else
+		{
+			pPlayer->m_ShowName = false;
+		}
 
 		if (!pChr || ProcessedWinAlready)
 			continue;
@@ -1259,6 +1263,9 @@ void CDurak::SetShowAttackersTurn(int Game)
 		{
 			m_vpGames[Game]->m_aSeats[i].m_Player.m_Tooltip = CCard::TOOLTIP_ATTACKERS_TURN;
 			m_aCardUpdate[ClientID][&m_aStaticCards[DURAK_TEXT_TOOLTIP]] = true;
+
+			CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
+			if (pChr) pChr->EpicCircle(m_vpGames[Game]->m_AttackerIndex == i, -1, true);
 		}
 	}
 }
