@@ -769,5 +769,6 @@ public:
 	void OnInput(class CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput);
 	void OnPlayerLeave(int ClientID, bool Disconnect = false, bool Shutdown = false);
 	bool OnSetSpectator(int ClientID, int SpectatorID);
+	bool IsPlayerOnSeat(int ClientID);
 };
 #endif // GAME_SERVER_MINIGAMES_DURAK_H

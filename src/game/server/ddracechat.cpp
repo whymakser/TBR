@@ -1352,6 +1352,12 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 	int Minigame = pSelf->m_apPlayers[pResult->m_ClientID]->m_Minigame;
 	CGameContext::AccountInfo *pAccount = &pSelf->m_Accounts[pPlayer->GetAccID()];
 
+	// Show durak stats when on seat
+	if (pSelf->Durak()->IsPlayerOnSeat(ID))
+	{
+		Minigame = MINIGAME_DURAK;
+	}
+
 	switch (Minigame)
 	{
 		case MINIGAME_1VS1:

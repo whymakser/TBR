@@ -267,6 +267,15 @@ void CDurak::OnPlayerLeave(int ClientID, bool Disconnect, bool Shutdown)
 	}
 }
 
+bool CDurak::IsPlayerOnSeat(int ClientID)
+{
+	int Game = GetGameByClient(ClientID);
+	if (Game < 0)
+		return false;
+	CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
+	return pChr && GameServer()->Collision()->GetMapIndex(pChr->GetPos()) == m_vpGames[Game]->GetSeatByClient(ClientID)->m_MapIndex;
+}
+
 bool CDurak::OnSetSpectator(int ClientID, int SpectatorID)
 {
 	if (m_vpGames.size() && SpectatorID == m_aLastSnapID[ClientID][&m_aStaticCards[DURAK_TEXT_TOOLTIP]])
