@@ -924,7 +924,7 @@ bool CDurak::UpdateGame(int Game)
 			continue;
 
 		pChr->EpicCircle(pGame->m_DefenderIndex == i, -1, true);
-		if (!pSeat->m_Player.m_EndedMove)
+		if (!pSeat->m_Player.m_EndedMove && pGame->GetStateBySeat(i) != DURAK_PLAYERSTATE_NONE)
 		{
 			pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
 			const int NumHands = (int)pSeat->m_Player.m_vHandCards.size();
