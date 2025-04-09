@@ -333,8 +333,11 @@ bool CDurak::OnDropMoney(int ClientID, int Amount)
 {
 	int Game = GetGameByClient(ClientID);
 	// If the game is running already, the money has been subtracted already
-	if (Game < 0 || m_vpGames[Game]->m_Running)
+	if (Game < 0)
 		return false;
+	// Disallow accidental money dropping in durak game
+	if (m_vpGames[Game]->m_Running)
+		return true;
 	bool CanDrop = GameServer()->m_apPlayers[ClientID]->GetUsableMoney() - Amount >= m_vpGames[Game]->GetSeatByClient(ClientID)->m_Player.m_Stake;
 	if (!CanDrop)
 	{
@@ -496,9 +499,8 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 			}
 			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_SELECT_ATTACK)
 			{
-				if (pGame->TryDefend(pSeat->m_ID, pSeat->m_Player.m_SelectedAttack, pCard))
+				if (TryDefend(Game, pSeat->m_ID, pSeat->m_Player.m_SelectedAttack, pCard))
 				{
-					UpdateHandcards(Game, pSeat);
 					pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 					pGame->m_Attacks[pSeat->m_Player.m_SelectedAttack].m_Offense.SetHovered(false);
 					pSeat->m_Player.m_SelectedAttack = -1;
@@ -1048,11 +1050,10 @@ bool CDurak::UpdateGame(int Game)
 							{
 								pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_DEFEND;
 							}
-							else if (DragRelease && m_vpGames[Game]->TryDefend(i, a, pDraggedCard))
+							else if (DragRelease && TryDefend(Game, i, a, pDraggedCard))
 							{
 								// Keep tooltip away for 2 seconds
 								pSeat->m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed() * 2;
-								UpdateHandcards(Game, pSeat);
 								pDraggedCard = 0;
 							}
 							break;
@@ -1185,10 +1186,9 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 		{
 			// Making sure to update handcards for 0.7 here, because we can not catch every case from within CDurakGame where SortHand() gets called for example.
 			UpdateHandcards(Game, &pGame->m_aSeats[i]);
+			pGame->m_aSeats[i].m_Player.m_LastNumHandCards = -1; // Get our specific name back
 			pGame->m_aSeats[i].m_Player.m_EndedMove = false;
 			GameServer()->m_apPlayers[ClientID]->m_ShowName = true;
-			// Get our specific name back
-			pGame->m_aSeats[i].m_Player.m_LastNumHandCards = -1;
 			GameServer()->SendTuningParams(ClientID);
 		}
 	}
@@ -1203,13 +1203,36 @@ void CDurak::UpdateHandcards(int Game, CDurakGame::SSeat *pSeat)
 
 void CDurak::EndMove(int ClientID, int Game, CDurakGame::SSeat *pSeat)
 {
-	if (m_vpGames[Game]->m_IsDefenseOngoing)
+	if (pSeat->m_Player.m_EndedMove || !m_vpGames[Game]->m_IsDefenseOngoing)
+		return;
+
+	pSeat->m_Player.m_EndedMove = true;
+	pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
+	GameServer()->m_apPlayers[ClientID]->m_ShowName = false;
+	GameServer()->SendTuningParams(ClientID);
+}
+
+bool CDurak::TryDefend(int Game, int Seat, int Attack, CCard *pCard)
+{
+	CDurakGame *pGame = m_vpGames[Game];
+	if (pGame->TryDefend(Seat, Attack, pCard))
 	{
-		pSeat->m_Player.m_EndedMove = true;
-		pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
-		GameServer()->m_apPlayers[ClientID]->m_ShowName = false;
-		GameServer()->SendTuningParams(ClientID);
+		if (!pGame->m_IsDefenseOngoing)
+		{
+			pGame->m_IsDefenseOngoing = true;
+			for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+			{
+				int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
+				if (ClientID != -1 && pGame->GetStateBySeat(i) == DURAK_PLAYERSTATE_NONE)
+				{
+					EndMove(ClientID, Game, &pGame->m_aSeats[i]);
+				}
+			}
+		}
+		UpdateHandcards(Game, &pGame->m_aSeats[Seat]);
+		return true;
 	}
+	return false;
 }
 
 void CDurak::TakeCardsFromTable(int Game)

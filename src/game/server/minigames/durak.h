@@ -631,19 +631,6 @@ public:
 		m_Attacks[Attack].m_Defense.m_Rank = pCard->m_Rank;
 		RemoveCard(Seat, pCard);
 
-		if (!m_IsDefenseOngoing)
-		{
-			for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
-			{
-				if (GetStateBySeat(i) == DURAK_PLAYERSTATE_NONE)
-				{
-					m_aSeats[i].m_Player.m_EndedMove = true;
-
-				}
-			}
-		}
-
-		m_IsDefenseOngoing = true;
 		m_NextMove = 0;
 		return true;
 	}
@@ -747,6 +734,7 @@ class CDurak : public CMinigame
 	void UpdateHandcards(int Game, CDurakGame::SSeat *pSeat);
 	void TakeCardsFromTable(int Game);
 	void EndMove(int ClientID, int Game, CDurakGame::SSeat *pSeat);
+	bool TryDefend(int Game, int Seat, int Attack, CCard *pCard);
 	void SetShowAttackersTurn(int Game);
 	void ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bool ForceEnd = false);
 	bool HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg);
