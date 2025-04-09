@@ -467,7 +467,8 @@ public:
 			// Do before determining next attacker / defender to keep the order
 			DrawCardsAfterRound();
 
-			if (SuccessfulDefense)
+			// If he won, we move on :D
+			if (SuccessfulDefense && m_aSeats[m_DefenderIndex].m_Player.m_Stake >= 0)
 			{
 				// If successfully defended, defender turns to attacker
 				m_AttackerIndex = m_InitialAttackerIndex = m_DefenderIndex;

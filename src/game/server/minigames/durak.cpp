@@ -260,6 +260,7 @@ void CDurak::OnPlayerLeave(int ClientID, bool Disconnect, bool Shutdown)
 			pTeams->SetForceCharacterTeam(ClientID, 0);
 			m_aInDurakGame[ClientID] = false;
 			GameServer()->SendTuningParams(ClientID);
+			GameServer()->m_apPlayers[ClientID]->m_ShowName = true;
 			GameServer()->m_apPlayers[ClientID]->SetName(Server()->ClientName(ClientID));
 			GameServer()->m_apPlayers[ClientID]->UpdateInformation();
 			break;
@@ -920,27 +921,19 @@ bool CDurak::UpdateGame(int Game)
 		}
 		
 		// Hide name of players who are not actively participating right now
-		bool IsPassiveCurrently = DefenseOngoing && pGame->GetStateBySeat(i) == DURAK_PLAYERSTATE_NONE;
+		bool IsPassiveCurrently = pGame->GetStateBySeat(i) == DURAK_PLAYERSTATE_NONE;
 		if (!IsPassiveCurrently && !ProcessedWinAlready && pChr)
 		{
 			pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
-		}
-
-		const int NumHands = (int)pSeat->m_Player.m_vHandCards.size();
-		if (pSeat->m_Player.m_LastNumHandCards != NumHands)
-		{
-			char aBuf[MAX_NAME_LENGTH];
-			if (IsPassiveCurrently)
+			const int NumHands = (int)pSeat->m_Player.m_vHandCards.size();
+			if (pSeat->m_Player.m_LastNumHandCards != NumHands)
 			{
-				pPlayer->SetName(" ");
-			}
-			else
-			{
+				char aBuf[MAX_NAME_LENGTH];
 				str_format(aBuf, sizeof(aBuf), "%s x%d", GetCardSymbol(-1, -1), NumHands);
 				pPlayer->SetName(aBuf);
+				pPlayer->UpdateInformation();
+				pSeat->m_Player.m_LastNumHandCards = NumHands;
 			}
-			pPlayer->UpdateInformation();
-			pSeat->m_Player.m_LastNumHandCards = NumHands;
 		}
 
 		if (!pChr || ProcessedWinAlready)
@@ -1191,6 +1184,7 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 		{
 			// Making sure to update handcards for 0.7 here, because we can not catch every case from within CDurakGame where SortHand() gets called for example.
 			UpdateHandcards(Game, &pGame->m_aSeats[i]);
+			GameServer()->m_apPlayers[ClientID]->m_ShowName = true;
 			GameServer()->SendTuningParams(ClientID);
 		}
 	}
@@ -1209,6 +1203,7 @@ void CDurak::EndMove(int ClientID, int Game, CDurakGame::SSeat *pSeat)
 	{
 		pSeat->m_Player.m_EndedMove = true;
 		pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
+		GameServer()->m_apPlayers[ClientID]->m_ShowName = false;
 		GameServer()->SendTuningParams(ClientID);
 	}
 }
