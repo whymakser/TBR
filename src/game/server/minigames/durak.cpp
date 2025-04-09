@@ -21,7 +21,12 @@ CDurak::CDurak(CGameContext *pGameServer, int Type) : CMinigame(pGameServer, Typ
 		m_aInDurakGame[i] = false;
 		m_aDurakNumReserved[i] = 0;
 	}
-	m_aStaticCards[DURAK_TEXT_CARDS_STACK].m_TableOffset = vec2(3.9f * 32.f, 32.f);
+	for (int i = 0; i < 5; i++)
+	{
+		int Inversed = 5 - i - 1;
+		float Offset = (Inversed*(Inversed+1)*0.215f);
+		m_aStaticCards[DURAK_TEXT_CARDS_STACK_0 + i].m_TableOffset = vec2(3.9f * 32.f + Offset, 32.f - Offset);
+	}
 	m_aStaticCards[DURAK_TEXT_TRUMP_CARD].m_TableOffset = vec2(4.9f * 32.f, 32.f);
 	m_aStaticCards[DURAK_TEXT_KEYBOARD_CONTROL].m_TableOffset = vec2(3.f * 32.f, -2.f * 32.f);
 	for (auto &Game : m_vpGames)
@@ -921,7 +926,28 @@ bool CDurak::UpdateGame(int Game)
 		}
 		else if (pChr)
 		{
-			pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
+			if (!ProcessedWinAlready)
+			{
+				pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
+			}
+
+			const int NumHands = (int)pSeat->m_Player.m_vHandCards.size();
+			if (pSeat->m_Player.m_LastNumHandCards != NumHands)
+			{
+				char aBuf[MAX_NAME_LENGTH];
+				if (ProcessedWinAlready)
+				{
+					pPlayer->SetName(Server()->ClientName(ClientID));
+					pPlayer->UpdateInformation();
+				}
+				else
+				{
+					str_format(aBuf, sizeof(aBuf), "%s x%d", GetCardSymbol(-1, -1), NumHands);
+					pPlayer->SetName(aBuf);
+					pPlayer->UpdateInformation();
+				}
+				pSeat->m_Player.m_LastNumHandCards = NumHands;
+			}
 		}
 
 		if (!pChr || ProcessedWinAlready)
@@ -1072,7 +1098,7 @@ bool CDurak::UpdateGame(int Game)
 					}
 				}
 			}
-			else if (m_aStaticCards[DURAK_TEXT_CARDS_STACK].MouseOver(RelativeCursorPos) || m_aStaticCards[DURAK_TEXT_TRUMP_CARD].MouseOver(RelativeCursorPos))
+			else if (m_aStaticCards[DURAK_TEXT_CARDS_STACK_0].MouseOver(RelativeCursorPos) || m_aStaticCards[DURAK_TEXT_TRUMP_CARD].MouseOver(RelativeCursorPos))
 			{
 				if (PlayerState == DURAK_PLAYERSTATE_ATTACK)
 				{
@@ -1400,26 +1426,29 @@ void CDurak::PrepareStaticCards(int SnappingClient, CDurakGame *pGame, CDurakGam
 		pCard->m_Active = false;
 		switch (i)
 		{
-			case DURAK_TEXT_CARDS_STACK:
+			case DURAK_TEXT_CARDS_STACK_0:
+			case DURAK_TEXT_CARDS_STACK_1:
+			case DURAK_TEXT_CARDS_STACK_2:
+			case DURAK_TEXT_CARDS_STACK_3:
+			case DURAK_TEXT_CARDS_STACK_4:
 			{
-				if (InGame)
+				if (!InGame)
+					break;
+
+				if (pGame->m_Deck.IsEmpty())
 				{
-					bool OnlyTrumpCardLeft = pGame->m_Deck.Size() == 1;
-					if (!OnlyTrumpCardLeft)
+					if (i == 0 && pSeat && pGame->GetStateBySeat(pSeat->m_ID) == DURAK_PLAYERSTATE_ATTACK)
 					{
-						if (pGame->m_Deck.IsEmpty())
-						{
-							if (pSeat && pGame->GetStateBySeat(pSeat->m_ID) == DURAK_PLAYERSTATE_ATTACK)
-							{
-								pCard->m_Active = true;
-								pCard->SetInd(CCard::IND_END_MOVE_BUTTON);
-							}
-						}
-						else
-						{
-							pCard->m_Active = true;
-							pCard->Invalidate();
-						}
+						pCard->m_Active = true;
+						pCard->SetInd(CCard::IND_END_MOVE_BUTTON);
+					}
+				}
+				else if (pGame->m_Deck.Size() != 1)
+				{
+					if (i < (int)pGame->m_Deck.Size())
+					{
+						pCard->m_Active = true;
+						pCard->Invalidate();
 					}
 				}
 			} break;

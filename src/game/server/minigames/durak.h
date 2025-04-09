@@ -250,6 +250,7 @@ public:
 				m_EndedMove = false;
 				m_LastStake = -2;
 				m_LastNumParticipants = -1;
+				m_LastNumHandCards = -1;
 			}
 			struct
 			{
@@ -273,6 +274,7 @@ public:
 			bool m_EndedMove;
 			int m_LastNumParticipants;
 			int64 m_LastStake;
+			int m_LastNumHandCards;
 		} m_Player;
 	} m_aSeats[MAX_DURAK_PLAYERS];
 
@@ -703,7 +705,11 @@ class CDurak : public CMinigame
 {
 	enum
 	{
-		DURAK_TEXT_CARDS_STACK = 0,
+		DURAK_TEXT_CARDS_STACK_0 = 0,
+		DURAK_TEXT_CARDS_STACK_1,
+		DURAK_TEXT_CARDS_STACK_2,
+		DURAK_TEXT_CARDS_STACK_3,
+		DURAK_TEXT_CARDS_STACK_4,
 		DURAK_TEXT_TRUMP_CARD,
 		DURAK_TEXT_KEYBOARD_CONTROL,
 		DURAK_TEXT_TOOLTIP,
@@ -740,7 +746,7 @@ class CDurak : public CMinigame
 	void SendChatToParticipants(int Game, const char *pMessage);
 
 	int GetPlayerState(int ClientID);
-	const char *GetCardSymbol(int Suit, int Rank, CDurakGame *pGame);
+	const char *GetCardSymbol(int Suit, int Rank, CDurakGame *pGame = 0);
 	void UpdatePassive(int ClientID, int Seconds);
 
 	CDurakGame *GetOrAddGame(int Number);
