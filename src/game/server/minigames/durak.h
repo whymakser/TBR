@@ -565,7 +565,7 @@ public:
 
 	bool TryAttack(int Seat, CCard *pCard)
 	{
-		if (!pCard->Valid())
+		if (!pCard || !pCard->Valid())
 			return false;
 
 		int Used = 0;
@@ -616,7 +616,7 @@ public:
 
 	bool TryDefend(int Seat, int Attack, CCard *pCard)
 	{
-		if (Seat != m_DefenderIndex || !pCard->Valid())
+		if (Seat != m_DefenderIndex || !pCard || !pCard->Valid())
 			return false;
 
 		if (Attack < 0 || Attack >= MAX_DURAK_ATTACKS)
@@ -639,7 +639,7 @@ public:
 
 	bool TryPush(int Seat, CCard *pCard)
 	{
-		if (Seat != m_DefenderIndex || !pCard->Valid())
+		if (Seat != m_DefenderIndex || !pCard || !pCard->Valid())
 			return false;
 
 		int NumAttacks = 0;
