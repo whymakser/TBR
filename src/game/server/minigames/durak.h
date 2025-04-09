@@ -413,20 +413,11 @@ public:
 
 	bool ProcessNextMove(int CurrentTick)
 	{
-		bool AllPlayersEndedMove = true;
-		for (int i = 0; i < MAX_PLAYERS; i++)
-			if (GetStateBySeat(i) == DURAK_PLAYERSTATE_ATTACK)
-			{
-				AllPlayersEndedMove = false;
-				break;
-			}
-
-		// Speed up process
-		if (AllPlayersEndedMove)
+		if (m_aSeats[m_AttackerIndex].m_Player.m_EndedMove && m_aSeats[GetNextPlayer(m_DefenderIndex)].m_Player.m_EndedMove)
 			return true;
 
 		if (!m_NextMove)
-			m_NextMove = CurrentTick + SERVER_TICK_SPEED * 60;
+			m_NextMove = CurrentTick + SERVER_TICK_SPEED * 45;
 		return m_NextMove <= CurrentTick;
 	}
 
