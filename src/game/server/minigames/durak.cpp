@@ -921,8 +921,8 @@ bool CDurak::UpdateGame(int Game)
 		}
 		
 		// Hide name of players who are not actively participating right now
-		bool IsPassiveCurrently = pGame->GetStateBySeat(i) == DURAK_PLAYERSTATE_NONE;
-		if (!IsPassiveCurrently && !ProcessedWinAlready && pChr)
+		bool IsPassiveCurrently = (DefenseOngoing || ProcessedWinAlready) && pGame->GetStateBySeat(i) == DURAK_PLAYERSTATE_NONE;
+		if (!IsPassiveCurrently && pChr)
 		{
 			pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
 			const int NumHands = (int)pSeat->m_Player.m_vHandCards.size();
