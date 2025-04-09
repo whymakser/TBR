@@ -421,6 +421,8 @@ public:
 	bool m_ViewCursorZoomed;
 	int m_ViewCursorID;
 
+	int64 m_LockSpecPosUntil;
+	void SetViewPos(vec2 Pos);
 	void SkipSetViewPos() { m_SkipSetViewPos = 2; }
 	int m_aStrongWeakID[MAX_CLIENTS];
 	bool m_aMuted[MAX_CLIENTS];

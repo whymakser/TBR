@@ -2886,6 +2886,11 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				return;
 			}
 
+			if (pMsg->m_SpecMode == SPEC_PLAYER && Durak()->OnSetSpectator(ClientID, pMsg->m_SpectatorID))
+			{
+				return;
+			}
+
 			if (pMsg->m_SpecMode == SPEC_PLAYER && pMsg->m_SpectatorID >= 0)
 				if (!Server()->ReverseTranslate(pMsg->m_SpectatorID, ClientID))
 					return;
@@ -4711,6 +4716,7 @@ void CGameContext::OnSnap(int ClientID)
 void CGameContext::OnPreSnap() {}
 void CGameContext::OnPostSnap()
 {
+	Durak()->PostSnap();
 	m_World.PostSnap();
 	m_Events.Clear();
 }

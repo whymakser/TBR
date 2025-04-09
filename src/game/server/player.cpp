@@ -253,6 +253,7 @@ void CPlayer::Reset()
 
 	m_HideFromSpecCount = false;
 	m_aDelayedJoinMsg[0] = '\0';
+	m_LockSpecPosUntil = 0;
 }
 
 void CPlayer::Tick()
@@ -659,6 +660,14 @@ void CPlayer::Snap(int SnappingClient)
 		}
 		else
 		{
+			if (m_LockSpecPosUntil && m_LockSpecPosUntil > Server()->Tick())
+			{
+				SpectatorID = m_ClientID;
+			}
+			else
+			{
+				m_LockSpecPosUntil = 0;
+			}
 			// when we are spectating while being affected by rainbowname people we dont wanna focus on one player, so that no tee gets transparent due to IsOtherTeam
 			// its now actually only activated when we spec someone who has rainbowname, rest is handled in the update function
 			if (SpecMode == SPEC_PLAYER && GameServer()->m_RainbowName.IsAffected(m_ClientID))
@@ -1014,6 +1023,13 @@ bool CPlayer::RestrictZoom()
 float CPlayer::GetZoomLevel()
 {
 	return m_ShowDistance.x / m_StandardShowDistance.x;
+}
+
+void CPlayer::SetViewPos(vec2 Pos)
+{
+	m_ViewPos = Pos;
+	SkipSetViewPos();
+	m_LockSpecPosUntil = Server()->Tick() + Server()->TickSpeed();
 }
 
 bool CPlayer::JoinChat(bool Local)

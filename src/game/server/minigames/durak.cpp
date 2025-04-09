@@ -267,23 +267,43 @@ void CDurak::OnPlayerLeave(int ClientID, bool Disconnect, bool Shutdown)
 	}
 }
 
+bool CDurak::OnSetSpectator(int ClientID, int SpectatorID)
+{
+	if (m_vpGames.size() && SpectatorID == m_aLastSnapID[ClientID][&m_aStaticCards[DURAK_TEXT_TOOLTIP]])
+	{
+		GameServer()->m_apPlayers[ClientID]->SetViewPos(m_vpGames[0]->m_TablePos);
+		return true;
+	}
+	return false;
+}
+
 int CDurak::GetTeam(int ClientID, int MapID)
 {
 	if (!InDurakGame(ClientID))
 		return -1;
-	int FirstDurakID = GameServer()->m_World.GetFirstDurakID(ClientID);
-	if (MapID <= FirstDurakID - m_aDurakNumReserved[ClientID] || MapID > FirstDurakID)
+	int HighestDurakID = GameServer()->m_World.GetFirstDurakID(ClientID);
+	if (MapID > HighestDurakID - m_aDurakNumReserved[ClientID] && MapID <= HighestDurakID)
 	{
-		int ID = MapID;
-		if (!Server()->ReverseTranslate(ID, ClientID))
-			return -1;
+		// Card team
+		if (MapID == m_aLastSnapID[ClientID][&m_aStaticCards[DURAK_TEXT_KEYBOARD_CONTROL]] || MapID == m_aLastSnapID[ClientID][&m_aStaticCards[DURAK_TEXT_TOOLTIP]])
+			return 0;
+		if (GameServer()->Config()->m_SvDurakTeamColor)
+			return GameServer()->GetDDRaceTeam(ClientID);
+		return 0;
+	}
+
+	// Normal team for player
+	if (GameServer()->Config()->m_SvDurakTeamColor)
+		return -1;
+
+	int ID = MapID;
+	if (Server()->ReverseTranslate(ID, ClientID))
+	{
 		// Player or self
 		if (ID == ClientID || GameServer()->GetDDRaceTeam(ID) == GameServer()->GetDDRaceTeam(ClientID))
 			return 0;
-		return -1;
 	}
-	// Card team
-	return ActivelyPlaying(ClientID) ? 0 : GameServer()->GetDDRaceTeam(ClientID);
+	return -1;
 }
 
 bool CDurak::OnDropMoney(int ClientID, int Amount)
@@ -337,6 +357,10 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 			pCard->SetHovered(true);
 		}
 	}
+	else if (pSeat->m_Player.m_LastInput.m_HookColl == 0 && pNewInput->m_PlayerFlags&PLAYERFLAG_AIM)
+	{
+		pSeat->m_Player.m_KeyboardControl = true;
+	}
 	else if (pSeat->m_Player.m_LastInput.m_Jump == 0 && pNewInput->m_Jump != 0)
 	{
 		pSeat->m_Player.m_KeyboardControl = true;
@@ -352,6 +376,7 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 
 	pSeat->m_Player.m_LastInput.m_Direction = pNewInput->m_Direction;
 	pSeat->m_Player.m_LastInput.m_Jump = pNewInput->m_Jump;
+	pSeat->m_Player.m_LastInput.m_HookColl = pNewInput->m_PlayerFlags&PLAYERFLAG_AIM;
 	pSeat->m_Player.m_LastInput.m_TargetX = pNewInput->m_TargetX;
 	pSeat->m_Player.m_LastInput.m_TargetY = pNewInput->m_TargetY;
 }
@@ -440,9 +465,11 @@ bool CDurak::StartGame(int Game)
 		CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 		if (pGame->m_Stake >= 0)
 		{
-			HandleMoneyTransaction(ClientID, -pGame->m_Stake, "Durák stake");
-			str_format(aBuf, sizeof(aBuf), "Your stake got collected: -%lld money.", pGame->m_Stake);
-			GameServer()->SendChatTarget(ClientID, aBuf);
+			if (HandleMoneyTransaction(ClientID, -pGame->m_Stake, "Durák stake"))
+			{
+				str_format(aBuf, sizeof(aBuf), "Your stake got collected: -%lld money.", pGame->m_Stake);
+				GameServer()->SendChatTarget(ClientID, aBuf);
+			}
 		}
 
 		GameServer()->SetMinigame(ClientID, MINIGAME_DURAK, true, false);
@@ -486,7 +513,7 @@ void CDurak::EndGame(int Game)
 	m_vpGames.erase(m_vpGames.begin() + Game);
 }
 
-void CDurak::HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg)
+bool CDurak::HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg)
 {
 	CPlayer *pPlayer = ClientID >= 0 ? GameServer()->m_apPlayers[ClientID] : 0;
 	if (pPlayer && pPlayer->WalletTransaction(Amount, pMsg))
@@ -500,7 +527,9 @@ void CDurak::HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg)
 			else
 				pAccount->m_DurakTotalStake += Amount;
 		}
+		return true;
 	}
+	return false;
 }
 
 const char *CDurak::GetCardSymbol(int Suit, int Rank)
@@ -511,6 +540,8 @@ const char *CDurak::GetCardSymbol(int Suit, int Rank)
 	}
 	switch (Suit)
 	{
+	case CCard::IND_EMPTY: return " ";
+	case CCard::IND_DURAK_TABLE_LABEL: return "🂭   Durák";
 	case CCard::IND_KEYBOARD_ON: return "⌨☒";
 	case CCard::IND_KEYBOARD_OFF: return "⌨☐";
 	case CCard::IND_END_MOVE_BUTTON: return "[✓]";
@@ -836,8 +867,8 @@ bool CDurak::UpdateGame(int Game)
 						}
 						else if (DragRelease && m_vpGames[Game]->TryDefend(i, a, pDraggedCard))
 						{
-							// Keep tooltip away for 3 seconds, nothing else to clean
-							pSeat->m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed() * 3;
+							// Keep tooltip away for 2 seconds, nothing else to clean
+							pSeat->m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed() * 2;
 							pDraggedCard = 0;
 						}
 						break;
@@ -853,7 +884,7 @@ bool CDurak::UpdateGame(int Game)
 					else if (DragRelease && m_vpGames[Game]->TryPush(i, pDraggedCard))
 					{
 						// Nothing to clean
-						pSeat->m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed() * 3;
+						pSeat->m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed() * 2;
 						pDraggedCard = 0;
 					}
 				}
@@ -1056,7 +1087,8 @@ void CDurak::Snap(int SnappingClient)
 
 	if (Game < 0)
 	{
-		// render default fallback tabledesign
+		if (m_vpGames.size())
+			SnapDurakCard(SnappingClient, m_vpGames[0]->m_TablePos, &m_aStaticCards[DURAK_TEXT_TOOLTIP]);
 		return;
 	}
 
@@ -1140,11 +1172,13 @@ void CDurak::PrepareStaticCards(int SnappingClient, CDurakGame *pGame, CDurakGam
 			} break;
 			case DURAK_TEXT_TOOLTIP:
 			{
+				pCard->m_Active = true;
+				pCard->SetInd(InGame ? CCard::IND_EMPTY : CCard::IND_DURAK_TABLE_LABEL);
+				pCard->m_TableOffset = vec2(0, DURAK_CARD_NAME_OFFSET);
 				if (InGame && pSeat && pSeat->m_Player.m_Tooltip != CCard::TOOLTIP_NONE)
 				{
 					if (pSeat->m_Player.m_LastCursorMove < Server()->Tick() - Server()->TickSpeed() / 3)
 					{
-						pCard->m_Active = true;
 						pCard->SetTooltip(pSeat->m_Player.m_Tooltip);
 					}
 				}
@@ -1177,9 +1211,9 @@ void CDurak::PrepareDurakSnap(int SnappingClient, CDurakGame *pGame, CDurakGame:
 		}
 	}
 
-	int NumHand = pSeat ? pSeat->m_Player.m_vHandCards.size() : 0;
-	int NumNeeded = NumStatic + NumHand; + NumAttack;
-	int Diff = NumNeeded - m_aDurakNumReserved[SnappingClient];
+	const int NumHand = pSeat ? pSeat->m_Player.m_vHandCards.size() : 0;
+	const int NumNeeded = NumStatic + NumHand + NumAttack;
+	const int Diff = NumNeeded - m_aDurakNumReserved[SnappingClient];
 	if (Diff != 0)
 	{
 		GameServer()->m_World.AddToNumReserved(SnappingClient, Diff);
@@ -1192,10 +1226,6 @@ void CDurak::PrepareDurakSnap(int SnappingClient, CDurakGame *pGame, CDurakGame:
 	// Static cards
 	for (int i = 0; i < NUM_DURAK_STATIC_CARDS; i++)
 	{
-		// Snap tooltip last to avoid flickering
-		if (i == DURAK_TEXT_TOOLTIP)
-			continue;
-
 		CCard *pCard = &m_aStaticCards[i];
 		if (pCard->m_Active)
 		{
@@ -1227,14 +1257,20 @@ void CDurak::PrepareDurakSnap(int SnappingClient, CDurakGame *pGame, CDurakGame:
 		}
 	}
 
-	// Tooltip
-	if (m_aStaticCards[DURAK_TEXT_TOOLTIP].m_Active)
-	{
-		NewSnapMap[&m_aStaticCards[DURAK_TEXT_TOOLTIP]] = SnapID--;
-	}
-
 	// 0.7
 	UpdateCardSnapMapping(SnappingClient, NewSnapMap);
+}
+
+void CDurak::PostSnap()
+{
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		if (m_aUpdateTeamsState[i])
+		{
+			((CGameControllerDDRace *)GameServer()->m_pController)->m_Teams.SendTeamsState(i);
+			m_aUpdateTeamsState[i] = false;
+		}
+	}
 }
 
 void CDurak::UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, int> &NewMap)
@@ -1243,7 +1279,7 @@ void CDurak::UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, i
 
 	if (OldMap != NewMap)
 	{
-		((CGameControllerDDRace *)GameServer()->m_pController)->m_Teams.SendTeamsState(SnappingClient);
+		m_aUpdateTeamsState[SnappingClient] = true;
 	}
 
 	if (Server()->IsSevendown(SnappingClient))

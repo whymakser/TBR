@@ -101,14 +101,16 @@ public:
 
 	enum EIndicatorSuit
 	{
-		IND_KEYBOARD_ON = -2,
-		IND_KEYBOARD_OFF = -3,
-		IND_END_MOVE_BUTTON = -4,
-		IND_TOOLTIP_ATTACK = -5,
-		IND_TOOLTIP_DEFEND = -6,
-		IND_TOOLTIP_PUSH = -7,
-		IND_TOOLTIP_END_MOVE = -8,
-		IND_TOOLTIP_TAKE_CARDS = -9,
+		IND_EMPTY = -2,
+		IND_DURAK_TABLE_LABEL = -3,
+		IND_KEYBOARD_ON = -4,
+		IND_KEYBOARD_OFF = -5,
+		IND_END_MOVE_BUTTON = -6,
+		IND_TOOLTIP_ATTACK = -7,
+		IND_TOOLTIP_DEFEND = -8,
+		IND_TOOLTIP_PUSH = -9,
+		IND_TOOLTIP_END_MOVE = -10,
+		IND_TOOLTIP_TAKE_CARDS = -11,
 	};
 	enum
 	{
@@ -127,7 +129,7 @@ public:
 	void SetTooltip(int Tooltip)
 	{
 		// Don't pass TOOLTIP_NONE(0), will be handled at a different place xd
-		m_Suit = IND_END_MOVE_BUTTON - 1 - Tooltip;
+		m_Suit = IND_TOOLTIP_ATTACK - Tooltip;
 		m_TableOffset = vec2(-40.f, -40.f);
 	}
 };
@@ -241,6 +243,7 @@ public:
 				int m_Jump = 0;
 				int m_TargetX = 0;
 				int m_TargetY = 0;
+				int m_HookColl = 0;
 			} m_LastInput;
 			int m_ClientID;
 			int64 m_Stake;
@@ -682,13 +685,14 @@ class CDurak : public CMinigame
 	int64 m_aLastSeatOccupiedMsg[MAX_CLIENTS];
 	bool m_aUpdatedPassive[MAX_CLIENTS];
 	bool m_aInDurakGame[MAX_CLIENTS];
+	bool m_aUpdateTeamsState[MAX_CLIENTS];
 
 	std::vector<CDurakGame *> m_vpGames;
 	bool UpdateGame(int Game);
 	bool StartGame(int Game);
 	void EndGame(int Game);
 	void ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bool ForceEnd = false);
-	void HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg);
+	bool HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg);
 
 	void SendChatToDeployedStakePlayers(int Game, const char *pMessage, int NotThisID);
 	void SendChatToParticipants(int Game, const char *pMessage);
@@ -705,6 +709,7 @@ public:
 
 	virtual void Tick();
 	virtual void Snap(int SnappingClient);
+	void PostSnap();
 
 	void AddMapTableTile(int Number, vec2 Pos);
 	void AddMapSeatTile(int Number, int MapIndex, int SeatIndex);
@@ -721,5 +726,6 @@ public:
 	bool TryEnterBetStake(int ClientID, const char *pMessage);
 	void OnInput(class CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput);
 	void OnPlayerLeave(int ClientID, bool Disconnect = false, bool Shutdown = false);
+	bool OnSetSpectator(int ClientID, int SpectatorID);
 };
 #endif // GAME_SERVER_MINIGAMES_DURAK_H
