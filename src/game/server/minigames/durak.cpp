@@ -1100,7 +1100,6 @@ bool CDurak::UpdateGame(int Game)
 	}
 
 	bool Skip = pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_EndedMove && pGame->m_aSeats[pGame->GetNextPlayer(pGame->m_DefenderIndex)].m_Player.m_EndedMove;
-
 	if (Skip || pGame->ProcessNextMove(Server()->Tick()))
 	{
 		bool AllAttacksDefended = true;
@@ -1394,13 +1393,17 @@ void CDurak::PrepareStaticCards(int SnappingClient, CDurakGame *pGame, CDurakGam
 					bool OnlyTrumpCardLeft = pGame->m_Deck.Size() == 1;
 					if (!OnlyTrumpCardLeft)
 					{
-						pCard->m_Active = true;
-						if (pGame->m_Deck.IsEmpty() && pGame->GetStateBySeat(pSeat->m_ID) == DURAK_PLAYERSTATE_ATTACK)
+						if (pGame->m_Deck.IsEmpty())
 						{
-							pCard->SetInd(CCard::IND_END_MOVE_BUTTON);
+							if (pGame->GetStateBySeat(pSeat->m_ID) == DURAK_PLAYERSTATE_ATTACK)
+							{
+								pCard->m_Active = true;
+								pCard->SetInd(CCard::IND_END_MOVE_BUTTON);
+							}
 						}
 						else
 						{
+							pCard->m_Active = true;
 							pCard->Invalidate();
 						}
 					}
