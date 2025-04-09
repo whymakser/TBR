@@ -915,16 +915,13 @@ bool CDurak::UpdateGame(int Game)
 		
 		// Hide name of players who are not actively participating right now
 		pPlayer->m_ShowName = true;
-		if (DefenseOngoing)
+		if (DefenseOngoing && pGame->GetStateBySeat(i) == DURAK_PLAYERSTATE_NONE)
 		{
-			if (pGame->GetStateBySeat(i) == DURAK_PLAYERSTATE_NONE)
-			{
-				pPlayer->m_ShowName = false;
-			}
-			else if (pChr)
-			{
-				pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
-			}
+			pPlayer->m_ShowName = false;
+		}
+		else if (pChr)
+		{
+			pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
 		}
 
 		if (!pChr || ProcessedWinAlready)
