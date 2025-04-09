@@ -256,11 +256,12 @@ void CDurak::OnPlayerLeave(int ClientID, bool Disconnect, bool Shutdown)
 			{
 				GameServer()->SetMinigame(ClientID, MINIGAME_NONE, false, false);
 			}
-			GameServer()->m_apPlayers[ClientID]->m_ShowName = true;
 			GameServer()->m_apPlayers[ClientID]->m_ForceSpawnPos = vec2(-1, -1);
 			pTeams->SetForceCharacterTeam(ClientID, 0);
 			m_aInDurakGame[ClientID] = false;
 			GameServer()->SendTuningParams(ClientID);
+			GameServer()->m_apPlayers[ClientID]->SetName(Server()->ClientName(ClientID));
+			GameServer()->m_apPlayers[ClientID]->UpdateInformation();
 			break;
 		}
 	}
@@ -919,35 +920,27 @@ bool CDurak::UpdateGame(int Game)
 		}
 		
 		// Hide name of players who are not actively participating right now
-		pPlayer->m_ShowName = true;
-		if (DefenseOngoing && pGame->GetStateBySeat(i) == DURAK_PLAYERSTATE_NONE)
+		bool IsPassiveCurrently = DefenseOngoing && pGame->GetStateBySeat(i) == DURAK_PLAYERSTATE_NONE;
+		if (!IsPassiveCurrently && !ProcessedWinAlready && pChr)
 		{
-			pPlayer->m_ShowName = false;
+			pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
 		}
-		else if (pChr)
-		{
-			if (!ProcessedWinAlready)
-			{
-				pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
-			}
 
-			const int NumHands = (int)pSeat->m_Player.m_vHandCards.size();
-			if (pSeat->m_Player.m_LastNumHandCards != NumHands)
+		const int NumHands = (int)pSeat->m_Player.m_vHandCards.size();
+		if (pSeat->m_Player.m_LastNumHandCards != NumHands)
+		{
+			char aBuf[MAX_NAME_LENGTH];
+			if (IsPassiveCurrently)
 			{
-				char aBuf[MAX_NAME_LENGTH];
-				if (ProcessedWinAlready)
-				{
-					pPlayer->SetName(Server()->ClientName(ClientID));
-					pPlayer->UpdateInformation();
-				}
-				else
-				{
-					str_format(aBuf, sizeof(aBuf), "%s x%d", GetCardSymbol(-1, -1), NumHands);
-					pPlayer->SetName(aBuf);
-					pPlayer->UpdateInformation();
-				}
-				pSeat->m_Player.m_LastNumHandCards = NumHands;
+				pPlayer->SetName(" ");
 			}
+			else
+			{
+				str_format(aBuf, sizeof(aBuf), "%s x%d", GetCardSymbol(-1, -1), NumHands);
+				pPlayer->SetName(aBuf);
+			}
+			pPlayer->UpdateInformation();
+			pSeat->m_Player.m_LastNumHandCards = NumHands;
 		}
 
 		if (!pChr || ProcessedWinAlready)
