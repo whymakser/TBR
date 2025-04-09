@@ -1395,7 +1395,7 @@ void CDurak::PrepareStaticCards(int SnappingClient, CDurakGame *pGame, CDurakGam
 					{
 						if (pGame->m_Deck.IsEmpty())
 						{
-							if (pGame->GetStateBySeat(pSeat->m_ID) == DURAK_PLAYERSTATE_ATTACK)
+							if (pSeat && pGame->GetStateBySeat(pSeat->m_ID) == DURAK_PLAYERSTATE_ATTACK)
 							{
 								pCard->m_Active = true;
 								pCard->SetInd(CCard::IND_END_MOVE_BUTTON);
