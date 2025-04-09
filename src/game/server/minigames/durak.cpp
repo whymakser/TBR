@@ -1293,6 +1293,10 @@ void CDurak::SetShowAttackersTurn(int Game)
 void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bool ForceEnd)
 {
 	CDurakGame *pGame = m_vpGames[Game];
+	// A durak has been found already, do not dupe money, even if he places his last card. Do not process win
+	if (pGame->m_GameOverTick)
+		return;
+
 	int ClientID = pSeat->m_Player.m_ClientID;
 	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 
