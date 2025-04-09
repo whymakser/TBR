@@ -576,8 +576,8 @@ public:
 		int m_PortalBlocker;
 		int m_VoteMenuFlags;
 		int m_DurakWins;
-		int m_DurakTotalStake;
-		int m_DurakWinnings;
+		int64 m_DurakTotalStake;
+		int64 m_DurakWinnings;
 	};
 	std::vector<AccountInfo> m_Accounts;
 

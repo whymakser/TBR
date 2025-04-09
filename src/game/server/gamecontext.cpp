@@ -5965,8 +5965,8 @@ void CGameContext::SetAccVar(int ID, int VariableID, const char *pData)
 	case ACC_PORTAL_BLOCKER:			m_Accounts[ID].m_PortalBlocker = atoi(pData); break;
 	case ACC_VOTE_MENU_FLAGS:			m_Accounts[ID].m_VoteMenuFlags = atoi(pData); break;
 	case ACC_DURAK_WINS:				m_Accounts[ID].m_DurakWins = atoi(pData); break;
-	case ACC_DURAK_TOTAL_STAKE:			m_Accounts[ID].m_DurakTotalStake = atoi(pData); break;
-	case ACC_DURAK_WINNINGS:			m_Accounts[ID].m_DurakWinnings = atoi(pData); break;
+	case ACC_DURAK_TOTAL_STAKE:			m_Accounts[ID].m_DurakTotalStake = atoll(pData); break;
+	case ACC_DURAK_WINNINGS:			m_Accounts[ID].m_DurakWinnings = atoll(pData); break;
 	}
 }
 
@@ -6093,8 +6093,8 @@ const char *CGameContext::GetAccVarValue(int ID, int VariableID)
 	case ACC_PORTAL_BLOCKER:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_PortalBlocker); break;
 	case ACC_VOTE_MENU_FLAGS:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_VoteMenuFlags); break;
 	case ACC_DURAK_WINS:				str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_DurakWins); break;
-	case ACC_DURAK_TOTAL_STAKE:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_DurakTotalStake); break;
-	case ACC_DURAK_WINNINGS:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_DurakWinnings); break;
+	case ACC_DURAK_TOTAL_STAKE:			str_format(aBuf, sizeof(aBuf), "%lld", m_Accounts[ID].m_DurakTotalStake); break;
+	case ACC_DURAK_WINNINGS:			str_format(aBuf, sizeof(aBuf), "%lld", m_Accounts[ID].m_DurakWinnings); break;
 	}
 	return aBuf;
 }
