@@ -405,7 +405,7 @@ public:
 		for (int i = 1; i < MAX_DURAK_PLAYERS; i++)
 		{
 			int NextIndex = (CurrentIndex + i) % MAX_DURAK_PLAYERS;
-			if (m_aSeats[NextIndex].m_Player.m_ClientID != -1)
+			if (m_aSeats[NextIndex].m_Player.m_ClientID != -1 && m_aSeats[NextIndex].m_Player.m_Stake >= 0)
 				return NextIndex;
 		}
 		return -1;
