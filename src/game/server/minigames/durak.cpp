@@ -675,7 +675,7 @@ bool CDurak::HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg)
 			if (Amount > 0)
 				pAccount->m_DurakWinnings += Amount;
 			else
-				pAccount->m_DurakTotalStake += Amount;
+				pAccount->m_DurakTotalStake += abs(Amount);
 		}
 		return true;
 	}
