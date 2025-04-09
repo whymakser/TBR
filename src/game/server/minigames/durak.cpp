@@ -1151,7 +1151,11 @@ bool CDurak::UpdateGame(int Game)
 			int DefenderID = pGame->m_aSeats[pGame->m_DefenderIndex].m_Player.m_ClientID;
 			str_format(aBuf, sizeof(aBuf), "'%s' successfully defended", Server()->ClientName(DefenderID));
 			SendChatToParticipants(Game, aBuf);
-			GameServer()->CreateFinishConfetti(GameServer()->Collision()->GetPos(pGame->m_aSeats[pGame->m_DefenderIndex].m_MapIndex));
+			CCharacter *pChr = GameServer()->GetPlayerChar(DefenderID);
+			if (pChr)
+			{
+				GameServer()->CreateFinishConfetti(pChr->GetPos(), pChr->TeamMask());
+			}
 			StartNextRound(Game, true);
 		}
 		else if (HasUndefendedAttacks && !Skip)
