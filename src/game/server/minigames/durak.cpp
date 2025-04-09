@@ -158,6 +158,8 @@ bool CDurak::TryEnterBetStake(int ClientID, const char *pMessage)
 	CDurakGame *pGame = m_vpGames[Game];
 	if (pGame->m_Running)
 		return false;
+	if (str_is_number(pMessage) != 0)
+		return false;
 	int64 Stake = atoll(pMessage);
 	if (Stake <= 0 && pMessage[0] != '0')
 		return false;
