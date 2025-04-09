@@ -583,6 +583,9 @@ public:
 			}
 		}
 
+		if (Used >= MAX_DURAK_ATTACKS)
+			return false;
+
 		// allow attack from left guy too, as soon as at least 1 slot has been used
 		if (Seat != m_AttackerIndex && (!Used || GetStateBySeat(Seat) != DURAK_PLAYERSTATE_ATTACK))
 			return false;
