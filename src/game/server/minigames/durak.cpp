@@ -1251,7 +1251,7 @@ void CDurak::TakeCardsFromTable(int Game)
 
 void CDurak::SetShowAttackersTurn(int Game)
 {
-	m_vpGames[Game]->m_ShowAttackersTurnUntil = Server()->Tick() + Server()->TickSpeed() * 5;
+	m_vpGames[Game]->m_ShowAttackersTurnUntil = Server()->Tick() + Server()->TickSpeed() * 10;
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
 		int ClientID = m_vpGames[Game]->m_aSeats[i].m_Player.m_ClientID;
