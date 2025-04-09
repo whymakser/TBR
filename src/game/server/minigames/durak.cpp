@@ -924,7 +924,7 @@ bool CDurak::UpdateGame(int Game)
 			continue;
 
 		pChr->EpicCircle(pGame->m_DefenderIndex == i, -1, true);
-		if (!pSeat->m_Player.m_EndedMove && pGame->GetStateBySeat(i) != DURAK_PLAYERSTATE_NONE)
+		if (!pSeat->m_Player.m_EndedMove)
 		{
 			pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
 			const int NumHands = (int)pSeat->m_Player.m_vHandCards.size();
@@ -1116,11 +1116,7 @@ bool CDurak::UpdateGame(int Game)
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "'%s' is the Durák!", Server()->ClientName(DurakClientID));
 		SendChatToParticipants(Game, aBuf);
-
-		// Simulate ending move, so we end up in DURAK_PLAYERSTATE_NONE, so we can move after finishing
-		pGame->GetSeatByClient(DurakClientID)->m_Player.m_EndedMove = true;
-		GameServer()->SendTuningParams(DurakClientID);
-
+		EndMove(DurakClientID, Game, pGame->GetSeatByClient(DurakClientID));
 		pGame->m_GameOverTick = Server()->Tick();
 		return true;
 	}
@@ -1189,6 +1185,7 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 		{
 			// Making sure to update handcards for 0.7 here, because we can not catch every case from within CDurakGame where SortHand() gets called for example.
 			UpdateHandcards(Game, &pGame->m_aSeats[i]);
+			pGame->m_aSeats[i].m_Player.m_EndedMove = false;
 			GameServer()->m_apPlayers[ClientID]->m_ShowName = true;
 			// Get our specific name back
 			pGame->m_aSeats[i].m_Player.m_LastNumHandCards = -1;
@@ -1206,7 +1203,7 @@ void CDurak::UpdateHandcards(int Game, CDurakGame::SSeat *pSeat)
 
 void CDurak::EndMove(int ClientID, int Game, CDurakGame::SSeat *pSeat)
 {
-	if (m_vpGames[Game]->IsDefenseOngoing())
+	if (m_vpGames[Game]->m_IsDefenseOngoing)
 	{
 		pSeat->m_Player.m_EndedMove = true;
 		pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
@@ -1337,9 +1334,7 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bo
 		GameServer()->m_Accounts[pPlayer->GetAccID()].m_DurakWins++;
 	}
 
-	// Simulate ending move, so we end up in DURAK_PLAYERSTATE_NONE, so we can move after finishing
-	pSeat->m_Player.m_EndedMove = true;
-	GameServer()->SendTuningParams(ClientID);
+	EndMove(ClientID, Game, pSeat);
 }
 
 void CDurak::Snap(int SnappingClient)

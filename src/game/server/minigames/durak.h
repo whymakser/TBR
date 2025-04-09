@@ -211,6 +211,7 @@ public:
 		m_GameOverTick = 0;
 		m_LeftPlayersStake = 0;
 		m_ShowAttackersTurnUntil = 0;
+		m_IsDefenseOngoing = false;
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 		{
 			m_aSeats[i].m_ID = i;
@@ -299,6 +300,7 @@ public:
 	int64 m_GameOverTick;
 	int64 m_LeftPlayersStake;
 	int64 m_ShowAttackersTurnUntil;
+	bool m_IsDefenseOngoing;
 
 	SSeat *GetSeatByClient(int ClientID)
 	{
@@ -479,20 +481,10 @@ public:
 				m_AttackerIndex = m_InitialAttackerIndex = GetNextPlayer(m_DefenderIndex);
 			}
 		}
-
-		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
-			m_aSeats[i].m_Player.m_EndedMove = false;
 		m_DefenderIndex = GetNextPlayer(m_InitialAttackerIndex);
 		m_RoundCount++;
+		m_IsDefenseOngoing = false;
 		m_NextMove = 0;
-	}
-
-	bool IsDefenseOngoing()
-	{
-		for (auto &pair : m_Attacks)
-			if (pair.m_Defense.Valid())
-				return true;
-		return false;
 	}
 
 	void DrawCardsAfterRound()
@@ -639,6 +631,19 @@ public:
 		m_Attacks[Attack].m_Defense.m_Rank = pCard->m_Rank;
 		RemoveCard(Seat, pCard);
 
+		if (!m_IsDefenseOngoing)
+		{
+			for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+			{
+				if (GetStateBySeat(i) == DURAK_PLAYERSTATE_NONE)
+				{
+					m_aSeats[i].m_Player.m_EndedMove = true;
+
+				}
+			}
+		}
+
+		m_IsDefenseOngoing = true;
 		m_NextMove = 0;
 		return true;
 	}
