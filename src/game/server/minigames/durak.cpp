@@ -1186,6 +1186,8 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 			// Making sure to update handcards for 0.7 here, because we can not catch every case from within CDurakGame where SortHand() gets called for example.
 			UpdateHandcards(Game, &pGame->m_aSeats[i]);
 			GameServer()->m_apPlayers[ClientID]->m_ShowName = true;
+			// Get our specific name back
+			pGame->m_aSeats[i].m_Player.m_LastNumHandCards = -1;
 			GameServer()->SendTuningParams(ClientID);
 		}
 	}
