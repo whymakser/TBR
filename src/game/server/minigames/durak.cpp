@@ -867,8 +867,6 @@ bool CDurak::UpdateGame(int Game)
 		return true;
 	}
 
-	bool DefenseOngoing = pGame->IsDefenseOngoing();
-
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
 		CDurakGame::SSeat *pSeat = &pGame->m_aSeats[i];
@@ -923,8 +921,7 @@ bool CDurak::UpdateGame(int Game)
 		}
 		
 		// Hide name of players who are not actively participating right now
-		bool IsPassiveCurrently = (DefenseOngoing || ProcessedWinAlready) && pGame->GetStateBySeat(i) == DURAK_PLAYERSTATE_NONE;
-		if (!IsPassiveCurrently && pChr)
+		if (!pSeat->m_Player.m_EndedMove && pChr)
 		{
 			pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
 			const int NumHands = (int)pSeat->m_Player.m_vHandCards.size();
@@ -936,10 +933,6 @@ bool CDurak::UpdateGame(int Game)
 				pPlayer->UpdateInformation();
 				pSeat->m_Player.m_LastNumHandCards = NumHands;
 			}
-		}
-		else
-		{
-			pPlayer->m_ShowName = false;
 		}
 
 		if (!pChr || ProcessedWinAlready)
@@ -1338,6 +1331,9 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bo
 	{
 		GameServer()->m_Accounts[pPlayer->GetAccID()].m_DurakWins++;
 	}
+
+	// Simulate ending move, so we end up in DURAK_PLAYERSTATE_NONE, so we can move after finishing
+	pSeat->m_Player.m_EndedMove = true;
 }
 
 void CDurak::Snap(int SnappingClient)
