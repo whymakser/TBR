@@ -375,7 +375,7 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 				int CurIndex = -1;
 				for (unsigned int i = 0; i < vOpenAttackIndices.size(); i++)
 				{
-					if (pSeat->m_Player.m_SelectedAttack == i)
+					if (pSeat->m_Player.m_SelectedAttack == (int)i)
 					{
 						CurIndex = i;
 						break;
