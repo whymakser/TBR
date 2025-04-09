@@ -4294,12 +4294,8 @@ void CGameContext::FDDraceInitPreMapInit()
 	m_pMinigames[MINIGAME_INSTAGIB_BOOMFNG] = new CMinigame(this, MINIGAME_INSTAGIB_BOOMFNG);
 	m_pMinigames[MINIGAME_INSTAGIB_FNG] = new CMinigame(this, MINIGAME_INSTAGIB_FNG);
 
-	// check if there are minigame spawns available (survival and instagib are checked in their own ticks)
 	for (int i = 0; i < NUM_MINIGAMES; i++)
 		m_aMinigameDisabled[i] = false;
-	m_aMinigameDisabled[MINIGAME_BLOCK] = !Collision()->TileUsed(TILE_MINIGAME_BLOCK);
-	m_aMinigameDisabled[MINIGAME_1VS1] = !Collision()->TileUsed(TILE_1VS1_LOBBY);
-	m_aMinigameDisabled[MINIGAME_DURAK] = true; // Validate when adding table tiles
 }
 
 void CGameContext::FDDraceInit()
@@ -4336,6 +4332,11 @@ void CGameContext::FDDraceInit()
 		if (!aRequiredRandomTilePositions[i])
 			Collision()->m_vTiles[i].clear();
 	}
+
+	// check if there are minigame spawns available (survival and instagib are checked in their own ticks)
+	m_aMinigameDisabled[MINIGAME_BLOCK] = !Collision()->TileUsed(TILE_MINIGAME_BLOCK);
+	m_aMinigameDisabled[MINIGAME_1VS1] = !Collision()->TileUsed(TILE_1VS1_LOBBY);
+	m_aMinigameDisabled[MINIGAME_DURAK] = true; // Validate when adding table tiles
 
 	CreateFolders();
 
