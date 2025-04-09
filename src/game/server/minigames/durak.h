@@ -15,7 +15,6 @@ enum
 	MAX_DURAK_PLAYERS = 6,
 	NUM_DURAK_INITIAL_HAND_CARDS = 6,
 	MAX_DURAK_ATTACKS = 6,
-	MAX_DURAK_ATTACKS_BEFORE_FIRST_TEE = 5,
 	MAX_DURAK_GAMES = VANILLA_MAX_CLIENTS-1,
 	DURAK_CARD_NAME_OFFSET = 48,
 };
@@ -43,6 +42,7 @@ public:
 		m_TableOffset = vec2(0, 0);
 		m_HoverState = HOVERSTATE_NONE;
 		m_Active = false;
+		m_HeightPos = 0.f;
 	}
 
 	int m_Suit;
@@ -55,6 +55,7 @@ public:
 		HOVERSTATE_DRAGGING,
 	};
 	int m_HoverState;
+	float m_HeightPos;
 	bool m_Active;
 
 	bool Valid() { return m_Suit != -1 && m_Rank != -1; }
@@ -80,12 +81,12 @@ public:
 	{
 		if (Set)
 		{
-			m_TableOffset.y = CCard::ms_TableSizeRadius.y - DURAK_CARD_HOVER_OFFSET;
+			m_TableOffset.y = m_HeightPos - DURAK_CARD_HOVER_OFFSET;
 			m_HoverState = HOVERSTATE_MOUSEOVER;
 		}
 		else
 		{
-			m_TableOffset.y = CCard::ms_TableSizeRadius.y;
+			m_TableOffset.y = m_HeightPos;
 			m_HoverState = HOVERSTATE_NONE;
 		}
 	}
@@ -106,11 +107,15 @@ public:
 		IND_KEYBOARD_ON = -4,
 		IND_KEYBOARD_OFF = -5,
 		IND_END_MOVE_BUTTON = -6,
-		IND_TOOLTIP_ATTACK = -7,
-		IND_TOOLTIP_DEFEND = -8,
-		IND_TOOLTIP_PUSH = -9,
-		IND_TOOLTIP_END_MOVE = -10,
-		IND_TOOLTIP_TAKE_CARDS = -11,
+		IND_START_TIMER = -7,
+		IND_PLAYERCOUNTER = -8,
+		IND_STAKE = -9,
+		IND_TOOLTIP_ATTACK = -10,
+		IND_TOOLTIP_DEFEND = -11,
+		IND_TOOLTIP_PUSH = -12,
+		IND_TOOLTIP_END_MOVE = -13,
+		IND_TOOLTIP_TAKE_CARDS = -14,
+		IND_SELECT_ATTACK = -15,
 	};
 	enum
 	{
@@ -120,6 +125,7 @@ public:
 		TOOLTIP_PUSH,
 		TOOLTIP_END_MOVE,
 		TOOLTIP_TAKE_CARDS,
+		TOOLTIP_SELECT_ATTACK,
 		NUM_TOOLTIPS
 	};
 	void SetInd(EIndicatorSuit IndSuit)
@@ -213,6 +219,7 @@ public:
 		for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
 		{
 			m_Attacks[i].m_Offense.m_TableOffset = vec2(PosX, CCard::ms_AttackAreaCenterOffset.y);
+			m_Attacks[i].m_Offense.m_HeightPos = CCard::ms_AttackAreaCenterOffset.y;
 			m_Attacks[i].m_Defense.m_TableOffset = vec2(PosX - CCard::ms_CardSizeRadius.x / 3.f, CCard::ms_AttackAreaCenterOffset.y + CCard::ms_CardSizeRadius.y * 1.25f);
 			PosX += CardSize;
 		}
@@ -236,14 +243,18 @@ public:
 				m_KeyboardControl = false;
 				m_LastKeyboardControl = false;
 				m_LastCursorMove = 0;
+				m_SelectedAttack = -1;
+				m_EndedMove = false;
+				m_LastStake = -2;
+				m_LastNumParticipants = -1;
 			}
 			struct
 			{
 				int m_Direction = 0;
-				int m_Jump = 0;
+				bool m_Jump = false;
+				bool m_HookColl = false;
 				int m_TargetX = 0;
 				int m_TargetY = 0;
-				int m_HookColl = 0;
 			} m_LastInput;
 			int m_ClientID;
 			int64 m_Stake;
@@ -255,6 +266,10 @@ public:
 			bool m_KeyboardControl;
 			bool m_LastKeyboardControl;
 			int64 m_LastCursorMove;
+			int m_SelectedAttack;
+			bool m_EndedMove;
+			int m_LastNumParticipants;
+			int64 m_LastStake;
 		} m_Player;
 	} m_aSeats[MAX_DURAK_PLAYERS];
 
@@ -289,6 +304,8 @@ public:
 
 	int GetStateBySeat(int SeatIndex)
 	{
+		if (m_aSeats[SeatIndex].m_Player.m_EndedMove)
+			return DURAK_PLAYERSTATE_NONE;
 		if (SeatIndex == m_AttackerIndex || SeatIndex == GetNextPlayer(m_DefenderIndex))
 			return DURAK_PLAYERSTATE_ATTACK;
 		if (SeatIndex == m_DefenderIndex)
@@ -324,7 +341,7 @@ public:
 				if (m_aSeats[s].m_Player.m_ClientID != -1)
 				{
 					CCard Card = m_Deck.DrawCard();
-					Card.m_TableOffset.y = CCard::ms_TableSizeRadius.y;
+					Card.m_TableOffset.y = Card.m_HeightPos = CCard::ms_TableSizeRadius.y;
 					m_aSeats[s].m_Player.m_vHandCards.push_back(Card);
 					if (m_Deck.IsEmpty())
 					{
@@ -392,12 +409,24 @@ public:
 
 	bool ProcessNextMove(int CurrentTick)
 	{
+		bool AllPlayersEndedMove = true;
+		for (int i = 0; i < MAX_PLAYERS; i++)
+			if (m_aSeats[i].m_Player.m_ClientID != -1 && !m_aSeats[i].m_Player.m_EndedMove)
+			{
+				AllPlayersEndedMove = false;
+				break;
+			}
+
+		// Speed up process
+		if (AllPlayersEndedMove)
+			return true;
+
 		if (!m_NextMove)
 			m_NextMove = CurrentTick + SERVER_TICK_SPEED * 60;
 		return m_NextMove <= CurrentTick;
 	}
 
-	int NextRound(bool SuccessfulDefense = false)
+	void NextRound(bool SuccessfulDefense = false)
 	{
 		for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
 		{
@@ -405,7 +434,6 @@ public:
 			m_Attacks[i].m_Defense.Invalidate();
 		}
 
-		int Ret = -1;
 		if (m_RoundCount == 0)
 		{
 			int LowestTrumpPlayerIndex = -1;
@@ -438,10 +466,6 @@ public:
 					}
 				}
 			}
-			else
-			{
-				Ret = LowestTrumpRank;
-			}
 			m_AttackerIndex = m_InitialAttackerIndex = LowestTrumpPlayerIndex;
 		}
 		else
@@ -460,10 +484,12 @@ public:
 				m_AttackerIndex = m_InitialAttackerIndex = GetNextPlayer(m_DefenderIndex);
 			}
 		}
+
+		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+			m_aSeats[i].m_Player.m_EndedMove = false;
 		m_DefenderIndex = GetNextPlayer(m_InitialAttackerIndex);
 		m_RoundCount++;
 		m_NextMove = 0;
-		return Ret;
 	}
 
 	bool IsDefenseOngoing()
@@ -493,7 +519,7 @@ public:
 					if (!m_Deck.IsEmpty())
 					{
 						CCard Card = m_Deck.DrawCard();
-						Card.m_TableOffset.y = CCard::ms_TableSizeRadius.y;
+						Card.m_TableOffset.y = Card.m_HeightPos = CCard::ms_TableSizeRadius.y;
 						m_aSeats[Index].m_Player.m_vHandCards.push_back(Card);
 					}
 					else
@@ -508,6 +534,15 @@ public:
 				SortHand(m_aSeats[Index].m_Player.m_vHandCards, m_Deck.GetTrumpSuit());
 			}
 		}
+	}
+
+	std::vector<int> GetOpenAttacks()
+	{
+		std::vector<int> vOpenAttackIndices;
+		for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
+			if (m_Attacks[i].m_Offense.Valid() && !m_Attacks[i].m_Defense.Valid())
+				vOpenAttackIndices.push_back(i);
+		return vOpenAttackIndices;
 	}
 
 	bool IsGameOver(int *pDurakClientID = 0)
@@ -542,12 +577,22 @@ public:
 			return false;
 
 		int Used = 0;
+		int Required = 0;
 		for (auto &pair : m_Attacks)
+		{
 			if (pair.m_Offense.Valid())
+			{
 				Used++;
+				if (!pair.m_Defense.Valid())
+					Required++;
+			}
+		}
 
 		// allow attack from left guy too, as soon as at least 1 slot has been used
 		if (Seat != m_AttackerIndex && (!Used || GetStateBySeat(Seat) != DURAK_PLAYERSTATE_ATTACK))
+			return false;
+
+		if ((int)m_aSeats[m_DefenderIndex].m_Player.m_vHandCards.size() < Required + 1)
 			return false;
 
 		// If not first attack, card has to match existing ranks on table
@@ -678,8 +723,8 @@ class CDurak : public CMinigame
 	std::map<int, std::map<CCard*, bool>> m_aCardUpdate; // [ClientID][Card] = true
 	void PrepareStaticCards(int SnappingClient, CDurakGame *pGame, CDurakGame::SSeat *pSeat);
 	void PrepareDurakSnap(int SnappingClient, CDurakGame *pGame, CDurakGame::SSeat *pSeat);
-	void UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, int> &NewMap);
-	void SnapDurakCard(int SnappingClient, vec2 TablePos, CCard *pCard);
+	void UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, int> &NewMap, CDurakGame *pGame);
+	void SnapDurakCard(int SnappingClient, CDurakGame *pGame, CCard *pCard, vec2 ForcePos = vec2(-1, -1));
 
 	int m_aDurakNumReserved[MAX_CLIENTS];
 	int64 m_aLastSeatOccupiedMsg[MAX_CLIENTS];
@@ -691,6 +736,7 @@ class CDurak : public CMinigame
 	bool UpdateGame(int Game);
 	bool StartGame(int Game);
 	void EndGame(int Game);
+	void TakeCardsFromTable(int Game);
 	void ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bool ForceEnd = false);
 	bool HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg);
 
@@ -698,7 +744,7 @@ class CDurak : public CMinigame
 	void SendChatToParticipants(int Game, const char *pMessage);
 
 	int GetPlayerState(int ClientID);
-	const char *GetCardSymbol(int Suit, int Rank);
+	const char *GetCardSymbol(int Suit, int Rank, CDurakGame *pGame);
 	void UpdatePassive(int ClientID, int Seconds);
 
 	CDurakGame *GetOrAddGame(int Number);
