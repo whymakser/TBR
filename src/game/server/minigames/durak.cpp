@@ -1385,10 +1385,12 @@ void CDurak::Snap(int SnappingClient)
 	CPlayer *pSnap = GameServer()->m_apPlayers[SnappingClient];
 	if ((pSnap->GetTeam() == TEAM_SPECTATORS || pSnap->IsPaused()) && pSnap->GetSpectatorID() >= 0)
 		ClientID = pSnap->GetSpectatorID();
+	bool IsSpectator = SnappingClient != ClientID;
 
 	int Game = GetGameByClient(ClientID);
 	CDurakGame *pGame = Game >= 0 ? m_vpGames[Game] : 0;
-	CDurakGame::SSeat *pSeat = pGame ? pGame->GetSeatByClient(ClientID) : 0;
+	// As spectator, always render hand cards (hidden) of defender
+	CDurakGame::SSeat *pSeat = pGame ? pGame->GetSeatByClient(IsSpectator ? pGame->m_DefenderIndex : ClientID) : 0;
 
 	// Prepare snap ids..
 	PrepareDurakSnap(SnappingClient, pGame, pSeat);
@@ -1434,7 +1436,7 @@ void CDurak::Snap(int SnappingClient)
 	if (pSeat)
 	{
 		for (unsigned int i = 0; i < pSeat->m_Player.m_vHandCards.size(); i++)
-			SnapDurakCard(SnappingClient, pGame, &pSeat->m_Player.m_vHandCards[i], SnappingClient != ClientID);
+			SnapDurakCard(SnappingClient, pGame, &pSeat->m_Player.m_vHandCards[i], IsSpectator);
 	}
 
 	// Attack cards
@@ -1704,7 +1706,7 @@ void CDurak::SnapDurakCard(int SnappingClient, CDurakGame *pGame, CCard *pCard, 
 		const char *pName = IsSpectator ? GetCardSymbol(-1, -1) : GetCardSymbol(pCard->m_Suit, pCard->m_Rank, pGame);
 		StrToInts(&pClientInfo[0], 4, pName);
 		StrToInts(&pClientInfo[4], 3, "");
-		StrToInts(&pClientInfo[8], 6, "default");
+		StrToInts(&pClientInfo[8], 6, "x_spec");
 		pClientInfo[14] = 1;
 		pClientInfo[15] = pClientInfo[16] = 255;
 
@@ -1731,9 +1733,16 @@ void CDurak::SnapDurakCard(int SnappingClient, CDurakGame *pGame, CCard *pCard, 
 	}
 	pCharacter->m_X = Pos.x;
 	pCharacter->m_Y = Pos.y;
-	pCharacter->m_Weapon = WEAPON_GUN;
-	if (Pos.x > TablePos.x)
-		pCharacter->m_Angle = 804;
+	if (GameServer()->GetClientDDNetVersion(SnappingClient) < VERSION_DDNET_TEE_NO_WEAPON)
+	{
+		pCharacter->m_Weapon = WEAPON_GUN;
+		if (Pos.x > TablePos.x)
+			pCharacter->m_Angle = 804;
+	}
+	else
+	{
+		pCharacter->m_Weapon = -1;
+	}
 
 	if(Server()->IsSevendown(SnappingClient))
 	{
