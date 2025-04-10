@@ -359,6 +359,14 @@ bool CDurak::OnDropMoney(int ClientID, int Amount)
 	return false;
 }
 
+bool CDurak::OnRainbowName(int ClientID, int MapID)
+{
+	int TableMapID = GameServer()->m_World.GetFirstDurakID(ClientID);
+	if (MapID != TableMapID || GameServer()->m_aMinigameDisabled[MINIGAME_DURAK])
+		return false;
+	return m_vpGames.size() && !::NetworkClipped(GameServer(), ClientID, m_vpGames[0]->m_TablePos);
+}
+
 void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 {
 	int ClientID = pCharacter->GetPlayer()->GetCID();
@@ -1758,7 +1766,7 @@ void CDurak::SnapDurakCard(int SnappingClient, CDurakGame *pGame, CCard *pCard, 
 		const char *pName = IsSpectator ? GetCardSymbol(-1, -1) : GetCardSymbol(pCard->m_Suit, pCard->m_Rank, pGame);
 		StrToInts(&pClientInfo[0], 4, pName);
 		StrToInts(&pClientInfo[4], 3, "");
-		StrToInts(&pClientInfo[8], 6, "x_spec");
+		StrToInts(&pClientInfo[8], 6, pGame ? "x_spec" : "default");
 		pClientInfo[14] = 1;
 		pClientInfo[15] = pClientInfo[16] = 255;
 

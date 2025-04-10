@@ -378,6 +378,7 @@ MACRO_CONFIG_INT(SvGrogForceHammer, sv_grog_force_hammer, 0, 0, 1, CFGFLAG_SERVE
 MACRO_CONFIG_INT(SvDurakTeamColor, sv_durak_team_colors, 1, 0, 1, CFGFLAG_SERVER, "Whether Durák minigame uses team colors for own round", AUTHED_ADMIN)
 
 // other
+MACRO_CONFIG_INT(SvRainbowNameSpec, sv_rainbowname_spec, 0, 0, 1, CFGFLAG_SERVER, "Whether rainbowname is processed while paused or spectating (annoying in +spectate)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvHideMinigamePlayers, sv_hide_minigame_players, 1, 0, 1, CFGFLAG_SERVER, "Whether players in different minigames are shown in the scoreboard", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvRainbowSpeedDefault, sv_rainbow_speed_default, 5, 1, 50, CFGFLAG_SERVER, "Default speed for rainbow", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvOldJetpackSound, sv_old_jetpack_sound, 0, 0, 1, CFGFLAG_SERVER, "Whether to use the default gun sound for jetpack or another sound", AUTHED_ADMIN)
