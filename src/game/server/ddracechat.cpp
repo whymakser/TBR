@@ -1353,7 +1353,7 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 	CGameContext::AccountInfo *pAccount = &pSelf->m_Accounts[pPlayer->GetAccID()];
 
 	// Show durak stats when on seat
-	if (pSelf->Durak()->IsPlayerOnSeat(ID))
+	if (pSelf->Durak()->IsPlayerOnSeat(pResult->m_ClientID))
 	{
 		Minigame = MINIGAME_DURAK;
 	}
