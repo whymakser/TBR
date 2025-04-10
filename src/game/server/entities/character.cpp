@@ -2732,7 +2732,7 @@ void CCharacter::HandleTiles(int Index)
 
 	// 1vs1 over the whole map, we need to avoid some stuff here
 	bool FightStarted = GameServer()->Arenas()->FightStarted(m_pPlayer->GetCID());
-	if (!FightStarted)
+	if (!FightStarted && GameServer()->Durak()->InDurakGame(m_pPlayer->GetCID()))
 	{
 		// start
 		if (((m_TileIndex == TILE_BEGIN) || (m_TileFIndex == TILE_BEGIN) || FTile1 == TILE_BEGIN || FTile2 == TILE_BEGIN || FTile3 == TILE_BEGIN || FTile4 == TILE_BEGIN || Tile1 == TILE_BEGIN || Tile2 == TILE_BEGIN || Tile3 == TILE_BEGIN || Tile4 == TILE_BEGIN) && (m_DDRaceState == DDRACE_NONE || m_DDRaceState == DDRACE_FINISHED || (m_DDRaceState == DDRACE_STARTED && !Team() && Config()->m_SvTeam != 3)))
@@ -6024,6 +6024,8 @@ void CCharacter::Meteor(bool Set, int FromID, bool Infinite, bool Silent)
 
 void CCharacter::Passive(bool Set, int FromID, bool Silent)
 {
+	if (m_Passive == Set)
+		return;
 	m_Passive = Set;
 	Teams()->m_Core.SetPassive(m_pPlayer->GetCID(), Set);
 	GameServer()->SendTuningParams(m_pPlayer->GetCID(), m_TuneZone);

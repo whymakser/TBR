@@ -936,7 +936,7 @@ bool CDurak::UpdateGame(int Game)
 			continue;
 
 		pChr->EpicCircle(pGame->m_DefenderIndex == i, -1, true);
-		pChr->Passive(pGame->GetStateBySeat(i) == DURAK_PLAYERSTATE_NONE, -1, true);
+		pChr->Passive(pGame->GetStateBySeat(i) != DURAK_PLAYERSTATE_NONE, -1, true);
 		if (!pSeat->m_Player.m_EndedMove)
 		{
 			pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
