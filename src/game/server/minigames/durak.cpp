@@ -946,6 +946,7 @@ bool CDurak::UpdateGame(int Game)
 				char aBuf[MAX_NAME_LENGTH];
 				str_format(aBuf, sizeof(aBuf), "%s x%d", GetCardSymbol(-1, -1), NumHands);
 				pPlayer->SetName(aBuf);
+				pPlayer->SetClan(Server()->ClientName(ClientID));
 				pPlayer->UpdateInformation();
 				pSeat->m_Player.m_LastNumHandCards = NumHands;
 			}
