@@ -4258,18 +4258,13 @@ void CCharacter::FDDraceInit()
 	m_IsGrounded = false;
 	m_aLineExp[0] = '\0';
 	m_aLineMoney[0] = '\0';
+
+	int Permille = m_pPlayer->m_Permille;
+	m_pPlayer->m_Permille = 0;
+	if (m_pPlayer->m_JailTime)
+		IncreasePermille(Permille);
 	m_pGrog = 0;
 	m_NumGrogsHolding = 0;
-	if (m_pPlayer->m_JailTime)
-	{
-		int Permille = m_pPlayer->m_Permille;
-		m_pPlayer->m_Permille = 0;
-		IncreasePermille(Permille);
-	}
-	else
-	{
-		m_pPlayer->m_Permille = 0;
-	}
 	m_FirstPermilleTick = 0;
 	m_DeadlyPermilleDieTick = 0;
 	m_GrogSpirit = 0;
