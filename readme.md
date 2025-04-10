@@ -79,7 +79,18 @@ Yes, that's right. You can sit down in a nice tavern and buy some grog for you a
 You can find a list of minigames using `/minigames`. When joining a minigame, your complete tee status including position, weapons, extras, etc. will be saved and can be loaded later when leaving the minigame again using `/leave`. Nothing will be missed and you can continue playing as before.
 
 * **1vs1 minigame** <br>
-The reason why the 1vs1 minigame deserves it's own entry in this list is simple. It's innovative and unique. You can create a 1vs1 lobby using `/1vs1 <name>` and what's so special about it is, that you can take ANY place from the whole map to play a 1vs1 there. You can enlarge the area using zoom and adjust weapons to be used during the round.
+The reason why the 1vs1 minigame deserves it's own entry in this list is simple. It's innovative and unique. You can create a 1vs1 lobby using `/1vs1 <name>` and what's so special about it is, that you can take ANY place from the whole map to play a 1vs1 there. You can enlarge the area using zoom and adjust weapons to be used during the round.<br>
+
+* **Durák card game** <br>
+You can play Durák by mouse or via keyboarc controls (+left, +right, +jump, +showhookcoll) <br>
+	* **Requirements** <br>
+	`cl_show_direction 0; cl_nameplates_size 50; cl_nameplates_offset 30`
+	* **Durák controls/rules** <br>
+	Round start: Initial attacker name will be displayed at top left of table.<br>
+	Attacker: You start, drag and drop a card of your choice on the middle table area. Or select a card using A/D, submit using SPACE or go back using HOOK-COLLISION. When you selected the card using SPACE, you can choose what you want to do with the card using A/D again and submit using SPACE again.
+	If you don't want to place any offense cards anymore, you can click End move (click on the card stack or trump card) in order to speed up the process. Otherwise wait 1 min. <br>
+	Defender: You can either defend by dragging a card onto an offense card, or you can place a card with the same rank next to it in the table area to push the attack to the next person. <br>
+	If you can't defend or do not want to, you can click in the table area to take the cards in order to speed up the process. Otherwise wait 1min.
 
 * **Flags and weapon drops** <br>
 You can drop flags using `F3` key (vote yes key) and weapons using `F4` key (vote no key). <br>
