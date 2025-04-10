@@ -493,9 +493,10 @@ public:
 	{
 		std::vector<int> vDrawOrder;
 		vDrawOrder.push_back(m_InitialAttackerIndex);
-		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
-			if (i != m_InitialAttackerIndex && i != m_DefenderIndex)
-				vDrawOrder.push_back(i);
+		int NextPlayer = m_InitialAttackerIndex;
+		while ((NextPlayer = GetNextPlayer(NextPlayer)) != m_InitialAttackerIndex)
+			if (NextPlayer != m_DefenderIndex)
+				vDrawOrder.push_back(NextPlayer);
 		vDrawOrder.push_back(m_DefenderIndex);
 
 		for (unsigned int i = 0; i < vDrawOrder.size(); i++)
@@ -739,6 +740,7 @@ class CDurak : public CMinigame
 	bool TryDefend(int Game, int Seat, int Attack, CCard *pCard);
 	bool TryPush(int Game, int Seat, CCard *pCard);
 	bool TryAttack(int Game, int Seat, CCard *pCard);
+	void ProcessCardPlacement(int Game, CDurakGame::SSeat *pSeat, CCard *pFlyingPointToCard);
 	void SetShowAttackersTurn(int Game);
 	void ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bool ForceEnd = false);
 	bool HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg);

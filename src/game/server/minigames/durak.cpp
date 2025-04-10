@@ -1242,6 +1242,7 @@ bool CDurak::TryDefend(int Game, int Seat, int Attack, CCard *pCard)
 	{
 		if (!pGame->m_IsDefenseOngoing)
 		{
+			// First offense card placed. Now no more pushes are allowed, so we know who has to play and who not.
 			pGame->m_IsDefenseOngoing = true;
 			for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 			{
@@ -1252,8 +1253,7 @@ bool CDurak::TryDefend(int Game, int Seat, int Attack, CCard *pCard)
 				}
 			}
 		}
-		UpdateHandcards(Game, &pGame->m_aSeats[Seat]);
-		CreateFlyingPoint(pGame->m_aSeats[Seat].m_Player.m_ClientID, Game, &pGame->m_Attacks[Attack].m_Defense);
+		ProcessCardPlacement(Game, &pGame->m_aSeats[Seat], &m_vpGames[Game]->m_Attacks[Attack].m_Defense);
 		return true;
 	}
 	return false;
@@ -1266,8 +1266,7 @@ bool CDurak::TryPush(int Game, int Seat, CCard *pCard)
 	if (Attack != -1)
 	{
 		SetShowAttackersTurn(Game);
-		UpdateHandcards(Game, &pGame->m_aSeats[Seat]);
-		CreateFlyingPoint(pGame->m_aSeats[Seat].m_Player.m_ClientID, Game, &pGame->m_Attacks[Attack].m_Offense);
+		ProcessCardPlacement(Game, &pGame->m_aSeats[Seat], &m_vpGames[Game]->m_Attacks[Attack].m_Offense);
 		return true;
 	}
 	return false;
@@ -1279,11 +1278,19 @@ bool CDurak::TryAttack(int Game, int Seat, CCard *pCard)
 	int Attack = pGame->TryAttack(Seat, pCard);
 	if (Attack != -1)
 	{
-		UpdateHandcards(Game, &pGame->m_aSeats[Seat]);
-		CreateFlyingPoint(pGame->m_aSeats[Seat].m_Player.m_ClientID, Game, &pGame->m_Attacks[Attack].m_Offense);
+		ProcessCardPlacement(Game, &pGame->m_aSeats[Seat], &m_vpGames[Game]->m_Attacks[Attack].m_Offense);
 		return true;
 	}
 	return false;
+}
+
+void CDurak::ProcessCardPlacement(int Game, CDurakGame::SSeat *pSeat, CCard *pFlyingPointToCard)
+{
+	int ClientID = pSeat->m_Player.m_ClientID;
+	if (pSeat->m_Player.m_vHandCards.empty())
+		EndMove(ClientID, Game, pSeat);
+	UpdateHandcards(Game, pSeat);
+	CreateFlyingPoint(ClientID, Game, pFlyingPointToCard);
 }
 
 void CDurak::TakeCardsFromTable(int Game)
