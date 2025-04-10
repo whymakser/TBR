@@ -558,10 +558,10 @@ public:
 		return m_Running && m_aSeats[Seat].m_Player.m_Stake >= 0 && m_aSeats[Seat].m_Player.m_ClientID != m_DurakClientID;
 	}
 
-	bool TryAttack(int Seat, CCard *pCard)
+	int TryAttack(int Seat, CCard *pCard)
 	{
 		if (!pCard || !pCard->Valid())
-			return false;
+			return -1;
 
 		int Used = 0;
 		int Required = 0;
@@ -576,14 +576,14 @@ public:
 		}
 
 		if (Used >= MAX_DURAK_ATTACKS)
-			return false;
+			return -1;
 
 		// allow attack from left guy too, as soon as at least 1 slot has been used
 		if (Seat != m_AttackerIndex && (!Used || GetStateBySeat(Seat) != DURAK_PLAYERSTATE_ATTACK))
-			return false;
+			return -1;
 
 		if ((int)m_aSeats[m_DefenderIndex].m_Player.m_vHandCards.size() < Required + 1)
-			return false;
+			return -1;
 
 		// If not first attack, card has to match existing ranks on table
 		if (Used > 0)
@@ -599,7 +599,7 @@ public:
 				}
 			}
 			if (!Match)
-				return false;
+				return -1;
 		}
 
 		// Assign card to attack slot
@@ -609,7 +609,7 @@ public:
 		RemoveCard(Seat, pCard);
 
 		m_NextMove = 0;
-		return true;
+		return Used;
 	}
 
 	bool TryDefend(int Seat, int Attack, CCard *pCard)
@@ -635,10 +635,10 @@ public:
 		return true;
 	}
 
-	bool TryPush(int Seat, CCard *pCard)
+	int TryPush(int Seat, CCard *pCard)
 	{
 		if (Seat != m_DefenderIndex || !pCard || !pCard->Valid())
-			return false;
+			return -1;
 
 		int NumAttacks = 0;
 		int TargetRank = -1;
@@ -647,40 +647,40 @@ public:
 			if (pair.m_Offense.Valid())
 			{
 				if (pair.m_Defense.Valid()) // No defense has happened already
-					return false;
+					return -1;
 
 				NumAttacks++;
 				if (TargetRank == -1)
 					TargetRank = pair.m_Offense.m_Rank;
 				else if (pair.m_Offense.m_Rank != TargetRank)
-					return false; // Can only push on same ranks
+					return -1; // Can only push on same ranks
 			}
 		}
 
 		if (TargetRank == -1 || pCard->m_Rank != TargetRank)
-			return false;
+			return -1;
 
 		// Find first free attack slot
-		for (auto &pair : m_Attacks)
+		for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
 		{
-			if (!pair.m_Offense.Valid())
+			if (!m_Attacks[i].m_Offense.Valid())
 			{
 				int NewDefender = GetNextPlayer(m_DefenderIndex);
 				if ((int)m_aSeats[NewDefender].m_Player.m_vHandCards.size() < NumAttacks + 1)
-					return false;
+					return -1;
 
-				pair.m_Offense.m_Suit = pCard->m_Suit;
-				pair.m_Offense.m_Rank = pCard->m_Rank;
+				m_Attacks[i].m_Offense.m_Suit = pCard->m_Suit;
+				m_Attacks[i].m_Offense.m_Rank = pCard->m_Rank;
 				RemoveCard(Seat, pCard);
 
 				// Successfully moved
 				m_AttackerIndex = m_DefenderIndex;
 				m_DefenderIndex = NewDefender;
 				m_NextMove = 0;
-				return true;
+				return i;
 			}
 		}
-		return false;
+		return -1;
 	}
 
 	void RemoveCard(int Seat, CCard *pCard)
@@ -737,6 +737,8 @@ class CDurak : public CMinigame
 	void TakeCardsFromTable(int Game);
 	void EndMove(int ClientID, int Game, CDurakGame::SSeat *pSeat);
 	bool TryDefend(int Game, int Seat, int Attack, CCard *pCard);
+	bool TryPush(int Game, int Seat, CCard *pCard);
+	bool TryAttack(int Game, int Seat, CCard *pCard);
 	void SetShowAttackersTurn(int Game);
 	void ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bool ForceEnd = false);
 	bool HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg);
@@ -747,6 +749,7 @@ class CDurak : public CMinigame
 	int GetPlayerState(int ClientID);
 	const char *GetCardSymbol(int Suit, int Rank, CDurakGame *pGame = 0);
 	void UpdatePassive(int ClientID, int Seconds);
+	void CreateFlyingPoint(int FromClientID, int Game, CCard *pToCard);
 
 	CDurakGame *GetOrAddGame(int Number);
 

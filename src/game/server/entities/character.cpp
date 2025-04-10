@@ -2066,7 +2066,7 @@ void CCharacter::Snap(int SnappingClient)
 		}
 	}
 
-	if (m_Passive && !GameServer()->Durak()->InDurakGame(m_pPlayer->GetCID()^^))
+	if (m_Passive && !GameServer()->Durak()->InDurakGame(m_pPlayer->GetCID()))
 	{
 		int Size = Server()->IsSevendown(SnappingClient) ? 4*4 : sizeof(CNetObj_Pickup);
 		CNetObj_Pickup* pP = static_cast<CNetObj_Pickup*>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_PassiveSnapID, Size));

@@ -6,6 +6,7 @@
 #include <game/server/teams.h>
 #include <engine/shared/config.h>
 #include <game/server/gamemodes/DDRace.h>
+#include <game/server/entities/flyingpoint.h>
 
 const vec2 CCard::ms_CardSizeRadius = vec2(14.f, 16.f);
 const vec2 CCard::ms_TableSizeRadius = vec2(4.9f * 32.f, 3.8f * 32.f); // 11*9 blocks around table center tile (all 4 corner tiles can be cut-out)
@@ -106,6 +107,17 @@ void CDurak::UpdatePassive(int ClientID, int Seconds)
 	CCharacter* pChr = GameServer()->GetPlayerChar(ClientID);
 	if (pChr && pChr->UpdatePassiveEndTick(Server()->Tick() + Server()->TickSpeed() * Seconds))
 		m_aUpdatedPassive[ClientID] = true;
+}
+
+void CDurak::CreateFlyingPoint(int FromClientID, int Game, CCard *pToCard)
+{
+	if (GameServer()->GetPlayerChar(FromClientID))
+	{
+		vec2 From = GameServer()->GetPlayerChar(FromClientID)->GetPos();
+		vec2 To = m_vpGames[Game]->m_TablePos + pToCard->m_TableOffset;
+		To.y -= DURAK_CARD_NAME_OFFSET;
+		new CFlyingPoint(&GameServer()->m_World, From, -1, FromClientID, normalize(To - From) * 15.f, To);
+	}
 }
 
 void CDurak::OnCharacterSeat(int ClientID, int Number, int SeatIndex)
@@ -480,9 +492,10 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 		{
 			if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_ATTACK)
 			{
-				if (pGame->TryAttack(pSeat->m_ID, pCard))
+				if (TryAttack(Game, pSeat->m_ID, pCard))
 				{
-					UpdateHandcards(Game, pSeat);
+					// Nothing to do
+					pCard = 0;
 				}
 			}
 			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_DEFEND)
@@ -501,14 +514,15 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 				{
 					pGame->m_Attacks[pSeat->m_Player.m_SelectedAttack].m_Offense.SetHovered(false);
 					pSeat->m_Player.m_SelectedAttack = -1;
+					pCard = 0;
 				}
 			}
 			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_PUSH)
 			{
-				if (pGame->TryPush(pSeat->m_ID, pCard))
+				if (TryPush(Game, pSeat->m_ID, pCard))
 				{
-					UpdateHandcards(Game, pSeat);
-					SetShowAttackersTurn(Game);
+					// Nothing to do..
+					pCard = 0;
 				}
 			}
 			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_TAKE_CARDS)
@@ -778,7 +792,12 @@ bool CDurak::UpdateGame(int Game)
 		{
 			if (pCard->m_HoverState > CCard::HOVERSTATE_NONE)
 			{
-				pCard->m_HoverState = CCard::HOVERSTATE_DRAGGING;
+				if (pCard->m_HoverState == CCard::HOVERSTATE_MOUSEOVER)
+				{
+					// Unset CCard::IND_TOOLTIP_ATTACKERS_TURN
+					pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
+					pCard->m_HoverState = CCard::HOVERSTATE_DRAGGING;
+				}
 				float CornerY = 0.f;
 				if ((RelativeCursorPos.x < -CCard::ms_TableSizeRadius.x + 32.f) ||
 					RelativeCursorPos.x > CCard::ms_TableSizeRadius.x - 32.f)
@@ -1029,9 +1048,8 @@ bool CDurak::UpdateGame(int Game)
 					{
 						pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_ATTACK;
 					}
-					else if (DragRelease && m_vpGames[Game]->TryAttack(i, pDraggedCard))
+					else if (DragRelease && TryAttack(Game, i, pDraggedCard))
 					{
-						UpdateHandcards(Game, pSeat);
 						pDraggedCard = 0;
 					}
 				}
@@ -1064,11 +1082,9 @@ bool CDurak::UpdateGame(int Game)
 						{
 							pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_PUSH;
 						}
-						else if (DragRelease && m_vpGames[Game]->TryPush(i, pDraggedCard))
+						else if (DragRelease && TryPush(Game, i, pDraggedCard))
 						{
 							pSeat->m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed() * 2;
-							UpdateHandcards(Game, pSeat);
-							SetShowAttackersTurn(Game);
 							pDraggedCard = 0;
 						}
 						else
@@ -1236,6 +1252,34 @@ bool CDurak::TryDefend(int Game, int Seat, int Attack, CCard *pCard)
 			}
 		}
 		UpdateHandcards(Game, &pGame->m_aSeats[Seat]);
+		CreateFlyingPoint(pGame->m_aSeats[Seat].m_Player.m_ClientID, Game, &pGame->m_Attacks[Attack].m_Defense);
+		return true;
+	}
+	return false;
+}
+
+bool CDurak::TryPush(int Game, int Seat, CCard *pCard)
+{
+	CDurakGame *pGame = m_vpGames[Game];
+	int Attack = pGame->TryPush(Seat, pCard);
+	if (Attack != -1)
+	{
+		SetShowAttackersTurn(Game);
+		UpdateHandcards(Game, &pGame->m_aSeats[Seat]);
+		CreateFlyingPoint(pGame->m_aSeats[Seat].m_Player.m_ClientID, Game, &pGame->m_Attacks[Attack].m_Offense);
+		return true;
+	}
+	return false;
+}
+
+bool CDurak::TryAttack(int Game, int Seat, CCard *pCard)
+{
+	CDurakGame *pGame = m_vpGames[Game];
+	int Attack = pGame->TryAttack(Seat, pCard);
+	if (Attack != -1)
+	{
+		UpdateHandcards(Game, &pGame->m_aSeats[Seat]);
+		CreateFlyingPoint(pGame->m_aSeats[Seat].m_Player.m_ClientID, Game, &pGame->m_Attacks[Attack].m_Offense);
 		return true;
 	}
 	return false;
