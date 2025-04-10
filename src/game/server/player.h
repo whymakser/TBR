@@ -397,6 +397,9 @@ public:
 	bool m_HideFromSpecCount;
 	char m_aDelayedJoinMsg[128];
 
+	// Moved to player from character, because jail should keep permille xd
+	int m_Permille;
+
 	// Voting Menu calls, used when executing the chat command aswell
 	void SetSilentFarm(bool Set);
 	void SetHideDrawings(bool Set);

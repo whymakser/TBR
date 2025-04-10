@@ -1649,7 +1649,7 @@ void CGameContext::ConSetPermille(IConsole::IResult *pResult, void *pUserData)
 	CCharacter *pChr = pSelf->GetPlayerChar(Victim);
 	if (pChr)
 	{
-		pChr->m_Permille = 0;
+		pChr->GetPlayer()->m_Permille = 0;
 		pChr->m_FirstPermilleTick = 0;
 		pChr->m_GrogBalancePosX = CCharacter::GROG_BALANCE_POS_UNSET;
 		pChr->m_GrogDirDelayEnd = 0;

@@ -254,6 +254,7 @@ void CPlayer::Reset()
 	m_HideFromSpecCount = false;
 	m_aDelayedJoinMsg[0] = '\0';
 	m_LockSpecPosUntil = 0;
+	m_Permille = 0;
 }
 
 void CPlayer::Tick()

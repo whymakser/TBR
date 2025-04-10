@@ -490,10 +490,10 @@ int CVotingMenu::PrepareTempDescriptions(int ClientID)
 		}
 	}
 
-	if (pPlayer->GetCharacter() && pPlayer->GetCharacter()->m_Permille)
+	if (pPlayer->GetCharacter() && pPlayer->m_Permille)
 	{
 		DoAnnouncement = true;
-		str_format(aBuf, sizeof(aBuf), "Grog permille: %.1f‰ / %.1f‰", pPlayer->GetCharacter()->m_Permille / 10.f, pPlayer->GetCharacter()->GetPermilleLimit() / 10.f);
+		str_format(aBuf, sizeof(aBuf), "Grog permille: %.1f‰ / %.1f‰", pPlayer->m_Permille / 10.f, pPlayer->GetCharacter()->GetPermilleLimit() / 10.f);
 		DoLineText(Page, &NumOptions, aBuf, BULLET_POINT);
 	}
 
@@ -936,7 +936,7 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 	{
 		pStats->m_JailTime = pPlayer->m_JailTime;
 		pStats->m_EscapeTime = pPlayer->m_EscapeTime;
-		pStats->m_Permille = pChr ? pChr->m_Permille : 0;
+		pStats->m_Permille = pChr ? pPlayer->m_Permille : 0; // Got moved to player, but still check for character due to other dependencies
 	}
 
 	pStats->m_Flags = Flags;

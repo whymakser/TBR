@@ -579,7 +579,7 @@ public:
 	bool AddGrog();
 	int m_NumGrogsHolding;
 	CGrog *m_pGrog;
-	int m_Permille;
+	//int m_Permille; // Moved to player from character, because jail should keep permille xd
 	int64 m_FirstPermilleTick;
 	int m_GrogSpirit;
 	int DetermineGrogSpirit();

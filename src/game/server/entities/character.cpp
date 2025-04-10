@@ -2889,7 +2889,7 @@ void CCharacter::HandleTiles(int Index)
 				}
 
 				//grog permille
-				if (m_Permille)
+				if (m_pPlayer->m_Permille)
 				{
 					Money += 1;
 				}
@@ -2924,7 +2924,7 @@ void CCharacter::HandleTiles(int Index)
 
 				str_format(aPolice, sizeof(aPolice), " +%dpolice", pAccount->m_PoliceLevel);
 				str_format(m_aLineMoney, sizeof(m_aLineMoney), "%s [%lld] +%d%s%s%s", BankMode == 2 ? "Bank" : "Wallet", BankMode == 1 ? m_pPlayer->GetWalletMoney() : pAccount->m_Money,
-					TileMoney, (PoliceMoneyTile && pAccount->m_PoliceLevel) ? aPolice : "", pAccount->m_VIP ? " +2vip" : "", m_Permille ? " +1grog" : "");
+					TileMoney, (PoliceMoneyTile && pAccount->m_PoliceLevel) ? aPolice : "", pAccount->m_VIP ? " +2vip" : "", m_pPlayer->m_Permille ? " +1grog" : "");
 
 				if (!IsWeaponIndicator() && !m_pPlayer->m_HideBroadcasts)
 				{
@@ -4260,7 +4260,16 @@ void CCharacter::FDDraceInit()
 	m_aLineMoney[0] = '\0';
 	m_pGrog = 0;
 	m_NumGrogsHolding = 0;
-	m_Permille = 0;
+	if (m_pPlayer->m_JailTime)
+	{
+		int Permille = m_pPlayer->m_Permille;
+		m_pPlayer->m_Permille = 0;
+		IncreasePermille(Permille);
+	}
+	else
+	{
+		m_pPlayer->m_Permille = 0;
+	}
 	m_FirstPermilleTick = 0;
 	m_DeadlyPermilleDieTick = 0;
 	m_GrogSpirit = 0;
@@ -4740,10 +4749,10 @@ void CCharacter::IncreasePermille(int Permille)
 		m_FirstPermilleTick = Server()->Tick();
 	}
 
-	m_Permille += Permille;
+	m_pPlayer->m_Permille += Permille;
 	GameServer()->CreateDeath(m_Pos, m_pPlayer->GetCID(), TeamMask());
 
-	if (m_Permille > GetPermilleLimit())
+	if (m_pPlayer->m_Permille > GetPermilleLimit() && !m_pPlayer->m_JailTime)
 	{
 		// +5 minutes escape time initially, add 2 minutes for each extra drink over
 		m_pPlayer->m_EscapeTime += Server()->TickSpeed() * (m_pPlayer->m_EscapeTime ? 120 : 300);
@@ -4754,7 +4763,7 @@ void CCharacter::IncreasePermille(int Permille)
 		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Police is searching you because you have exceeded your legal drinking limit");
 	}
 
-	if (m_Permille <= Config()->m_SvGrogMinPermilleLimit)
+	if (m_pPlayer->m_Permille <= Config()->m_SvGrogMinPermilleLimit)
 	{
 		// 10 minutes passive, if you dont drink in this time, ur gonna have a ratio of 2/3, cuz 1 drink = passive + 0.3, so 15 min to decrease 0.3, but 10 min passive
 		UpdatePassiveEndTick(Server()->Tick() + Server()->TickSpeed() * 60 * 10);
@@ -4780,13 +4789,13 @@ int CCharacter::GetPermilleLimit()
 int CCharacter::DetermineGrogSpirit()
 {
 	int GrogSpirit = 0;
-	if (m_Permille >= 5) // 0.5
+	if (m_pPlayer->m_Permille >= 5) // 0.5
 		GrogSpirit++;
-	if (m_Permille >= 10) // 1.0
+	if (m_pPlayer->m_Permille >= 10) // 1.0
 		GrogSpirit++;
-	if (m_Permille >= 20) // 2.0
+	if (m_pPlayer->m_Permille >= 20) // 2.0
 		GrogSpirit++;
-	if (m_Permille >= 30) // 3.0
+	if (m_pPlayer->m_Permille >= 30) // 3.0
 		GrogSpirit++;
 	return GrogSpirit;
 }
@@ -5543,8 +5552,8 @@ bool CCharacter::GrogTick()
 		int64 StartTickDiff = Now - m_FirstPermilleTick;
 		if (StartTickDiff % (Server()->TickSpeed() * 60 * 5) == 0)
 		{
-			m_Permille--;
-			if (m_Permille <= 0)
+			m_pPlayer->m_Permille--;
+			if (m_pPlayer->m_Permille <= 0)
 			{
 				m_FirstPermilleTick = 0;
 				m_NextGrogEmote = 0;
@@ -5562,7 +5571,7 @@ bool CCharacter::GrogTick()
 			}
 
 			// Balance impaired
-			if (m_Permille >= 8) // 0.8
+			if (m_pPlayer->m_Permille >= 8) // 0.8
 			{
 				if (!m_NextGrogBalance)
 				{
@@ -5611,7 +5620,7 @@ bool CCharacter::GrogTick()
 			}
 
 			// Input delayed
-			if (m_Permille >= 15) // 1.5
+			if (m_pPlayer->m_Permille >= 15) // 1.5
 			{
 				if (!m_NextGrogDirDelay)
 				{
@@ -5658,20 +5667,20 @@ bool CCharacter::GrogTick()
 	m_GrogSpirit = GrogSpirit;
 
 	// After 3 seconds of freeze, disable passive
-	if (m_Permille && m_PassiveEndTick && m_FirstFreezeTick && m_FirstFreezeTick + Server()->TickSpeed() * 3 < Server()->Tick())
+	if (m_pPlayer->m_Permille && m_PassiveEndTick && m_FirstFreezeTick && m_FirstFreezeTick + Server()->TickSpeed() * 3 < Server()->Tick())
 	{
 		m_PassiveEndTick = 0;
 		Passive(false, -1, true);
 	}
 
 	// Very deadly alcohol!!! stupid alcohol!! dont drink, smoke weed instead 420
-	if (m_Permille >= 35) // 3.5
+	if (m_pPlayer->m_Permille >= 35) // 3.5
 	{
 		// long term alcoholics can handle it better
 		// let's add 0.5 permille on top, so 4.4permille is the ABSOLUTE maximum without dying, depending on register date
 		// for other people, 3.5 will be deadly limit
 		int DeadlyLimit = max(GetPermilleLimit() + 5, 35);
-		if (m_Permille > DeadlyLimit)
+		if (m_pPlayer->m_Permille > DeadlyLimit)
 		{
 			if (!m_DeadlyPermilleDieTick)
 			{
@@ -5687,7 +5696,7 @@ bool CCharacter::GrogTick()
 				m_pPlayer->m_EscapeTime = 0;
 				Die(WEAPON_SELF);
 				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), "'%s' died as a result of excessive grog consumption (%.1f‰ / %.1f‰)", Server()->ClientName(m_pPlayer->GetCID()), m_Permille / 10.f, GetPermilleLimit() / 10.f);
+				str_format(aBuf, sizeof(aBuf), "'%s' died as a result of excessive grog consumption (%.1f‰ / %.1f‰)", Server()->ClientName(m_pPlayer->GetCID()), m_pPlayer->m_Permille / 10.f, GetPermilleLimit() / 10.f);
 				GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
 				return true;
 			}
@@ -5705,7 +5714,7 @@ int64 CCharacter::GetNextGrogActionTick()
 {
 	int Seconds = random(20, 60);
 	float Multiplier = random(5, 10) / 10.f;
-	int DecreaseSeconds = min((int)(m_Permille * 3 * Multiplier), Seconds - 1);
+	int DecreaseSeconds = min((int)(m_pPlayer->m_Permille * 3 * Multiplier), Seconds - 1);
 	return Server()->Tick() + Server()->TickSpeed() * (Seconds - DecreaseSeconds);
 }
 
@@ -5714,9 +5723,9 @@ int CCharacter::GetCorruptionScore()
 	int Score = m_pPlayer->m_SpawnBlockScore + m_NoBonusContext.m_Score;
 	// add 1 score per 0.2 permille
 	int PermilleLimit = GetPermilleLimit();
-	if (m_Permille > PermilleLimit)
+	if (m_pPlayer->m_Permille > PermilleLimit)
 	{
-		int Diff = m_Permille - PermilleLimit;
+		int Diff = m_pPlayer->m_Permille - PermilleLimit;
 		Score += Diff / 2;
 	}
 	return Score;
@@ -5749,9 +5758,9 @@ bool CCharacter::TryCatchingWanted(int TargetCID, vec2 EffectPos)
 
 	str_format(aBuf, sizeof(aBuf), "'%s' has been caught by '%s' (%d minutes arrest)", Server()->ClientName(TargetCID), Server()->ClientName(m_pPlayer->GetCID()), Minutes);
 	GameServer()->SendChatPolice(aBuf);
-	if (pTarget->m_Permille)
+	if (pTarget->m_pPlayer->m_Permille)
 	{
-		str_format(aBuf, sizeof(aBuf), "Grog testing results: %.1f‰ / %.1f‰", pTarget->m_Permille / 10.f, pTarget->GetPermilleLimit() / 10.f);
+		str_format(aBuf, sizeof(aBuf), "Grog testing results: %.1f‰ / %.1f‰", pTarget->m_pPlayer->m_Permille / 10.f, pTarget->GetPermilleLimit() / 10.f);
 		GameServer()->SendChatPolice(aBuf);
 	}
 

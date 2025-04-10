@@ -204,7 +204,7 @@ void CSaveTee::Save(CCharacter *pChr)
 	m_Confetti = pChr->m_Confetti;
 	m_InNoBonusArea = pChr->m_NoBonusContext.m_InArea;
 	m_NumGrogsHolding = pChr->m_NumGrogsHolding;
-	m_Permille = pChr->m_Permille;
+	m_Permille = pChr->GetPlayer()->m_Permille;
 	if (pChr->m_FirstPermilleTick)
 		m_TicksSinceFirstPermille = pChr->Server()->Tick() - pChr->m_FirstPermilleTick;
 	else
@@ -414,7 +414,7 @@ void CSaveTee::Load(CCharacter *pChr, int Team)
 		pChr->OnNoBonusArea(m_InNoBonusArea, true);
 		for (int i = 0; i < m_NumGrogsHolding; i++)
 			pChr->AddGrog();
-		pChr->m_Permille = m_Permille;
+		pChr->GetPlayer()->m_Permille = m_Permille;
 		if (m_TicksSinceFirstPermille)
 		{
 			pChr->m_FirstPermilleTick = pChr->Server()->Tick() - m_TicksSinceFirstPermille;
