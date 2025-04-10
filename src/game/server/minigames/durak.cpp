@@ -1235,7 +1235,7 @@ void CDurak::UpdateHandcards(int Game, CDurakGame::SSeat *pSeat)
 
 void CDurak::EndMove(int ClientID, int Game, CDurakGame::SSeat *pSeat)
 {
-	if (pSeat->m_Player.m_EndedMove || !m_vpGames[Game]->m_IsDefenseOngoing)
+	if (pSeat->m_Player.m_EndedMove)
 		return;
 
 	pSeat->m_Player.m_EndedMove = true;
