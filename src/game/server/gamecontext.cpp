@@ -655,7 +655,7 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 	Msg.m_TargetID = -1;
 
 	int MsgFlags = 0;
-	if (ChatterClientID >= 0 && !m_apPlayers[ChatterClientID]->m_ShowName)
+	if (ChatterClientID >= 0 && (!m_apPlayers[ChatterClientID]->m_ShowName || Durak()->InDurakGame(ChatterClientID)))
 		MsgFlags |= MSGFLAG_NONAME;
 
 	if(Mode == CHAT_ALL)
@@ -762,7 +762,7 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 		// send to sender
 		{
 			MsgFlags = 0;
-			if (!m_apPlayers[To]->m_ShowName)
+			if (!m_apPlayers[To]->m_ShowName || Durak()->InDurakGame(To))
 				MsgFlags |= MSGFLAG_NONAME;
 
 			// reset ids bcs they got translated
