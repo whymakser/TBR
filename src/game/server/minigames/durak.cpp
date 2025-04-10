@@ -21,6 +21,7 @@ CDurak::CDurak(CGameContext *pGameServer, int Type) : CMinigame(pGameServer, Typ
 		m_aUpdatedPassive[i] = false;
 		m_aInDurakGame[i] = false;
 		m_aDurakNumReserved[i] = 0;
+		m_aSnappedSeatIndex[i] = -1;
 	}
 	for (int i = 0; i < 5; i++)
 	{
@@ -364,7 +365,7 @@ bool CDurak::OnRainbowName(int ClientID, int MapID)
 	int TableMapID = GameServer()->m_World.GetFirstDurakID(ClientID);
 	if (MapID != TableMapID || GameServer()->m_aMinigameDisabled[MINIGAME_DURAK])
 		return false;
-	return m_vpGames.size() && !::NetworkClipped(GameServer(), ClientID, m_vpGames[0]->m_TablePos);
+	return m_aSnappedSeatIndex[ClientID] == -1 && !::NetworkClipped(GameServer(), ClientID, m_vpGames[0]->m_TablePos);
 }
 
 void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
@@ -1451,6 +1452,7 @@ void CDurak::Snap(int SnappingClient)
 	CDurakGame *pGame = Game >= 0 ? m_vpGames[Game] : 0;
 	// As spectator, always render hand cards (hidden) of defender
 	CDurakGame::SSeat *pSeat = pGame ? pGame->GetSeatByClient(IsSpectator ? pGame->m_DefenderIndex : ClientID) : 0;
+	m_aSnappedSeatIndex[SnappingClient] = pSeat ? pSeat->m_ID : -1;
 
 	// Prepare snap ids..
 	PrepareDurakSnap(SnappingClient, pGame, pSeat);

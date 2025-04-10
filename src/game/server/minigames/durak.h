@@ -728,6 +728,7 @@ class CDurak : public CMinigame
 	bool m_aUpdatedPassive[MAX_CLIENTS];
 	bool m_aInDurakGame[MAX_CLIENTS];
 	bool m_aUpdateTeamsState[MAX_CLIENTS];
+	int m_aSnappedSeatIndex[MAX_CLIENTS];
 
 	std::vector<CDurakGame *> m_vpGames;
 	bool UpdateGame(int Game);
