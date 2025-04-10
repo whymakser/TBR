@@ -699,8 +699,10 @@ void IGameController::Snap(int SnappingClient)
 		| GAMEINFOFLAG_DONT_MASK_ENTITIES;
 	pGameInfoEx->m_Flags2 = 0
 		| GAMEINFOFLAG2_GAMETYPE_FDDRACE
-		| GAMEINFOFLAG2_ENTITIES_FDDRACE
-		| GAMEINFOFLAG2_ALLOW_X_SKINS;
+		| GAMEINFOFLAG2_ENTITIES_FDDRACE;
+
+	if (Config()->m_SvAllowXSkins)
+		pGameInfoEx->m_Flags2 |= GAMEINFOFLAG2_ALLOW_X_SKINS;
 
 	if (!Config()->m_SvWeakHook)
 		pGameInfoEx->m_Flags2 |= GAMEINFOFLAG2_NO_WEAK_HOOK_AND_BOUNCE;
