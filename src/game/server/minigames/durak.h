@@ -719,8 +719,8 @@ class CDurak : public CMinigame
 	std::map<int, std::map<CCard*, bool>> m_aCardUpdate; // [ClientID][Card] = true
 	void PrepareStaticCards(int SnappingClient, CDurakGame *pGame, CDurakGame::SSeat *pSeat);
 	void PrepareDurakSnap(int SnappingClient, CDurakGame *pGame, CDurakGame::SSeat *pSeat);
-	void UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, int> &NewMap, CDurakGame *pGame);
-	void SnapDurakCard(int SnappingClient, CDurakGame *pGame, CCard *pCard, vec2 ForcePos = vec2(-1, -1));
+	void UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, int> &NewMap, CDurakGame *pGame, bool IsSpectator);
+	void SnapDurakCard(int SnappingClient, CDurakGame *pGame, CCard *pCard, bool IsSpectator = false, vec2 ForcePos = vec2(-1, -1));
 
 	int m_aDurakNumReserved[MAX_CLIENTS];
 	int64 m_aLastSeatOccupiedMsg[MAX_CLIENTS];

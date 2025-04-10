@@ -1003,6 +1003,12 @@ bool CDurak::UpdateGame(int Game)
 		{
 			pSeat->m_Player.m_LastTooltip = pSeat->m_Player.m_Tooltip;
 			m_aCardUpdate[pSeat->m_Player.m_ClientID][&m_aStaticCards[DURAK_TEXT_TOOLTIP]] = true;
+			for (int c = 0; c < MAX_CLIENTS; c++)
+			{
+				CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
+				if ((pPlayer->GetTeam() == TEAM_SPECTATORS || pPlayer->IsPaused()) && pPlayer->GetSpectatorID() == pSeat->m_Player.m_ClientID)
+					m_aCardUpdate[c][&m_aStaticCards[DURAK_TEXT_TOOLTIP]] = true;
+			}
 		}
 
 		if (!pSeat->m_Player.m_KeyboardControl && !pSeat->m_Player.m_EndedMove)
@@ -1286,6 +1292,12 @@ void CDurak::SetShowAttackersTurn(int Game)
 		{
 			m_vpGames[Game]->m_aSeats[i].m_Player.m_Tooltip = CCard::TOOLTIP_ATTACKERS_TURN;
 			m_aCardUpdate[ClientID][&m_aStaticCards[DURAK_TEXT_TOOLTIP]] = true;
+			for (int c = 0; c < MAX_CLIENTS; c++)
+			{
+				CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
+				if ((pPlayer->GetTeam() == TEAM_SPECTATORS || pPlayer->IsPaused()) && pPlayer->GetSpectatorID() == ClientID)
+					m_aCardUpdate[c][&m_aStaticCards[DURAK_TEXT_TOOLTIP]] = true;
+			}
 		}
 	}
 }
@@ -1376,7 +1388,7 @@ void CDurak::Snap(int SnappingClient)
 
 	int Game = GetGameByClient(ClientID);
 	CDurakGame *pGame = Game >= 0 ? m_vpGames[Game] : 0;
-	CDurakGame::SSeat *pSeat = pGame ? pGame->GetSeatByClient(SnappingClient) : 0;
+	CDurakGame::SSeat *pSeat = pGame ? pGame->GetSeatByClient(ClientID) : 0;
 
 	// Prepare snap ids..
 	PrepareDurakSnap(SnappingClient, pGame, pSeat);
@@ -1394,17 +1406,17 @@ void CDurak::Snap(int SnappingClient)
 				{
 					Pos.y -= 32.f;
 				}
-				SnapDurakCard(SnappingClient, pGame, &m_aStaticCards[DURAK_TEXT_TOOLTIP], Pos);
+				SnapDurakCard(SnappingClient, pGame, &m_aStaticCards[DURAK_TEXT_TOOLTIP], false, Pos);
 				Pos.y += 32.f;
 			}
 			if (m_aStaticCards[DURAK_TEXT_KEYBOARD_CONTROL].m_Active)
 			{
-				SnapDurakCard(SnappingClient, pGame, &m_aStaticCards[DURAK_TEXT_KEYBOARD_CONTROL], Pos);
+				SnapDurakCard(SnappingClient, pGame, &m_aStaticCards[DURAK_TEXT_KEYBOARD_CONTROL], false, Pos);
 				Pos.y += 32.f;
 			}
 			if (m_aStaticCards[DURAK_TEXT_TRUMP_CARD].m_Active)
 			{
-				SnapDurakCard(SnappingClient, pGame, &m_aStaticCards[DURAK_TEXT_TRUMP_CARD], Pos);
+				SnapDurakCard(SnappingClient, pGame, &m_aStaticCards[DURAK_TEXT_TRUMP_CARD], false, Pos);
 			}
 		}
 		return;
@@ -1422,7 +1434,7 @@ void CDurak::Snap(int SnappingClient)
 	if (pSeat)
 	{
 		for (unsigned int i = 0; i < pSeat->m_Player.m_vHandCards.size(); i++)
-			SnapDurakCard(SnappingClient, pGame, &pSeat->m_Player.m_vHandCards[i]);
+			SnapDurakCard(SnappingClient, pGame, &pSeat->m_Player.m_vHandCards[i], SnappingClient != ClientID);
 	}
 
 	// Attack cards
@@ -1607,7 +1619,7 @@ void CDurak::PrepareDurakSnap(int SnappingClient, CDurakGame *pGame, CDurakGame:
 	}
 
 	// 0.7
-	UpdateCardSnapMapping(SnappingClient, NewSnapMap, pGame);
+	UpdateCardSnapMapping(SnappingClient, NewSnapMap, pGame, pSeat && pSeat->m_Player.m_ClientID != SnappingClient);
 }
 
 void CDurak::PostSnap()
@@ -1622,7 +1634,7 @@ void CDurak::PostSnap()
 	}
 }
 
-void CDurak::UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, int> &NewMap, CDurakGame *pGame)
+void CDurak::UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, int> &NewMap, CDurakGame *pGame, bool IsSpectator)
 {
 	auto &OldMap = m_aLastSnapID[SnappingClient];
 	// First pass: identify disconnects
@@ -1646,11 +1658,12 @@ void CDurak::UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, i
 			m_aUpdateTeamsState[SnappingClient] = true;
 			if (!Server()->IsSevendown(SnappingClient))
 			{
+				const char *pName = IsSpectator ? GetCardSymbol(-1, -1) : GetCardSymbol(pCard->m_Suit, pCard->m_Rank, pGame);
 				CNetMsg_Sv_ClientInfo NewClientInfoMsg;
 				NewClientInfoMsg.m_ClientID = NewID;
 				NewClientInfoMsg.m_Local = 0;
 				NewClientInfoMsg.m_Team = TEAM_BLUE;
-				NewClientInfoMsg.m_pName = GetCardSymbol(pCard->m_Suit, pCard->m_Rank, pGame);
+				NewClientInfoMsg.m_pName = pName;
 				NewClientInfoMsg.m_pClan = "";
 				NewClientInfoMsg.m_Country = -1;
 				NewClientInfoMsg.m_Silent = 1;
@@ -1670,7 +1683,7 @@ void CDurak::UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, i
 	OldMap = NewMap;
 }
 
-void CDurak::SnapDurakCard(int SnappingClient, CDurakGame *pGame, CCard *pCard, vec2 ForcePos)
+void CDurak::SnapDurakCard(int SnappingClient, CDurakGame *pGame, CCard *pCard, bool IsSpectator, vec2 ForcePos)
 {
 	int ID = m_aLastSnapID[SnappingClient][pCard];
 	if (!Server()->IsSevendown(SnappingClient))
@@ -1688,7 +1701,8 @@ void CDurak::SnapDurakCard(int SnappingClient, CDurakGame *pGame, CCard *pCard, 
 		int *pClientInfo = (int*)Server()->SnapNewItem(11 + NUM_NETOBJTYPES, ID, 17*4); // NETOBJTYPE_CLIENTINFO
 		if(!pClientInfo)
 			return;
-		StrToInts(&pClientInfo[0], 4, GetCardSymbol(pCard->m_Suit, pCard->m_Rank, pGame));
+		const char *pName = IsSpectator ? GetCardSymbol(-1, -1) : GetCardSymbol(pCard->m_Suit, pCard->m_Rank, pGame);
+		StrToInts(&pClientInfo[0], 4, pName);
 		StrToInts(&pClientInfo[4], 3, "");
 		StrToInts(&pClientInfo[8], 6, "default");
 		pClientInfo[14] = 1;
