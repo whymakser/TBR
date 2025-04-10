@@ -238,6 +238,9 @@ public:
 	bool m_EyeEmote;
 	int m_DefEmote;
 	int m_DefEmoteReset;
+	int m_SavedDefEmote;
+	void SaveDefEmote() { m_SavedDefEmote = m_DefEmote; }
+	void LoadDefEmote() { if (m_SavedDefEmote != -1) { m_DefEmote = m_SavedDefEmote; m_SavedDefEmote = -1; } }
 	bool m_Halloween;
 	bool m_FirstPacket;
 #if defined(CONF_SQL)

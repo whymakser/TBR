@@ -5780,6 +5780,7 @@ bool CCharacter::SetZombieHuman(bool Zombie, bool GiveGun)
 		Jetpack(false, -1, true);
 		SetWeapon(WEAPON_HAMMER);
 
+		m_pPlayer->SaveDefEmote();
 		m_pPlayer->m_DefEmote = EMOTE_ANGRY;
 		m_pPlayer->m_DefEmoteReset = -1;
 		
@@ -5802,7 +5803,7 @@ bool CCharacter::SetZombieHuman(bool Zombie, bool GiveGun)
 	{
 		m_pPlayer->m_DisableCustomColorsTick = 0;
 		m_pPlayer->ResetSkin();
-		m_pPlayer->m_DefEmote = EMOTE_NORMAL;
+		m_pPlayer->LoadDefEmote();
 		m_pPlayer->m_DefEmoteReset = -1;
 		m_pPlayer->SetClan(Server()->ClientClan(m_pPlayer->GetCID()));
 		if (GiveGun)

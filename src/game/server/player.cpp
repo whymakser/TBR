@@ -100,6 +100,7 @@ void CPlayer::Reset()
 		}
 	}
 	m_DefEmoteReset = -1;
+	m_SavedDefEmote = -1;
 
 	GameServer()->Score()->PlayerData(m_ClientID)->Reset();
 
