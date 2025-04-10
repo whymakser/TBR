@@ -127,7 +127,13 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	Teams()->OnCharacterSpawn(GetPlayer()->GetCID());
 	GameServer()->m_pController->OnCharacterSpawn(this);
 	DDraceInit();
-	m_pPlayer->LoadMinigameTee();
+	if (!m_pPlayer->LoadMinigameTee())
+	{
+		if (m_pPlayer->m_DoubleXpLifesLeft && !m_pPlayer->IsMinigame())
+		{
+			m_pPlayer->UpdateDoubleXpLifes();
+		}
+	}
 
 	mem_zero(&m_LatestPrevPrevInput, sizeof(m_LatestPrevPrevInput));
 	m_LatestPrevPrevInput.m_TargetY = -1;
@@ -139,12 +145,6 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 	m_LastLockedTunings.clear();
 	SendTuneMsg(GameServer()->m_aaZoneEnterMsg[m_TuneZone]); // we want a entermessage also on spawn
 	GameServer()->SendTuningParams(m_pPlayer->GetCID(), m_TuneZone);
-
-	if (m_pPlayer->m_DoubleXpLifesLeft && !m_pPlayer->IsMinigame())
-	{
-		m_pPlayer->UpdateDoubleXpLifes();
-	}
-
 	return true;
 }
 
