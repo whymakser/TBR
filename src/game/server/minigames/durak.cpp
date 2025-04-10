@@ -483,8 +483,6 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 				if (pGame->TryAttack(pSeat->m_ID, pCard))
 				{
 					UpdateHandcards(Game, pSeat);
-					pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
-					pSeat->m_Player.m_HoveredCard = -1;
 				}
 			}
 			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_DEFEND)
@@ -501,10 +499,8 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 			{
 				if (TryDefend(Game, pSeat->m_ID, pSeat->m_Player.m_SelectedAttack, pCard))
 				{
-					pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 					pGame->m_Attacks[pSeat->m_Player.m_SelectedAttack].m_Offense.SetHovered(false);
 					pSeat->m_Player.m_SelectedAttack = -1;
-					pSeat->m_Player.m_HoveredCard = -1;
 				}
 			}
 			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_PUSH)
@@ -513,8 +509,6 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 				{
 					UpdateHandcards(Game, pSeat);
 					SetShowAttackersTurn(Game);
-					pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
-					pSeat->m_Player.m_HoveredCard = -1;
 				}
 			}
 			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_TAKE_CARDS)
@@ -923,6 +917,7 @@ bool CDurak::UpdateGame(int Game)
 			continue;
 
 		pChr->EpicCircle(pGame->m_DefenderIndex == i, -1, true);
+		pChr->Passive(pGame->GetStateBySeat(i) == DURAK_PLAYERSTATE_NONE, -1, true);
 		if (!pSeat->m_Player.m_EndedMove)
 		{
 			pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));

@@ -90,6 +90,7 @@ CCharacter::~CCharacter()
 	Server()->SnapFreeID(m_PortalBlockerIndSnapID);
 	for (int i = 0; i < EUntranslatedMap::NUM_IDS; i++)
 		Server()->SnapFreeID(m_aUntranslatedID[i]);
+	Server()->SnapFreeID(m_PassiveSnapID);
 }
 
 void CCharacter::Reset()
@@ -2063,6 +2064,25 @@ void CCharacter::Snap(int SnappingClient)
 			pInd->m_FromY = round_to_int(m_Pos.y - 80);
 			pInd->m_StartTick = Server()->Tick();
 		}
+	}
+
+	if (m_Passive && !GameServer()->Durak()->InDurakGame(m_pPlayer->GetCID()))
+	{
+		int Size = Server()->IsSevendown(SnappingClient) ? 4*4 : sizeof(CNetObj_Pickup);
+		CNetObj_Pickup* pP = static_cast<CNetObj_Pickup*>(Server()->SnapNewItem(NETOBJTYPE_PICKUP, m_PassiveSnapID, Size));
+		if (!pP)
+			return;
+
+		pP->m_X = round_to_int(m_Pos.x);
+		pP->m_Y = round_to_int(m_Pos.y - 50.f);
+		if (Server()->IsSevendown(SnappingClient))
+		{
+			int Subtype = 0;
+			pP->m_Type = POWERUP_ARMOR;
+			((int*)pP)[3] = Subtype;
+		}
+		else
+			pP->m_Type = PICKUP_ARMOR;
 	}
 
 	// translate id, if we are not in the map of the other person display us as weapon and our hook as a laser
@@ -4125,12 +4145,11 @@ void CCharacter::FDDraceInit()
 	m_FakeTuneCollision = false;
 	m_OldFakeTuneCollision = false;
 	m_Passive = false;
-	m_pPassiveShield = 0;
+	m_PassiveSnapID = Server()->SnapNewID();
 	m_PoliceHelper = false;
 	m_pTelekinesisEntity = 0;
 	m_pLightsaber = 0;
 	m_Item = -3;
-	m_pItem = 0;
 	m_DoorHammer = false;
 	m_pHelicopter = 0;
 
@@ -6010,8 +6029,6 @@ void CCharacter::Passive(bool Set, int FromID, bool Silent)
 	GameServer()->SendTuningParams(m_pPlayer->GetCID(), m_TuneZone);
 	if (m_Passive)
 		DropFlag(0);
-
-	m_pPassiveShield = !Set ? 0 : new CPickup(GameWorld(), m_Pos, POWERUP_ARMOR, 0, 0, 0, m_pPlayer->GetCID());
 	GameServer()->SendExtraMessage(PASSIVE, m_pPlayer->GetCID(), Set, FromID, Silent);
 }
 

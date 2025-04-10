@@ -97,7 +97,7 @@ void CPickup::Tick()
 	if (m_Owner >= 0)
 	{
 		CCharacter* pChr = GameServer()->GetPlayerChar(m_Owner);
-		if (pChr && (pChr->m_pPassiveShield == this || pChr->m_pItem == this))
+		if (pChr && pChr->m_pItem == this)
 		{
 			m_Pos.x = pChr->GetPos().x;
 			m_Pos.y = pChr->GetPos().y - 50;

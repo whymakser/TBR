@@ -690,6 +690,8 @@ public:
 			[&](const CCard &c) { return c.m_Suit == pCard->m_Suit && c.m_Rank == pCard->m_Rank; }),
 			vHand.end());
 
+		m_aSeats[Seat].m_Player.m_HoveredCard = -1;
+		m_aSeats[Seat].m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 		if (m_Deck.IsEmpty() && m_aSeats[Seat].m_Player.m_vHandCards.empty() && std::find(m_vWinners.begin(), m_vWinners.end(), Seat) == m_vWinners.end())
 		{
 			m_vWinners.push_back(Seat);
