@@ -1179,7 +1179,7 @@ bool CDurak::UpdateGame(int Game)
 		return true;
 	}
 
-	if(pGame->m_NextMove && pGame->m_NextMove > Server()->Tick() && Server()->Tick() + Server()->TickSpeed() * 5 > pGame->m_NextMove)
+	if(pGame->NextMoveSoon(Server()->Tick()))
 	{
 		SetTurnTooltip(Game, CCard::TOOLTIP_NEXT_MOVE);
 	}
@@ -1332,7 +1332,7 @@ bool CDurak::TryPass(int Game, int Seat, CCard *pCard)
 bool CDurak::TryAttack(int Game, int Seat, CCard *pCard)
 {
 	CDurakGame *pGame = m_vpGames[Game];
-	int Attack = pGame->TryAttack(Seat, pCard);
+	int Attack = pGame->TryAttack(Seat, pCard, Server()->Tick());
 	if (Attack != -1)
 	{
 		SetTurnTooltip(Game, CCard::TOOLTIP_NONE);

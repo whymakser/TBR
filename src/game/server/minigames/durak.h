@@ -561,12 +561,17 @@ public:
 		return true;
 	}
 
+	bool NextMoveSoon(int Tick)
+	{
+		return m_NextMove && m_NextMove > Tick && Tick + SERVER_TICK_SPEED * 5 > m_NextMove;
+	}
+
 	bool CanProcessWin(int Seat)
 	{
 		return m_Running && m_aSeats[Seat].m_Player.m_Stake >= 0 && m_aSeats[Seat].m_Player.m_ClientID != m_DurakClientID;
 	}
 
-	int TryAttack(int Seat, CCard *pCard)
+	int TryAttack(int Seat, CCard *pCard, int Tick)
 	{
 		if (!pCard || !pCard->Valid())
 			return -1;
@@ -616,7 +621,10 @@ public:
 		// Remove card from hand
 		RemoveCard(Seat, pCard);
 
-		m_NextMove = 0;
+		if (!NextMoveSoon(Tick))
+		{
+			m_NextMove = 0;
+		}
 		return Used;
 	}
 
