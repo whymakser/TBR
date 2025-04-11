@@ -852,7 +852,7 @@ void CPlayer::Snap(int SnappingClient)
 	{
 		ShowSpec = true;
 		SpecPos = m_MinigameTee.GetPos();
-		int ClientID = IsPaused && pSnapping->GetSpectatorID() >= 0 ? pSnapping->GetSpectatorID() : SnappingClient;
+		int ClientID = IsPaused && pSnapping->GetSpectatorID() == m_ClientID ? m_ClientID : SnappingClient;
 		if (GameServer()->Arenas()->FightStarted(ClientID) || GameServer()->Durak()->InDurakGame(ClientID))
 		{
 			ShowSpec = ShowOthers;
