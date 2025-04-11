@@ -1304,6 +1304,7 @@ void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 	{
 		GameServer()->Durak()->OnInput(this, pNewInput);
 		ResetInput |= 1;
+		ResetInput |= 4;
 	}
 	else if (m_DrawEditor.Active())
 	{
@@ -1333,8 +1334,11 @@ void CCharacter::OnPredictedInput(CNetObj_PlayerInput *pNewInput)
 	{
 		pNewInput->m_Direction = 0;
 		pNewInput->m_Jump = 0;
-		pNewInput->m_Hook = 0;
-		if (ResetInput&2)
+		if (!(ResetInput & 4))
+		{
+			pNewInput->m_Hook = 0;
+		}
+		if (ResetInput & 2)
 		{
 			pNewInput->m_TargetX = m_Input.m_TargetX;
 			pNewInput->m_TargetY = m_Input.m_TargetY;
