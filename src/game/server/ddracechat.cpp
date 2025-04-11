@@ -2824,8 +2824,8 @@ void CGameContext::SendTop5AccMessage(IConsole::IResult* pResult, void* pUserDat
 	// Short name for entries
 	switch (Type)
 	{
-	case TOP_PORTAL_BATTERY: // fall-through
-	case TOP_PORTAL_BLOCKER: pType = "Amount"; break;
+	case TOP_PORTAL_BATTERY: pType = "Batteries"; break;
+	case TOP_PORTAL_BLOCKER: pType = "Blockers"; break;
 	case TOP_DURAK_WINS: pType = "Wins"; break;
 	case TOP_DURAK_PROFIT: pType = "Profit"; break;
 	}
