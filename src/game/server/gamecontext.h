@@ -213,6 +213,11 @@ public:
 	IAntibot *Antibot() { return m_pAntibot; }
 
 	LOCKED_TUNES *LockedTuning() { return &m_vLockedTuning[0]; }
+	bool IsTuneInList(LOCKED_TUNES *pLockedTunings, const char *pParam) { return std::any_of(pLockedTunings->begin(), pLockedTunings->end(),
+			[pParam](const CLockedTune &Tune) {
+				return str_comp(Tune.m_aParam, pParam);
+			}); }
+	bool ResetLockedTune(LOCKED_TUNES *pLockedTunings, const char *pParam);
 	bool SetLockedTune(LOCKED_TUNES *pLockedTunings, CLockedTune &Tune);
 	void ApplyTuneLock(LOCKED_TUNES *pLockedTunings, int TuneLock);
 	CTuningParams *ApplyLockedTunings(CTuningParams *pTuning, LOCKED_TUNES &LockedTunings);

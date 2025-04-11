@@ -782,8 +782,9 @@ public:
 	bool OnRainbowName(int ClientID, int MapID);
 	void OnCharacterSeat(int ClientID, int Number, int SeatIndex);
 	void OnCharacterSpawn(class CCharacter *pChr);
+	void OnHookAttach(class CCharacter *pChr);
 	bool TryEnterBetStake(int ClientID, const char *pMessage);
-	void OnInput(class CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput);
+	void OnInput(class CCharacter *pChr, CNetObj_PlayerInput *pNewInput);
 	void OnPlayerLeave(int ClientID, bool Disconnect = false, bool Shutdown = false);
 	bool OnSetSpectator(int ClientID, int SpectatorID);
 	bool IsPlayerOnSeat(int ClientID);

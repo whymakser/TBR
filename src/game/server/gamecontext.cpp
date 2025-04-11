@@ -179,6 +179,18 @@ CTuningParams *CGameContext::TuningFromChrOrZone(int ClientID, int Zone)
 	return &m_Tuning;
 }
 
+bool CGameContext::ResetLockedTune(LOCKED_TUNES *pLockedTunings, const char *pParam)
+{
+	if (!IsTuneInList(pLockedTunings, pParam))
+		return false;
+	float GlobalValue;
+	if (!m_Tuning.Get(pParam, &GlobalValue))
+		return false;
+	CLockedTune Tune(pParam, GlobalValue);
+	SetLockedTune(pLockedTunings, Tune);
+	return true;
+}
+
 bool CGameContext::SetLockedTune(LOCKED_TUNES *pLockedTunings, CLockedTune &Tune)
 {
 	const char *pParam = Tune.m_aParam;
@@ -378,6 +390,7 @@ void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamag
 		{
 			if (Owner != -1 && pChr && pChr->IsAlive() && !pChr->CanCollide(Owner)) continue;
 			if (Owner == -1 && ActivatedTeam != -1 && pChr && pChr->IsAlive() && pChr->Team() != ActivatedTeam) continue;
+			if (pChr && Durak()->ActivelyPlaying(pChr->GetPlayer()->GetCID())) continue;
 
 			// Explode at most once per team
 			int PlayerTeam = pChr ? ((CGameControllerDDRace*)m_pController)->m_Teams.m_Core.Team(pChr->GetPlayer()->GetCID()) : 0;

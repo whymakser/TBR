@@ -120,19 +120,34 @@ void CDurak::CreateFlyingPoint(int FromClientID, int Game, CCard *pToCard)
 	new CFlyingPoint(&GameServer()->m_World, From, -1, FromClientID, normalize(To - From) * 15.f, To);
 }
 
+void CDurak::OnHookAttach(CCharacter *pChr)
+{
+	int HookedPlayer = pChr->Core()->HookedPlayer();
+	if (HookedPlayer < 0 || HookedPlayer >= MAX_CLIENTS)
+		return;
+
+	if (ActivelyPlaying(HookedPlayer))
+	{
+		if (GameServer()->ResetLockedTune(&pChr->m_LockedTunings, "hook_drag_accel"))
+		{
+			pChr->ApplyLockedTunings();
+		}
+	}
+	else if (!GameServer()->IsTuneInList(&pChr->m_LockedTunings, "hook_drag_accel"))
+	{
+		CLockedTune Tune("hook_drag_accel", 0.f);
+		GameServer()->SetLockedTune(&pChr->m_LockedTunings, Tune);
+		pChr->ApplyLockedTunings();
+	}
+}
+
 void CDurak::OnCharacterSpawn(CCharacter *pChr)
 {
 	if (!InDurakGame(pChr->GetPlayer()->GetCID()))
 		return;
 
-	CLockedTune Hook("hook_drag_accel", 0.f);
-	CLockedTune Hammer("hammer_strength", 0.f);
-	CLockedTune Explosion("explosion_strength", 0.f);
-	CLockedTune Shotgun("shotgun_strength", 0.f);
-	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Hook);
-	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Hammer);
-	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Explosion);
-	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Shotgun);
+	CLockedTune Tune("hook_drag_accel", 0.f);
+	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Tune);
 	pChr->ApplyLockedTunings();
 }
 
@@ -384,9 +399,9 @@ bool CDurak::OnRainbowName(int ClientID, int MapID)
 	return m_aSnappedSeatIndex[ClientID] == -1 && !::NetworkClipped(GameServer(), ClientID, m_vpGames[0]->m_TablePos);
 }
 
-void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
+void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 {
-	int ClientID = pCharacter->GetPlayer()->GetCID();
+	int ClientID = pChr->GetPlayer()->GetCID();
 	int Game = GetGameByClient(ClientID);
 	if (Game < 0)
 		return;
@@ -400,7 +415,7 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 	}
 
 	int Direction = pSeat->m_Player.m_LastInput.m_Direction == 0 ? pNewInput->m_Direction : 0;
-	bool HookColl = !pSeat->m_Player.m_LastInput.m_HookColl ? (pCharacter->GetPlayer()->m_PlayerFlags&PLAYERFLAG_AIM) : false;
+	bool HookColl = !pSeat->m_Player.m_LastInput.m_HookColl ? (pChr->GetPlayer()->m_PlayerFlags&PLAYERFLAG_AIM) : false;
 	bool Jump = !pSeat->m_Player.m_LastInput.m_Jump ? pNewInput->m_Jump : false;
 
 	pSeat->m_Player.m_LastKeyboardControl = pSeat->m_Player.m_KeyboardControl;
@@ -573,7 +588,7 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 
 	pSeat->m_Player.m_LastInput.m_Direction = pNewInput->m_Direction;
 	pSeat->m_Player.m_LastInput.m_Jump = pNewInput->m_Jump;
-	pSeat->m_Player.m_LastInput.m_HookColl = (pCharacter->GetPlayer()->m_PlayerFlags&PLAYERFLAG_AIM);
+	pSeat->m_Player.m_LastInput.m_HookColl = (pChr->GetPlayer()->m_PlayerFlags&PLAYERFLAG_AIM);
 	pSeat->m_Player.m_LastInput.m_TargetX = pNewInput->m_TargetX;
 	pSeat->m_Player.m_LastInput.m_TargetY = pNewInput->m_TargetY;
 
@@ -1268,12 +1283,6 @@ void CDurak::EndMove(int Game, CDurakGame::SSeat *pSeat)
 	pSeat->m_Player.m_EndedMove = true;
 	pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 	GameServer()->m_apPlayers[ClientID]->m_ShowName = false;
-	CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
-	if (pChr)
-	{
-		pChr->m_LockedTunings.clear();
-		pChr->ApplyLockedTunings();
-	}
 }
 
 bool CDurak::TryDefend(int Game, int Seat, int Attack, CCard *pCard)

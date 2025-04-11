@@ -658,8 +658,10 @@ void CCharacter::FireWeapon()
 							pTarget->UnFreeze();
 						}
 
-						pTarget->TakeDamage((vec2(0.f, -1.0f) + Temp) * Tuning()->m_HammerStrength, Dir * -1, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage,
-							m_pPlayer->GetCID(), GetActiveWeapon());
+						if (!GameServer()->Durak()->ActivelyPlaying(m_pPlayer->GetCID()))
+						{
+							pTarget->TakeDamage((vec2(0.f, -1.0f) + Temp) * Tuning()->m_HammerStrength, Dir * -1, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage, m_pPlayer->GetCID(), GetActiveWeapon());
+						}
 
 						if (m_FreezeHammer)
 							pTarget->Freeze();
@@ -1472,6 +1474,7 @@ void CCharacter::Tick()
 		if(m_Core.m_HookedPlayer != -1 && GameServer()->m_apPlayers[m_Core.m_HookedPlayer]->GetTeam() != -1)
 		{
 			Antibot()->OnHookAttach(m_pPlayer->GetCID(), true);
+			GameServer()->Durak()->OnHookAttach(this);
 		}
 	}
 
