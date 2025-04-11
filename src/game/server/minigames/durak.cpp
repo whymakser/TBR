@@ -1490,11 +1490,15 @@ void CDurak::Snap(int SnappingClient)
 	int Game = GetGameByClient(ClientID);
 	CDurakGame *pGame = Game >= 0 ? m_vpGames[Game] : 0;
 	// As spectator, always render hand cards (hidden) of defender
-	CDurakGame::SSeat *pSeat = pGame ? pGame->GetSeatByClient(IsSpectator ? pGame->m_DefenderIndex : ClientID) : 0;
-	m_aSnappedSeatIndex[SnappingClient] = pSeat ? pSeat->m_ID : -1;
+	CDurakGame::SSeat *pSeat = 0;
+	if (pGame)
+	{
+		pSeat = IsSpectator ? &pGame->m_aSeats[pGame->m_DefenderIndex] : pGame->GetSeatByClient(ClientID);
+	}
 
 	// Prepare snap ids..
 	PrepareDurakSnap(SnappingClient, pGame, pSeat);
+	m_aSnappedSeatIndex[SnappingClient] = pSeat ? pSeat->m_ID : -1;
 
 	if (Game < 0 || (pGame && !pGame->m_Running))
 	{
@@ -1555,6 +1559,7 @@ void CDurak::Snap(int SnappingClient)
 
 void CDurak::PrepareStaticCards(int SnappingClient, CDurakGame *pGame, CDurakGame::SSeat *pSeat)
 {
+	bool OwnSeat = SnappingClient == pSeat->m_Player.m_ClientID;
 	bool InGame = pGame && pGame->m_Running;
 	for (int i = 0; i < NUM_DURAK_STATIC_CARDS; i++)
 	{
