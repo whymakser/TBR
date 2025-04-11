@@ -273,14 +273,17 @@ void CDurak::OnPlayerLeave(int ClientID, bool Disconnect, bool Shutdown)
 			}
 
 			int64 PlayerStake = m_vpGames[g]->m_aSeats[i].m_Player.m_Stake;
-			if (Shutdown && PlayerStake >= 0)
+			if (m_vpGames[g]->m_Running && PlayerStake >= 0)
 			{
-				HandleMoneyTransaction(ClientID, PlayerStake, "Durák stake return");
-			}
-			else if (m_vpGames[g]->m_Running)
-			{
-				// Add stake for the winner, or simply the next winner. if everybody leaves, last person gets the win
-				m_vpGames[g]->m_LeftPlayersStake += PlayerStake;
+				if (Shutdown)
+				{
+					HandleMoneyTransaction(ClientID, PlayerStake, "Durák stake return");
+				}
+				else
+				{
+					// Add stake for the winner, or simply the next winner. if everybody leaves, last person gets the win
+					m_vpGames[g]->m_LeftPlayersStake += PlayerStake;
+				}
 			}
 			m_vpGames[g]->m_aSeats[i].m_Player.Reset();
 
