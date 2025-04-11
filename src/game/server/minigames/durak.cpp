@@ -294,7 +294,7 @@ void CDurak::OnPlayerLeave(int ClientID, bool Disconnect, bool Shutdown)
 			}
 
 			int64 PlayerStake = m_vpGames[g]->m_aSeats[i].m_Player.m_Stake;
-			if (Shutdown)
+			if (Shutdown && PlayerStake >= 0)
 			{
 				HandleMoneyTransaction(ClientID, PlayerStake, "Durák stake return");
 			}
@@ -1447,7 +1447,7 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bo
 
 	// WinPos == -1: Force last player, if somebody won before, 0: nobody won before
 	int64 ReturnStake = 0;
-	if (WinPos >= 0)
+	if (WinPos >= 0 && pSeat->m_Player.m_Stake >= 0)
 	{
 		ReturnStake = pSeat->m_Player.m_Stake;
 		HandleMoneyTransaction(ClientID, ReturnStake, "Durák stake return");
