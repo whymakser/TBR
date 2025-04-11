@@ -4833,9 +4833,9 @@ bool CCharacter::AddGrog()
 	return true;
 }
 
-void CCharacter::DropMoney(int64 Amount, int Dir, bool GlobalPickupDelay)
+void CCharacter::DropMoney(int64 Amount, int Dir, bool GlobalPickupDelay, bool OnDeath)
 {
-	if (Amount <= 0 || Amount > m_pPlayer->GetUsableMoney() || GameServer()->Durak()->OnDropMoney(m_pPlayer->GetCID(), Amount))
+	if (Amount <= 0 || Amount > m_pPlayer->GetUsableMoney() || GameServer()->Durak()->OnDropMoney(m_pPlayer->GetCID(), Amount, OnDeath))
 		return;
 
 	if (Dir == -3)
@@ -4979,7 +4979,7 @@ void CCharacter::DropLoot(int Weapon)
 
 	// Drop money even if killed by the game, e.g. team change, but never when leaving a minigame (joining and being frozen drops too)
 	if ((Weapon != WEAPON_MINIGAME_CHANGE || m_pPlayer->m_RequestedMinigame != MINIGAME_NONE) && m_FreezeTime)
-		DropMoney(m_pPlayer->GetWalletMoney(), -3, ZombieHit);
+		DropMoney(m_pPlayer->GetWalletMoney(), -3, ZombieHit, true);
 
 	if (Weapon == WEAPON_GAME || Weapon == WEAPON_MINIGAME_CHANGE)
 		return;

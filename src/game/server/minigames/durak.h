@@ -778,7 +778,7 @@ public:
 	int GetTeam(int ClientID, int MapID);
 	bool InDurakGame(int ClientID) { return ClientID >= 0 && m_aInDurakGame[ClientID]; }
 	bool ActivelyPlaying(int ClientID) { return GetPlayerState(ClientID) != DURAK_PLAYERSTATE_NONE; }
-	bool OnDropMoney(int ClientID, int Amount);
+	bool OnDropMoney(int ClientID, int Amount, bool OnDeath);
 	bool OnRainbowName(int ClientID, int MapID);
 	void OnCharacterSeat(int ClientID, int Number, int SeatIndex);
 	void OnCharacterSpawn(class CCharacter *pChr);

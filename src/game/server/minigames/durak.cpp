@@ -380,14 +380,14 @@ int CDurak::GetTeam(int ClientID, int MapID)
 	return -1;
 }
 
-bool CDurak::OnDropMoney(int ClientID, int Amount)
+bool CDurak::OnDropMoney(int ClientID, int Amount, bool OnDeath)
 {
 	int Game = GetGameByClient(ClientID);
 	// If the game is running already, the money has been subtracted already
 	if (Game < 0)
 		return false;
 	// Disallow accidental money dropping in durak game
-	if (m_vpGames[Game]->m_Running)
+	if (m_vpGames[Game]->m_Running && OnDeath)
 		return true;
 	bool CanDrop = GameServer()->m_apPlayers[ClientID]->GetUsableMoney() - Amount >= m_vpGames[Game]->GetSeatByClient(ClientID)->m_Player.m_Stake;
 	if (!CanDrop)
