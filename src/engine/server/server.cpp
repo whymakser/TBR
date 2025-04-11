@@ -3840,12 +3840,7 @@ void *CServer::SnapNewItem(int Type, int ID, int Size)
 	{
 		g_UuidManager.GetUuid(Type);
 	}
-	if (ID < 0 || ID > 0xffff)
-	{
-		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "incorrect id: %d", ID);
-		dbg_assert(ID >= 0 && ID <= 0xffff, aBuf);
-	}
+	dbg_assert(ID >= 0 && ID <= 0xffff, "incorrect id");
 	return ID < 0 ? 0 : m_SnapshotBuilder.NewItem(Type, ID, Size);
 }
 
