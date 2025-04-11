@@ -20,9 +20,9 @@ void CGameContext::ConCredits(IConsole::IResult *pResult, void *pUserData)
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credits",
 		"F-DDrace is a mod by fokkonaut");
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credits",
-		"This mod is based on Teeworlds vanilla 0.7 by the Teeworlds developers. It also incorporates features, ideas, and");
+		"This mod is based on Teeworlds 0.7 and also incorporates features, ideas, and partial implementations");
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credits",
-		"partial implementations from DDNet++ by ChillerDragon, DDNet by the DDNet developers, and other community projects.");
+		"from DDNet++ by ChillerDragon, DDNet by the DDNet developers, and other community projects.");
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credits",
 		"If you want to check out the code or contribute, feel free to check out F-DDrace on GitHub:");
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credits",
@@ -40,7 +40,7 @@ void CGameContext::ConInfo(IConsole::IResult *pResult, void *pUserData)
 		str_format(aBuf, sizeof(aBuf), "Git revision hash: %s", GIT_SHORTREV_HASH);
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info", aBuf);
 	}
-	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info", "For more info, say '/cmdlist'");
+	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info", "For more info, say '/cmdlist' or '/credits'");
 }
 
 void CGameContext::ConList(IConsole::IResult *pResult, void *pUserData)

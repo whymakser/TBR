@@ -1715,6 +1715,7 @@ void CGameContext::OnClientEnter(int ClientID)
 	}
 
 	SendChatTarget(ClientID, "F-DDrace Mod. Version: " GAME_VERSION ", by fokkonaut");
+	SendChatTarget(ClientID, "for more information, please say '/info'");
 	if (Config()->m_SvWelcome[0] != 0)
 		SendChatTarget(ClientID, Config()->m_SvWelcome);
 
