@@ -2853,7 +2853,9 @@ void CGameContext::SendTop5AccMessage(IConsole::IResult* pResult, void* pUserDat
 			case TOP_DURAK_WINS: Value = r->m_DurakWins; break;
 			case TOP_DURAK_PROFIT: Value = r->m_DurakProfit; break;
 			}
-			str_format(aBuf, sizeof(aBuf), "%d. %s %s: %d", i + Debut, r->m_aUsername, pType, Value);
+			char aValue[64];
+			str_format(aValue, sizeof(aValue), "%s%d%s", Type == TOP_DURAK_PROFIT && Value > 0 ? "+" : "", Value, Type == TOP_DURAK_PROFIT ? "$" : "");
+			str_format(aBuf, sizeof(aBuf), "%d. %s %s: %s", i + Debut, r->m_aUsername, pType, aValue);
 		}
 
 		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
