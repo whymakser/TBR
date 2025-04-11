@@ -4581,6 +4581,8 @@ void CGameContext::OnPreShutdown()
 		if (!pPlayer)
 			continue;
 
+		Durak()->OnPlayerLeave(i, false, true);
+
 		// Move all money from wallet to bank
 		if (pPlayer->GetAccID() >= ACC_START)
 		{
@@ -4600,8 +4602,6 @@ void CGameContext::OnPreShutdown()
 				pPlayer->GetCharacter()->DropMoney(pPlayer->GetWalletMoney());
 			}
 		}
-
-		Durak()->OnPlayerLeave(i, false, true);
 
 		// properly disconnect dummies on reload/shutdown
 		if (pPlayer->m_IsDummy)
