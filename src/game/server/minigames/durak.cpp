@@ -749,8 +749,8 @@ const char *CDurak::GetCardSymbol(int Suit, int Rank, CDurakGame *pGame)
 		str_format(aBuf, sizeof(aBuf), "%s", Server()->ClientName(pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_ClientID));
 		return aBuf;
 	}
-	case CCard::IND_TOOLTIP_ATTACKER_PASSED: return "Passed...";
-	case CCard::IND_TOOLTIP_TAKING_CARDS: return "Passed...";
+	case CCard::IND_TOOLTIP_DEFENDER_PASSED: return "Passed...";
+	case CCard::IND_TOOLTIP_TAKING_CARDS:
 	{
 		str_format(aBuf, sizeof(aBuf), "Taking in %ds…", (int)(pGame->m_NextMove - Server()->Tick()) / Server()->TickSpeed() + 1);
 		return aBuf;
@@ -950,7 +950,7 @@ bool CDurak::UpdateGame(int Game)
 		if (!pChr || ProcessedWinAlready)
 			continue;
 
-		pChr->EpicCircle(pGame->m_DefenderIndex == i, -1, true);
+		pChr->EpicCircle(pGame->m_DefenderIndex == i && !pSeat->m_Player.m_EndedMove, -1, true);
 		pChr->Passive(pGame->GetStateBySeat(i) != DURAK_PLAYERSTATE_NONE, -1, true);
 		if (!pSeat->m_Player.m_EndedMove)
 		{
@@ -1160,8 +1160,8 @@ bool CDurak::UpdateGame(int Game)
 		return true;
 	}
 
-	bool AllEndedMove = pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_EndedMove && pGame->m_aSeats[pGame->GetNextPlayer(pGame->m_DefenderIndex)].m_Player.m_EndedMove;
-	if (AllEndedMove || pGame->ProcessNextMove(Server()->Tick()))
+	bool AttackersEndedMove = pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_EndedMove && pGame->m_aSeats[pGame->GetNextPlayer(pGame->m_DefenderIndex)].m_Player.m_EndedMove;
+	if (AttackersEndedMove || pGame->ProcessNextMove(Server()->Tick()))
 	{
 		bool AllAttacksDefended = true;
 		bool HasUndefendedAttacks = false;
@@ -1193,12 +1193,12 @@ bool CDurak::UpdateGame(int Game)
 			}
 			StartNextRound(Game, true);
 		}
-		else if (HasUndefendedAttacks && !AllEndedMove)
+		else if (HasUndefendedAttacks && (!AttackersEndedMove || pGame->m_aSeats[pGame->m_DefenderIndex].m_Player.m_EndedMove))
 		{
 			TakeCardsFromTable(Game);
 			
 		}
-		else if (!AllEndedMove)
+		else if (!AttackersEndedMove)
 		{
 			char aBuf[128];
 			int AttackerID = pGame->m_aSeats[pGame->m_InitialAttackerIndex].m_Player.m_ClientID;
