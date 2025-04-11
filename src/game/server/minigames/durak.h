@@ -118,7 +118,7 @@ public:
 		IND_TOOLTIP_SELECT_ATTACK = -15,
 		IND_TOOLTIP_ATTACKERS_TURN = -16,
 		IND_TOOLTIP_DEFENDER_PASSED = -17,
-		IND_TOOLTIP_TAKING_CARDS = -18,
+		IND_TOOLTIP_NEXT_MOVE = -18,
 	};
 	enum
 	{
@@ -131,7 +131,7 @@ public:
 		TOOLTIP_SELECT_ATTACK,
 		TOOLTIP_ATTACKERS_TURN,
 		TOOLTIP_DEFENDER_PASSED,
-		TOOLTIP_TAKING_CARDS,
+		TOOLTIP_NEXT_MOVE,
 		NUM_TOOLTIPS
 	};
 	void SetInd(EIndicatorSuit IndSuit)
@@ -258,7 +258,7 @@ public:
 				m_LastNumParticipants = -1;
 				m_LastNumHandCards = -1;
 			}
-			bool IsTurnTooltip() { return m_Tooltip == CCard::TOOLTIP_ATTACKERS_TURN || m_Tooltip == CCard::TOOLTIP_DEFENDER_PASSED || m_Tooltip == CCard::TOOLTIP_TAKING_CARDS; }
+			bool IsTurnTooltip() { return m_Tooltip == CCard::TOOLTIP_ATTACKERS_TURN || m_Tooltip == CCard::TOOLTIP_DEFENDER_PASSED || m_Tooltip == CCard::TOOLTIP_NEXT_MOVE; }
 			struct
 			{
 				int m_Direction = 0;

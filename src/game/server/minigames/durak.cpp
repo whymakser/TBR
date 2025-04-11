@@ -764,9 +764,9 @@ const char *CDurak::GetCardSymbol(int Suit, int Rank, CDurakGame *pGame)
 		return aBuf;
 	}
 	case CCard::IND_TOOLTIP_DEFENDER_PASSED: return "Passed...";
-	case CCard::IND_TOOLTIP_TAKING_CARDS:
+	case CCard::IND_TOOLTIP_NEXT_MOVE:
 	{
-		str_format(aBuf, sizeof(aBuf), "Taking in %llds…", (pGame->m_NextMove - Server()->Tick()) / Server()->TickSpeed() + 1);
+		str_format(aBuf, sizeof(aBuf), "Next move: %llds…", (pGame->m_NextMove - Server()->Tick()) / Server()->TickSpeed() + 1);
 		return aBuf;
 	}
 	}
@@ -1172,7 +1172,7 @@ bool CDurak::UpdateGame(int Game)
 
 	if(pGame->m_NextMove && pGame->m_NextMove > Server()->Tick() && Server()->Tick() + Server()->TickSpeed() * 5 > pGame->m_NextMove)
 	{
-		SetTurnTooltip(Game, CCard::TOOLTIP_TAKING_CARDS);
+		SetTurnTooltip(Game, CCard::TOOLTIP_NEXT_MOVE);
 	}
 
 	bool AttackersEndedMove = pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_EndedMove && pGame->m_aSeats[pGame->GetNextPlayer(pGame->m_DefenderIndex)].m_Player.m_EndedMove;
@@ -1299,6 +1299,7 @@ bool CDurak::TryDefend(int Game, int Seat, int Attack, CCard *pCard)
 				}
 			}
 		}
+		SetTurnTooltip(Game, CCard::TOOLTIP_NONE);
 		ProcessCardPlacement(Game, &pGame->m_aSeats[Seat], &m_vpGames[Game]->m_Attacks[Attack].m_Defense);
 		return true;
 	}
@@ -1324,6 +1325,7 @@ bool CDurak::TryAttack(int Game, int Seat, CCard *pCard)
 	int Attack = pGame->TryAttack(Seat, pCard);
 	if (Attack != -1)
 	{
+		SetTurnTooltip(Game, CCard::TOOLTIP_NONE);
 		ProcessCardPlacement(Game, &pGame->m_aSeats[Seat], &m_vpGames[Game]->m_Attacks[Attack].m_Offense);
 		return true;
 	}
@@ -1337,6 +1339,7 @@ void CDurak::ProcessCardPlacement(int Game, CDurakGame::SSeat *pSeat, CCard *pFl
 		EndMove(Game, pSeat, true);
 	UpdateHandcards(Game, pSeat);
 	CreateFlyingPoint(ClientID, Game, pFlyingPointToCard);
+
 }
 
 void CDurak::TakeCardsFromTable(int Game)
@@ -1355,7 +1358,7 @@ void CDurak::TakeCardsFromTable(int Game)
 			EndMove(Game, pSeat);
 			// Force next move in 5 sec so others can throw in cards still
 			pGame->m_NextMove = Server()->Tick() + Server()->TickSpeed() * 5;
-			SetTurnTooltip(Game, CCard::TOOLTIP_TAKING_CARDS);
+			SetTurnTooltip(Game, CCard::TOOLTIP_NEXT_MOVE);
 		}
 		// Clicking it again will not help and will not speed up the process
 		return;
@@ -1405,7 +1408,7 @@ void CDurak::SetTurnTooltip(int Game, int Tooltip)
 		{
 			m_vpGames[Game]->m_aSeats[i].m_Player.m_Tooltip = Tooltip;
 			// Keep tooltip away for 2 seconds
-			int Seconds = Tooltip == CCard::TOOLTIP_TAKING_CARDS ? 5 : 2;
+			int Seconds = Tooltip == CCard::TOOLTIP_NEXT_MOVE ? 5 : 2;
 			m_vpGames[Game]->m_aSeats[i].m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed() * Seconds;
 			m_aCardUpdate[ClientID][&m_aStaticCards[DURAK_TEXT_TOOLTIP]] = true;
 			for (int c = 0; c < MAX_CLIENTS; c++)
