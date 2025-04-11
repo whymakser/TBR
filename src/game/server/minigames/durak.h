@@ -411,12 +411,12 @@ public:
 		});
 	}
 
-	int GetNextPlayer(int CurrentIndex)
+	int GetNextPlayer(int CurrentIndex, bool CheckHands = false)
 	{
 		for (int i = 1; i < MAX_DURAK_PLAYERS; i++)
 		{
 			int NextIndex = (CurrentIndex + i) % MAX_DURAK_PLAYERS;
-			if (m_aSeats[NextIndex].m_Player.m_ClientID != -1 && m_aSeats[NextIndex].m_Player.m_Stake >= 0)
+			if (m_aSeats[NextIndex].m_Player.m_ClientID != -1 && m_aSeats[NextIndex].m_Player.m_Stake >= 0 && (!CheckHands || m_aSeats[NextIndex].m_Player.m_vHandCards.size()))
 				return NextIndex;
 		}
 		return -1;
@@ -671,7 +671,7 @@ public:
 		{
 			if (!m_Attacks[i].m_Offense.Valid())
 			{
-				int NewDefender = GetNextPlayer(m_DefenderIndex);
+				int NewDefender = GetNextPlayer(m_DefenderIndex, true);
 				if ((int)m_aSeats[NewDefender].m_Player.m_vHandCards.size() < NumAttacks + 1)
 					return -1;
 
@@ -742,7 +742,7 @@ class CDurak : public CMinigame
 	void StartNextRound(int Game, bool SuccessfulDefense = false);
 	void UpdateHandcards(int Game, CDurakGame::SSeat *pSeat);
 	void TakeCardsFromTable(int Game);
-	void EndMove(int Game, CDurakGame::SSeat *pSeat);
+	void EndMove(int Game, CDurakGame::SSeat *pSeat, bool Force = false);
 	bool TryDefend(int Game, int Seat, int Attack, CCard *pCard);
 	bool TryPass(int Game, int Seat, CCard *pCard);
 	bool TryAttack(int Game, int Seat, CCard *pCard);

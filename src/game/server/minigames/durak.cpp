@@ -1165,7 +1165,7 @@ bool CDurak::UpdateGame(int Game)
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "'%s' is the Durák!", Server()->ClientName(pGame->m_DurakClientID));
 		SendChatToParticipants(Game, aBuf);
-		EndMove(Game, pGame->GetSeatByClient(pGame->m_DurakClientID));
+		EndMove(Game, pGame->GetSeatByClient(pGame->m_DurakClientID), true);
 		pGame->m_GameOverTick = Server()->Tick();
 		return true;
 	}
@@ -1264,9 +1264,9 @@ void CDurak::UpdateHandcards(int Game, CDurakGame::SSeat *pSeat)
 		m_aCardUpdate[pSeat->m_Player.m_ClientID][&pSeat->m_Player.m_vHandCards[i]] = true;
 }
 
-void CDurak::EndMove(int Game, CDurakGame::SSeat *pSeat)
+void CDurak::EndMove(int Game, CDurakGame::SSeat *pSeat, bool Force)
 {
-	if (pSeat->m_Player.m_EndedMove)
+	if (pSeat->m_Player.m_EndedMove || (!m_vpGames[Game]->m_IsDefenseOngoing && !Force))
 		return;
 
 	int ClientID = pSeat->m_Player.m_ClientID;
@@ -1334,7 +1334,7 @@ void CDurak::ProcessCardPlacement(int Game, CDurakGame::SSeat *pSeat, CCard *pFl
 {
 	int ClientID = pSeat->m_Player.m_ClientID;
 	if (pSeat->m_Player.m_vHandCards.empty())
-		EndMove(Game, pSeat);
+		EndMove(Game, pSeat, true);
 	UpdateHandcards(Game, pSeat);
 	CreateFlyingPoint(ClientID, Game, pFlyingPointToCard);
 }
@@ -1489,7 +1489,7 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bo
 		GameServer()->m_Accounts[pPlayer->GetAccID()].m_DurakWins++;
 	}
 
-	EndMove(Game, pSeat);
+	EndMove(Game, pSeat, true);
 }
 
 void CDurak::Snap(int SnappingClient)
