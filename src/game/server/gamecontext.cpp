@@ -5782,7 +5782,7 @@ void CGameContext::LazySaveTopAccounts()
 		char aEntry[256];
 		for (unsigned int i = 0; i < m_TopAccounts.size(); i++)
 		{
-			str_format(aEntry, sizeof(aEntry), "%s\t%s\t%d\t%d\t\%lld\t%d\t%d\t%d\t%d\t%d",
+			str_format(aEntry, sizeof(aEntry), "%s\t%s\t%d\t%d\t%lld\t%d\t%d\t%d\t%d\t%d",
 				m_TopAccounts[i].m_aAccountName,
 				m_TopAccounts[i].m_aUsername,
 				m_TopAccounts[i].m_Level,
