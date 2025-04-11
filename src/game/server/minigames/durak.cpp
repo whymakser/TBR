@@ -1418,7 +1418,7 @@ void CDurak::SetTurnTooltip(int Game, int Tooltip)
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
 		int ClientID = m_vpGames[Game]->m_aSeats[i].m_Player.m_ClientID;
-		if (ClientID != -1)
+		if (ClientID != -1 && m_vpGames[Game]->m_aSeats[i].m_Player.m_Tooltip != Tooltip)
 		{
 			m_vpGames[Game]->m_aSeats[i].m_Player.m_Tooltip = Tooltip;
 			// Keep tooltip away for 2 seconds
