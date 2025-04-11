@@ -1325,6 +1325,7 @@ void CDurak::TakeCardsFromTable(int Game)
 		{
 			// Force next move in 5 sec so others can throw in cards still
 			pGame->m_NextMove = Server()->Tick() + Server()->TickSpeed() * 5;
+			SetTurnTooltip(Game, CCard::IND_TOOLTIP_TAKING_CARDS);
 			EndMove(Game, pSeat);
 		}
 		// Clicking it again will not help and will not speed up the process
