@@ -107,8 +107,8 @@ CHAT_COMMAND("top5level", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5Level, 
 CHAT_COMMAND("top5points", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5Points, this, "Shows top5 accounts sorted by block points", AUTHED_NO)
 CHAT_COMMAND("top5money", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5Money, this, "Shows top5 accounts sorted by money", AUTHED_NO)
 CHAT_COMMAND("top5spree", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5Spree, this, "Shows top5 accounts sorted by killing spree", AUTHED_NO)
-CHAT_COMMAND("top5portalbattery", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5PortalBattery, this, "Shows top5 accounts sorted by portal batteries", AUTHED_NO)
-CHAT_COMMAND("top5portalblocker", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5PortalBlocker, this, "Shows top5 accounts sorted by portal blockers", AUTHED_NO)
+CHAT_COMMAND("top5battery", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5PortalBattery, this, "Shows top5 accounts sorted by portal batteries", AUTHED_NO)
+CHAT_COMMAND("top5portalblock", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5PortalBlocker, this, "Shows top5 accounts sorted by portal blockers", AUTHED_NO)
 CHAT_COMMAND("top5durakwins", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5DurakWins, this, "Shows top5 accounts sorted by Durák wins", AUTHED_NO)
 CHAT_COMMAND("top5durakprofit", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5DurakProfit, this, "Shows top5 accounts sorted by Durák profit", AUTHED_NO)
 
