@@ -1274,6 +1274,11 @@ void CDurak::EndMove(int Game, CDurakGame::SSeat *pSeat)
 	pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 	GameServer()->m_apPlayers[ClientID]->m_ShowName = false;
 	GameServer()->SendTuningParams(ClientID);
+	CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
+	if (pChr)
+	{
+		pChr->Core()->m_ActivelyPlayingDurak = false;
+	}
 }
 
 bool CDurak::TryDefend(int Game, int Seat, int Attack, CCard *pCard)
