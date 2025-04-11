@@ -141,8 +141,6 @@ bool CCharacter::Spawn(CPlayer *pPlayer, vec2 Pos)
 
 	m_TuneZone = GameServer()->Collision()->IsTune(GameServer()->Collision()->GetMapIndex(Pos));
 	m_TuneZoneOld = -1; // no zone leave msg on spawn
-	m_LockedTunings.clear();
-	m_LastLockedTunings.clear();
 	SendTuneMsg(GameServer()->m_aaZoneEnterMsg[m_TuneZone]); // we want a entermessage also on spawn
 	GameServer()->SendTuningParams(m_pPlayer->GetCID(), m_TuneZone);
 	return true;
@@ -4287,6 +4285,8 @@ void CCharacter::FDDraceInit()
 
 	m_HitSaved = m_Hit;
 	m_vCheckpoints.clear();
+	m_LockedTunings.clear();
+	m_LastLockedTunings.clear();
 
 	m_pDummyHandle = 0;
 	CreateDummyHandle(m_pPlayer->GetDummyMode());
