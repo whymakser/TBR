@@ -128,8 +128,11 @@ bool CDurak::TrySetCharacterPos(int ClientID)
 	int Game = GetGameByClient(ClientID);
 	if (Game < 0)
 		return false;
+	CDurakGame::SSeat *pSeat = m_vpGames[Game]->GetSeatByClient(ClientID);
+	if (pSeat->m_Player.m_EndedMove)
+		return false;
 	CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
-	pChr->ForceSetPos(GameServer()->Collision()->GetPos(m_vpGames[Game]->GetSeatByClient(ClientID)->m_MapIndex));
+	pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
 	return true;
 }
 
