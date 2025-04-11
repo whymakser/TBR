@@ -844,7 +844,7 @@ void CPlayer::Snap(int SnappingClient)
 	if(m_Paused == PAUSE_PAUSED || GameServer()->Arenas()->IsConfiguring(m_ClientID))
 		pDDNetPlayer->m_Flags |= EXPLAYERFLAG_PAUSED;
 
-	bool ShowSpec = false;
+	bool ShowSpec = true;
 	vec2 SpecPos;
 	if (IsMinigame() && m_SavedMinigameTee)
 	{
