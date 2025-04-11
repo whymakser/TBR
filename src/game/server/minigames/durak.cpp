@@ -1192,6 +1192,11 @@ bool CDurak::UpdateGame(int Game)
 		return true;
 	}
 
+	if (Server()->Tick() + Server()->TickSpeed() * 5 > pGame->m_NextMove)
+	{
+		SetTurnTooltip(Game, CCard::TOOLTIP_TAKING_CARDS);
+	}
+
 	bool AttackersEndedMove = pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_EndedMove && pGame->m_aSeats[pGame->GetNextPlayer(pGame->m_DefenderIndex)].m_Player.m_EndedMove;
 	if (AttackersEndedMove || pGame->ProcessNextMove(Server()->Tick()))
 	{
@@ -1412,12 +1417,12 @@ void CDurak::SetTurnTooltip(int Game, int Tooltip)
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
 		int ClientID = m_vpGames[Game]->m_aSeats[i].m_Player.m_ClientID;
-		if (ClientID != -1)
+		if (ClientID != -1 && m_vpGames[Game]->m_aSeats[i].m_Player.m_Tooltip != Tooltip)
 		{
+			m_vpGames[Game]->m_aSeats[i].m_Player.m_Tooltip = Tooltip;
 			// Keep tooltip away for 2 seconds
 			int Seconds = Tooltip == CCard::TOOLTIP_TAKING_CARDS ? 5 : 2;
 			m_vpGames[Game]->m_aSeats[i].m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed() * Seconds;
-			m_vpGames[Game]->m_aSeats[i].m_Player.m_Tooltip = Tooltip;
 			m_aCardUpdate[ClientID][&m_aStaticCards[DURAK_TEXT_TOOLTIP]] = true;
 			for (int c = 0; c < MAX_CLIENTS; c++)
 			{

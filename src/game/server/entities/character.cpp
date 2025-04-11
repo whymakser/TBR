@@ -658,7 +658,7 @@ void CCharacter::FireWeapon()
 							pTarget->UnFreeze();
 						}
 
-						if (!GameServer()->Durak()->ActivelyPlaying(m_pPlayer->GetCID()))
+						if (!GameServer()->Durak()->ActivelyPlaying(pTarget->GetPlayer()->GetCID()))
 						{
 							pTarget->TakeDamage((vec2(0.f, -1.0f) + Temp) * Tuning()->m_HammerStrength, Dir * -1, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage, m_pPlayer->GetCID(), GetActiveWeapon());
 						}
