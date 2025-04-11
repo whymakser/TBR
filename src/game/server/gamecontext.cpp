@@ -5881,6 +5881,8 @@ void CGameContext::SetTopAccStats(int FromID)
 			m_TopAccounts[i].m_KillStreak = m_Accounts[FromID].m_KillingSpreeRecord;
 			m_TopAccounts[i].m_PortalBattery = m_Accounts[FromID].m_PortalBattery;
 			m_TopAccounts[i].m_PortalBlocker = m_Accounts[FromID].m_PortalBlocker;
+			m_TopAccounts[i].m_DurakWins = m_Accounts[FromID].m_DurakWins;
+			m_TopAccounts[i].m_DurakProfit = m_Accounts[FromID].m_DurakProfit;
 			str_copy(m_TopAccounts[i].m_aUsername, m_Accounts[FromID].m_aLastPlayerName, sizeof(m_TopAccounts[i].m_aUsername));
 			return;
 		}
@@ -5894,6 +5896,8 @@ void CGameContext::SetTopAccStats(int FromID)
 	Account.m_KillStreak = m_Accounts[FromID].m_KillingSpreeRecord;
 	Account.m_PortalBattery = m_Accounts[FromID].m_PortalBattery;
 	Account.m_PortalBlocker = m_Accounts[FromID].m_PortalBlocker;
+	Account.m_DurakWins = m_Accounts[FromID].m_DurakWins;
+	Account.m_DurakProfit = m_Accounts[FromID].m_DurakProfit;
 	str_copy(Account.m_aUsername, m_Accounts[FromID].m_aLastPlayerName, sizeof(Account.m_aUsername));
 	str_copy(Account.m_aAccountName, m_Accounts[FromID].m_Username, sizeof(Account.m_aAccountName));
 	m_TopAccounts.push_back(Account);
