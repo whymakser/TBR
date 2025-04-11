@@ -503,7 +503,6 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 			{
 				if (TryAttack(Game, pSeat->m_ID, pCard))
 				{
-					// Nothing to do
 					pCard = 0;
 				}
 			}
@@ -530,7 +529,6 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 			{
 				if (TryPass(Game, pSeat->m_ID, pCard))
 				{
-					// Nothing to do..
 					pCard = 0;
 				}
 			}
@@ -950,7 +948,7 @@ bool CDurak::UpdateGame(int Game)
 		if (!pChr || ProcessedWinAlready)
 			continue;
 
-		pChr->EpicCircle(pGame->m_DefenderIndex == i && !pSeat->m_Player.m_EndedMove, -1, true);
+		pChr->EpicCircle(pGame->m_DefenderIndex == i, -1, true);
 		pChr->Passive(pGame->GetStateBySeat(i) != DURAK_PLAYERSTATE_NONE, -1, true);
 		if (!pSeat->m_Player.m_EndedMove)
 		{
@@ -1084,8 +1082,6 @@ bool CDurak::UpdateGame(int Game)
 							}
 							else if (DragRelease && TryDefend(Game, i, a, pDraggedCard))
 							{
-								// Keep tooltip away for 2 seconds
-								pSeat->m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed() * 2;
 								pDraggedCard = 0;
 							}
 							break;
@@ -1100,7 +1096,6 @@ bool CDurak::UpdateGame(int Game)
 						}
 						else if (DragRelease && TryPass(Game, i, pDraggedCard))
 						{
-							pSeat->m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed() * 2;
 							pDraggedCard = 0;
 						}
 						else
@@ -1323,10 +1318,10 @@ void CDurak::TakeCardsFromTable(int Game)
 	{
 		if (!pSeat->m_Player.m_EndedMove)
 		{
+			EndMove(Game, pSeat);
 			// Force next move in 5 sec so others can throw in cards still
 			pGame->m_NextMove = Server()->Tick() + Server()->TickSpeed() * 5;
-			SetTurnTooltip(Game, CCard::IND_TOOLTIP_TAKING_CARDS);
-			EndMove(Game, pSeat);
+			SetTurnTooltip(Game, CCard::TOOLTIP_TAKING_CARDS);
 		}
 		// Clicking it again will not help and will not speed up the process
 		return;
@@ -1374,6 +1369,9 @@ void CDurak::SetTurnTooltip(int Game, int Tooltip)
 		int ClientID = m_vpGames[Game]->m_aSeats[i].m_Player.m_ClientID;
 		if (ClientID != -1)
 		{
+			// Keep tooltip away for 2 seconds
+			int Seconds = Tooltip == CCard::TOOLTIP_TAKING_CARDS ? 5 : 2;
+			m_vpGames[Game]->m_aSeats[i].m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed() * Seconds;
 			m_vpGames[Game]->m_aSeats[i].m_Player.m_Tooltip = Tooltip;
 			m_aCardUpdate[ClientID][&m_aStaticCards[DURAK_TEXT_TOOLTIP]] = true;
 			for (int c = 0; c < MAX_CLIENTS; c++)
