@@ -4644,7 +4644,7 @@ void CGameContext::OnPreShutdown()
 	if (ServerIsStopping && Config()->m_SvShutdownAutoReconnect == 2 && Config()->m_SvShutdownSaveTees)
 	{
 		char *pMsg = ((CServer *)Server())->m_NetServer.m_ShutdownMessage;
-		str_copy(pMsg, "Restarting... Please wait, your full stats will be reloaded", sizeof(((CServer*)Server())->m_NetServer.m_ShutdownMessage));
+		str_copy(pMsg, "Restarting... Your stats will be fully reloaded shortly", sizeof(((CServer*)Server())->m_NetServer.m_ShutdownMessage));
 	}
 }
 
