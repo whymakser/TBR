@@ -141,7 +141,10 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 
 		if (IsCharacter)
 		{
-			pChr->Core()->m_Vel = ClampVel(pChr->m_MoveRestrictions, Temp);
+			if (!GameServer()->Durak()->ActivelyPlaying(pChr->GetPlayer()->GetCID()))
+			{
+				pChr->Core()->m_Vel = ClampVel(pChr->m_MoveRestrictions, Temp);
+			}
 		}
 		else
 		{

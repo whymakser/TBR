@@ -658,10 +658,7 @@ void CCharacter::FireWeapon()
 							pTarget->UnFreeze();
 						}
 
-						if (!GameServer()->Durak()->ActivelyPlaying(pTarget->GetPlayer()->GetCID()))
-						{
-							pTarget->TakeDamage((vec2(0.f, -1.0f) + Temp) * Tuning()->m_HammerStrength, Dir * -1, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage, m_pPlayer->GetCID(), GetActiveWeapon());
-						}
+						pTarget->TakeDamage((vec2(0.f, -1.0f) + Temp) * Tuning()->m_HammerStrength, Dir * -1, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage, m_pPlayer->GetCID(), GetActiveWeapon());
 
 						if (m_FreezeHammer)
 							pTarget->Freeze();
@@ -1944,8 +1941,11 @@ bool CCharacter::TakeDamage(vec2 Force, vec2 Source, int Dmg, int From, int Weap
 		SetEmote(EMOTE_PAIN, Server()->Tick() + 500 * Server()->TickSpeed() / 1000);
 	}
 
-	vec2 Temp = m_Core.m_Vel + Force;
-	m_Core.m_Vel = ClampVel(m_MoveRestrictions, Temp);
+	if (!GameServer()->Durak()->ActivelyPlaying(m_pPlayer->GetCID()))
+	{
+		vec2 Temp = m_Core.m_Vel + Force;
+		m_Core.m_Vel = ClampVel(m_MoveRestrictions, Temp);
+	}
 
 	return true;
 }
