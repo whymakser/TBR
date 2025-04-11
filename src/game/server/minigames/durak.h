@@ -500,10 +500,15 @@ public:
 	{
 		std::vector<int> vDrawOrder;
 		vDrawOrder.push_back(m_InitialAttackerIndex);
-		int NextPlayer = m_InitialAttackerIndex;
-		while ((NextPlayer = GetNextPlayer(NextPlayer)) != m_InitialAttackerIndex)
-			if (NextPlayer != m_DefenderIndex)
-				vDrawOrder.push_back(NextPlayer);
+		int CurPlayer = m_InitialAttackerIndex;
+		for (int i = 1; i < MAX_DURAK_PLAYERS; i++)
+		{
+			int CurPlayer = (CurPlayer + i) % MAX_DURAK_PLAYERS;
+			if (CurPlayer != m_DefenderIndex && m_aSeats[CurPlayer].m_Player.m_ClientID != -1 && m_aSeats[CurPlayer].m_Player.m_Stake >= 0)
+			{
+				vDrawOrder.push_back(CurPlayer);
+			}
+		}
 		vDrawOrder.push_back(m_DefenderIndex);
 
 		for (unsigned int i = 0; i < vDrawOrder.size(); i++)

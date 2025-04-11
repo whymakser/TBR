@@ -1246,7 +1246,7 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
 		int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
-		if (ClientID != -1)
+		if (ClientID != -1 && pGame->m_aSeats[i].m_Player.m_Stake >= 0)
 		{
 			// Making sure to update handcards for 0.7 here, because we can not catch every case from within CDurakGame where SortHand() gets called for example.
 			UpdateHandcards(Game, &pGame->m_aSeats[i]);
