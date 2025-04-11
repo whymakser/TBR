@@ -1228,6 +1228,9 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 			if (pChr)
 			{
 				pChr->m_LockedTunings.push_back({"hook_drag_accel", 0.f});
+				pChr->m_LockedTunings.push_back({"hammer_strength", 0.f});
+				pChr->m_LockedTunings.push_back({"explosion_strength", 0.f});
+				pChr->m_LockedTunings.push_back({"shotgun_strength", 0.f});
 				pChr->ApplyLockedTunings();
 			}
 			else // ApplyLockedTunings takes care of sending tunes already
