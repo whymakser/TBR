@@ -15,6 +15,7 @@ const vec2 CCard::ms_AttackAreaCenterOffset = vec2(-32.f, 16.f);
 
 CDurak::CDurak(CGameContext *pGameServer, int Type) : CMinigame(pGameServer, Type)
 {
+	m_vLastDuraks.clear();
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
 		m_aLastSeatOccupiedMsg[i] = 0;
@@ -658,6 +659,8 @@ bool CDurak::StartGame(int Game)
 	pGame->m_Running = true;
 	pGame->m_Deck.Shuffle();
 
+	int LastDurakIndex = -1;
+	std::vector<std::pair<int, int64_t> >::iterator DurakIt = m_vLastDuraks.end();
 	char aBuf[128];
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
@@ -687,8 +690,28 @@ bool CDurak::StartGame(int Game)
 		pPlayer->m_ForceSpawnPos = GameServer()->Collision()->GetPos(pSeat->m_MapIndex);
 		m_aInDurakGame[ClientID] = true;
 		pTeams->SetForceCharacterTeam(ClientID, FirstFreeTeam);
+
+		// Check for previous durak to attack in first round
+		auto it = std::find_if(m_vLastDuraks.begin(), m_vLastDuraks.end(),
+			[ClientID](const std::pair<int, int64_t>& p) {
+				return p.first == ClientID;
+			});
+		if (it != m_vLastDuraks.end())
+		{
+			if (DurakIt == m_vLastDuraks.end() || it->second > DurakIt->second)
+			{
+				DurakIt = it;
+				LastDurakIndex = i;
+			}
+		}
 	}
 
+	// Attack previous durak in new round
+	if (LastDurakIndex != -1)
+	{
+		// Get previous player of LastDurakIndex, so that LastDurakIndex ends up getting attacked.
+		pGame->m_InitialAttackerIndex = pGame->GetNextPlayer(LastDurakIndex, false, true);
+	}
 	pGame->DealHandCards();
 	StartNextRound(Game);
 	return true;
@@ -1176,6 +1199,8 @@ bool CDurak::UpdateGame(int Game)
 		SendChatToParticipants(Game, aBuf);
 		EndMove(Game, pGame->GetSeatByClient(pGame->m_DurakClientID), true);
 		pGame->m_GameOverTick = Server()->Tick();
+		std::pair<int, int64> Pair(pGame->m_DurakClientID, pGame->m_GameOverTick);
+		m_vLastDuraks.push_back(Pair);
 		return true;
 	}
 

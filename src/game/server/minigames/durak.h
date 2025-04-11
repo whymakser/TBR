@@ -254,7 +254,7 @@ public:
 				m_LastCursorMove = 0;
 				m_SelectedAttack = -1;
 				m_EndedMove = false;
-				m_LastStake = -2;
+				m_LastStake = -1;
 				m_LastNumParticipants = -1;
 				m_LastNumHandCards = -1;
 				m_CanSetNextMove = true;
@@ -413,11 +413,12 @@ public:
 		});
 	}
 
-	int GetNextPlayer(int CurrentIndex, bool CheckHands = false)
+	int GetNextPlayer(int CurrentIndex, bool CheckHands = false, bool Prev = false)
 	{
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 		{
-			int NextIndex = (CurrentIndex + i + 1) % MAX_DURAK_PLAYERS;
+			int p = Prev ? -1 : 1;
+			int NextIndex = (CurrentIndex + p*(i + 1)) % MAX_DURAK_PLAYERS;
 			if (m_aSeats[NextIndex].m_Player.m_ClientID != -1 && m_aSeats[NextIndex].m_Player.m_Stake >= 0 && (!CheckHands || m_aSeats[NextIndex].m_Player.m_vHandCards.size()))
 				return NextIndex;
 		}
@@ -441,37 +442,43 @@ public:
 
 		if (m_RoundCount == 0)
 		{
-			int LowestTrumpPlayerIndex = -1;
-			int LowestTrumpRank = 15;
-
-			for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+			if (m_InitialAttackerIndex != -1)
 			{
-				if (m_aSeats[i].m_Player.m_ClientID == -1)
-					continue;
-
-				for (auto &Card : m_aSeats[i].m_Player.m_vHandCards)
-				{
-					if (Card.m_Suit == m_Deck.GetTrumpSuit() && Card.m_Rank < LowestTrumpRank)
-					{
-						LowestTrumpRank = Card.m_Rank;
-						LowestTrumpPlayerIndex = i;
-					}
-				}
+				// Determined by m_vLastDuraks
+				m_AttackerIndex = m_InitialAttackerIndex;
 			}
-
-			// In case no trump was dealt, just begin somewhere
-			if (LowestTrumpPlayerIndex == -1)
+			else
 			{
+				int LowestTrumpPlayerIndex = -1;
+				int LowestTrumpRank = 15;
 				for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 				{
-					if (m_aSeats[i].m_Player.m_ClientID != -1)
+					if (m_aSeats[i].m_Player.m_ClientID == -1)
+						continue;
+
+					for (auto& Card : m_aSeats[i].m_Player.m_vHandCards)
 					{
-						LowestTrumpPlayerIndex = i;
-						break;
+						if (Card.m_Suit == m_Deck.GetTrumpSuit() && Card.m_Rank < LowestTrumpRank)
+						{
+							LowestTrumpRank = Card.m_Rank;
+							LowestTrumpPlayerIndex = i;
+						}
 					}
 				}
+				// In case no trump was dealt, just begin somewhere
+				if (LowestTrumpPlayerIndex == -1)
+				{
+					for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+					{
+						if (m_aSeats[i].m_Player.m_ClientID != -1)
+						{
+							LowestTrumpPlayerIndex = i;
+							break;
+						}
+					}
+				}
+				m_AttackerIndex = m_InitialAttackerIndex = LowestTrumpPlayerIndex;
 			}
-			m_AttackerIndex = m_InitialAttackerIndex = LowestTrumpPlayerIndex;
 		}
 		else
 		{
@@ -749,6 +756,7 @@ class CDurak : public CMinigame
 	bool m_aInDurakGame[MAX_CLIENTS];
 	bool m_aUpdateTeamsState[MAX_CLIENTS];
 	int m_aSnappedSeatIndex[MAX_CLIENTS];
+	std::vector<std::pair<int, int64> > m_vLastDuraks; // first: ClientID, second: DurakLoseTick
 
 	std::vector<CDurakGame *> m_vpGames;
 	bool UpdateGame(int Game);
