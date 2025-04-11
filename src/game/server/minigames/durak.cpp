@@ -1192,7 +1192,7 @@ bool CDurak::UpdateGame(int Game)
 		return true;
 	}
 
-	if (Server()->Tick() + Server()->TickSpeed() * 5 > pGame->m_NextMove)
+	if ((int)(pGame->m_NextMove - Server()->Tick()) / Server()->TickSpeed() + 1 <= 5)
 	{
 		SetTurnTooltip(Game, CCard::TOOLTIP_TAKING_CARDS);
 	}
