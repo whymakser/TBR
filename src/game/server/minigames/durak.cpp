@@ -660,7 +660,7 @@ bool CDurak::StartGame(int Game)
 	pGame->m_Deck.Shuffle();
 
 	int LastDurakIndex = -1;
-	std::vector<std::pair<int, int64_t> >::iterator DurakIt = m_vLastDuraks.end();
+	std::vector<std::pair<int, int64> >::iterator DurakIt = m_vLastDuraks.end();
 	char aBuf[128];
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
