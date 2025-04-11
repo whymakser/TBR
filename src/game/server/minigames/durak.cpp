@@ -766,7 +766,7 @@ const char *CDurak::GetCardSymbol(int Suit, int Rank, CDurakGame *pGame)
 	case CCard::IND_TOOLTIP_DEFENDER_PASSED: return "Passed...";
 	case CCard::IND_TOOLTIP_NEXT_MOVE:
 	{
-		str_format(aBuf, sizeof(aBuf), "Next move: %llds…", (pGame->m_NextMove - Server()->Tick()) / Server()->TickSpeed() + 1);
+		str_format(aBuf, sizeof(aBuf), "Next move: %llds", (pGame->m_NextMove - Server()->Tick()) / Server()->TickSpeed() + 1);
 		return aBuf;
 	}
 	}
