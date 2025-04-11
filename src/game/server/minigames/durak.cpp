@@ -112,13 +112,24 @@ void CDurak::UpdatePassive(int ClientID, int Seconds)
 
 void CDurak::CreateFlyingPoint(int FromClientID, int Game, CCard *pToCard)
 {
-	if (GameServer()->GetPlayerChar(FromClientID))
-	{
-		vec2 From = GameServer()->GetPlayerChar(FromClientID)->GetPos();
-		vec2 To = m_vpGames[Game]->m_TablePos + pToCard->m_TableOffset;
-		To.y -= DURAK_CARD_NAME_OFFSET;
-		new CFlyingPoint(&GameServer()->m_World, From, -1, FromClientID, normalize(To - From) * 15.f, To);
-	}
+	if (!GameServer()->GetPlayerChar(FromClientID))
+		return;
+	vec2 From = GameServer()->GetPlayerChar(FromClientID)->GetPos();
+	vec2 To = m_vpGames[Game]->m_TablePos + pToCard->m_TableOffset;
+	To.y -= DURAK_CARD_NAME_OFFSET;
+	new CFlyingPoint(&GameServer()->m_World, From, -1, FromClientID, normalize(To - From) * 15.f, To);
+}
+
+void CDurak::OnCharacterSpawn(CCharacter *pChr)
+{
+	if (!InDurakGame(pChr->GetPlayer()->GetCID()))
+		return;
+
+	pChr->m_LockedTunings.push_back({ "hook_drag_accel", 0.f });
+	pChr->m_LockedTunings.push_back({ "hammer_strength", 0.f });
+	pChr->m_LockedTunings.push_back({ "explosion_strength", 0.f });
+	pChr->m_LockedTunings.push_back({ "shotgun_strength", 0.f });
+	pChr->ApplyLockedTunings();
 }
 
 void CDurak::OnCharacterSeat(int ClientID, int Number, int SeatIndex)
@@ -1227,11 +1238,7 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 			CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
 			if (pChr)
 			{
-				pChr->m_LockedTunings.push_back({"hook_drag_accel", 0.f});
-				pChr->m_LockedTunings.push_back({"hammer_strength", 0.f});
-				pChr->m_LockedTunings.push_back({"explosion_strength", 0.f});
-				pChr->m_LockedTunings.push_back({"shotgun_strength", 0.f});
-				pChr->ApplyLockedTunings();
+				OnCharacterSpawn(pChr);
 			}
 			else // ApplyLockedTunings takes care of sending tunes already
 			{
