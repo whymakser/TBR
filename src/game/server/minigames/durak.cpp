@@ -1317,7 +1317,7 @@ void CDurak::TakeCardsFromTable(int Game)
 	if (pGame->GetOpenAttacks().empty())
 		return;
 
-	CDurakGame::SSeat *pSeat = pGame->GetSeatByClient(pGame->m_DefenderIndex);
+	CDurakGame::SSeat *pSeat = &pGame->m_aSeats[pGame->m_DefenderIndex];
 	bool TimerUp = pGame->ProcessNextMove(Server()->Tick());
 	if (!TimerUp)
 	{
