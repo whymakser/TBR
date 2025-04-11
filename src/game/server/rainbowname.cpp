@@ -122,9 +122,12 @@ void CRainbowName::Update(int ClientID)
 				pInfo->m_UpdateTeams = true;
 			}
 
-			if (!InRange || pCore->Team(ClientID) != pCore->Team(ID) || OwnMapID == -1)
+			if (!InRange || pCore->Team(ClientID) != pCore->Team(ID))
 				continue;
 		}
+
+		if (OwnMapID == -1)
+			continue;
 
 		int SpectatorID = pPlayer->GetSpectatorID();
 		bool NoSpecOrFollow = !IsPaused || (SpectatorID != -1 && GameServer()->m_apPlayers[SpectatorID]);
