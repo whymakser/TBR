@@ -2797,7 +2797,6 @@ void CGameContext::Con1VS1(IConsole::IResult *pResult, void *pUserData)
 void CGameContext::SendTop5AccMessage(IConsole::IResult* pResult, void* pUserData, int Type)
 {
 	CGameContext* pSelf = (CGameContext*)pUserData;
-	char aType[8];
 
 	pSelf->LazyLoadTopAccounts(Type);
 
@@ -2805,9 +2804,32 @@ void CGameContext::SendTop5AccMessage(IConsole::IResult* pResult, void* pUserDat
 	int Debut = pResult->NumArguments() >= 1 && pResult->GetInteger(0) != 0 ? pResult->GetInteger(0) : 1;
 	Debut = max(1, Debut < 0 ? (int)pSelf->m_TopAccounts.size() + Debut - 3 : Debut);
 
-	str_format(aType, sizeof(aType), "%s", Type == TOP_LEVEL ? "Level" : Type == TOP_POINTS ? "Points" : Type == TOP_MONEY ? "Money" : Type == TOP_SPREE ? "Spree" : "Portal");
-	str_format(aBuf, sizeof(aBuf), "----------- Top 5 %s -----------", aType);
+	// Header
+	const char *pType = "";
+	switch (Type)
+	{
+	case TOP_LEVEL: pType = "Level"; break;
+	case TOP_POINTS: pType = "Points"; break;
+	case TOP_MONEY: pType = "Money"; break;
+	case TOP_SPREE: pType = "Spree"; break;
+	case TOP_PORTAL_BATTERY: pType = "Portal Battery"; break;
+	case TOP_PORTAL_BLOCKER: pType = "Portal Blocker"; break;
+	case TOP_DURAK_WINS: pType = "Durák wins"; break;
+	case TOP_DURAK_PROFIT: pType = "Durák profit"; break;
+	}
+
+	str_format(aBuf, sizeof(aBuf), "----------- Top 5 %s -----------", pType);
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+
+	// Short name for entries
+	switch (Type)
+	{
+	case TOP_PORTAL_BATTERY: // fall-through
+	case TOP_PORTAL_BLOCKER: pType = "Amount"; break;
+	case TOP_DURAK_WINS: pType = "Wins"; break;
+	case TOP_DURAK_PROFIT: pType = "Profit"; break;
+	}
+
 	for (int i = 0; i < 5; i++)
 	{
 		if (i + Debut > (int)pSelf->m_TopAccounts.size())
@@ -2815,9 +2837,24 @@ void CGameContext::SendTop5AccMessage(IConsole::IResult* pResult, void* pUserDat
 		CGameContext::TopAccounts* r = &pSelf->m_TopAccounts[i + Debut - 1];
 
 		if (Type == TOP_MONEY)
+		{
 			str_format(aBuf, sizeof(aBuf), "%d. %s Money: %lld", i + Debut, r->m_aUsername, r->m_Money);
+		}
 		else
-			str_format(aBuf, sizeof(aBuf), "%d. %s %s: %d", i + Debut, r->m_aUsername, aType, Type == TOP_LEVEL ? r->m_Level : Type == TOP_POINTS ? r->m_Points : Type == TOP_SPREE ? r->m_KillStreak : r->m_Portal);
+		{
+			int Value = -1;
+			switch (Type)
+			{
+			case TOP_LEVEL: Value = r->m_Level; break;
+			case TOP_POINTS: Value = r->m_Points; break;
+			case TOP_SPREE: Value = r->m_KillStreak; break;
+			case TOP_PORTAL_BATTERY: Value = r->m_PortalBattery; break;
+			case TOP_PORTAL_BLOCKER: Value = r->m_PortalBlocker; break;
+			case TOP_DURAK_WINS: Value = r->m_DurakWins; break;
+			case TOP_DURAK_PROFIT: Value = r->m_DurakProfit; break;
+			}
+			str_format(aBuf, sizeof(aBuf), "%d. %s %s: %d", i + Debut, r->m_aUsername, pType, Value);
+		}
 
 		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	}
@@ -2851,10 +2888,16 @@ void CGameContext::ConTop5Spree(IConsole::IResult* pResult, void* pUserData)
 	pSelf->SendTop5AccMessage(pResult, pUserData, TOP_SPREE);
 }
 
-void CGameContext::ConTop5Portal(IConsole::IResult* pResult, void* pUserData)
+void CGameContext::ConTop5PortalBattery(IConsole::IResult* pResult, void* pUserData)
 {
 	CGameContext* pSelf = (CGameContext*)pUserData;
-	pSelf->SendTop5AccMessage(pResult, pUserData, TOP_PORTAL);
+	pSelf->SendTop5AccMessage(pResult, pUserData, TOP_PORTAL_BATTERY);
+}
+
+void CGameContext::ConTop5PortalBlocker(IConsole::IResult* pResult, void* pUserData)
+{
+	CGameContext* pSelf = (CGameContext*)pUserData;
+	pSelf->SendTop5AccMessage(pResult, pUserData, TOP_PORTAL_BLOCKER);
 }
 
 void CGameContext::ConTop5DurakWins(IConsole::IResult* pResult, void* pUserData)

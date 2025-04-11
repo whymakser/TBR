@@ -5780,14 +5780,15 @@ void CGameContext::LazySaveTopAccounts()
 		char aEntry[256];
 		for (unsigned int i = 0; i < m_TopAccounts.size(); i++)
 		{
-			str_format(aEntry, sizeof(aEntry), "%s\t%s\t%d\t%d\t\%lld\t%d\t%d\t%d\t%d",
+			str_format(aEntry, sizeof(aEntry), "%s\t%s\t%d\t%d\t\%lld\t%d\t%d\t%d\t%d\t%d",
 				m_TopAccounts[i].m_aAccountName,
 				m_TopAccounts[i].m_aUsername,
 				m_TopAccounts[i].m_Level,
 				m_TopAccounts[i].m_Points,
 				m_TopAccounts[i].m_Money,
 				m_TopAccounts[i].m_KillStreak,
-				m_TopAccounts[i].m_Portal,
+				m_TopAccounts[i].m_PortalBattery,
+				m_TopAccounts[i].m_PortalBlocker,
 				m_TopAccounts[i].m_DurakWins,
 				m_TopAccounts[i].m_DurakProfit
 			);
@@ -5817,19 +5818,20 @@ bool CGameContext::LazyLoadTopAccounts(int Type)
 	{
 		CGameContext::TopAccounts Account;
 		const char *pData = data.c_str();
-		int Num = sscanf(pData, "%[^\t]\t%[^\t]\t%d\t%d\t%lld\t%d\t%d\t%d\t%d",
+		int Num = sscanf(pData, "%[^\t]\t%[^\t]\t%d\t%d\t%lld\t%d\t%d\t%d\t%d\t%d",
 			Account.m_aAccountName,
 			Account.m_aUsername,
 			&Account.m_Level,
 			&Account.m_Points,
 			&Account.m_Money,
 			&Account.m_KillStreak,
-			&Account.m_Portal,
+			&Account.m_PortalBattery,
+			&Account.m_PortalBlocker,
 			&Account.m_DurakWins,
 			&Account.m_DurakProfit
 		);
 
-		if (Num == 9)
+		if (Num == 10)
 		{
 			// update top accounts with all currently online accs so we get correct and up-to-date information
 			auto it = AccountMap.find(Account.m_aAccountName);
@@ -5840,7 +5842,8 @@ bool CGameContext::LazyLoadTopAccounts(int Type)
 				Account.m_Points = it->second.m_BlockPoints;
 				Account.m_Money = it->second.m_Money;
 				Account.m_KillStreak = it->second.m_KillingSpreeRecord;
-				Account.m_Portal = it->second.m_PortalBattery;
+				Account.m_PortalBattery = it->second.m_PortalBattery;
+				Account.m_PortalBlocker = it->second.m_PortalBlocker;
 				Account.m_DurakWins = it->second.m_DurakWins;
 				Account.m_DurakProfit = it->second.m_DurakProfit;
 			}
@@ -5855,7 +5858,8 @@ bool CGameContext::LazyLoadTopAccounts(int Type)
 			case TOP_POINTS: return a.m_Points > b.m_Points;
 			case TOP_MONEY: return a.m_Money > b.m_Money;
 			case TOP_SPREE: return a.m_KillStreak > b.m_KillStreak;
-			case TOP_PORTAL: return a.m_Portal > b.m_Portal;
+			case TOP_PORTAL_BATTERY: return a.m_PortalBattery > b.m_PortalBattery;
+			case TOP_PORTAL_BLOCKER: return a.m_PortalBlocker > b.m_PortalBlocker;
 			case TOP_DURAK_WINS: return a.m_DurakWins > b.m_DurakWins;
 			case TOP_DURAK_PROFIT: return a.m_DurakProfit > b.m_DurakProfit;
 			default: return false;
@@ -5875,7 +5879,8 @@ void CGameContext::SetTopAccStats(int FromID)
 			m_TopAccounts[i].m_Points = m_Accounts[FromID].m_BlockPoints;
 			m_TopAccounts[i].m_Money = m_Accounts[FromID].m_Money;
 			m_TopAccounts[i].m_KillStreak = m_Accounts[FromID].m_KillingSpreeRecord;
-			m_TopAccounts[i].m_Portal = m_Accounts[FromID].m_PortalBattery;
+			m_TopAccounts[i].m_PortalBattery = m_Accounts[FromID].m_PortalBattery;
+			m_TopAccounts[i].m_PortalBlocker = m_Accounts[FromID].m_PortalBlocker;
 			str_copy(m_TopAccounts[i].m_aUsername, m_Accounts[FromID].m_aLastPlayerName, sizeof(m_TopAccounts[i].m_aUsername));
 			return;
 		}
@@ -5887,7 +5892,8 @@ void CGameContext::SetTopAccStats(int FromID)
 	Account.m_Points = m_Accounts[FromID].m_BlockPoints;
 	Account.m_Money = m_Accounts[FromID].m_Money;
 	Account.m_KillStreak = m_Accounts[FromID].m_KillingSpreeRecord;
-	Account.m_Portal = m_Accounts[FromID].m_PortalBattery;
+	Account.m_PortalBattery = m_Accounts[FromID].m_PortalBattery;
+	Account.m_PortalBlocker = m_Accounts[FromID].m_PortalBlocker;
 	str_copy(Account.m_aUsername, m_Accounts[FromID].m_aLastPlayerName, sizeof(Account.m_aUsername));
 	str_copy(Account.m_aAccountName, m_Accounts[FromID].m_Username, sizeof(Account.m_aAccountName));
 	m_TopAccounts.push_back(Account);

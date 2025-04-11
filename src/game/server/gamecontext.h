@@ -82,7 +82,8 @@ enum Top5
 	TOP_POINTS,
 	TOP_MONEY,
 	TOP_SPREE,
-	TOP_PORTAL,
+	TOP_PORTAL_BATTERY,
+	TOP_PORTAL_BLOCKER,
 	TOP_DURAK_WINS,
 	TOP_DURAK_PROFIT,
 };
@@ -507,7 +508,8 @@ public:
 		int m_Points;
 		int64 m_Money;
 		int m_KillStreak;
-		int m_Portal;
+		int m_PortalBattery;
+		int m_PortalBlocker;
 		int m_DurakWins;
 		int m_DurakProfit;
 	};
@@ -951,7 +953,8 @@ private:
 	static void ConTop5Points(IConsole::IResult* pResult, void* pUserData);
 	static void ConTop5Money(IConsole::IResult* pResult, void* pUserData);
 	static void ConTop5Spree(IConsole::IResult* pResult, void* pUserData);
-	static void ConTop5Portal(IConsole::IResult* pResult, void* pUserData);
+	static void ConTop5PortalBattery(IConsole::IResult* pResult, void* pUserData);
+	static void ConTop5PortalBlocker(IConsole::IResult* pResult, void* pUserData);
 	static void ConTop5DurakWins(IConsole::IResult* pResult, void* pUserData);
 	static void ConTop5DurakProfit(IConsole::IResult* pResult, void* pUserData);
 
