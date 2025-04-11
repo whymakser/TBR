@@ -337,7 +337,7 @@ void CCharacter::DoWeaponSwitch()
 {
 	// make sure we can switch
 	if (m_ReloadTimer != 0 || m_QueuedWeapon == -1 || (m_QueuedWeapon != -2 && !m_aWeapons[m_QueuedWeapon].m_Got) || (m_aWeapons[WEAPON_NINJA].m_Got && !m_ScrollNinja)
-		|| m_DrawEditor.Selecting() || ((m_NumGrogsHolding || m_pHelicopter) && !m_DrawEditor.Active()) || m_BirthdayGiftEndTick > Server()->Tick())
+		|| m_DrawEditor.Selecting() || ((m_NumGrogsHolding || m_pHelicopter) && !m_DrawEditor.Active()) || m_BirthdayGiftEndTick)
 		return;
 
 	if (m_QueuedWeapon == -2)
@@ -3255,7 +3255,7 @@ void CCharacter::HandleTiles(int Index)
 		}
 		else if (m_pPlayer->m_IsBirthdayGift)
 		{
-			if ((m_BirthdayGiftEndTick && m_BirthdayGiftEndTick > Server()->Tick()) || m_Jetpack)
+			if (m_BirthdayGiftEndTick || m_Jetpack)
 			{
 				GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You've picked up your present already! Come back next year.");
 			}
@@ -4859,6 +4859,9 @@ void CCharacter::DropFlag(int Dir)
 
 bool CCharacter::CanDropWeapon(int Type)
 {
+	// Dissallow weapon drop while jetpack 45sec
+	if (m_BirthdayGiftEndTick)
+		return false;
 	// Do not drop spawnweapons
 	int W = GetSpawnWeaponIndex(Type);
 	if (W != -1 && m_aSpawnWeaponActive[W])
