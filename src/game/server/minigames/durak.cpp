@@ -1707,12 +1707,11 @@ void CDurak::PrepareDurakSnap(int SnappingClient, CDurakGame *pGame, CDurakGame:
 		}
 	}
 
-	const unsigned int NumHand = pSeat ? (int)pSeat->m_Player.m_vHandCards.size() : 0;
+	const int NumHand = pSeat ? (int)pSeat->m_Player.m_vHandCards.size() : 0;
 	const int NumNeeded = NumStatic + NumHand + NumAttack;
 	const int Diff = NumNeeded - m_aDurakNumReserved[SnappingClient];
 	if (Diff != 0)
 	{
-		dbg_msg("durak//warn", "%d %d %d", SnappingClient, Diff, m_aDurakNumReserved[SnappingClient]);
 		GameServer()->m_World.AddToNumReserved(SnappingClient, Diff);
 		m_aDurakNumReserved[SnappingClient] += Diff;
 	}
