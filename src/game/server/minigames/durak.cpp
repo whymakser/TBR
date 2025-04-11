@@ -497,6 +497,7 @@ void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 		else
 		{
 			pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
+			pSeat->m_Player.m_CanSetNextMove = true;
 		}
 	}
 	else if (Jump)
@@ -555,6 +556,10 @@ void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_END_MOVE)
 			{
 				EndMove(Game, pSeat);
+			}
+			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_NEXT_MOVE)
+			{
+				pSeat->m_Player.m_CanSetNextMove = false;
 			}
 		}
 	}
@@ -1243,6 +1248,7 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 			UpdateHandcards(Game, &pGame->m_aSeats[i]);
 			pGame->m_aSeats[i].m_Player.m_LastNumHandCards = -1; // Get our specific name back
 			pGame->m_aSeats[i].m_Player.m_EndedMove = false;
+			pGame->m_aSeats[i].m_Player.m_CanSetNextMove = true;
 			GameServer()->m_apPlayers[ClientID]->m_ShowName = true;
 			CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
 			if (pChr)
@@ -1339,7 +1345,7 @@ void CDurak::ProcessCardPlacement(int Game, CDurakGame::SSeat *pSeat, CCard *pFl
 		EndMove(Game, pSeat, true);
 	UpdateHandcards(Game, pSeat);
 	CreateFlyingPoint(ClientID, Game, pFlyingPointToCard);
-
+	pSeat->m_Player.m_CanSetNextMove = true;
 }
 
 void CDurak::TakeCardsFromTable(int Game)
@@ -1403,13 +1409,16 @@ void CDurak::SetTurnTooltip(int Game, int Tooltip)
 	m_vpGames[Game]->m_TurnTooltipEnd = Server()->Tick() + Server()->TickSpeed() * 10;
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
-		int ClientID = m_vpGames[Game]->m_aSeats[i].m_Player.m_ClientID;
-		if (ClientID != -1 && m_vpGames[Game]->m_aSeats[i].m_Player.m_Tooltip != Tooltip)
+		CDurakGame::SSeat *pSeat = &m_vpGames[Game]->m_aSeats[i];
+		int ClientID = pSeat->m_Player.m_ClientID;
+		if (ClientID != -1)
 		{
-			m_vpGames[Game]->m_aSeats[i].m_Player.m_Tooltip = Tooltip;
+			if (Tooltip == CCard::TOOLTIP_NEXT_MOVE && pSeat->m_Player.m_Tooltip != Tooltip && !pSeat->m_Player.m_CanSetNextMove)
+				continue;
+
 			// Keep tooltip away for 2 seconds
-			int Seconds = Tooltip == CCard::TOOLTIP_NEXT_MOVE ? 5 : 2;
-			m_vpGames[Game]->m_aSeats[i].m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed() * Seconds;
+			pSeat->m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed() * (Tooltip == CCard::TOOLTIP_NEXT_MOVE ? 5 : 2);
+			pSeat->m_Player.m_Tooltip = Tooltip;
 			m_aCardUpdate[ClientID][&m_aStaticCards[DURAK_TEXT_TOOLTIP]] = true;
 			for (int c = 0; c < MAX_CLIENTS; c++)
 			{

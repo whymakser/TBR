@@ -257,6 +257,7 @@ public:
 				m_LastStake = -2;
 				m_LastNumParticipants = -1;
 				m_LastNumHandCards = -1;
+				m_CanSetNextMove = true;
 			}
 			bool IsTurnTooltip() { return m_Tooltip == CCard::TOOLTIP_ATTACKERS_TURN || m_Tooltip == CCard::TOOLTIP_DEFENDER_PASSED || m_Tooltip == CCard::TOOLTIP_NEXT_MOVE; }
 			struct
@@ -282,6 +283,7 @@ public:
 			int m_LastNumParticipants;
 			int64 m_LastStake;
 			int m_LastNumHandCards;
+			bool m_CanSetNextMove;
 		} m_Player;
 	} m_aSeats[MAX_DURAK_PLAYERS];
 
