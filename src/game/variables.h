@@ -157,7 +157,7 @@ MACRO_CONFIG_INT(SvVotesPerTick, sv_votes_per_tick, 5, 1, 15, CFGFLAG_SERVER, "N
 // account
 MACRO_CONFIG_INT(SvAccounts, sv_accounts, 1, 0, 1, CFGFLAG_SERVER, "Whether accounts are activated or deactivated", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvAccFilePath, sv_acc_file_path, 128, "data/accounts", CFGFLAG_SERVER, "The path where the server searches the account files (relative to binary)", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvDataSaveInterval, sv_data_save_interval, 30, 5, 60, CFGFLAG_SERVER, "Intervall in minutes between data saves", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvDataSaveInterval, sv_data_save_interval, 60, 5, 1440, CFGFLAG_SERVER, "Intervall in minutes between data saves", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvDonationFilePath, sv_donation_file_path, 128, "data", CFGFLAG_SERVER, "The path where the server searches the for the donation file (relative to binary)", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvTopAccountsFilePath, sv_top_accounts_file_path, 128, "data", CFGFLAG_SERVER, "The path where the server searches the for the top accounts file (relative to binary)", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvPlotFilePath, sv_plot_file_path, 128, "data/plots", CFGFLAG_SERVER, "The path where the server searches the plot files (relative to binary)", AUTHED_ADMIN)

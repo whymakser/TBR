@@ -517,6 +517,7 @@ public:
 	void SetTopAccStats(int FromID);
 	void LazySaveTopAccounts();
 	bool LazyLoadTopAccounts(int Type);
+	void SaveCurrentTopAccounts();
 
 	int m_LogoutAccountsPort;
 	static int InitAccounts(const char* pName, int IsDir, int StorageType, void* pUser);

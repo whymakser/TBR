@@ -1465,6 +1465,7 @@ void CGameContext::OnTick()
 		for (int i = 0; i < Collision()->m_NumPlots + 1; i++)
 			WritePlotStats(i);
 		WriteMoneyListFile();
+		SaveCurrentTopAccounts();
 		m_LastDataSaveTick = Server()->Tick();
 	}
 
@@ -4629,6 +4630,7 @@ void CGameContext::OnPreShutdown()
 		}
 	}
 
+	SaveCurrentTopAccounts();
 	LogoutAllAccounts();
 	for (int i = 0; i < Collision()->m_NumPlots + 1; i++)
 		WritePlotStats(i);
@@ -5901,6 +5903,14 @@ void CGameContext::SetTopAccStats(int FromID)
 	str_copy(Account.m_aUsername, m_Accounts[FromID].m_aLastPlayerName, sizeof(Account.m_aUsername));
 	str_copy(Account.m_aAccountName, m_Accounts[FromID].m_Username, sizeof(Account.m_aAccountName));
 	m_TopAccounts.push_back(Account);
+}
+
+void CGameContext::SaveCurrentTopAccounts()
+{
+	LazyLoadTopAccounts(TOP_LEVEL);
+	for (unsigned int i = 0; i < m_Accounts.size(); i++)
+		SetTopAccStats(i);
+	LazySaveTopAccounts();
 }
 
 int CGameContext::InitAccounts(const char *pName, int IsDir, int StorageType, void *pUser)
