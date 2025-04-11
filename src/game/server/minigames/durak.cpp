@@ -145,8 +145,13 @@ void CDurak::OnHookAttach(CCharacter *pChr, bool Player)
 
 void CDurak::OnCharacterSpawn(CCharacter *pChr)
 {
-	if (!InDurakGame(pChr->GetPlayer()->GetCID()))
+	int ClientID = pChr->GetPlayer()->GetCID();
+	if (!InDurakGame(ClientID))
 		return;
+
+	// Player can't move while playing and grenade, hammer, shotgun doesn't affect them, so we dont have to forcefully set the position in Tick anymore
+	int Game = GetGameByClient(ClientID);
+	pChr->ForceSetPos(GameServer()->Collision()->GetPos(m_vpGames[Game]->GetSeatByClient(ClientID)->m_MapIndex));
 
 	CLockedTune Tune("hook_drag_accel", 0.f);
 	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Tune);
@@ -985,7 +990,6 @@ bool CDurak::UpdateGame(int Game)
 		pChr->EpicCircle(pGame->m_DefenderIndex == i, -1, true);
 		if (!pSeat->m_Player.m_EndedMove)
 		{
-			pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
 			const int NumHands = (int)pSeat->m_Player.m_vHandCards.size();
 			if (pSeat->m_Player.m_LastNumHandCards != NumHands)
 			{
@@ -1285,6 +1289,7 @@ void CDurak::EndMove(int Game, CDurakGame::SSeat *pSeat)
 	pSeat->m_Player.m_EndedMove = true;
 	pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 	GameServer()->m_apPlayers[ClientID]->m_ShowName = false;
+	GameServer()->SendTuningParams(ClientID);
 }
 
 bool CDurak::TryDefend(int Game, int Seat, int Attack, CCard *pCard)
