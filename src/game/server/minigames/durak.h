@@ -781,7 +781,6 @@ public:
 	bool OnDropMoney(int ClientID, int Amount);
 	bool OnRainbowName(int ClientID, int MapID);
 	void OnCharacterSeat(int ClientID, int Number, int SeatIndex);
-	bool TrySetCharacterPos(int ClientID);
 	bool TryEnterBetStake(int ClientID, const char *pMessage);
 	void OnInput(class CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput);
 	void OnPlayerLeave(int ClientID, bool Disconnect = false, bool Shutdown = false);

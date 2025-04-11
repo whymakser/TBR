@@ -121,21 +121,6 @@ void CDurak::CreateFlyingPoint(int FromClientID, int Game, CCard *pToCard)
 	}
 }
 
-bool CDurak::TrySetCharacterPos(int ClientID)
-{
-	if (!InDurakGame(ClientID))
-		return false;
-	int Game = GetGameByClient(ClientID);
-	if (Game < 0)
-		return false;
-	CDurakGame::SSeat *pSeat = m_vpGames[Game]->GetSeatByClient(ClientID);
-	if (pSeat->m_Player.m_EndedMove)
-		return false;
-	CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
-	pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
-	return true;
-}
-
 void CDurak::OnCharacterSeat(int ClientID, int Number, int SeatIndex)
 {
 	if (InDurakGame(ClientID) || GameServer()->m_aMinigameDisabled[MINIGAME_DURAK])
@@ -968,6 +953,7 @@ bool CDurak::UpdateGame(int Game)
 		pChr->EpicCircle(pGame->m_DefenderIndex == i, -1, true);
 		if (!pSeat->m_Player.m_EndedMove)
 		{
+			pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
 			const int NumHands = (int)pSeat->m_Player.m_vHandCards.size();
 			if (pSeat->m_Player.m_LastNumHandCards != NumHands)
 			{
@@ -1238,7 +1224,16 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 			pGame->m_aSeats[i].m_Player.m_LastNumHandCards = -1; // Get our specific name back
 			pGame->m_aSeats[i].m_Player.m_EndedMove = false;
 			GameServer()->m_apPlayers[ClientID]->m_ShowName = true;
-			GameServer()->SendTuningParams(ClientID);
+			CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
+			if (pChr)
+			{
+				pChr->m_LockedTunings.push_back({"hook_drag_accel", 0.f});
+				pChr->ApplyLockedTunings();
+			}
+			else // ApplyLockedTunings takes care of sending tunes already
+			{
+				GameServer()->SendTuningParams(ClientID);
+			}
 		}
 	}
 }
@@ -1259,7 +1254,12 @@ void CDurak::EndMove(int Game, CDurakGame::SSeat *pSeat)
 	pSeat->m_Player.m_EndedMove = true;
 	pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 	GameServer()->m_apPlayers[ClientID]->m_ShowName = false;
-	GameServer()->SendTuningParams(ClientID);
+	CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
+	if (pChr)
+	{
+		pChr->m_LockedTunings.clear();
+		pChr->ApplyLockedTunings();
+	}
 }
 
 bool CDurak::TryDefend(int Game, int Seat, int Attack, CCard *pCard)
