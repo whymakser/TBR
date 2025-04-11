@@ -105,7 +105,7 @@ void CDurak::AddMapSeatTile(int Number, int MapIndex, int SeatIndex)
 
 void CDurak::UpdatePassive(int ClientID, int Seconds)
 {
-	CCharacter* pChr = GameServer()->GetPlayerChar(ClientID);
+	CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
 	if (pChr && pChr->UpdatePassiveEndTick(Server()->Tick() + Server()->TickSpeed() * Seconds))
 		m_aUpdatedPassive[ClientID] = true;
 }
@@ -119,6 +119,17 @@ void CDurak::CreateFlyingPoint(int FromClientID, int Game, CCard *pToCard)
 		To.y -= DURAK_CARD_NAME_OFFSET;
 		new CFlyingPoint(&GameServer()->m_World, From, -1, FromClientID, normalize(To - From) * 15.f, To);
 	}
+}
+
+bool CDurak::TrySetCharacterPos(int ClientID)
+{
+	if (!InDurakGame(ClientID))
+		return false;
+	int Game = GetGameByClient(ClientID);
+	if (Game < 0)
+		return false;
+	CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
+	pChr->ForceSetPos(GameServer()->Collision()->GetPos(m_vpGames[Game]->GetSeatByClient(ClientID)->m_MapIndex));
 }
 
 void CDurak::OnCharacterSeat(int ClientID, int Number, int SeatIndex)
@@ -949,10 +960,8 @@ bool CDurak::UpdateGame(int Game)
 			continue;
 
 		pChr->EpicCircle(pGame->m_DefenderIndex == i, -1, true);
-		pChr->Passive(pGame->GetStateBySeat(i) != DURAK_PLAYERSTATE_NONE, -1, true);
 		if (!pSeat->m_Player.m_EndedMove)
 		{
-			pChr->ForceSetPos(GameServer()->Collision()->GetPos(pSeat->m_MapIndex));
 			const int NumHands = (int)pSeat->m_Player.m_vHandCards.size();
 			if (pSeat->m_Player.m_LastNumHandCards != NumHands)
 			{

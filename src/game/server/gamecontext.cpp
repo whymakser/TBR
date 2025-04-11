@@ -1158,17 +1158,17 @@ void CGameContext::SendTuningParams(int ClientID, int Zone)
 
 	if (pChr)
 	{
-		if (pChr->m_FakeTuneCollision || pChr->m_InSnake)
+		bool IsDurakPlaying = Durak()->ActivelyPlaying(ClientID);
+		if (pChr->m_FakeTuneCollision || pChr->m_InSnake || IsDurakPlaying)
 			Tunings.m_PlayerCollision = 0.f;
-		if ((pChr->m_Passive && !pChr->m_Super) || pChr->m_Snake.Active())
+		if ((pChr->m_Passive && !pChr->m_Super) || pChr->m_Snake.Active() || IsDurakPlaying)
 			Tunings.m_PlayerHooking = 0.f;
 
-		bool IsDurakPlaying = Durak()->ActivelyPlaying(ClientID);
 		if (pChr->m_DrawEditor.Active() || pChr->m_pHelicopter || pChr->m_Snake.Active() || IsDurakPlaying)
 			Tunings.m_HookFireSpeed = 0.f;
-		if (pChr->m_pHelicopter || pChr->m_Snake.Active())
+		if (pChr->m_pHelicopter || pChr->m_Snake.Active() || IsDurakPlaying)
 			Tunings.m_HookDragAccel = 0.f;
-		if (pChr->m_pHelicopter || pChr->m_InSnake)
+		if (pChr->m_pHelicopter || pChr->m_InSnake || IsDurakPlaying)
 			Tunings.m_HookDragSpeed = 0.f;
 
 		if (pChr->m_DrawEditor.Active() || pChr->m_pHelicopter|| pChr->m_InSnake || IsDurakPlaying

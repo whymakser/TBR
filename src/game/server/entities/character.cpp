@@ -2186,16 +2186,19 @@ int CCharacter::GetDDNetCharacterFlags(int SnappingClient)
 		if (m_aWeapons[i].m_Got)
 			aGotWeapon[GameServer()->GetWeaponType(i)] = true;
 
-	bool Helicopter = SnappingClient == m_pPlayer->GetCID() && m_pHelicopter;
+	bool Self = SnappingClient == m_pPlayer->GetCID();
+	bool Helicopter = Self && m_pHelicopter;
+	bool ActivelyPlayingDurak = Self && GameServer()->Durak()->ActivelyPlaying(m_pPlayer->GetCID());
+
 	if(m_Solo)
 		Flags |= CHARACTERFLAG_SOLO;
 	if(m_Super)
 		Flags |= CHARACTERFLAG_SUPER;
 	if(m_EndlessHook)
 		Flags |= CHARACTERFLAG_ENDLESS_HOOK;
-	if(!m_Core.m_Collision || !Tuning()->m_PlayerCollision || (m_Passive && !m_Super) || Helicopter)
+	if(!m_Core.m_Collision || !Tuning()->m_PlayerCollision || (m_Passive && !m_Super) || Helicopter || ActivelyPlayingDurak)
 		Flags |= CHARACTERFLAG_NO_COLLISION;
-	if(!m_Core.m_Hook || !Tuning()->m_PlayerHooking || (m_Passive && !m_Super) || Helicopter)
+	if(!m_Core.m_Hook || !Tuning()->m_PlayerHooking || (m_Passive && !m_Super) || Helicopter || ActivelyPlayingDurak)
 		Flags |= CHARACTERFLAG_NO_HOOK;
 	if(m_SuperJump)
 		Flags |= CHARACTERFLAG_ENDLESS_JUMP;

@@ -740,13 +740,18 @@ void CGameWorld::Tick()
 		// we need to do this between core tick and Move of all the players, because otherwise its getting jiggly for those whose coretick didnt happen yet
 		for (CCharacter *pChr = (CCharacter *)FindFirst(ENTTYPE_CHARACTER); pChr; pChr = (CCharacter *)pChr->TypeNext())
 		{
+			if (GameServer()->Durak()->TrySetCharacterPos(pChr->GetPlayer()->GetCID()))
+			{
+				continue;
+			}
+
 			pChr->m_Snake.Tick();
 
 			if (pChr->GetPlayer()->m_IsDummy)
 				continue;
 
 			NumCharacters++;
-			if (pChr->m_MoneyTile == CCharacter::MONEYTILE_POLICE && !pChr->m_Passive)
+			if (pChr->m_MoneyTile == CCharacter::MONEYTILE_POLICE && !pChr->m_Passive && !pChr->GetPlayer()->IsMinigame())
 			{
 				m_PoliceFarm.m_NumPoliceTilePlayers++;
 			}
