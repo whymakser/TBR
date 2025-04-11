@@ -1358,12 +1358,12 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 		Minigame = MINIGAME_DURAK;
 	}
 
+	bool BankEnabled = pSelf->Config()->m_SvMoneyBankMode != 0;
 	switch (Minigame)
 	{
 		case MINIGAME_1VS1:
 		case MINIGAME_NONE:
 		{
-			bool BankEnabled = pSelf->Config()->m_SvMoneyBankMode != 0;
 			str_format(aBuf, sizeof(aBuf), "--- %s's Stats ---", pSelf->Server()->ClientName(ID));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			str_format(aBuf, sizeof(aBuf), "Level [%d]%s", pAccount->m_Level, pPlayer->GetAccID() < ACC_START ? " (not logged in)" : "");
@@ -1419,11 +1419,15 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 
 		case MINIGAME_DURAK:
 		{
-			str_format(aBuf, sizeof(aBuf), "--- %s's Durák Stats ---", pSelf->Server()->ClientName(ID));
+			str_format(aBuf, sizeof(aBuf), "--- %s's Stats ---", pSelf->Server()->ClientName(ID));
+			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+			str_format(aBuf, sizeof(aBuf), "%s [%lld]", BankEnabled ? "Bank" : "Wallet", pPlayer->GetWalletOrBankDisplay());
+			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+			str_format(aBuf, sizeof(aBuf), "--- Durák ---", pSelf->Server()->ClientName(ID));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			str_format(aBuf, sizeof(aBuf), "Games won: %d", pAccount->m_DurakWins);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "Profit: %s%lld", pAccount->m_DurakProfit > 0 ? "+" : "", pAccount->m_DurakProfit);
+			str_format(aBuf, sizeof(aBuf), "Profit: %s%lld$", pAccount->m_DurakProfit > 0 ? "+" : "", pAccount->m_DurakProfit);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 		} break;
 
@@ -1948,12 +1952,12 @@ void CGameContext::ConMoney(IConsole::IResult* pResult, void* pUserData)
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	if (BankEnabled)
 	{
-		str_format(aBuf, sizeof(aBuf), "Wallet: %lld", pPlayer->GetWalletMoney());
+		str_format(aBuf, sizeof(aBuf), "Wallet [%lld]", pPlayer->GetWalletMoney());
 		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	}
 	if (pSelf->Config()->m_SvEuroMode || pSelf->m_Accounts[pPlayer->GetAccID()].m_Euros > 0)
 	{
-		str_format(aBuf, sizeof(aBuf), "Euros: %.2f", pSelf->m_Accounts[pPlayer->GetAccID()].m_Euros);
+		str_format(aBuf, sizeof(aBuf), "Euros [%.2f]", pSelf->m_Accounts[pPlayer->GetAccID()].m_Euros);
 		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	}
 	pSelf->SendChatTarget(pResult->m_ClientID, "~~~~~~~~~~");
