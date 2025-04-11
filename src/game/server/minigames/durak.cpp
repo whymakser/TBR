@@ -129,10 +129,10 @@ void CDurak::OnCharacterSpawn(CCharacter *pChr)
 	CLockedTune Hammer("hammer_strength", 0.f);
 	CLockedTune Explosion("explosion_strength", 0.f);
 	CLockedTune Shotgun("shotgun_strength", 0.f);
-	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Tune);
-	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Tune);
-	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Tune);
-	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Tune);
+	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Hook);
+	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Hammer);
+	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Explosion);
+	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Shotgun);
 	pChr->ApplyLockedTunings();
 }
 
