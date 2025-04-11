@@ -120,13 +120,13 @@ void CDurak::CreateFlyingPoint(int FromClientID, int Game, CCard *pToCard)
 	new CFlyingPoint(&GameServer()->m_World, From, -1, FromClientID, normalize(To - From) * 15.f, To);
 }
 
-void CDurak::OnHookAttach(CCharacter *pChr)
+void CDurak::OnHookAttach(CCharacter *pChr, bool Player)
 {
 	int HookedPlayer = pChr->Core()->HookedPlayer();
 	if (HookedPlayer < 0 || HookedPlayer >= MAX_CLIENTS)
 		return;
 
-	if (ActivelyPlaying(HookedPlayer))
+	if (Player && ActivelyPlaying(HookedPlayer))
 	{
 		if (GameServer()->ResetLockedTune(&pChr->m_LockedTunings, "hook_drag_accel"))
 		{
