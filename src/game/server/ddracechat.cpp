@@ -1423,7 +1423,7 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 		{
 			str_format(aBuf, sizeof(aBuf), "--- %s's Stats ---", pSelf->Server()->ClientName(ID));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s [%lld]", BankEnabled ? "Bank" : "Wallet", pPlayer->GetWalletOrBankDisplay());
+			str_format(aBuf, sizeof(aBuf), "Wallet [%lld]", pPlayer->GetUsableMoney());
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			pSelf->SendChatTarget(pResult->m_ClientID, "--- Durák ---");
 			str_format(aBuf, sizeof(aBuf), "Games won: %d", pAccount->m_DurakWins);
