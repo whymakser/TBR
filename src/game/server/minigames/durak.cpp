@@ -1318,15 +1318,13 @@ void CDurak::TakeCardsFromTable(int Game)
 		return;
 
 	CDurakGame::SSeat *pSeat = pGame->GetSeatByClient(pGame->m_DefenderIndex);
-
-	// Force next move in 5 sec so others can throw in cards still
-	const int64 TakeCardsTick = Server()->Tick() + Server()->TickSpeed() * 5;
 	bool TimerUp = pGame->ProcessNextMove(Server()->Tick());
 	if (!TimerUp)
 	{
 		if (!pSeat->m_Player.m_EndedMove)
 		{
-			pGame->m_NextMove = TakeCardsTick;
+			// Force next move in 5 sec so others can throw in cards still
+			pGame->m_NextMove = Server()->Tick() + Server()->TickSpeed() * 5;
 			EndMove(Game, pSeat);
 		}
 		// Clicking it again will not help and will not speed up the process
