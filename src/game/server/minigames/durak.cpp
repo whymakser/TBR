@@ -1183,7 +1183,7 @@ bool CDurak::UpdateGame(int Game)
 
 	bool AttackersEndedMove = pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_EndedMove && pGame->m_aSeats[pGame->GetNextPlayer(pGame->m_DefenderIndex)].m_Player.m_EndedMove;
 	bool ProcessMove = pGame->ProcessNextMove(Server()->Tick());
-	if (AttackersEndedMove || ProcessMove)
+	if (ProcessMove || AttackersEndedMove)
 	{
 		bool AllAttacksDefended = true;
 		bool HasUndefendedAttacks = false;
@@ -1215,12 +1215,12 @@ bool CDurak::UpdateGame(int Game)
 			}
 			StartNextRound(Game, true);
 		}
-		else if (HasUndefendedAttacks && (ProcessMove || pGame->m_aSeats[pGame->m_DefenderIndex].m_Player.m_EndedMove))
+		else if (HasUndefendedAttacks)
 		{
 			TakeCardsFromTable(Game);
 			
 		}
-		else if (!AttackersEndedMove)
+		else if (ProcessMove)
 		{
 			char aBuf[128];
 			int AttackerID = pGame->m_aSeats[pGame->m_InitialAttackerIndex].m_Player.m_ClientID;

@@ -509,7 +509,7 @@ public:
 		for (unsigned int i = 0; i < vDrawOrder.size(); i++)
 		{
 			int Index = vDrawOrder[i];
-			if (m_aSeats[Index].m_Player.m_ClientID != -1)
+			if (Index != -1 && m_aSeats[Index].m_Player.m_ClientID != -1)
 			{
 				while ((int)m_aSeats[Index].m_Player.m_vHandCards.size() < NUM_DURAK_INITIAL_HAND_CARDS)
 				{
