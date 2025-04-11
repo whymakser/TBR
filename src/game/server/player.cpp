@@ -857,7 +857,7 @@ void CPlayer::Snap(int SnappingClient)
 		int ClientID = IsSpectating ? m_ClientID : SnappingClient;
 		if (GameServer()->Arenas()->FightStarted(ClientID) || GameServer()->Durak()->InDurakGame(ClientID))
 		{
-			ShowSpec = SnappingClient == m_ClientID ? ShowOthers : pSnapping->m_ShowOthers == 1;
+			ShowSpec = pSnapping->m_ShowOthers == 1;
 		}
 	}
 	else if (m_pCharacter)
