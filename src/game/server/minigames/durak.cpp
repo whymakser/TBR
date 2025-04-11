@@ -287,13 +287,16 @@ void CDurak::OnPlayerLeave(int ClientID, bool Disconnect, bool Shutdown)
 			{
 				GameServer()->SetMinigame(ClientID, MINIGAME_NONE, false, false);
 			}
-			GameServer()->m_apPlayers[ClientID]->m_ForceSpawnPos = vec2(-1, -1);
 			pTeams->SetForceCharacterTeam(ClientID, 0);
+			// Set before tunings
 			m_aInDurakGame[ClientID] = false;
 			GameServer()->SendTuningParams(ClientID);
-			GameServer()->m_apPlayers[ClientID]->m_ShowName = true;
-			GameServer()->m_apPlayers[ClientID]->SetName(Server()->ClientName(ClientID));
-			GameServer()->m_apPlayers[ClientID]->UpdateInformation();
+			CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
+			pPlayer->m_ForceSpawnPos = vec2(-1, -1);
+			pPlayer->m_ShowName = true;
+			pPlayer->SetName(Server()->ClientName(ClientID));
+			pPlayer->SetClan(Server()->ClientName(ClientID));
+			pPlayer->UpdateInformation();
 			break;
 		}
 	}
