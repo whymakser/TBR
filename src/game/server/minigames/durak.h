@@ -415,9 +415,9 @@ public:
 
 	int GetNextPlayer(int CurrentIndex, bool CheckHands = false)
 	{
-		for (int i = 1; i < MAX_DURAK_PLAYERS; i++)
+		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 		{
-			int NextIndex = (CurrentIndex + i) % MAX_DURAK_PLAYERS;
+			int NextIndex = (CurrentIndex + i + 1) % MAX_DURAK_PLAYERS;
 			if (m_aSeats[NextIndex].m_Player.m_ClientID != -1 && m_aSeats[NextIndex].m_Player.m_Stake >= 0 && (!CheckHands || m_aSeats[NextIndex].m_Player.m_vHandCards.size()))
 				return NextIndex;
 		}
@@ -674,7 +674,7 @@ public:
 			if (!m_Attacks[i].m_Offense.Valid())
 			{
 				int NewDefender = GetNextPlayer(m_DefenderIndex, true);
-				if ((int)m_aSeats[NewDefender].m_Player.m_vHandCards.size() < NumAttacks + 1)
+				if (NewDefender == -1 || (int)m_aSeats[NewDefender].m_Player.m_vHandCards.size() < NumAttacks + 1)
 					return -1;
 
 				m_Attacks[i].m_Offense.m_Suit = pCard->m_Suit;

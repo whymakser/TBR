@@ -559,6 +559,7 @@ void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 			}
 			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_NEXT_MOVE)
 			{
+				pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 				pSeat->m_Player.m_CanSetNextMove = false;
 			}
 		}
@@ -1362,9 +1363,13 @@ void CDurak::TakeCardsFromTable(int Game)
 		if (!pSeat->m_Player.m_EndedMove)
 		{
 			EndMove(Game, pSeat);
-			// Force next move in 5 sec so others can throw in cards still
-			pGame->m_NextMove = Server()->Tick() + Server()->TickSpeed() * 5;
 			SetTurnTooltip(Game, CCard::TOOLTIP_NEXT_MOVE);
+			// Force next move in 5 sec so others can throw in cards still
+			const int64 NextMoveTick = Server()->Tick() + Server()->TickSpeed() * 5;
+			if (pGame->m_NextMove > NextMoveTick)
+			{
+				pGame->m_NextMove = NextMoveTick;
+			}
 		}
 		// Clicking it again will not help and will not speed up the process
 		return;
