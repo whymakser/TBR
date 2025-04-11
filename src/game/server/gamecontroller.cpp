@@ -154,16 +154,13 @@ void IGameController::OnCharacterSpawn(CCharacter *pChr)
 	case MINIGAME_1VS1:
 	{
 		if (GameServer()->Arenas()->OnCharacterSpawn(pChr->GetPlayer()->GetCID()))
-		{
-			goto default_case;
-		}
-		break;
+			break;
+		goto default_case;
 	}
 	case MINIGAME_DURAK:
 	{
 		GameServer()->Durak()->OnCharacterSpawn(pChr);
 		goto default_case;
-		break;
 	}
 	default_case:
 	default:
