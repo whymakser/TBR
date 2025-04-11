@@ -846,12 +846,14 @@ void CPlayer::Snap(int SnappingClient)
 
 	bool ShowSpec = false;
 	vec2 SpecPos;
-	bool ShowOthers = pSnapping->m_ShowOthers == 1 || pSnapping->GetTeam() == TEAM_SPECTATORS || pSnapping->IsPaused();
+	bool IsPaused = pSnapping->GetTeam() == TEAM_SPECTATORS || pSnapping->IsPaused();
+	bool ShowOthers = IsPaused || pSnapping->m_ShowOthers == 1;
 	if (IsMinigame() && m_SavedMinigameTee)
 	{
 		ShowSpec = true;
 		SpecPos = m_MinigameTee.GetPos();
-		if (GameServer()->Arenas()->FightStarted(SnappingClient) || GameServer()->Durak()->InDurakGame(SnappingClient))
+		int ClientID = IsPaused && pSnapping->GetSpectatorID() >= 0 ? pSnapping->GetSpectatorID() : SnappingClient;
+		if (GameServer()->Arenas()->FightStarted(ClientID) || GameServer()->Durak()->InDurakGame(ClientID))
 		{
 			ShowSpec = ShowOthers;
 		}
