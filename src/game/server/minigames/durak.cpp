@@ -125,10 +125,10 @@ void CDurak::OnCharacterSpawn(CCharacter *pChr)
 	if (!InDurakGame(pChr->GetPlayer()->GetCID()))
 		return;
 
-	pChr->m_LockedTunings.push_back(CLockedTune("hook_drag_accel", 0.f ));
-	pChr->m_LockedTunings.push_back(CLockedTune("hammer_strength", 0.f));
-	pChr->m_LockedTunings.push_back(CLockedTune("explosion_strength", 0.f));
-	pChr->m_LockedTunings.push_back(CLockedTune("shotgun_strength", 0.f));
+	GameServer()->SetLockedTune(&pChr->m_LockedTunings, CLockedTune("hook_drag_accel", 0.f));
+	GameServer()->SetLockedTune(&pChr->m_LockedTunings, CLockedTune("hammer_strength", 0.f));
+	GameServer()->SetLockedTune(&pChr->m_LockedTunings, CLockedTune("explosion_strength", 0.f));
+	GameServer()->SetLockedTune(&pChr->m_LockedTunings, CLockedTune("shotgun_strength", 0.f));
 	pChr->ApplyLockedTunings();
 }
 
