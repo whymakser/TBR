@@ -816,7 +816,7 @@ void IGameController::UpdateGameInfo(int ClientID)
 				continue;
 
 			// F-DDrace
-			if (pPlayer->m_ScoreMode == SCORE_TIME && !pPlayer->IsMinigame())
+			if (pPlayer->m_ScoreMode == SCORE_TIME && !pPlayer->IsMinigame() && !GameServer()->Durak()->IsPlayerOnSeat(ClientID))
 				GameInfoMsg.m_GameFlags |= GAMEFLAG_RACE;
 
 			if (GameServer()->Arenas()->FightStarted(i))
@@ -835,7 +835,7 @@ void IGameController::UpdateGameInfo(int ClientID)
 	{
 		// F-DDrace
 		CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
-		if (pPlayer && pPlayer->m_ScoreMode == SCORE_TIME && !pPlayer->IsMinigame())
+		if (pPlayer && pPlayer->m_ScoreMode == SCORE_TIME && !pPlayer->IsMinigame() && !GameServer()->Durak()->IsPlayerOnSeat(ClientID))
 			GameInfoMsg.m_GameFlags |= GAMEFLAG_RACE;
 
 		if (GameServer()->Arenas()->FightStarted(ClientID))

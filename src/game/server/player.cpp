@@ -582,7 +582,7 @@ void CPlayer::Snap(int SnappingClient)
 			Score = GameServer()->m_Accounts[GetAccID()].m_Kills;
 		else if (pSnapping->m_Minigame == MINIGAME_SURVIVAL)
 			Score = GameServer()->m_Accounts[GetAccID()].m_SurvivalKills;
-		else if (pSnapping->m_Minigame == MINIGAME_DURAK)
+		else if (pSnapping->m_Minigame == MINIGAME_DURAK || (GameServer()->Durak()->IsPlayerOnSeat(m_ClientID) && SnappingClient == m_ClientID))
 			Score = GameServer()->m_Accounts[GetAccID()].m_DurakWins;
 		else if (pSnapping->m_Minigame == MINIGAME_INSTAGIB_BOOMFNG || pSnapping->m_Minigame == MINIGAME_INSTAGIB_FNG)
 		{

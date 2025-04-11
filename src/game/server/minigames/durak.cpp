@@ -172,6 +172,7 @@ void CDurak::OnCharacterSeat(int ClientID, int Number, int SeatIndex)
 		str_format(aBuf, sizeof(aBuf), "Welcome to Durák, %s! In order to participate, please enter the current stake of '%lld' in the chat.", Server()->ClientName(ClientID), pGame->m_Stake);
 	}
 	GameServer()->SendChatTarget(ClientID, aBuf);
+	GameServer()->m_pController->UpdateGameInfo(ClientID);
 }
 
 bool CDurak::TryEnterBetStake(int ClientID, const char *pMessage)
@@ -923,6 +924,7 @@ bool CDurak::UpdateGame(int Game)
 					pChr->Passive(false, -1, true);
 				}
 				m_aUpdatedPassive[ClientID] = false;
+				GameServer()->m_pController->UpdateGameInfo(ClientID);
 				pSeat->m_Player.Reset();
 				continue;
 			}
