@@ -112,22 +112,26 @@ public:
 		IND_STAKE = -9,
 		IND_TOOLTIP_ATTACK = -10,
 		IND_TOOLTIP_DEFEND = -11,
-		IND_TOOLTIP_PUSH = -12,
+		IND_TOOLTIP_PASS = -12,
 		IND_TOOLTIP_END_MOVE = -13,
 		IND_TOOLTIP_TAKE_CARDS = -14,
 		IND_TOOLTIP_SELECT_ATTACK = -15,
 		IND_TOOLTIP_ATTACKERS_TURN = -16,
+		IND_TOOLTIP_ATTACKER_PASSED = -17,
+		IND_TOOLTIP_TAKING_CARDS = -18,
 	};
 	enum
 	{
 		TOOLTIP_NONE = -1,
 		TOOLTIP_ATTACK,
 		TOOLTIP_DEFEND,
-		TOOLTIP_PUSH,
+		TOOLTIP_PASS,
 		TOOLTIP_END_MOVE,
 		TOOLTIP_TAKE_CARDS,
 		TOOLTIP_SELECT_ATTACK,
 		TOOLTIP_ATTACKERS_TURN,
+		TOOLTIP_DEFENDER_PASSED,
+		TOOLTIP_TAKING_CARDS,
 		NUM_TOOLTIPS
 	};
 	void SetInd(EIndicatorSuit IndSuit)
@@ -210,7 +214,7 @@ public:
 		m_NextMove = 0;
 		m_GameOverTick = 0;
 		m_LeftPlayersStake = 0;
-		m_ShowAttackersTurnUntil = 0;
+		m_TurnTooltipEnd = 0;
 		m_IsDefenseOngoing = false;
 		m_DurakClientID = -1;
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
@@ -254,6 +258,7 @@ public:
 				m_LastNumParticipants = -1;
 				m_LastNumHandCards = -1;
 			}
+			bool IsTurnTooltip() { return m_Tooltip == CCard::TOOLTIP_ATTACKERS_TURN || m_Tooltip == CCard::TOOLTIP_DEFENDER_PASSED || m_Tooltip == CCard::TOOLTIP_TAKING_CARDS; }
 			struct
 			{
 				int m_Direction = 0;
@@ -300,7 +305,7 @@ public:
 	std::vector<int> m_vWinners;
 	int64 m_GameOverTick;
 	int64 m_LeftPlayersStake;
-	int64 m_ShowAttackersTurnUntil;
+	int64 m_TurnTooltipEnd;
 	bool m_IsDefenseOngoing;
 	int m_DurakClientID;
 
@@ -636,7 +641,7 @@ public:
 		return true;
 	}
 
-	int TryPush(int Seat, CCard *pCard)
+	int TryPass(int Seat, CCard *pCard)
 	{
 		if (Seat != m_DefenderIndex || !pCard || !pCard->Valid())
 			return -1;
@@ -654,7 +659,7 @@ public:
 				if (TargetRank == -1)
 					TargetRank = pair.m_Offense.m_Rank;
 				else if (pair.m_Offense.m_Rank != TargetRank)
-					return -1; // Can only push on same ranks
+					return -1; // Can only pass on same ranks
 			}
 		}
 
@@ -737,12 +742,12 @@ class CDurak : public CMinigame
 	void StartNextRound(int Game, bool SuccessfulDefense = false);
 	void UpdateHandcards(int Game, CDurakGame::SSeat *pSeat);
 	void TakeCardsFromTable(int Game);
-	void EndMove(int ClientID, int Game, CDurakGame::SSeat *pSeat);
+	void EndMove(int Game, CDurakGame::SSeat *pSeat);
 	bool TryDefend(int Game, int Seat, int Attack, CCard *pCard);
-	bool TryPush(int Game, int Seat, CCard *pCard);
+	bool TryPass(int Game, int Seat, CCard *pCard);
 	bool TryAttack(int Game, int Seat, CCard *pCard);
 	void ProcessCardPlacement(int Game, CDurakGame::SSeat *pSeat, CCard *pFlyingPointToCard);
-	void SetShowAttackersTurn(int Game);
+	void SetTurnTooltip(int Game, int Tooltip);
 	void ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bool ForceEnd = false);
 	bool HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg);
 

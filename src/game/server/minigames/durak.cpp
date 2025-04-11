@@ -395,7 +395,7 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 
 	if (Direction)
 	{
-		if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_NONE || pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_ATTACKERS_TURN)
+		if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_NONE || pSeat->m_Player.IsTurnTooltip())
 		{
 			if (pSeat->m_Player.m_vHandCards.size())
 			{
@@ -451,7 +451,7 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 			}
 			else if (PlayerState == DURAK_PLAYERSTATE_DEFEND)
 			{
-				int aOptions[3] = { CCard::TOOLTIP_DEFEND, CCard::TOOLTIP_PUSH, CCard::TOOLTIP_TAKE_CARDS };
+				int aOptions[3] = { CCard::TOOLTIP_DEFEND, CCard::TOOLTIP_PASS, CCard::TOOLTIP_TAKE_CARDS };
 				int Current = -1;
 				for (int i = 0; i < 3; i++)
 				{
@@ -526,9 +526,9 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 					pCard = 0;
 				}
 			}
-			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_PUSH)
+			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_PASS)
 			{
-				if (TryPush(Game, pSeat->m_ID, pCard))
+				if (TryPass(Game, pSeat->m_ID, pCard))
 				{
 					// Nothing to do..
 					pCard = 0;
@@ -540,7 +540,7 @@ void CDurak::OnInput(CCharacter *pCharacter, CNetObj_PlayerInput *pNewInput)
 			}
 			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_END_MOVE)
 			{
-				EndMove(ClientID, Game, pSeat);
+				EndMove(Game, pSeat);
 			}
 		}
 	}
@@ -724,7 +724,7 @@ const char *CDurak::GetCardSymbol(int Suit, int Rank, CDurakGame *pGame)
 	case CCard::IND_START_TIMER:
 	{
 		if (pGame->NumParticipants() < MIN_DURAK_PLAYERS) return "Waiting...";
-		str_format(aBuf, sizeof(aBuf), "Start in %llds…", (pGame->m_GameStartTick - Server()->Tick()) / Server()->TickSpeed() + 1);
+		str_format(aBuf, sizeof(aBuf), "Start in %ds…", (int)(pGame->m_GameStartTick - Server()->Tick()) / Server()->TickSpeed() + 1);
 		return aBuf;
 	}
 	case CCard::IND_PLAYERCOUNTER:
@@ -741,12 +741,18 @@ const char *CDurak::GetCardSymbol(int Suit, int Rank, CDurakGame *pGame)
 	case CCard::IND_TOOLTIP_SELECT_ATTACK: return "Select attack";
 	case CCard::IND_TOOLTIP_ATTACK: return "Attack!";
 	case CCard::IND_TOOLTIP_DEFEND: return "Defend";
-	case CCard::IND_TOOLTIP_PUSH: return "Push!";
+	case CCard::IND_TOOLTIP_PASS: return "Pass!";
 	case CCard::IND_TOOLTIP_END_MOVE: return "End move";
 	case CCard::IND_TOOLTIP_TAKE_CARDS: return "Take cards";
 	case CCard::IND_TOOLTIP_ATTACKERS_TURN:
 	{
 		str_format(aBuf, sizeof(aBuf), "%s", Server()->ClientName(pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_ClientID));
+		return aBuf;
+	}
+	case CCard::IND_TOOLTIP_ATTACKER_PASSED: return "Passed...";
+	case CCard::IND_TOOLTIP_TAKING_CARDS: return "Passed...";
+	{
+		str_format(aBuf, sizeof(aBuf), "Taking in %ds…", (int)(pGame->m_NextMove - Server()->Tick()) / Server()->TickSpeed() + 1);
 		return aBuf;
 	}
 	}
@@ -803,7 +809,7 @@ bool CDurak::UpdateGame(int Game)
 			{
 				if (pCard->m_HoverState == CCard::HOVERSTATE_MOUSEOVER)
 				{
-					// Unset CCard::IND_TOOLTIP_ATTACKERS_TURN
+					// Unset attacker turn tooltip
 					pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 					pCard->m_HoverState = CCard::HOVERSTATE_DRAGGING;
 				}
@@ -1042,7 +1048,7 @@ bool CDurak::UpdateGame(int Game)
 
 		if (!pSeat->m_Player.m_KeyboardControl && !pSeat->m_Player.m_EndedMove)
 		{
-			if (pSeat->m_Player.m_Tooltip != CCard::TOOLTIP_ATTACKERS_TURN)
+			if (!pSeat->m_Player.IsTurnTooltip())
 			{
 				pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 			}
@@ -1090,9 +1096,9 @@ bool CDurak::UpdateGame(int Game)
 					{
 						if (Dragging && pDraggedCard)
 						{
-							pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_PUSH;
+							pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_PASS;
 						}
-						else if (DragRelease && TryPush(Game, i, pDraggedCard))
+						else if (DragRelease && TryPass(Game, i, pDraggedCard))
 						{
 							pSeat->m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed() * 2;
 							pDraggedCard = 0;
@@ -1115,7 +1121,7 @@ bool CDurak::UpdateGame(int Game)
 					pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_END_MOVE;
 					if (Dragging)
 					{
-						EndMove(ClientID, Game, pSeat);
+						EndMove(Game, pSeat);
 					}
 				}
 			}
@@ -1149,13 +1155,13 @@ bool CDurak::UpdateGame(int Game)
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), "'%s' is the Durák!", Server()->ClientName(pGame->m_DurakClientID));
 		SendChatToParticipants(Game, aBuf);
-		EndMove(pGame->m_DurakClientID, Game, pGame->GetSeatByClient(pGame->m_DurakClientID));
+		EndMove(Game, pGame->GetSeatByClient(pGame->m_DurakClientID));
 		pGame->m_GameOverTick = Server()->Tick();
 		return true;
 	}
 
-	bool Skip = pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_EndedMove && pGame->m_aSeats[pGame->GetNextPlayer(pGame->m_DefenderIndex)].m_Player.m_EndedMove;
-	if (Skip || pGame->ProcessNextMove(Server()->Tick()))
+	bool AllEndedMove = pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_EndedMove && pGame->m_aSeats[pGame->GetNextPlayer(pGame->m_DefenderIndex)].m_Player.m_EndedMove;
+	if (AllEndedMove || pGame->ProcessNextMove(Server()->Tick()))
 	{
 		bool AllAttacksDefended = true;
 		bool HasUndefendedAttacks = false;
@@ -1187,11 +1193,12 @@ bool CDurak::UpdateGame(int Game)
 			}
 			StartNextRound(Game, true);
 		}
-		else if (HasUndefendedAttacks && !Skip)
+		else if (HasUndefendedAttacks && !AllEndedMove)
 		{
 			TakeCardsFromTable(Game);
+			
 		}
-		else if (!Skip)
+		else if (!AllEndedMove)
 		{
 			char aBuf[128];
 			int AttackerID = pGame->m_aSeats[pGame->m_InitialAttackerIndex].m_Player.m_ClientID;
@@ -1210,7 +1217,7 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 {
 	CDurakGame *pGame = m_vpGames[Game];
 	pGame->NextRound(SuccessfulDefense);
-	SetShowAttackersTurn(Game);
+	SetTurnTooltip(Game, CCard::TOOLTIP_ATTACKERS_TURN);
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
 		int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
@@ -1233,11 +1240,12 @@ void CDurak::UpdateHandcards(int Game, CDurakGame::SSeat *pSeat)
 		m_aCardUpdate[pSeat->m_Player.m_ClientID][&pSeat->m_Player.m_vHandCards[i]] = true;
 }
 
-void CDurak::EndMove(int ClientID, int Game, CDurakGame::SSeat *pSeat)
+void CDurak::EndMove(int Game, CDurakGame::SSeat *pSeat)
 {
 	if (pSeat->m_Player.m_EndedMove)
 		return;
 
+	int ClientID = pSeat->m_Player.m_ClientID;
 	pSeat->m_Player.m_EndedMove = true;
 	pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 	GameServer()->m_apPlayers[ClientID]->m_ShowName = false;
@@ -1251,14 +1259,14 @@ bool CDurak::TryDefend(int Game, int Seat, int Attack, CCard *pCard)
 	{
 		if (!pGame->m_IsDefenseOngoing)
 		{
-			// First offense card placed. Now no more pushes are allowed, so we know who has to play and who not.
+			// First offense card placed. Now no more passes are allowed, so we know who has to play and who not.
 			pGame->m_IsDefenseOngoing = true;
 			for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 			{
 				int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
 				if (ClientID != -1 && pGame->GetStateBySeat(i) == DURAK_PLAYERSTATE_NONE)
 				{
-					EndMove(ClientID, Game, &pGame->m_aSeats[i]);
+					EndMove(Game, &pGame->m_aSeats[i]);
 				}
 			}
 		}
@@ -1268,13 +1276,13 @@ bool CDurak::TryDefend(int Game, int Seat, int Attack, CCard *pCard)
 	return false;
 }
 
-bool CDurak::TryPush(int Game, int Seat, CCard *pCard)
+bool CDurak::TryPass(int Game, int Seat, CCard *pCard)
 {
 	CDurakGame *pGame = m_vpGames[Game];
-	int Attack = pGame->TryPush(Seat, pCard);
+	int Attack = pGame->TryPass(Seat, pCard);
 	if (Attack != -1)
 	{
-		SetShowAttackersTurn(Game);
+		SetTurnTooltip(Game, CCard::TOOLTIP_DEFENDER_PASSED);
 		ProcessCardPlacement(Game, &pGame->m_aSeats[Seat], &m_vpGames[Game]->m_Attacks[Attack].m_Offense);
 		return true;
 	}
@@ -1297,7 +1305,7 @@ void CDurak::ProcessCardPlacement(int Game, CDurakGame::SSeat *pSeat, CCard *pFl
 {
 	int ClientID = pSeat->m_Player.m_ClientID;
 	if (pSeat->m_Player.m_vHandCards.empty())
-		EndMove(ClientID, Game, pSeat);
+		EndMove(Game, pSeat);
 	UpdateHandcards(Game, pSeat);
 	CreateFlyingPoint(ClientID, Game, pFlyingPointToCard);
 }
@@ -1308,6 +1316,22 @@ void CDurak::TakeCardsFromTable(int Game)
 	// Can't take cards if all attacks are defended already
 	if (pGame->GetOpenAttacks().empty())
 		return;
+
+	CDurakGame::SSeat *pSeat = pGame->GetSeatByClient(pGame->m_DefenderIndex);
+
+	// Force next move in 5 sec so others can throw in cards still
+	const int64 TakeCardsTick = Server()->Tick() + Server()->TickSpeed() * 5;
+	bool TimerUp = pGame->ProcessNextMove(Server()->Tick());
+	if (!TimerUp)
+	{
+		if (!pSeat->m_Player.m_EndedMove)
+		{
+			pGame->m_NextMove = TakeCardsTick;
+			EndMove(Game, pSeat);
+		}
+		// Clicking it again will not help and will not speed up the process
+		return;
+	}
 
 	// Defender takes all cards from table
 	for (int i = 0; i < MAX_DURAK_ATTACKS; i++)
@@ -1343,15 +1367,15 @@ void CDurak::TakeCardsFromTable(int Game)
 	StartNextRound(Game);
 }
 
-void CDurak::SetShowAttackersTurn(int Game)
+void CDurak::SetTurnTooltip(int Game, int Tooltip)
 {
-	m_vpGames[Game]->m_ShowAttackersTurnUntil = Server()->Tick() + Server()->TickSpeed() * 10;
+	m_vpGames[Game]->m_TurnTooltipEnd = Server()->Tick() + Server()->TickSpeed() * 10;
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
 		int ClientID = m_vpGames[Game]->m_aSeats[i].m_Player.m_ClientID;
 		if (ClientID != -1)
 		{
-			m_vpGames[Game]->m_aSeats[i].m_Player.m_Tooltip = CCard::TOOLTIP_ATTACKERS_TURN;
+			m_vpGames[Game]->m_aSeats[i].m_Player.m_Tooltip = Tooltip;
 			m_aCardUpdate[ClientID][&m_aStaticCards[DURAK_TEXT_TOOLTIP]] = true;
 			for (int c = 0; c < MAX_CLIENTS; c++)
 			{
@@ -1434,7 +1458,7 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bo
 		GameServer()->m_Accounts[pPlayer->GetAccID()].m_DurakWins++;
 	}
 
-	EndMove(ClientID, Game, pSeat);
+	EndMove(Game, pSeat);
 }
 
 void CDurak::Snap(int SnappingClient)
@@ -1585,9 +1609,9 @@ void CDurak::PrepareStaticCards(int SnappingClient, CDurakGame *pGame, CDurakGam
 				pCard->m_TableOffset = vec2(0, DURAK_CARD_NAME_OFFSET);
 				if (InGame && pSeat && pSeat->m_Player.m_Tooltip != CCard::TOOLTIP_NONE)
 				{
-					if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_ATTACKERS_TURN)
+					if (pSeat->m_Player.IsTurnTooltip())
 					{
-						if (pGame->m_ShowAttackersTurnUntil > Server()->Tick())
+						if (pGame->m_TurnTooltipEnd > Server()->Tick())
 						{
 							pCard->SetTooltip(pSeat->m_Player.m_Tooltip);
 							break;
