@@ -1521,7 +1521,7 @@ void CDurak::Snap(int SnappingClient)
 	CDurakGame::SSeat *pSeat = 0;
 	if (pGame)
 	{
-		pSeat = IsSpectator ? &pGame->m_aSeats[pGame->m_DefenderIndex] : pGame->GetSeatByClient(ClientID);
+		pSeat = IsSpectator && pGame->m_DefenderIndex != -1 ? &pGame->m_aSeats[pGame->m_DefenderIndex] : pGame->GetSeatByClient(ClientID);
 	}
 
 	// Prepare snap ids..
