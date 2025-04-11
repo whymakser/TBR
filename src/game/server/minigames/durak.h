@@ -723,7 +723,7 @@ class CDurak : public CMinigame
 	CCard m_aStaticCards[NUM_DURAK_STATIC_CARDS];
 	std::map<int, std::map<CCard*, int>> m_aLastSnapID; // [ClientID][Card] = SnapID
 	std::map<int, std::map<CCard*, bool>> m_aCardUpdate; // [ClientID][Card] = true
-	void PrepareStaticCards(int SnappingClient, CDurakGame *pGame, CDurakGame::SSeat *pSeat);
+	void PrepareStaticCards(CDurakGame *pGame, CDurakGame::SSeat *pSeat);
 	void PrepareDurakSnap(int SnappingClient, CDurakGame *pGame, CDurakGame::SSeat *pSeat);
 	void UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, int> &NewMap, CDurakGame *pGame, bool IsSpectator);
 	void SnapDurakCard(int SnappingClient, CDurakGame *pGame, CCard *pCard, bool IsSpectator = false, vec2 ForcePos = vec2(-1, -1));

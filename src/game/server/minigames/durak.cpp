@@ -1557,9 +1557,8 @@ void CDurak::Snap(int SnappingClient)
 	}
 }
 
-void CDurak::PrepareStaticCards(int SnappingClient, CDurakGame *pGame, CDurakGame::SSeat *pSeat)
+void CDurak::PrepareStaticCards(CDurakGame *pGame, CDurakGame::SSeat *pSeat)
 {
-	bool OwnSeat = SnappingClient == pSeat->m_Player.m_ClientID;
 	bool InGame = pGame && pGame->m_Running;
 	for (int i = 0; i < NUM_DURAK_STATIC_CARDS; i++)
 	{
@@ -1659,7 +1658,7 @@ void CDurak::PrepareStaticCards(int SnappingClient, CDurakGame *pGame, CDurakGam
 void CDurak::PrepareDurakSnap(int SnappingClient, CDurakGame *pGame, CDurakGame::SSeat *pSeat)
 {
 	// Prepare static card values for SnappingClient
-	PrepareStaticCards(SnappingClient, pGame, pSeat);
+	PrepareStaticCards(pGame, pSeat);
 
 	int NumStatic = 0;
 	for (int i = 0; i < NUM_DURAK_STATIC_CARDS; i++)
