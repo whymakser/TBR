@@ -1421,11 +1421,19 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 
 		case MINIGAME_DURAK:
 		{
-			str_format(aBuf, sizeof(aBuf), "--- %s's Stats ---", pSelf->Server()->ClientName(ID));
-			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "Wallet [%lld]", pPlayer->GetUsableMoney());
-			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			pSelf->SendChatTarget(pResult->m_ClientID, "--- Durák ---");
+			if (ID == pResult->m_ClientID)
+			{
+				str_format(aBuf, sizeof(aBuf), "--- %s's Stats ---", pSelf->Server()->ClientName(ID));
+				pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+				str_format(aBuf, sizeof(aBuf), "Wallet [%lld]", pPlayer->GetUsableMoney());
+				pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+				pSelf->SendChatTarget(pResult->m_ClientID, "--- Durák ---");
+			}
+			else
+			{
+				str_format(aBuf, sizeof(aBuf), "--- %s's Durák Stats ---", pSelf->Server()->ClientName(ID));
+				pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+			}
 			str_format(aBuf, sizeof(aBuf), "Games won: %d", pAccount->m_DurakWins);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			str_format(aBuf, sizeof(aBuf), "Profit: %s%lld$", pAccount->m_DurakProfit > 0 ? "+" : "", pAccount->m_DurakProfit);
@@ -2814,8 +2822,8 @@ void CGameContext::SendTop5AccMessage(IConsole::IResult* pResult, void* pUserDat
 	case TOP_SPREE: pType = "Spree"; break;
 	case TOP_PORTAL_BATTERY: pType = "Portal Battery"; break;
 	case TOP_PORTAL_BLOCKER: pType = "Portal Blocker"; break;
-	case TOP_DURAK_WINS: pType = "Durák wins"; break;
-	case TOP_DURAK_PROFIT: pType = "Durák profit"; break;
+	case TOP_DURAK_WINS: pType = "Durák Wins"; break;
+	case TOP_DURAK_PROFIT: pType = "Durák Profit"; break;
 	}
 
 	str_format(aBuf, sizeof(aBuf), "----------- Top 5 %s -----------", pType);
