@@ -98,6 +98,7 @@ void CCharacterCore::Reset()
 	m_MoveRestrictionExtra.m_VipPlus = false;
 	m_FakeTuneCID = -1;
 	m_FightStarted = false;
+	m_ActivelyPlayingDurak = false;
 	m_EndlessHook = false;
 }
 
@@ -484,10 +485,16 @@ void CCharacterCore::Tick(bool UseInput)
 					float Accel = m_Tuning.m_HookDragAccel * (Distance/m_Tuning.m_HookLength);
 
 					// add force to the hooked player
-					pCharCore->m_HookDragVel += Dir*Accel*1.5f;
+					if (!pCharCore->m_ActivelyPlayingDurak)
+					{
+						pCharCore->m_HookDragVel += Dir * Accel * 1.5f;
+					}
 
 					// add a little bit force to the guy who has the grip
-					m_HookDragVel -= Dir*Accel*0.25f;
+					if (!m_ActivelyPlayingDurak)
+					{
+						m_HookDragVel -= Dir * Accel * 0.25f;
+					}
 
 					if (m_pCollision->m_pConfig->m_SvWeakHook && !m_FightStarted)
 					{

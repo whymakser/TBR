@@ -120,29 +120,6 @@ void CDurak::CreateFlyingPoint(int FromClientID, int Game, CCard *pToCard)
 	new CFlyingPoint(&GameServer()->m_World, From, -1, FromClientID, normalize(To - From) * 15.f, To);
 }
 
-void CDurak::OnHookAttach(CCharacter *pChr, bool Player)
-{
-	if (!InDurakGame(pChr->GetPlayer()->GetCID()))
-		return;
-	int HookedPlayer = pChr->Core()->HookedPlayer();
-	if (HookedPlayer < 0 || HookedPlayer >= MAX_CLIENTS)
-		return;
-
-	if (Player && ActivelyPlaying(HookedPlayer))
-	{
-		if (GameServer()->ResetLockedTune(&pChr->m_LockedTunings, "hook_drag_accel"))
-		{
-			pChr->ApplyLockedTunings();
-		}
-	}
-	else if (!GameServer()->IsTuneInList(&pChr->m_LockedTunings, "hook_drag_accel"))
-	{
-		CLockedTune Tune("hook_drag_accel", 0.f);
-		GameServer()->SetLockedTune(&pChr->m_LockedTunings, Tune);
-		pChr->ApplyLockedTunings();
-	}
-}
-
 void CDurak::OnCharacterSpawn(CCharacter *pChr)
 {
 	int ClientID = pChr->GetPlayer()->GetCID();
@@ -152,8 +129,9 @@ void CDurak::OnCharacterSpawn(CCharacter *pChr)
 	// Player can't move while playing and grenade, hammer, shotgun doesn't affect them, so we dont have to forcefully set the position in Tick anymore
 	int Game = GetGameByClient(ClientID);
 	pChr->ForceSetPos(GameServer()->Collision()->GetPos(m_vpGames[Game]->GetSeatByClient(ClientID)->m_MapIndex));
+	pChr->Core()->m_ActivelyPlayingDurak = ActivelyPlaying(ClientID);
 
-	CLockedTune Tune("hook_drag_accel", 0.f);
+	CLockedTune Tune("gravity", 0.3f);
 	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Tune);
 	pChr->ApplyLockedTunings();
 }
@@ -305,7 +283,7 @@ void CDurak::OnPlayerLeave(int ClientID, bool Disconnect, bool Shutdown)
 			}
 			m_vpGames[g]->m_aSeats[i].m_Player.Reset();
 
-			if (!GameServer()->Collision()->TileUsed(TILE_DURAK_LOBBY))
+			if (!GameServer()->Collision()->TileUsed(TILE_DURAK_LOBBY) && !Shutdown) // don't kill player on shutdown, we need character for SaveCharacter()
 			{
 				GameServer()->SetMinigame(ClientID, MINIGAME_NONE, false, false);
 			}

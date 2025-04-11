@@ -274,6 +274,7 @@ public:
 	CCollision::MoveRestrictionExtra m_MoveRestrictionExtra;
 
 	bool m_FightStarted;
+	bool m_ActivelyPlayingDurak;
 
 	bool HookDurationExceeded(int AdditionalTicks = 0) { return m_HookTick > SERVER_TICK_SPEED+SERVER_TICK_SPEED/5+AdditionalTicks; }
 	bool m_EndlessHook;

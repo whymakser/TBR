@@ -1463,7 +1463,6 @@ void CCharacter::Tick()
 	if(!m_PrevInput.m_Hook && m_Input.m_Hook && !(m_Core.m_TriggeredEvents & COREEVENTFLAG_HOOK_ATTACH_PLAYER))
 	{
 		Antibot()->OnHookAttach(m_pPlayer->GetCID(), false);
-		GameServer()->Durak()->OnHookAttach(this, false);
 	}
 
 	// handle Weapons
@@ -1475,7 +1474,6 @@ void CCharacter::Tick()
 		if(m_Core.m_HookedPlayer != -1 && GameServer()->m_apPlayers[m_Core.m_HookedPlayer]->GetTeam() != -1)
 		{
 			Antibot()->OnHookAttach(m_pPlayer->GetCID(), true);
-			GameServer()->Durak()->OnHookAttach(this, true);
 		}
 	}
 
