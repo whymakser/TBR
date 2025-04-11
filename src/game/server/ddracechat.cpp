@@ -1592,10 +1592,6 @@ void CGameContext::ConRegister(IConsole::IResult * pResult, void * pUserData)
 	time_t Now;
 	time(&Now);
 	pSelf->m_Accounts[ID].m_RegisterDate = Now;
-
-	// also update topaccounts
-	pSelf->SetTopAccStats(ID);
-
 	pSelf->Logout(ID);
 
 	pSelf->SendChatTarget(pResult->m_ClientID, "Successfully registered an account, you can login now");
@@ -2803,7 +2799,7 @@ void CGameContext::SendTop5AccMessage(IConsole::IResult* pResult, void* pUserDat
 	CGameContext* pSelf = (CGameContext*)pUserData;
 	char aType[8];
 
-	pSelf->UpdateTopAccounts(Type);
+	pSelf->LazyLoadTopAccounts(Type);
 
 	char aBuf[512];
 	int Debut = pResult->NumArguments() >= 1 && pResult->GetInteger(0) != 0 ? pResult->GetInteger(0) : 1;
@@ -2826,6 +2822,9 @@ void CGameContext::SendTop5AccMessage(IConsole::IResult* pResult, void* pUserDat
 		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	}
 	pSelf->SendChatTarget(pResult->m_ClientID, "----------------------------------------");
+
+	// Unload top accounts again after lazy loading
+	pSelf->m_TopAccounts.clear();
 }
 
 void CGameContext::ConTop5Level(IConsole::IResult* pResult, void* pUserData)
@@ -2856,6 +2855,18 @@ void CGameContext::ConTop5Portal(IConsole::IResult* pResult, void* pUserData)
 {
 	CGameContext* pSelf = (CGameContext*)pUserData;
 	pSelf->SendTop5AccMessage(pResult, pUserData, TOP_PORTAL);
+}
+
+void CGameContext::ConTop5DurakWins(IConsole::IResult* pResult, void* pUserData)
+{
+	CGameContext* pSelf = (CGameContext*)pUserData;
+	pSelf->SendTop5AccMessage(pResult, pUserData, TOP_DURAK_WINS);
+}
+
+void CGameContext::ConTop5DurakProfit(IConsole::IResult* pResult, void* pUserData)
+{
+	CGameContext* pSelf = (CGameContext*)pUserData;
+	pSelf->SendTop5AccMessage(pResult, pUserData, TOP_DURAK_PROFIT);
 }
 
 void CGameContext::ConPoliceHelper(IConsole::IResult* pResult, void* pUserData)

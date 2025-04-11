@@ -41,6 +41,7 @@
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unordered_map>
 
 #include "score.h"
 #include "score/file_score.h"
@@ -4357,6 +4358,7 @@ void CGameContext::FDDraceInit()
 	AddAccount(); // account id 0 means not logged in, so we add an unused account with id 0
 	m_LogoutAccountsPort = Config()->m_SvPort; // set before calling InitAccounts
 	Storage()->ListDirectory(IStorage::TYPE_ALL, Config()->m_SvAccFilePath, InitAccounts, this);
+	LazySaveTopAccounts();
 
 	// load plot data AFTER map init
 	for (int i = 0; i < Collision()->m_NumPlots + 1; i++)
@@ -5768,46 +5770,98 @@ float CGameContext::MonthsPassedSinceRegister(int AccID)
 	return Days / 30.f;
 }
 
-void CGameContext::UpdateTopAccounts(int Type)
+void CGameContext::LazySaveTopAccounts()
 {
-	// update top accounts with all currently online accs so we get correct and up-to-date information
-	for (unsigned int i = ACC_START; i < m_Accounts.size(); i++)
-		SetTopAccStats(i);
-
-	switch (Type)
+	char aFile[256];
+	str_format(aFile, sizeof(aFile), "%s/topaccounts.txt", Config()->m_SvTopAccountsFilePath);
+	std::ofstream TopAccsFile(aFile);
+	if (TopAccsFile.is_open())
 	{
-	case TOP_LEVEL:		std::sort(m_TopAccounts.begin(), m_TopAccounts.end(), [](const TopAccounts& a, const TopAccounts& b) -> bool { return a.m_Level > b.m_Level; }); break;
-	case TOP_POINTS:	std::sort(m_TopAccounts.begin(), m_TopAccounts.end(), [](const TopAccounts& a, const TopAccounts& b) -> bool { return a.m_Points > b.m_Points; }); break;
-	case TOP_MONEY:		std::sort(m_TopAccounts.begin(), m_TopAccounts.end(), [](const TopAccounts& a, const TopAccounts& b) -> bool { return a.m_Money > b.m_Money; }); break;
-	case TOP_SPREE:		std::sort(m_TopAccounts.begin(), m_TopAccounts.end(), [](const TopAccounts& a, const TopAccounts& b) -> bool { return a.m_KillStreak > b.m_KillStreak; }); break;
-	case TOP_PORTAL:	std::sort(m_TopAccounts.begin(), m_TopAccounts.end(), [](const TopAccounts& a, const TopAccounts& b) -> bool { return a.m_Portal > b.m_Portal; }); break;
+		char aEntry[256];
+		for (unsigned int i = 0; i < m_TopAccounts.size(); i++)
+		{
+			str_format(aEntry, sizeof(aEntry), "%s\t%s\t%d\t%d\t\%lld\t%d\t%d\t%d\t%d",
+				m_TopAccounts[i].m_aAccountName,
+				m_TopAccounts[i].m_aUsername,
+				m_TopAccounts[i].m_Level,
+				m_TopAccounts[i].m_Points,
+				m_TopAccounts[i].m_Money,
+				m_TopAccounts[i].m_KillStreak,
+				m_TopAccounts[i].m_Portal,
+				m_TopAccounts[i].m_DurakWins,
+				m_TopAccounts[i].m_DurakProfit
+			);
+			TopAccsFile << aEntry << "\n";
+		}
+		TopAccsFile << "\n";
 	}
+	m_TopAccounts.clear();
 }
 
-int CGameContext::InitAccounts(const char *pName, int IsDir, int StorageType, void *pUser)
+bool CGameContext::LazyLoadTopAccounts(int Type)
 {
-	CGameContext *pSelf = (CGameContext *)pUser;
+	char aFile[256];
+	str_format(aFile, sizeof(aFile), "%s/topaccounts.txt", Config()->m_SvTopAccountsFilePath);
+	std::fstream TopAccsFile(aFile, std::ios::in);
+	if (!TopAccsFile.is_open())
+		return false;
 
-	if (!IsDir && str_endswith(pName, ".acc"))
+	std::unordered_map<std::string, CGameContext::AccountInfo> AccountMap;
+	for (unsigned int AccID = ACC_START; AccID < m_Accounts.size(); AccID++)
 	{
-		char aUsername[64];
-		str_copy(aUsername, pName, str_length(pName) - 3); // remove the .acc
-
-		int ID = pSelf->GetAccount(aUsername);
-		if (ID < ACC_START)
-			return 0;
-
-		// load all accounts into the top account list too
-		pSelf->SetTopAccStats(ID);
-
-		// logout account if needed
-		if (pSelf->m_Accounts[ID].m_LoggedIn && pSelf->m_Accounts[ID].m_Port == pSelf->m_LogoutAccountsPort)
-			pSelf->Logout(ID, true);
-		else
-			pSelf->FreeAccount(ID);
+		AccountMap[m_Accounts[AccID].m_Username] = m_Accounts[AccID];
 	}
 
-	return 0;
+	std::string data;
+	while (getline(TopAccsFile, data))
+	{
+		CGameContext::TopAccounts Account;
+		const char *pData = data.c_str();
+		int Num = sscanf(pData, "%[^\t]\t%[^\t]\t%d\t%d\t%lld\t%d\t%d\t%d\t%d",
+			Account.m_aAccountName,
+			Account.m_aUsername,
+			&Account.m_Level,
+			&Account.m_Points,
+			&Account.m_Money,
+			&Account.m_KillStreak,
+			&Account.m_Portal,
+			&Account.m_DurakWins,
+			&Account.m_DurakProfit
+		);
+
+		if (Num == 9)
+		{
+			// update top accounts with all currently online accs so we get correct and up-to-date information
+			auto it = AccountMap.find(Account.m_aAccountName);
+			if (it != AccountMap.end())
+			{
+				str_copy(Account.m_aUsername, it->second.m_aLastPlayerName, sizeof(Account.m_aUsername));
+				Account.m_Level = it->second.m_Level;
+				Account.m_Points = it->second.m_BlockPoints;
+				Account.m_Money = it->second.m_Money;
+				Account.m_KillStreak = it->second.m_KillingSpreeRecord;
+				Account.m_Portal = it->second.m_PortalBattery;
+				Account.m_DurakWins = it->second.m_DurakWins;
+				Account.m_DurakProfit = it->second.m_DurakProfit;
+			}
+			m_TopAccounts.push_back(Account);
+		}
+	}
+
+	std::sort(m_TopAccounts.begin(), m_TopAccounts.end(), [Type](const TopAccounts &a, const TopAccounts &b) -> bool {
+		switch (Type)
+		{
+			case TOP_LEVEL: return a.m_Level > b.m_Level;
+			case TOP_POINTS: return a.m_Points > b.m_Points;
+			case TOP_MONEY: return a.m_Money > b.m_Money;
+			case TOP_SPREE: return a.m_KillStreak > b.m_KillStreak;
+			case TOP_PORTAL: return a.m_Portal > b.m_Portal;
+			case TOP_DURAK_WINS: return a.m_DurakWins > b.m_DurakWins;
+			case TOP_DURAK_PROFIT: return a.m_DurakProfit > b.m_DurakProfit;
+			default: return false;
+		}
+	});
+	return true;
 }
 
 void CGameContext::SetTopAccStats(int FromID)
@@ -5837,6 +5891,32 @@ void CGameContext::SetTopAccStats(int FromID)
 	str_copy(Account.m_aUsername, m_Accounts[FromID].m_aLastPlayerName, sizeof(Account.m_aUsername));
 	str_copy(Account.m_aAccountName, m_Accounts[FromID].m_Username, sizeof(Account.m_aAccountName));
 	m_TopAccounts.push_back(Account);
+}
+
+int CGameContext::InitAccounts(const char *pName, int IsDir, int StorageType, void *pUser)
+{
+	CGameContext *pSelf = (CGameContext *)pUser;
+
+	if (!IsDir && str_endswith(pName, ".acc"))
+	{
+		char aUsername[64];
+		str_copy(aUsername, pName, str_length(pName) - 3); // remove the .acc
+
+		int ID = pSelf->GetAccount(aUsername);
+		if (ID < ACC_START)
+			return 0;
+
+		// load all accounts into the top account list too
+		pSelf->SetTopAccStats(ID);
+
+		// logout account if needed
+		if (pSelf->m_Accounts[ID].m_LoggedIn && pSelf->m_Accounts[ID].m_Port == pSelf->m_LogoutAccountsPort)
+			pSelf->Logout(ID, true);
+		else
+			pSelf->FreeAccount(ID);
+	}
+
+	return 0;
 }
 
 int CGameContext::AddAccount()
@@ -6849,6 +6929,7 @@ void CGameContext::CreateFolders()
 	char aBuf[IO_MAX_PATH_LENGTH] = { 0 };
 	fs_makedir(Storage()->GetBinaryPath(Config()->m_SvAccFilePath, aBuf, sizeof(aBuf)));
 	fs_makedir(Storage()->GetBinaryPath(Config()->m_SvDonationFilePath, aBuf, sizeof(aBuf)));
+	fs_makedir(Storage()->GetBinaryPath(Config()->m_SvTopAccountsFilePath, aBuf, sizeof(aBuf)));
 
 	char aPath[IO_MAX_PATH_LENGTH];
 

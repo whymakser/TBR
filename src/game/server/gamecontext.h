@@ -83,6 +83,8 @@ enum Top5
 	TOP_MONEY,
 	TOP_SPREE,
 	TOP_PORTAL,
+	TOP_DURAK_WINS,
+	TOP_DURAK_PROFIT,
 };
 
 enum
@@ -499,17 +501,20 @@ public:
 
 	struct TopAccounts
 	{
+		char m_aUsername[32];
+		char m_aAccountName[32];
 		int m_Level;
 		int m_Points;
 		int64 m_Money;
 		int m_KillStreak;
 		int m_Portal;
-		char m_aUsername[32];
-		char m_aAccountName[32];
+		int m_DurakWins;
+		int m_DurakProfit;
 	};
 	std::vector<TopAccounts> m_TopAccounts;
-	void UpdateTopAccounts(int Type);
 	void SetTopAccStats(int FromID);
+	void LazySaveTopAccounts();
+	bool LazyLoadTopAccounts(int Type);
 
 	int m_LogoutAccountsPort;
 	static int InitAccounts(const char* pName, int IsDir, int StorageType, void* pUser);
@@ -947,6 +952,8 @@ private:
 	static void ConTop5Money(IConsole::IResult* pResult, void* pUserData);
 	static void ConTop5Spree(IConsole::IResult* pResult, void* pUserData);
 	static void ConTop5Portal(IConsole::IResult* pResult, void* pUserData);
+	static void ConTop5DurakWins(IConsole::IResult* pResult, void* pUserData);
+	static void ConTop5DurakProfit(IConsole::IResult* pResult, void* pUserData);
 
 	static void ConPoliceHelper(IConsole::IResult* pResult, void* pUserData);
 	static void ConWanted(IConsole::IResult* pResult, void* pUserData);
