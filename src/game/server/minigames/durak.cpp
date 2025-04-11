@@ -130,6 +130,7 @@ bool CDurak::TrySetCharacterPos(int ClientID)
 		return false;
 	CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
 	pChr->ForceSetPos(GameServer()->Collision()->GetPos(m_vpGames[Game]->GetSeatByClient(ClientID)->m_MapIndex));
+	return true;
 }
 
 void CDurak::OnCharacterSeat(int ClientID, int Number, int SeatIndex)
