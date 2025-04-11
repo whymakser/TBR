@@ -422,7 +422,7 @@ public:
 		return -1;
 	}
 
-	bool ProcessNextMove(int CurrentTick)
+	bool ProcessNextMove(int64 CurrentTick)
 	{
 		if (!m_NextMove)
 			m_NextMove = CurrentTick + SERVER_TICK_SPEED * 60;

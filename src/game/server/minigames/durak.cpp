@@ -766,7 +766,7 @@ const char *CDurak::GetCardSymbol(int Suit, int Rank, CDurakGame *pGame)
 	case CCard::IND_TOOLTIP_DEFENDER_PASSED: return "Passed...";
 	case CCard::IND_TOOLTIP_TAKING_CARDS:
 	{
-		str_format(aBuf, sizeof(aBuf), "Taking in %ds…", (int)(pGame->m_NextMove - Server()->Tick()) / Server()->TickSpeed() + 1);
+		str_format(aBuf, sizeof(aBuf), "Taking in %llds…", (pGame->m_NextMove - Server()->Tick()) / Server()->TickSpeed() + 1);
 		return aBuf;
 	}
 	}
@@ -1170,7 +1170,7 @@ bool CDurak::UpdateGame(int Game)
 		return true;
 	}
 
-	if(pGame->m_NextMove && Server()->Tick() + Server()->TickSpeed() * 5 > pGame->m_NextMove)
+	if(pGame->m_NextMove && pGame->m_NextMove > Server()->Tick() && Server()->Tick() + Server()->TickSpeed() * 5 > pGame->m_NextMove)
 	{
 		SetTurnTooltip(Game, CCard::TOOLTIP_TAKING_CARDS);
 	}
