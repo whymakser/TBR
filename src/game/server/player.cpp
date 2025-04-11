@@ -844,23 +844,28 @@ void CPlayer::Snap(int SnappingClient)
 	if(m_Paused == PAUSE_PAUSED || GameServer()->Arenas()->IsConfiguring(m_ClientID))
 		pDDNetPlayer->m_Flags |= EXPLAYERFLAG_PAUSED;
 
-	bool ShowSpec = true;
+	bool ShowSpec = false;
 	vec2 SpecPos;
+	bool ShowOthers = pSnapping->m_ShowOthers == 1 || pSnapping->GetTeam() == TEAM_SPECTATORS || pSnapping->IsPaused();
 	if (IsMinigame() && m_SavedMinigameTee)
 	{
+		ShowSpec = true;
 		SpecPos = m_MinigameTee.GetPos();
+		if (GameServer()->Arenas()->FightStarted(SnappingClient) || GameServer()->Durak()->InDurakGame(SnappingClient))
+		{
+			ShowSpec = ShowOthers;
+		}
 	}
 	else if (m_pCharacter)
 	{
 		ShowSpec = m_pCharacter->IsPaused() && m_pCharacter->CanSnapCharacter(SnappingClient);
 		SpecPos = m_pCharacter->Core()->m_Pos;
-	}
 
-	if(SnappingClient >= 0)
-	{
-		bool ShowTeam = !GameServer()->Arenas()->FightStarted(SnappingClient) && GameServer()->GetDDRaceTeam(m_ClientID) == GameServer()->GetDDRaceTeam(SnappingClient);
-		if (!(ShowTeam || pSnapping->m_ShowOthers == 1 || (pSnapping->GetTeam() == TEAM_SPECTATORS || pSnapping->IsPaused())))
-			ShowSpec = false;
+		if (SnappingClient >= 0)
+		{
+			bool ShowTeam = GameServer()->GetDDRaceTeam(m_ClientID) == GameServer()->GetDDRaceTeam(SnappingClient);
+			ShowSpec = ShowSpec && (ShowTeam || ShowOthers);
+		}
 	}
 
 	if(ShowSpec)
