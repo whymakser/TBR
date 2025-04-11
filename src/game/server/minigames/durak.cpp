@@ -122,6 +122,8 @@ void CDurak::CreateFlyingPoint(int FromClientID, int Game, CCard *pToCard)
 
 void CDurak::OnHookAttach(CCharacter *pChr, bool Player)
 {
+	if (!InDurakGame(pChr->GetPlayer()->GetCID()))
+		return;
 	int HookedPlayer = pChr->Core()->HookedPlayer();
 	if (HookedPlayer < 0 || HookedPlayer >= MAX_CLIENTS)
 		return;
