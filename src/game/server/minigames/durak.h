@@ -510,7 +510,7 @@ public:
 		int CurPlayer = m_InitialAttackerIndex;
 		for (int i = 1; i < MAX_DURAK_PLAYERS; i++)
 		{
-			int CurPlayer = (CurPlayer + i) % MAX_DURAK_PLAYERS;
+			CurPlayer = (CurPlayer + i) % MAX_DURAK_PLAYERS;
 			if (CurPlayer != m_DefenderIndex && m_aSeats[CurPlayer].m_Player.m_ClientID != -1 && m_aSeats[CurPlayer].m_Player.m_Stake >= 0)
 			{
 				vDrawOrder.push_back(CurPlayer);
