@@ -1247,7 +1247,7 @@ bool CDurak::UpdateGame(int Game)
 			}
 			StartNextRound(Game, true);
 		}
-		else if (HasUndefendedAttacks)
+		else if (HasUndefendedAttacks && ProcessMove)
 		{
 			TakeCardsFromTable(Game);
 			
