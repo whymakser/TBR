@@ -678,7 +678,13 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 			{
 				bool Send = (Server()->IsSevendown(i) && (Flags&CHAT_SEVENDOWN)) || (!Server()->IsSevendown(i) && (Flags&CHAT_SEVEN));
 				if (Send)
+				{
+					if (ChatterClientID == -1)
+					{
+						Msg.m_pMessage = m_apPlayers[i]->Localize(aText);
+					}
 					SendChatMsg(&Msg, MsgFlags|MSGFLAG_VITAL, i);
+				}
 			}
 	}
 	else if(Mode == CHAT_TEAM)
@@ -750,7 +756,13 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 		Msg.m_Mode = CHAT_ALL;
 		for (int i = 0; i < MAX_CLIENTS; i++)
 			if (m_apPlayers[i] && m_Accounts[m_apPlayers[i]->GetAccID()].m_PoliceLevel)
+			{
+				if (ChatterClientID == -1)
+				{
+					Msg.m_pMessage = m_apPlayers[i]->Localize(aText);
+				}
 				SendChatMsg(&Msg, MsgFlags|MSGFLAG_VITAL, i);
+			}
 	}
 	else // Mode == CHAT_WHISPER
 	{
@@ -1301,7 +1313,7 @@ void CGameContext::OnTick()
 		// abort the kick-vote on player-leave
 		if(m_VoteCloseTime == -1)
 		{
-			SendChat(-1, CHAT_ALL, -1, "Vote aborted", -1, CHAT_SEVENDOWN);
+			SendChat(-1, CHAT_ALL, -1, Localizable("Vote aborted"), -1, CHAT_SEVENDOWN);
 			EndVote(VOTE_END_ABORT, false);
 		}
 		else
@@ -1353,12 +1365,12 @@ void CGameContext::OnTick()
 				if(m_VoteCreator != -1 && m_apPlayers[m_VoteCreator])
 					m_apPlayers[m_VoteCreator]->m_LastVoteCall = 0;
 
-				SendChat(-1, CHAT_ALL, -1, "Vote passed", -1, CHAT_SEVENDOWN);
+				SendChat(-1, CHAT_ALL, -1, Localizable("Vote passed"), -1, CHAT_SEVENDOWN);
 				EndVote(VOTE_END_PASS, m_VoteEnforce==VOTE_ENFORCE_YES);
 			}
 			else if(m_VoteEnforce == VOTE_ENFORCE_NO || (m_VoteUpdate && No >= (Total+1)/2) || time_get() > m_VoteCloseTime)
 			{
-				SendChat(-1, CHAT_ALL, -1, "Vote failed", -1, CHAT_SEVENDOWN);
+				SendChat(-1, CHAT_ALL, -1, Localizable("Vote failed"), -1, CHAT_SEVENDOWN);
 				EndVote(VOTE_END_FAIL, m_VoteEnforce==VOTE_ENFORCE_NO);
 			}
 			else if(m_VoteUpdate)
@@ -1497,7 +1509,7 @@ void CGameContext::OnTick()
 				int ClientID = m_Accounts[AccID].m_ClientID;
 				if (ClientID >= 0 && m_apPlayers[ClientID])
 				{
-					SendChatTarget(ClientID, "Your plot is no longer subject to a search warrant and can no longer be destroyed");
+					SendChatTarget(ClientID, m_apPlayers[ClientID]->Localize("Your plot is no longer subject to a search warrant and can no longer be destroyed"));
 				}
 			}
 		}
@@ -1690,7 +1702,10 @@ void CGameContext::OnClientEnter(int ClientID)
 	if (!Config()->m_SvSilentSpectatorMode || m_apPlayers[ClientID]->GetTeam() != TEAM_SPECTATORS)
 	{
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "'%s' entered and joined the %s", Server()->ClientName(ClientID), m_pController->GetTeamName(m_apPlayers[ClientID]->GetTeam()));
+		if (m_apPlayers[ClientID]->GetTeam() == TEAM_RED)
+			str_format(aBuf, sizeof(aBuf), Localizable("'%s' entered and joined the game"), Server()->ClientName(ClientID));
+		else
+			str_format(aBuf, sizeof(aBuf), Localizable("'%s' entered and joined the spectators"), Server()->ClientName(ClientID));
 		int Flags = CHAT_SEVEN|CHAT_SEVENDOWN;
 		if (m_apPlayers[ClientID]->m_IsDummy)
 			Flags |= CHAT_NO_WEBHOOK;
@@ -1731,7 +1746,7 @@ void CGameContext::OnClientEnter(int ClientID)
 	if(Seconds != 0 && m_apPlayers[ClientID]->m_JoinTick > m_NonEmptySince + 10 * Server()->TickSpeed() && Server()->GetDummy(ClientID) == -1)
 	{
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "This server has an initial chat delay, you will need to wait %d seconds before talking.", Seconds);
+		str_format(aBuf, sizeof(aBuf), m_apPlayers[ClientID]->Localize("This server has an initial chat delay, you will need to wait %d seconds before talking."), Seconds);
 		SendChatTarget(ClientID, aBuf);
 		NETADDR Addr;
 		Server()->GetClientAddr(ClientID, &Addr);
@@ -1758,7 +1773,7 @@ void CGameContext::SendStartMessages(int ClientID)
 void CGameContext::OnClientRejoin(int ClientID)
 {
 	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "'%s' rejoined current session", Server()->ClientName(ClientID));
+	str_format(aBuf, sizeof(aBuf), Localizable("'%s' rejoined current session"), Server()->ClientName(ClientID));
 	SendChat(-1, CHAT_ALL, -1, aBuf);
 
 	if (!m_apPlayers[ClientID])
@@ -1795,7 +1810,7 @@ void CGameContext::MapDesignChangeDone(int ClientID)
 	SendTuningParams(ClientID, Zone);
 
 	if (Server()->GetDummy(ClientID) != -1)
-		SendChatTarget(ClientID, "[WARNING] You need to reconnect your dummy after the design change is done, so it can get back it's old state.");
+		SendChatTarget(ClientID, m_apPlayers[ClientID]->Localize("[WARNING] You need to reconnect your dummy after the design change is done, so it can get back it's old state."));
 }
 
 void CGameContext::OnClientConnected(int ClientID, bool Dummy, bool AsSpec)
@@ -1861,10 +1876,14 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 		if (!Config()->m_SvSilentSpectatorMode || m_apPlayers[ClientID]->GetTeam() != TEAM_SPECTATORS)
 		{
 			char aBuf[128];
-			if (pReason && *pReason)
-				str_format(aBuf, sizeof(aBuf), "'%s' has left the game (%s)", Server()->ClientName(ClientID), pReason);
-			else if (m_apPlayers[ClientID]->m_aDelayedJoinMsg[0] == '\0')
-				str_format(aBuf, sizeof(aBuf), "'%s' has left the game", Server()->ClientName(ClientID));
+			bool HasReason = pReason && *pReason;
+			if (HasReason || m_apPlayers[ClientID]->m_aDelayedJoinMsg[0] == '\0')
+			{
+				char aReason[64] = "";
+				if (HasReason)
+					str_format(aReason, sizeof(aReason), " (%s)", pReason);
+				str_format(aBuf, sizeof(aBuf), Localizable("'%s' has left the game%s"), Server()->ClientName(ClientID), aReason);
+			}
 
 			int Flags = CHAT_SEVEN|CHAT_SEVENDOWN;
 			if (m_apPlayers[ClientID]->m_IsDummy)
@@ -2131,7 +2150,7 @@ void *CGameContext::PreProcessMsg(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					}
 					else
 					{
-						SendChatTarget(ClientID, "You do not have an ongoing conversation. Whisper to someone to start one");
+						SendChatTarget(ClientID, pPlayer->Localize("You do not have an ongoing conversation. Whisper to someone to start one"));
 						return 0; // dont process any further
 					}
 				}
@@ -2189,7 +2208,7 @@ void *CGameContext::PreProcessMsg(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					Server()->SetClientName(ClientID, pName);
 
 					char aChatText[256];
-					str_format(aChatText, sizeof(aChatText), "'%s' changed name to '%s'", aOldName, Server()->ClientName(ClientID));
+					str_format(aChatText, sizeof(aChatText), Localizable("'%s' changed name to '%s'"), aOldName, Server()->ClientName(ClientID));
 					SendChat(-1, CHAT_ALL, -1, aChatText);
 					pPlayer->SetName(Server()->ClientName(ClientID));
 
@@ -2425,7 +2444,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 					if (aLocalNames[0])
 					{
-						SendChatTarget(ClientID, "Following players can't receive your message because either you or they are in local chat mode:");
+						SendChatTarget(ClientID, pPlayer->Localize("Following players can't receive your message because either you or they are in local chat mode:"));
 						SendChatTarget(ClientID, aLocalNames);
 					}
 				}
@@ -2494,7 +2513,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 							return;
 						}
 
-						str_format(aChatmsg, sizeof(aChatmsg), "'%s' called vote to change server option '%s' (%s)", Server()->ClientName(ClientID),
+						str_format(aChatmsg, sizeof(aChatmsg), Localizable("'%s' called vote to change server option '%s' (%s)"), Server()->ClientName(ClientID),
 							pOption->m_aDescription, aReason);
 						str_format(aDesc, sizeof(aDesc), "%s", pOption->m_aDescription);
 
@@ -2519,13 +2538,13 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				{
 					if(Authed != AUTHED_ADMIN) // allow admins to call any vote they want
 					{
-						str_format(aChatmsg, sizeof(aChatmsg), "'%s' isn't an option on this server", pMsg->m_Value);
+						str_format(aChatmsg, sizeof(aChatmsg), pPlayer->Localize("'%s' isn't an option on this server"), pMsg->m_Value);
 						SendChatTarget(ClientID, aChatmsg);
 						return;
 					}
 					else
 					{
-						str_format(aChatmsg, sizeof(aChatmsg), "'%s' called vote to change server option '%s'", Server()->ClientName(ClientID), pMsg->m_Value);
+						str_format(aChatmsg, sizeof(aChatmsg), Localizable("'%s' called vote to change server option '%s'"), Server()->ClientName(ClientID), pMsg->m_Value);
 						str_format(aDesc, sizeof(aDesc), "%s", pMsg->m_Value);
 						str_format(aCmd, sizeof(aCmd), "%s", pMsg->m_Value);
 					}
@@ -2540,7 +2559,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					return;
 				else if(!Authed && time_get() < m_apPlayers[ClientID]->m_Last_KickVote + (time_freq() * Config()->m_SvVoteKickDelay))
 				{
-					str_format(aChatmsg, sizeof(aChatmsg), "There's a %d second wait time between kick votes for each player please wait %d second(s)",
+					str_format(aChatmsg, sizeof(aChatmsg), pPlayer->Localize("There's a %d second wait time between kick votes for each player please wait %d second(s)"),
 						Config()->m_SvVoteKickDelay,
 						(int)(((m_apPlayers[ClientID]->m_Last_KickVote + (m_apPlayers[ClientID]->m_Last_KickVote * time_freq())) / time_freq()) - (time_get() / time_freq())));
 					SendChatTarget(ClientID, aChatmsg);
@@ -2549,7 +2568,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				}
 				else if(!Config()->m_SvVoteKick && !Authed) // allow admins to call kick votes even if they are forbidden
 				{
-					SendChatTarget(ClientID, "Server does not allow voting to kick players");
+					SendChatTarget(ClientID, pPlayer->Localize("Server does not allow voting to kick players"));
 					m_apPlayers[ClientID]->m_Last_KickVote = time_get();
 					return;
 				}
@@ -2586,7 +2605,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 					if(NumPlayers < Config()->m_SvVoteKickMin)
 					{
-						str_format(aChatmsg, sizeof(aChatmsg), "Kick voting requires %d players", Config()->m_SvVoteKickMin);
+						str_format(aChatmsg, sizeof(aChatmsg), pPlayer->Localize("Kick voting requires %d players"), Config()->m_SvVoteKickMin);
 						SendChatTarget(ClientID, aChatmsg);
 						return;
 					}
@@ -2605,21 +2624,21 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				}
 				if(KickID == ClientID)
 				{
-					SendChatTarget(ClientID, "You can't kick yourself");
+					SendChatTarget(ClientID, pPlayer->Localize("You can't kick yourself"));
 					return;
 				}
 				if (m_apPlayers[KickID]->m_IsDummy)
 				{
-					SendChatTarget(ClientID, "You can't kick dummies");
+					SendChatTarget(ClientID, pPlayer->Localize("You can't kick dummies"));
 					return;
 				}
 				int KickedAuthed = Server()->GetAuthedState(KickID);
 				if(KickedAuthed > Authed)
 				{
-					SendChatTarget(ClientID, "You can't kick authorized players");
+					SendChatTarget(ClientID, pPlayer->Localize("You can't kick authorized players"));
 					m_apPlayers[ClientID]->m_Last_KickVote = time_get();
 					char aBufKick[128];
-					str_format(aBufKick, sizeof(aBufKick), "'%s' called for vote to kick you", Server()->ClientName(ClientID));
+					str_format(aBufKick, sizeof(aBufKick), pPlayer->Localize("'%s' called for vote to kick you"), Server()->ClientName(ClientID));
 					SendChatTarget(KickID, aBufKick);
 					return;
 				}
@@ -2627,12 +2646,12 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				// Don't allow kicking if a player has no character
 				if(!GetPlayerChar(ClientID) || !GetPlayerChar(KickID) || GetDDRaceTeam(ClientID) != GetDDRaceTeam(KickID))
 				{
-					SendChatTarget(ClientID, "You can kick only your team member");
+					SendChatTarget(ClientID, pPlayer->Localize("You can kick only your team member"));
 					m_apPlayers[ClientID]->m_Last_KickVote = time_get();
 					return;
 				}
 
-				str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to kick '%s' (%s)", Server()->ClientName(ClientID), Server()->ClientName(KickID), aReason);
+				str_format(aChatmsg, sizeof(aChatmsg), Localizable("'%s' called for vote to kick '%s' (%s)"), Server()->ClientName(ClientID), Server()->ClientName(KickID), aReason);
 				str_format(aDesc, sizeof(aDesc), "%2d: %s", KickID, Server()->ClientName(KickID));
 				if(!GetDDRaceTeam(ClientID))
 				{
@@ -2662,7 +2681,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			{
 				if(!Config()->m_SvVoteSpectate)
 				{
-					SendChatTarget(ClientID, "Server does not allow voting to move players to spectators");
+					SendChatTarget(ClientID, pPlayer->Localize("Server does not allow voting to move players to spectators"));
 					return;
 				}
 
@@ -2679,31 +2698,31 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				}
 				if(SpectateID == ClientID)
 				{
-					SendChatTarget(ClientID, "You can't move yourself");
+					SendChatTarget(ClientID, pPlayer->Localize("You can't move yourself"));
 					return;
 				}
 				if (m_apPlayers[SpectateID]->m_IsDummy)
 				{
-					SendChatTarget(ClientID, "You can't set dummies to spectator");
+					SendChatTarget(ClientID, pPlayer->Localize("You can't set dummies to spectator"));
 					return;
 				}
 
 				if(!GetPlayerChar(ClientID) || !GetPlayerChar(SpectateID) || GetDDRaceTeam(ClientID) != GetDDRaceTeam(SpectateID))
 				{
-					SendChatTarget(ClientID, "You can only move your team member to spectators");
+					SendChatTarget(ClientID, pPlayer->Localize("You can only move your team member to spectators"));
 					return;
 				}
 
 				str_format(aDesc, sizeof(aDesc), "%2d: %s", SpectateID, Server()->ClientName(SpectateID));
 				if(Config()->m_SvPauseable && Config()->m_SvVotePause)
 				{
-					str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to pause '%s' for %d seconds (%s)", Server()->ClientName(ClientID), Server()->ClientName(SpectateID), Config()->m_SvVotePauseTime, aReason);
+					str_format(aChatmsg, sizeof(aChatmsg), Localizable("'%s' called for vote to pause '%s' for %d seconds (%s)"), Server()->ClientName(ClientID), Server()->ClientName(SpectateID), Config()->m_SvVotePauseTime, aReason);
 					str_format(aSevendownDesc, sizeof(aSevendownDesc), "Pause '%s' (%ds)", Server()->ClientName(SpectateID), Config()->m_SvVotePauseTime);
 					str_format(aCmd, sizeof(aCmd), "uninvite %d %d; force_pause %d %d", SpectateID, GetDDRaceTeam(SpectateID), SpectateID, Config()->m_SvVotePauseTime);
 				}
 				else
 				{
-					str_format(aChatmsg, sizeof(aChatmsg), "'%s' called for vote to move '%s' to spectators (%s)", Server()->ClientName(ClientID), Server()->ClientName(SpectateID), aReason);
+					str_format(aChatmsg, sizeof(aChatmsg), Localizable("'%s' called for vote to move '%s' to spectators (%s)"), Server()->ClientName(ClientID), Server()->ClientName(SpectateID), aReason);
 					str_format(aSevendownDesc, sizeof(aSevendownDesc), "Move '%s' to spectators", Server()->ClientName(SpectateID));
 					str_format(aCmd, sizeof(aCmd), "uninvite %d %d; set_team %d -1 %d", SpectateID, GetDDRaceTeam(SpectateID), SpectateID, Config()->m_SvVoteSpectateRejoindelay);
 				}
@@ -2823,7 +2842,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				if (pPlayer->m_TeeControlMode != SetTeeControl)
 				{
 					pPlayer->m_TeeControlMode = SetTeeControl;
-					SendChatTarget(ClientID, pPlayer->m_TeeControlMode ? "You are now using the tee controller" : "You are no longer using the tee controller");
+					SendChatTarget(ClientID, pPlayer->m_TeeControlMode ? pPlayer->Localize("You are now using the tee controller") : pPlayer->Localize("You are no longer using the tee controller"));
 					SendTeamChange(ClientID, SetTeeControl ? TEAM_SPECTATORS : pPlayer->GetTeam(), true, Server()->Tick(), ClientID);
 					if (pPlayer->GetCharacter() && !Server()->IsSevendown(ClientID))
 						SendTuningParams(ClientID, pPlayer->GetCharacter()->m_TuneZone);
@@ -2844,15 +2863,15 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				int CurrTime = (Server()->Tick() - pChr->m_StartTime) / Server()->TickSpeed();
 				if (Config()->m_SvKillProtection != 0 && CurrTime >= (60 * Config()->m_SvKillProtection) && pChr->m_DDRaceState == DDRACE_STARTED)
 				{
-					SendChatTarget(ClientID, "Kill Protection enabled. If you really want to join the spectators, first type /kill");
+					SendChatTarget(ClientID, pPlayer->Localize("Kill Protection enabled. If you really want to join the spectators, first type /kill"));
 					return;
 				}
 				if (Config()->m_SvWalletKillProtection != 0 && pPlayer->GetWalletMoney() >= Config()->m_SvWalletKillProtection && pChr->m_FreezeTime)
 				{
 					char aBuf[128];
-					str_format(aBuf, sizeof(aBuf), "Warning you have %lld money in your wallet! (see /money)", pPlayer->GetWalletMoney());
+					str_format(aBuf, sizeof(aBuf), pPlayer->Localize("Warning you have %lld money in your wallet! (see /money)"), pPlayer->GetWalletMoney());
 					SendChatTarget(ClientID, aBuf);
-					SendChatTarget(ClientID, "Wallet kill Protection enabled. If you really want to join the spectators, first type /kill");
+					SendChatTarget(ClientID, pPlayer->Localize("Wallet kill Protection enabled. If you really want to join the spectators, first type /kill"));
 					return;
 				}
 			}
@@ -2861,7 +2880,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 			if (pPlayer->m_EscapeTime)
 			{
-				SendChatTarget(ClientID, "You can't join the spectators while being searched by the police");
+				SendChatTarget(ClientID, pPlayer->Localize("You can't join the spectators while being searched by the police"));
 				return;
 			}
 
@@ -3033,7 +3052,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				if (pPlayer->m_DieTick > Server()->Tick() - Server()->TickSpeed() * 10)
 				{
 					char aBuf[128];
-					str_format(aBuf, sizeof(aBuf), "You need to wait %d seconds before killing again due to escaping", 10 - (Server()->Tick() - pPlayer->m_DieTick) / Server()->TickSpeed());
+					str_format(aBuf, sizeof(aBuf), pPlayer->Localize("You need to wait %d seconds before killing again due to escaping"), 10 - (Server()->Tick() - pPlayer->m_DieTick) / Server()->TickSpeed());
 					SendChatTarget(ClientID, aBuf);
 					return;
 				}
@@ -3043,15 +3062,15 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			int CurrTime = (Server()->Tick() - pChr->m_StartTime) / Server()->TickSpeed();
 			if (Config()->m_SvKillProtection != 0 && CurrTime >= (60 * Config()->m_SvKillProtection) && pChr->m_DDRaceState == DDRACE_STARTED)
 			{
-				SendChatTarget(ClientID, "Kill Protection enabled. If you really want to kill, type /kill");
+				SendChatTarget(ClientID, pPlayer->Localize("Kill Protection enabled. If you really want to kill, type /kill"));
 				return;
 			}
 			if (Config()->m_SvWalletKillProtection != 0 && pPlayer->GetWalletMoney() >= Config()->m_SvWalletKillProtection && pChr->m_FreezeTime)
 			{
 				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), "Warning you have %lld money in your wallet! (see /money)", pPlayer->GetWalletMoney());
+				str_format(aBuf, sizeof(aBuf), pPlayer->Localize("Warning you have %lld money in your wallet! (see /money)"), pPlayer->GetWalletMoney());
 				SendChatTarget(ClientID, aBuf);
-				SendChatTarget(ClientID, "Wallet kill Protection enabled. If you really want to kill, type /kill");
+				SendChatTarget(ClientID, pPlayer->Localize("Wallet kill Protection enabled. If you really want to kill, type /kill"));
 				return;
 			}
 
@@ -3775,7 +3794,7 @@ void CGameContext::ConchainUpdateLocalChat(IConsole::IResult* pResult, void* pUs
 				if (pSelf->m_apPlayers[i] && pSelf->m_apPlayers[i]->m_LocalChat)
 				{
 					pSelf->m_apPlayers[i]->m_LocalChat = false;
-					pSelf->SendChatTarget(i, "Local chat mode has been disabled, automatically entered public chat");
+					pSelf->SendChatTarget(i, pSelf->m_apPlayers[i]->Localize("Local chat mode has been disabled, automatically entered public chat"));
 				}
 			}
 		}
@@ -3797,7 +3816,7 @@ void CGameContext::ConchainUpdateBankMode(IConsole::IResult* pResult, void* pUse
 					pSelf->m_apPlayers[i]->BankTransaction(pSelf->m_apPlayers[i]->GetWalletMoney(), "automatic wallet to bank due to bank disabling");
 					// Manually set wallet money instead of using WalletTransaction, because SvMoneyBankMode 0 redirects walelttransactions to bank, which doesn't make any sense here
 					pSelf->m_apPlayers[i]->SetWalletMoney(0);
-					pSelf->SendChatTarget(i, "Automatic wallet to bank due to bank disabling");
+					pSelf->SendChatTarget(i, pSelf->m_apPlayers[i]->Localize("Automatic wallet to bank due to bank disabling"));
 				}
 			}
 		}
@@ -4458,36 +4477,28 @@ void CGameContext::OnMapChange(char* pNewMapName, int MapNameSize)
 	str_format(aConfig, sizeof(aConfig), "maps/%s.cfg", Config()->m_SvMap);
 	str_format(aTemp, sizeof(aTemp), "%s.temp.%d", pNewMapName, pid());
 
-	IOHANDLE File = Storage()->OpenFile(aConfig, IOFLAG_READ, IStorage::TYPE_ALL);
-	if (!File)
+	CLineReader LineReader;
+	if (!LineReader.OpenFile(Storage()->OpenFile(aConfig, IOFLAG_READ, IStorage::TYPE_ALL)))
 	{
 		// No map-specific config, just return.
 		return;
 	}
-	CLineReader LineReader;
-	LineReader.Init(File);
 
-	array<char*> aLines;
-	char* pLine;
+	std::vector<const char *> vpLines;
 	int TotalLength = 0;
-	while ((pLine = LineReader.Get()))
+	while(const char *pLine = LineReader.Get())
 	{
-		int Length = str_length(pLine) + 1;
-		char* pCopy = (char*)malloc(Length);
-		mem_copy(pCopy, pLine, Length);
-		aLines.add(pCopy);
-		TotalLength += Length;
+		vpLines.push_back(pLine);
+		TotalLength += str_length(pLine) + 1;
 	}
-	io_close(File);
 
 	char* pSettings = (char*)malloc(TotalLength);
 	int Offset = 0;
-	for (int i = 0; i < aLines.size(); i++)
+	for(const char *pLine : vpLines)
 	{
-		int Length = str_length(aLines[i]) + 1;
-		mem_copy(pSettings + Offset, aLines[i], Length);
+		int Length = str_length(pLine) + 1;
+		mem_copy(pSettings + Offset, pLine, Length);
 		Offset += Length;
-		free(aLines[i]);
 	}
 
 	CDataFileReader Reader;
@@ -4876,7 +4887,7 @@ int CGameContext::ProcessSpamProtection(int ClientID)
 	if (Muted > 0)
 	{
 		char aBuf[128];
-		str_format(aBuf, sizeof aBuf, "You are not permitted to talk for the next %d seconds.", Muted);
+		str_format(aBuf, sizeof aBuf, m_apPlayers[ClientID]->Localize("You are not permitted to talk for the next %d seconds."), Muted);
 		SendChatTarget(ClientID, aBuf);
 		return 1;
 	}
@@ -5563,7 +5574,7 @@ void CGameContext::ExpirePlots()
 				int ClientID = m_Accounts[AccID].m_ClientID;
 				if (ClientID >= 0 && m_apPlayers[ClientID])
 				{
-					SendChatTarget(ClientID, "Your plot expired");
+					SendChatTarget(ClientID, m_apPlayers[ClientID]->Localize("Your plot expired"));
 					m_apPlayers[ClientID]->CancelPlotAuction();
 					m_apPlayers[ClientID]->CancelPlotSwap();
 					m_apPlayers[ClientID]->StopPlotEditing();
@@ -5680,14 +5691,14 @@ bool CGameContext::OnPlotDoorTaser(int PlotID, int TaserStrength, int ClientID, 
 			int PlotOwner = m_Accounts[AccID].m_ClientID;
 			if (PlotOwner >= 0 && m_apPlayers[PlotOwner])
 			{
-				SendChatTarget(PlotOwner, "The police have gained access to your plot in hopes of finding you");
+				SendChatTarget(PlotOwner, m_apPlayers[PlotOwner]->Localize("The police have gained access to your plot in hopes of finding you"));
 			}
 		}
 		return true;
 	}
 
 	char aBuf[64];
-	str_format(aBuf, sizeof(aBuf), "Plot %d Door Health [%d/%d]", PlotID, m_aPlots[PlotID].m_DoorHealth, Config()->m_SvPlotDoorHealth);
+	str_format(aBuf, sizeof(aBuf), m_apPlayers[ClientID]->Localize("Plot %d Door Health [%d/%d]"), PlotID, m_aPlots[PlotID].m_DoorHealth, Config()->m_SvPlotDoorHealth);
 	SendBroadcast(aBuf, ClientID);
 	return false;
 }
@@ -5996,6 +6007,7 @@ int CGameContext::AddAccount()
 	Account.m_VoteMenuFlags = 0;
 	Account.m_DurakWins = 0;
 	Account.m_DurakProfit = 0;
+	Account.m_aLanguage[0] = '\0';
 
 	m_Accounts.push_back(Account);
 	return m_Accounts.size()-1;
@@ -6092,6 +6104,7 @@ void CGameContext::SetAccVar(int ID, int VariableID, const char *pData)
 	case ACC_VOTE_MENU_FLAGS:			m_Accounts[ID].m_VoteMenuFlags = atoi(pData); break;
 	case ACC_DURAK_WINS:				m_Accounts[ID].m_DurakWins = atoi(pData); break;
 	case ACC_DURAK_PROFIT:				m_Accounts[ID].m_DurakProfit = atoll(pData); break;
+	case ACC_LANGUAGE:					str_copy(m_Accounts[ID].m_aLanguage, pData, sizeof(m_Accounts[ID].m_aLanguage)); break;
 	}
 }
 
@@ -6153,6 +6166,7 @@ const char *CGameContext::GetAccVarName(int VariableID)
 	case ACC_VOTE_MENU_FLAGS:			return "vote_menu_flags";
 	case ACC_DURAK_WINS:				return "durak_wins";
 	case ACC_DURAK_PROFIT:				return "durak_profit";
+	case ACC_LANGUAGE:					return "language";
 	}
 	return "Unknown";
 }
@@ -6218,6 +6232,7 @@ const char *CGameContext::GetAccVarValue(int ID, int VariableID)
 	case ACC_VOTE_MENU_FLAGS:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_VoteMenuFlags); break;
 	case ACC_DURAK_WINS:				str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_DurakWins); break;
 	case ACC_DURAK_PROFIT:				str_format(aBuf, sizeof(aBuf), "%lld", m_Accounts[ID].m_DurakProfit); break;
+	case ACC_LANGUAGE:				str_copy(aBuf, m_Accounts[ID].m_aLanguage, sizeof(aBuf)); break;
 	}
 	return aBuf;
 }
@@ -6258,7 +6273,7 @@ bool CGameContext::Login(int ClientID, const char *pUsername, const char *pPassw
 
 	if (pPlayer->GetAccID() >= ACC_START)
 	{
-		SendChatTarget(ClientID, "You are already logged in");
+		SendChatTarget(ClientID, pPlayer->Localize("You are already logged in"));
 		return false;
 	}
 
@@ -6267,7 +6282,7 @@ bool CGameContext::Login(int ClientID, const char *pUsername, const char *pPassw
 
 	if (m_Accounts[ID].m_Username[0] == '\0')
 	{
-		SendChatTarget(ClientID, "That account doesn't exist, please register first");
+		SendChatTarget(ClientID, pPlayer->Localize("That account doesn't exist, please register first"));
 		FreeAccount(ID);
 		return false;
 	}
@@ -6275,16 +6290,16 @@ bool CGameContext::Login(int ClientID, const char *pUsername, const char *pPassw
 	if (m_Accounts[ID].m_LoggedIn)
 	{
 		if (m_Accounts[ID].m_Port == Config()->m_SvPort)
-			SendChatTarget(ClientID, "This account is already logged in");
+			SendChatTarget(ClientID, pPlayer->Localize("This account is already logged in"));
 		else
-			SendChatTarget(ClientID, "This account is already logged in on another server");
+			SendChatTarget(ClientID, pPlayer->Localize("This account is already logged in on another server"));
 		FreeAccount(ID);
 		return false;
 	}
 
 	if (m_Accounts[ID].m_Disabled)
 	{
-		SendChatTarget(ClientID, "This account is disabled");
+		SendChatTarget(ClientID, pPlayer->Localize("This account is disabled"));
 		FreeAccount(ID);
 		return false;
 	}
@@ -6303,7 +6318,7 @@ bool CGameContext::Login(int ClientID, const char *pUsername, const char *pPassw
 
 	if (PasswordRequired && CheckPassword(ID, pPassword))
 	{
-		SendChatTarget(ClientID, "Wrong password");
+		SendChatTarget(ClientID, pPlayer->Localize("Wrong password"));
 		FreeAccount(ID);
 
 		ProcessAccountSystemBan(ClientID, ACC_SYS_LOGIN);
@@ -7135,7 +7150,7 @@ bool CGameContext::ForceJailRelease(int ClientID)
 		return false;
 
 	pPlayer->m_JailTime = 1;
-	SendChatTarget(ClientID, "You were released from jail");
+	SendChatTarget(ClientID, pPlayer->Localize("You were released from jail"));
 	pPlayer->KillCharacter(WEAPON_GAME);
 	return true;
 }
@@ -7162,14 +7177,14 @@ void CGameContext::ProcessSpawnBlockProtection(int ClientID)
 			if (pKiller->m_SpawnBlockScore > 5)
 			{
 				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), "'%s' is spawnblocking. Catch him!", Server()->ClientName(Killer));
+				str_format(aBuf, sizeof(aBuf), Localizable("'%s' is spawnblocking. Catch him!"), Server()->ClientName(Killer));
 				SendChatPolice(aBuf);
-				SendChatTarget(Killer, "Police is searching you because of spawnblocking");
+				SendChatTarget(Killer, pKiller->Localize("Police is searching you because of spawnblocking"));
 				pKiller->m_EscapeTime += Server()->TickSpeed() * 120; // + 2 minutes escape time
 			}
 			else
 			{
-				SendChatTarget(Killer, "[WARNING] Spawnblocking is illegal");
+				SendChatTarget(Killer, pKiller->Localize("[WARNING] Spawnblocking is illegal"));
 			}
 		}
 	}
@@ -7269,13 +7284,13 @@ int CGameContext::ProcessAccountSystemBan(int ClientID, int Type)
 		const char *pReason = "";
 		switch (Type)
 		{
-		case ACC_SYS_REGISTER: pReason = "Registration spam"; break;
-		case ACC_SYS_LOGIN: pReason = "Too many login fails"; break;
-		case ACC_SYS_PIN: pReason = "Too many pin fails"; break;
+		case ACC_SYS_REGISTER: pReason = m_apPlayers[ClientID]->Localize("Registration spam"); break;
+		case ACC_SYS_LOGIN: pReason = m_apPlayers[ClientID]->Localize("Too many login fails"); break;
+		case ACC_SYS_PIN: pReason = m_apPlayers[ClientID]->Localize("Too many pin fails"); break;
 		}
 
 		char aBuf[128];
-		str_format(aBuf, sizeof aBuf, "You have been banned from the account system for %d seconds (%s)", ACC_SYS_BAN_DELAY, pReason);
+		str_format(aBuf, sizeof aBuf, m_apPlayers[ClientID]->Localize("You have been banned from the account system for %d seconds (%s)"), ACC_SYS_BAN_DELAY, pReason);
 		SendChatTarget(ClientID, aBuf);
 		return 1;
 	}
@@ -7304,7 +7319,7 @@ bool CGameContext::IsAccountSystemBanned(int ClientID, bool ChatMsg)
 	if (AccountSystemBanned > 0)
 	{
 		char aBuf[128];
-		str_format(aBuf, sizeof aBuf, "You are banned from the account system for the next %d seconds.", AccountSystemBanned);
+		str_format(aBuf, sizeof aBuf, m_apPlayers[ClientID]->Localize("You are banned from the account system for the next %d seconds."), AccountSystemBanned);
 		SendChatTarget(ClientID, aBuf);
 		return true;
 	}
@@ -8140,7 +8155,7 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force, bool DoCh
 	if (Minigame != MINIGAME_NONE && m_aMinigameDisabled[Minigame])
 	{
 		if (DoChatMsg)
-			SendChatTarget(ClientID, "This minigame is disabled");
+			SendChatTarget(ClientID, pPlayer->Localize("This minigame is disabled"));
 		return;
 	}
 
@@ -8151,10 +8166,10 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force, bool DoCh
 		if (DoChatMsg)
 		{
 			if (Minigame == MINIGAME_NONE)
-				SendChatTarget(ClientID, "You are not in a minigame");
+				SendChatTarget(ClientID, pPlayer->Localize("You are not in a minigame"));
 			else
 			{
-				str_format(aMsg, sizeof(aMsg), "You are already in minigame '%s'", GetMinigameName(Minigame));
+				str_format(aMsg, sizeof(aMsg), pPlayer->Localize("You are already in minigame '%s'"), GetMinigameName(Minigame));
 				SendChatTarget(ClientID, aMsg);
 			}
 		}
@@ -8165,7 +8180,7 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force, bool DoCh
 	{
 		if (Minigame == MINIGAME_DURAK && !Collision()->TileUsed(TILE_DURAK_LOBBY))
 		{
-			SendChatTarget(ClientID, "This map has no Durák lobby, you have to find your way to the table yourself");
+			SendChatTarget(ClientID, pPlayer->Localize("This map has no Durák lobby, you have to find your way to the table yourself"));
 			return;
 		}
 		else if (pPlayer->RequestMinigameChange(Minigame))
@@ -8179,7 +8194,7 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force, bool DoCh
 	{
 		if (DoChatMsg)
 		{
-			str_format(aMsg, sizeof(aMsg), "'%s' left the minigame '%s'", Server()->ClientName(ClientID), GetMinigameName(pPlayer->m_Minigame));
+			str_format(aMsg, sizeof(aMsg), Localizable("'%s' left the minigame '%s'"), Server()->ClientName(ClientID), GetMinigameName(pPlayer->m_Minigame));
 			SendChat(-1, CHAT_ALL, -1, aMsg);
 		}
 
@@ -8204,9 +8219,9 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force, bool DoCh
 	{
 		if (DoChatMsg)
 		{
-			str_format(aMsg, sizeof(aMsg), "'%s' joined the minigame '%s', use '/%s' to join aswell", Server()->ClientName(ClientID), GetMinigameName(Minigame), GetMinigameCommand(Minigame));
+			str_format(aMsg, sizeof(aMsg), Localizable("'%s' joined the minigame '%s', use '/%s' to join aswell"), Server()->ClientName(ClientID), GetMinigameName(Minigame), GetMinigameCommand(Minigame));
 			SendChat(-1, CHAT_ALL, -1, aMsg);
-			SendChatTarget(ClientID, "Say '/leave' to join the normal area again");
+			SendChatTarget(ClientID, pPlayer->Localize("Say '/leave' to join the normal area again"));
 		}
 
 		// Save character stats to reload them after leaving
@@ -8225,14 +8240,14 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force, bool DoCh
 		}
 		else if (Minigame == MINIGAME_1VS1)
 		{
-			SendChatTarget(ClientID, "Type '/1vs1 <playername>' to start a fight with someone");
-			SendChatTarget(ClientID, "For custom scorelimits or a kill-border use '/1vs1 <playername> <scorelimit> <killborder>'");
+			SendChatTarget(ClientID, pPlayer->Localize("Type '/1vs1 <playername>' to start a fight with someone"));
+			SendChatTarget(ClientID, pPlayer->Localize("For custom scorelimits or a kill-border use '/1vs1 <playername> <scorelimit> <killborder>'"));
 		}
 	}
 	else
 	{
 		// you can't join minigames if you are already in another mingame
-		SendChatTarget(ClientID, "You have to leave first in order to join another minigame");
+		SendChatTarget(ClientID, pPlayer->Localize("You have to leave first in order to join another minigame"));
 		return;
 	}
 
@@ -8284,11 +8299,11 @@ void CGameContext::SurvivalTick()
 
 		if (m_apPlayers[m_SurvivalWinner])
 		{
-			str_format(aBuf, sizeof(aBuf), "The winner is '%s'", Server()->ClientName(m_SurvivalWinner));
+			str_format(aBuf, sizeof(aBuf), Localizable("The winner is '%s'"), Server()->ClientName(m_SurvivalWinner));
 			SendSurvivalBroadcast(aBuf);
 
 			// send message to winner
-			SendChatTarget(m_SurvivalWinner, "You are the winner");
+			SendChatTarget(m_SurvivalWinner, m_apPlayers[m_SurvivalWinner]->Localize("You are the winner"));
 
 			// add a win to the winners' accounts
 			if (m_apPlayers[m_SurvivalWinner]->GetAccID() >= ACC_START)
@@ -8496,7 +8511,7 @@ void CGameContext::SendSurvivalBroadcast(const char *pMsg, bool Sound, bool IsIm
 			// show money broadcast instead of the wanted one if we are on a money tile
 			if (m_apPlayers[i]->GetCharacter() && m_apPlayers[i]->GetCharacter()->m_MoneyTile)
 				continue;
-			SendBroadcast(pMsg, i, IsImportant);
+			SendBroadcast(m_apPlayers[i]->Localize(pMsg), i, IsImportant);
 		}
 	}
 }

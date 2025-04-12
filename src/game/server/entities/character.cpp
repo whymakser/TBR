@@ -588,7 +588,7 @@ void CCharacter::FireWeapon()
 						{
 							if (!Status && GameServer()->PlotDoorDestroyed(pDoor->m_PlotID))
 							{
-								GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You can't close your door because the police destroyed it");
+								GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("You can't close your door because the police destroyed it"));
 							}
 							else
 							{
@@ -1689,7 +1689,7 @@ void CCharacter::Die(int Weapon, bool UpdateTeeControl, bool OnArenaDie)
 			pKillerChar->m_KillStreak++;
 			if (pKillerChar->m_KillStreak % 5 == 0)
 			{
-				str_format(aBuf, sizeof(aBuf), "%s is on a killing spree with %d %s", Server()->ClientName(Killer), pKillerChar->m_KillStreak, IsBlock ? "blocks" : "kills");
+				str_format(aBuf, sizeof(aBuf), Localizable("%s is on a killing spree with %d %s"), Server()->ClientName(Killer), pKillerChar->m_KillStreak, IsBlock ? "blocks" : "kills");
 				GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
 				GameServer()->CreateFinishConfetti(pKillerChar->GetPos(), pKillerChar->TeamMask());
 			}
@@ -1697,7 +1697,7 @@ void CCharacter::Die(int Weapon, bool UpdateTeeControl, bool OnArenaDie)
 
 		if (m_KillStreak >= 5)
 		{
-			str_format(aBuf, sizeof(aBuf), "%s's killing spree was ended by %s (%d %s)", Server()->ClientName(m_pPlayer->GetCID()), Server()->ClientName(Killer), m_KillStreak, IsBlock ? "blocks" : "kills");
+			str_format(aBuf, sizeof(aBuf), Localizable("%s's killing spree was ended by %s (%d %s)"), Server()->ClientName(m_pPlayer->GetCID()), Server()->ClientName(Killer), m_KillStreak, IsBlock ? "blocks" : "kills");
 			GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
 			pKiller->GiveXP(250, "for ending a killing spree");
 			GameServer()->CreateFinishConfetti(pKillerChar->GetPos(), pKillerChar->TeamMask());
@@ -1789,7 +1789,7 @@ void CCharacter::Die(int Weapon, bool UpdateTeeControl, bool OnArenaDie)
 	{
 		// check for players in the current game state
 		if (m_pPlayer->GetCID() != GameServer()->m_SurvivalWinner)
-			GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You lost, you can wait for another round or leave the lobby using '/leave'");
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("You lost, you can wait for another round or leave the lobby using '/leave'"));
 		if (GameServer()->CountSurvivalPlayers(GameServer()->m_SurvivalGameState) > 2)
 		{
 			// if there are more than just two players left, you will watch your killer or a random player
@@ -2821,7 +2821,7 @@ void CCharacter::HandleTiles(int Index)
 				if (!IsPoliceFarmActive && (m_LastPoliceFarmActive || Server()->Tick() % Server()->TickSpeed() == 0))
 				{
 					char aBuf[64];
-					str_format(aBuf, sizeof(aBuf), "Too many players on police tiles [%d/%d]", GameWorld()->m_PoliceFarm.m_NumPoliceTilePlayers, GameWorld()->m_PoliceFarm.m_MaxPoliceTilePlayers);
+					str_format(aBuf, sizeof(aBuf), m_pPlayer->Localize("Too many players on police tiles [%d/%d]"), GameWorld()->m_PoliceFarm.m_NumPoliceTilePlayers, GameWorld()->m_PoliceFarm.m_MaxPoliceTilePlayers);
 					GameServer()->SendBroadcast(aBuf, m_pPlayer->GetCID(), false);
 					m_LastPoliceFarmActive = IsPoliceFarmActive;
 					return;
@@ -2851,7 +2851,7 @@ void CCharacter::HandleTiles(int Index)
 				if (m_pPlayer->GetAccID() < ACC_START)
 				{
 					if (!IsWeaponIndicator())
-						GameServer()->SendBroadcast("You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'", m_pPlayer->GetCID(), false);
+						GameServer()->SendBroadcast(m_pPlayer->Localize("You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'"), m_pPlayer->GetCID(), false);
 					return;
 				}
 
@@ -2927,7 +2927,7 @@ void CCharacter::HandleTiles(int Index)
 				str_format(m_aLineExp, sizeof(m_aLineExp), "XP [%lld/%lld]%s", pAccount->m_XP, GameServer()->GetNeededXP(pAccount->m_Level), aPlusXP);
 
 				str_format(aPolice, sizeof(aPolice), " +%dpolice", pAccount->m_PoliceLevel);
-				str_format(m_aLineMoney, sizeof(m_aLineMoney), "%s [%lld] +%d%s%s%s", BankMode == 2 ? "Bank" : "Wallet", BankMode == 1 ? m_pPlayer->GetWalletMoney() : pAccount->m_Money,
+				str_format(m_aLineMoney, sizeof(m_aLineMoney), "%s [%lld] +%d%s%s%s", BankMode == 2 ? m_pPlayer->Localize("Bank") : m_pPlayer->Localize("Wallet"), BankMode == 1 ? m_pPlayer->GetWalletMoney() : pAccount->m_Money,
 					TileMoney, (PoliceMoneyTile && pAccount->m_PoliceLevel) ? aPolice : "", pAccount->m_VIP ? " +2vip" : "", m_pPlayer->m_Permille ? " +1grog" : "");
 
 				if (!IsWeaponIndicator() && !m_pPlayer->m_HideBroadcasts)
@@ -2944,7 +2944,7 @@ void CCharacter::HandleTiles(int Index)
 		{
 			m_pPlayer->m_TaserShield = min(m_pPlayer->m_TaserShield + 20, 100);
 			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), "Congratulations, +20%% taser shield, current: %d%%. Use '/taser' to check later.", m_pPlayer->m_TaserShield);
+			str_format(aBuf, sizeof(aBuf), m_pPlayer->Localize("Congratulations, +20%% taser shield, current: %d%%. Use '/taser' to check later."), m_pPlayer->m_TaserShield);
 			GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
 		}
 
@@ -2954,7 +2954,7 @@ void CCharacter::HandleTiles(int Index)
 			bool FirstlyAdded = m_pPlayer->m_DoubleXpLifesLeft == 0;
 			m_pPlayer->m_DoubleXpLifesLeft = min(m_pPlayer->m_DoubleXpLifesLeft + 2, 99);
 			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), "Congratulations, double-xp has been activated for %d lifes", m_pPlayer->m_DoubleXpLifesLeft);
+			str_format(aBuf, sizeof(aBuf), m_pPlayer->Localize("Congratulations, double-xp has been activated for %d lifes"), m_pPlayer->m_DoubleXpLifesLeft);
 			GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
 			if (FirstlyAdded)
 			{
@@ -2977,7 +2977,7 @@ void CCharacter::HandleTiles(int Index)
 			if (m_pPlayer->GetAccID() < ACC_START)
 			{
 				if (Server()->Tick() % 50 == 0)
-					GameServer()->SendBroadcast("You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'", m_pPlayer->GetCID(), false);
+					GameServer()->SendBroadcast(m_pPlayer->Localize("You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'"), m_pPlayer->GetCID(), false);
 			}
 			else if (m_pPlayer->m_LastMoneyXPBomb < Server()->Tick() - Server()->TickSpeed() * 5)
 			{
@@ -2993,7 +2993,7 @@ void CCharacter::HandleTiles(int Index)
 		if (!m_HasFinishedSpecialRace && m_DDRaceState != DDRACE_NONE && m_DDRaceState != DDRACE_CHEAT && (m_TileIndex == TILE_SPECIAL_FINISH || m_TileFIndex == TILE_SPECIAL_FINISH || FTile1 == TILE_SPECIAL_FINISH || FTile2 == TILE_SPECIAL_FINISH || FTile3 == TILE_SPECIAL_FINISH || FTile4 == TILE_SPECIAL_FINISH || Tile1 == TILE_SPECIAL_FINISH || Tile2 == TILE_SPECIAL_FINISH || Tile3 == TILE_SPECIAL_FINISH || Tile4 == TILE_SPECIAL_FINISH))
 		{
 			char aBuf[64];
-			str_format(aBuf, sizeof(aBuf), "'%s' finished the special race!", Server()->ClientName(m_pPlayer->GetCID()));
+			str_format(aBuf, sizeof(aBuf), Localizable("'%s' finished the special race!"), Server()->ClientName(m_pPlayer->GetCID()));
 			GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
 			m_pPlayer->GiveXP(750, "for finishing the special race");
 
@@ -3188,7 +3188,7 @@ void CCharacter::HandleTiles(int Index)
 	{
 		if (Server()->GetAuthedState(m_pPlayer->GetCID()) < AUTHED_HELPER)
 		{
-			GameServer()->SendChatTarget(GetPlayer()->GetCID(), "This area is for helpers only");
+			GameServer()->SendChatTarget(GetPlayer()->GetCID(), m_pPlayer->Localize("This area is for helpers only"));
 			Die(WEAPON_WORLD);
 			return;
 		}
@@ -3199,7 +3199,7 @@ void CCharacter::HandleTiles(int Index)
 	{
 		if (Server()->GetAuthedState(m_pPlayer->GetCID()) < AUTHED_MOD)
 		{
-			GameServer()->SendChatTarget(GetPlayer()->GetCID(), "This area is for moderators only");
+			GameServer()->SendChatTarget(GetPlayer()->GetCID(), m_pPlayer->Localize("This area is for moderators only"));
 			Die(WEAPON_WORLD);
 			return;
 		}
@@ -3210,7 +3210,7 @@ void CCharacter::HandleTiles(int Index)
 	{
 		if (Server()->GetAuthedState(m_pPlayer->GetCID()) < AUTHED_ADMIN)
 		{
-			GameServer()->SendChatTarget(GetPlayer()->GetCID(), "This area is for admins only");
+			GameServer()->SendChatTarget(GetPlayer()->GetCID(), m_pPlayer->Localize("This area is for admins only"));
 			Die(WEAPON_WORLD);
 			return;
 		}
@@ -3248,30 +3248,30 @@ void CCharacter::HandleTiles(int Index)
 	if ((m_TileIndex == TILE_BIRTHDAY_ENABLE) || (m_TileFIndex == TILE_BIRTHDAY_ENABLE))
 	{
 		m_pPlayer->m_IsBirthdayGift = true;
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Seems like it's your birthday! You may pick up your present at any time.");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("Seems like it's your birthday! You may pick up your present at any time."));
 	}
 	else if ((m_TileIndex == TILE_BIRTHDAY_JETPACK_RECV || m_TileFIndex == TILE_BIRTHDAY_JETPACK_RECV) && m_LastBirthdayMsg + Server()->TickSpeed() < Server()->Tick())
 	{
 		m_LastBirthdayMsg = Server()->Tick();
 		if (m_IsZombie)
 		{
-			GameServer()->SendChatTarget(m_pPlayer->GetCID(), "This gift is only dedicated to humans.");
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("This gift is only dedicated to humans."));
 		}
 		else if (m_pPlayer->m_IsBirthdayGift)
 		{
 			if (m_BirthdayGiftEndTick || m_Jetpack)
 			{
-				GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You've picked up your present already! Come back next year.");
+				GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("You've picked up your present already! Come back next year."));
 			}
 			else
 			{
 				SetBirthdayJetpack(true);
-				GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Happy birthday! :) You have jetpack for 45 seconds");
+				GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("Happy birthday! :) You have jetpack for 45 seconds"));
 			}
 		}
 		else
 		{
-			GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Sorry, someting is missing to get the gift.");
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("Sorry, someting is missing to get the gift."));
 		}
 	}
 
@@ -3356,13 +3356,13 @@ void CCharacter::HandleTiles(int Index)
 
 	if ((m_MoveRestrictions&CANTMOVE_ROOM) && m_RoomAntiSpamTick < Server()->Tick())
 	{
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You need a key to enter this room, buy one in the shop");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("You need a key to enter this room, buy one in the shop"));
 		m_RoomAntiSpamTick = Server()->Tick() + Server()->TickSpeed() * 5;
 	}
 
 	if ((m_MoveRestrictions&CANTMOVE_VIP_PLUS_ONLY) && m_VipPlusAntiSpamTick < Server()->Tick())
 	{
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "This area is for VIP+ only, buy it in the shop");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("This area is for VIP+ only, buy it in the shop"));
 		m_VipPlusAntiSpamTick = Server()->Tick() + Server()->TickSpeed() * 5;
 	}
 
@@ -4268,6 +4268,7 @@ void CCharacter::FDDraceInit()
 	if (m_pPlayer->m_JailTime)
 		IncreasePermille(Permille);
 	m_pGrog = 0;
+	m_LastGrogHoldMsg = 0;
 	m_NumGrogsHolding = 0;
 	m_FirstPermilleTick = 0;
 	m_DeadlyPermilleDieTick = 0;
@@ -4563,7 +4564,7 @@ void CCharacter::FDDraceTick()
 	if (m_BirthdayGiftEndTick && m_BirthdayGiftEndTick <= Server()->Tick())
 	{
 		SetBirthdayJetpack(false);
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Your jetpack is now disabled");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("Your jetpack is now disabled"));
 	}
 
 	// update
@@ -4755,9 +4756,9 @@ void CCharacter::IncreasePermille(int Permille)
 		m_pPlayer->m_EscapeTime += Server()->TickSpeed() * (m_pPlayer->m_EscapeTime ? 120 : 300);
 
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "'%s' has exceeded his legal drinking limit. Catch him!", Server()->ClientName(m_pPlayer->GetCID()));
+		str_format(aBuf, sizeof(aBuf), Localizable("'%s' has exceeded his legal drinking limit. Catch him!"), Server()->ClientName(m_pPlayer->GetCID()));
 		GameServer()->SendChatPolice(aBuf);
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Police is searching you because you have exceeded your legal drinking limit");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("Police is searching you because you have exceeded your legal drinking limit"));
 	}
 
 	if (m_pPlayer->m_Permille <= Config()->m_SvGrogMinPermilleLimit)
@@ -4801,9 +4802,13 @@ bool CCharacter::AddGrog()
 {
 	if (m_NumGrogsHolding >= Config()->m_SvGrogHoldLimit)
 	{
-		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "You can not hold more than %d grogs at once", Config()->m_SvGrogHoldLimit);
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
+		if (m_LastGrogHoldMsg + Server()->TickSpeed() * 3 < Server()->Tick())
+		{
+			char aBuf[64];
+			str_format(aBuf, sizeof(aBuf), m_pPlayer->Localize("You can not hold more than %d grogs at once"), Config()->m_SvGrogHoldLimit);
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
+			m_LastGrogHoldMsg = Server()->Tick();
+		}
 		return false;
 	}
 
@@ -5232,7 +5237,7 @@ void CCharacter::UpdateWeaponIndicator()
 	{
 		if (GameServer()->GetClientDDNetVersion(m_pPlayer->GetCID()) < VERSION_DDNET_NEW_HUD)
 		{
-			str_format(aBuf, sizeof(aBuf), "Weapon: %s%s", pName, aAmmo);
+			str_format(aBuf, sizeof(aBuf), m_pPlayer->Localize("Weapon: %s%s"), pName, aAmmo);
 		}
 		else
 		{
@@ -5323,15 +5328,15 @@ void CCharacter::IncreaseNoBonusScore(int Summand)
 			if (!m_NoBonusContext.m_LastAlertTick || m_NoBonusContext.m_LastAlertTick + Server()->TickSpeed() * 20 < Server()->Tick())
 			{
 				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), "'%s' is using bonus illegally. Catch him!", Server()->ClientName(m_pPlayer->GetCID()));
+				str_format(aBuf, sizeof(aBuf), Localizable("'%s' is using bonus illegally. Catch him!"), Server()->ClientName(m_pPlayer->GetCID()));
 				GameServer()->SendChatPolice(aBuf);
 				m_NoBonusContext.m_LastAlertTick = Server()->Tick();
 			}
-			GameServer()->SendChatTarget(m_pPlayer->GetCID(), "Police is searching you because of illegal bonus use");
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("Police is searching you because of illegal bonus use"));
 		}
 		else
 		{
-			GameServer()->SendChatTarget(m_pPlayer->GetCID(), "[WARNING] Using bonus in no-bonus area is illegal");
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("[WARNING] Using bonus in no-bonus area is illegal"));
 		}
 	}
 }
@@ -5383,14 +5388,14 @@ bool CCharacter::TrySafelyRedirectClient(int Port, bool Force)
 	if (!Force && pDummy && (!pDummy->m_LastRedirectTryTick || pDummy->m_LastRedirectTryTick + Server()->TickSpeed() * 30 < Server()->Tick()))
 	{
 		m_pPlayer->m_LastRedirectTryTick = Server()->Tick();
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "[WARNING] You need to enter this teleporter with your dummy within 30 seconds in order to get moved safely");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("[WARNING] You need to enter this teleporter with your dummy within 30 seconds in order to get moved safely"));
 		return false;
 	}
 
 	CCharacter *pDummyChar = GameServer()->GetPlayerChar(DummyID);
 	if (!Force && pDummy && !pDummyChar)
 	{
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "[WARNING] Your dummy has to be alive in order to get moved safely");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("[WARNING] Your dummy has to be alive in order to get moved safely"));
 		return false;
 	}
 
@@ -5423,7 +5428,7 @@ bool CCharacter::TrySafelyRedirectClientImpl(int Port)
 	{
 		// Send msg
 		char aMsg[128];
-		str_format(aMsg, sizeof(aMsg), "'%s' has been moved to another map", Server()->ClientName(m_pPlayer->GetCID()));
+		str_format(aMsg, sizeof(aMsg), Localizable("'%s' has been moved to another map"), Server()->ClientName(m_pPlayer->GetCID()));
 		GameServer()->SendChat(-1, CHAT_ALL, -1, aMsg);
 
 		Server()->SendRedirectSaveTeeAdd(m_RedirectTilePort, GameServer()->GetSavedIdentityHash(GameServer()->m_vSavedIdentities[IdentityIndex]));
@@ -5696,7 +5701,7 @@ bool CCharacter::GrogTick()
 				m_pPlayer->m_EscapeTime = 0;
 				Die(WEAPON_SELF);
 				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), "'%s' died as a result of excessive grog consumption (%.1f‰ / %.1f‰)", Server()->ClientName(m_pPlayer->GetCID()), m_pPlayer->m_Permille / 10.f, GetPermilleLimit() / 10.f);
+				str_format(aBuf, sizeof(aBuf), Localizable("'%s' died as a result of excessive grog consumption (%.1f‰ / %.1f‰)"), Server()->ClientName(m_pPlayer->GetCID()), m_pPlayer->m_Permille / 10.f, GetPermilleLimit() / 10.f);
 				GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
 				return true;
 			}
@@ -5749,22 +5754,22 @@ bool CCharacter::TryCatchingWanted(int TargetCID, vec2 EffectPos)
 		pTarget->GetPlayer()->BankTransaction(-Corrupt, aBuf);
 		str_format(aBuf, sizeof(aBuf), "corrupted by gangster '%s'", Server()->ClientName(TargetCID));
 		m_pPlayer->BankTransaction(Corrupt, aBuf);
-		str_format(aBuf, sizeof(aBuf), "You paid %d money to '%s' to reduce your jailtime by 5 minutes", Corrupt, Server()->ClientName(m_pPlayer->GetCID()));
+		str_format(aBuf, sizeof(aBuf), pTarget->GetPlayer()->Localize("You paid %d money to '%s' to reduce your jailtime by 5 minutes"), Corrupt, Server()->ClientName(m_pPlayer->GetCID()));
 		GameServer()->SendChatTarget(TargetCID, aBuf);
-		str_format(aBuf, sizeof(aBuf), "You got %d money from '%s' to reduce his jailtime by 5 minutes", Corrupt, Server()->ClientName(TargetCID));
+		str_format(aBuf, sizeof(aBuf), m_pPlayer->Localize("You got %d money from '%s' to reduce his jailtime by 5 minutes"), Corrupt, Server()->ClientName(TargetCID));
 		GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
 		Minutes -= 5;
 	}
 
-	str_format(aBuf, sizeof(aBuf), "'%s' has been caught by '%s' (%d minutes arrest)", Server()->ClientName(TargetCID), Server()->ClientName(m_pPlayer->GetCID()), Minutes);
+	str_format(aBuf, sizeof(aBuf), Localizable("'%s' has been caught by '%s' (%d minutes arrest)"), Server()->ClientName(TargetCID), Server()->ClientName(m_pPlayer->GetCID()), Minutes);
 	GameServer()->SendChatPolice(aBuf);
 	if (pTarget->m_pPlayer->m_Permille)
 	{
-		str_format(aBuf, sizeof(aBuf), "Grog testing results: %.1f‰ / %.1f‰", pTarget->m_pPlayer->m_Permille / 10.f, pTarget->GetPermilleLimit() / 10.f);
+		str_format(aBuf, sizeof(aBuf), Localizable("Grog testing results: %.1f‰ / %.1f‰"), pTarget->m_pPlayer->m_Permille / 10.f, pTarget->GetPermilleLimit() / 10.f);
 		GameServer()->SendChatPolice(aBuf);
 	}
 
-	str_format(aBuf, sizeof(aBuf), "You were arrested for %d minutes by '%s'", Minutes, Server()->ClientName(m_pPlayer->GetCID()));
+	str_format(aBuf, sizeof(aBuf), pTarget->GetPlayer()->Localize("You were arrested for %d minutes by '%s'"), Minutes, Server()->ClientName(m_pPlayer->GetCID()));
 	GameServer()->SendChatTarget(TargetCID, aBuf);
 	GameServer()->CreateFinishConfetti(EffectPos, TeamMask());
 	GameServer()->JailPlayer(TargetCID, Minutes * 60); // minimum 5 maximum 20 minutes jail
@@ -6011,7 +6016,7 @@ void CCharacter::Meteor(bool Set, int FromID, bool Infinite, bool Silent)
 	{
 		if (m_pPlayer->m_InfMeteors + m_Meteors >= 50)
 		{
-			GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You already have the maximum of 50 meteors");
+			GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("You already have the maximum of 50 meteors"));
 			return;
 		}
 
@@ -6294,7 +6299,7 @@ void CCharacter::OnRainbowVIP()
 {
 	if (!GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP)
 	{
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("You are not VIP"));
 		return;
 	}
 
@@ -6305,7 +6310,7 @@ void CCharacter::OnBloodyVIP()
 {
 	if (!GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP)
 	{
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("You are not VIP"));
 		return;
 	}
 
@@ -6320,7 +6325,7 @@ void CCharacter::OnAtomVIP()
 {
 	if (!GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP)
 	{
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("You are not VIP"));
 		return;
 	}
 
@@ -6335,7 +6340,7 @@ void CCharacter::OnTrailVIP()
 {
 	if (!GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP)
 	{
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("You are not VIP"));
 		return;
 	}
 
@@ -6349,7 +6354,7 @@ void CCharacter::OnSpreadGunVIP()
 {
 	if (!GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP)
 	{
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("You are not VIP"));
 		return;
 	}
 
@@ -6360,7 +6365,7 @@ void CCharacter::OnRainbowHookVIP()
 {
 	if (GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP != VIP_PLUS)
 	{
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP+");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("You are not VIP+"));
 		return;
 	}
 
@@ -6371,7 +6376,7 @@ void CCharacter::OnRotatingBallVIP()
 {
 	if (GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP != VIP_PLUS)
 	{
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP+");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("You are not VIP+"));
 		return;
 	}
 
@@ -6384,7 +6389,7 @@ void CCharacter::OnEpicCircleVIP()
 {
 	if (GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP != VIP_PLUS)
 	{
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP+");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("You are not VIP+"));
 		return;
 	}
 
@@ -6398,7 +6403,7 @@ void CCharacter::OnLovelyVIP()
 {
 	if (GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP != VIP_PLUS)
 	{
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP+");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("You are not VIP+"));
 		return;
 	}
 
@@ -6409,7 +6414,7 @@ void CCharacter::OnRainbowNameVIP()
 {
 	if (GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP != VIP_PLUS)
 	{
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP+");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("You are not VIP+"));
 		return;
 	}
 
@@ -6420,7 +6425,7 @@ void CCharacter::OnSparkleVIP()
 {
 	if (GameServer()->m_Accounts[m_pPlayer->GetAccID()].m_VIP != VIP_PLUS)
 	{
-		GameServer()->SendChatTarget(m_pPlayer->GetCID(), "You are not VIP+");
+		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("You are not VIP+"));
 		return;
 	}
 

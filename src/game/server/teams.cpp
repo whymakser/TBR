@@ -635,7 +635,7 @@ void CGameTeams::OnFinish(CPlayer* Player, float Time, const char *pTimestamp)
 	char aBuf[128];
 	SetCpActive(Player, -2);
 	str_format(aBuf, sizeof(aBuf),
-			"%s finished in: %d minute(s) %5.2f second(s)",
+			Player->Localize("%s finished in: %d minute(s) %5.2f second(s)"),
 			Server()->ClientName(Player->GetCID()), (int)Time / 60,
 			Time - ((int)Time / 60 * 60));
 	if (GameServer()->Config()->m_SvHideScore || !GameServer()->Config()->m_SvSaveWorseScores)
@@ -650,10 +650,10 @@ void CGameTeams::OnFinish(CPlayer* Player, float Time, const char *pTimestamp)
 		// new record \o/
 
 		if (Diff >= 60)
-			str_format(aBuf, sizeof(aBuf), "New record: %d minute(s) %5.2f second(s) better.",
+			str_format(aBuf, sizeof(aBuf), Player->Localize("New record: %d minute(s) %5.2f second(s) better."),
 					(int)Diff / 60, Diff - ((int)Diff / 60 * 60));
 		else
-			str_format(aBuf, sizeof(aBuf), "New record: %5.2f second(s) better.",
+			str_format(aBuf, sizeof(aBuf), Player->Localize("New record: %5.2f second(s) better."),
 					Diff);
 		if (GameServer()->Config()->m_SvHideScore || !GameServer()->Config()->m_SvSaveWorseScores)
 			GameServer()->SendChatTarget(Player->GetCID(), aBuf);
@@ -664,17 +664,16 @@ void CGameTeams::OnFinish(CPlayer* Player, float Time, const char *pTimestamp)
 	{
 		if (Diff <= 0.005f)
 		{
-			GameServer()->SendChatTarget(Player->GetCID(),
-					"You finished with your best time.");
+			GameServer()->SendChatTarget(Player->GetCID(), Player->Localize("You finished with your best time."));
 		}
 		else
 		{
 			if (Diff >= 60)
-				str_format(aBuf, sizeof(aBuf), "%d minute(s) %5.2f second(s) worse, better luck next time.",
+				str_format(aBuf, sizeof(aBuf), Player->Localize("%d minute(s) %5.2f second(s) worse, better luck next time."),
 						(int)Diff / 60, Diff - ((int)Diff / 60 * 60));
 			else
 				str_format(aBuf, sizeof(aBuf),
-						"%5.2f second(s) worse, better luck next time.",
+						Player->Localize("%5.2f second(s) worse, better luck next time."),
 						Diff);
 			GameServer()->SendChatTarget(Player->GetCID(), aBuf); //this is private, sent only to the tee
 		}

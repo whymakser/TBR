@@ -263,7 +263,7 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc, const char *
 			if (Reason > 0 && Reason <= GetNumWantedPages())
 				m_aClients[ClientID].m_WantedPlayersPage = Reason - 1;
 			else
-				GameServer()->SendChatTarget(ClientID, "Please specify the page using the reason field");
+				GameServer()->SendChatTarget(ClientID, pPlayer->Localize("Please specify the page using the reason field"));
 			return true;
 		}
 		// Acc info
@@ -374,7 +374,7 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc, const char *
 			if (Reason != -1)
 				pPlayer->SetRainbowSpeedVIP(Reason);
 			else
-				GameServer()->SendChatTarget(ClientID, "Please specify the rainbow speed using the reason field");
+				GameServer()->SendChatTarget(ClientID, pPlayer->Localize("Please specify the rainbow speed using the reason field"));
 			return true;
 		}
 
@@ -587,7 +587,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 
 		if (ShowEuros)
 		{
-			str_format(aBuf, sizeof(aBuf), "Euros: %.2f", pAccount->m_Euros);
+			str_format(aBuf, sizeof(aBuf), "EUR: %.2f", pAccount->m_Euros);
 			DoLineText(Page, pNumOptions, aBuf);
 		}
 

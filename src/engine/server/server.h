@@ -217,7 +217,8 @@ public:
 
 		bool m_Rejoining;
 
-		char m_aLanguage[5]; // would be 2, but "none" is 4
+		char m_aChatLanguage[5]; // would be 2, but "none" is 4
+		char m_aLanguageCode[32];
 
 		class CDnsblLookup : public IJob
 		{
@@ -616,14 +617,14 @@ public:
 			m_ClientID = ClientID;
 			m_Mode = Mode;
 			str_copy(m_aMessage, pMessage, sizeof(m_aMessage));
-			str_copy(m_aLanguage, pLanguage, sizeof(m_aLanguage));
+			str_copy(m_aChatLanguage, pLanguage, sizeof(m_aChatLanguage));
 		}
 		
 		CServer *m_pServer;
 		int m_ClientID;
 		int m_Mode;
 		char m_aMessage[256];
-		char m_aLanguage[5];
+		char m_aChatLanguage[5];
 	};
 	enum
 	{
@@ -632,8 +633,8 @@ public:
 	};
 	void TranslateChat(int ClientID, const char *pMsg, int Mode) override;
 	int m_TranslateState;
-	const char *GetLanguage(int ClientID) override { return m_aClients[ClientID].m_aLanguage; }
-	void SetLanguage(int ClientID, const char *pLanguage) override { str_copy(m_aClients[ClientID].m_aLanguage, pLanguage, sizeof(m_aClients[ClientID].m_aLanguage)); }
+	const char *GetLanguage(int ClientID) override { return m_aClients[ClientID].m_aChatLanguage; }
+	void SetLanguage(int ClientID, const char *pLanguage) override { str_copy(m_aClients[ClientID].m_aChatLanguage, pLanguage, sizeof(m_aClients[ClientID].m_aChatLanguage)); }
 
 	const char *GetClientVersionStr(int ClientID) const;
 

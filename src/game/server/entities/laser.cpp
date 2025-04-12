@@ -178,7 +178,7 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 				pChr->GetPlayer()->m_TaserShield = max(pChr->GetPlayer()->m_TaserShield - 5, 0);
 				new CTaserShield(GameWorld(), pChr->GetPos(), pChr->GetPlayer()->GetCID());
 				char aBuf[64];
-				str_format(aBuf, sizeof(aBuf), "Taser shield has been used, -5%%, new current: %d%%", pChr->GetPlayer()->m_TaserShield);
+				str_format(aBuf, sizeof(aBuf), pChr->GetPlayer()->Localize("Taser shield has been used, -5%%, new current: %d%%"), pChr->GetPlayer()->m_TaserShield);
 				GameServer()->SendChatTarget(pChr->GetPlayer()->GetCID(), aBuf);
 			}
 			else

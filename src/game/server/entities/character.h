@@ -577,6 +577,7 @@ public:
 
 	// Grog
 	bool AddGrog();
+	int64 m_LastGrogHoldMsg;
 	int m_NumGrogsHolding;
 	CGrog *m_pGrog;
 	//int m_Permille; // Moved to player from character, because jail should keep permille xd

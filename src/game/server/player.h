@@ -400,6 +400,10 @@ public:
 	bool m_HideFromSpecCount;
 	char m_aDelayedJoinMsg[128];
 
+	// Language
+	const char *Localize(const char *pText); // Never change this function name
+	int m_Language;
+
 	// Moved to player from character, because jail should keep permille xd
 	int m_Permille;
 

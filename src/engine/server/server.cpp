@@ -335,7 +335,7 @@ void CServer::CClient::ResetContent()
 		m_aIdleDummyTrack[i] = 0;
 	m_CurrentIdleTrackPos = 0;
 
-	str_copy(m_aLanguage, "none", sizeof(m_aLanguage));
+	str_copy(m_aChatLanguage, "none", sizeof(m_aChatLanguage));
 	m_Main = true;
 
 	m_Rejoining = false;
@@ -2701,12 +2701,13 @@ int CServer::LoadMap(const char *pMapName)
 	str_copy(m_aCurrentMap, pMapName, sizeof(m_aCurrentMap));
 
 	// load complete map into memory for download
+	IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
+	if (File)
 	{
-		IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
 		m_CurrentMapSize = (unsigned int)io_length(File);
-		if(m_pCurrentMapData)
+		if (m_pCurrentMapData)
 			mem_free(m_pCurrentMapData);
-		m_pCurrentMapData = (unsigned char *)mem_alloc(m_CurrentMapSize, 1);
+		m_pCurrentMapData = (unsigned char*)mem_alloc(m_CurrentMapSize, 1);
 		io_read(File, m_pCurrentMapData, m_CurrentMapSize);
 		io_close(File);
 	}
@@ -2807,6 +2808,11 @@ int CServer::Run()
 		str_format(aBuf, sizeof(aBuf), "git revision hash: %s", GIT_SHORTREV_HASH);
 		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 	}
+
+	// Language setting, do before command execution, to overridde default language if wanted
+	g_Localization.LoadIndexfile(Storage());
+	g_Localization.SelectDefaultLanguage(Config()->m_SvDefaultLanguage, sizeof(Config()->m_SvDefaultLanguage));
+	g_Localization.Load(Config()->m_SvDefaultLanguage);
 
 	// process pending commands
 	m_pConsole->StoreCommands(false);
@@ -3969,15 +3975,12 @@ void CServer::GetClientAddr(int ClientID, NETADDR* pAddr)
 
 const char* CServer::GetAnnouncementLine(char const* pFileName)
 {
-	IOHANDLE File = m_pStorage->OpenFile(pFileName, IOFLAG_READ, IStorage::TYPE_ALL);
-	if (!File)
+	CLineReader LineReader;
+	if (!LineReader.OpenFile(m_pStorage->OpenFile(pFileName, IOFLAG_READ, IStorage::TYPE_ALL)))
 		return 0;
 
-	std::vector<char*> v;
-	char* pLine;
-	CLineReader* lr = new CLineReader();
-	lr->Init(File);
-	while ((pLine = lr->Get()))
+	std::vector<const char *> v;
+	while(const char *pLine = LineReader.Get())
 		if (str_length(pLine))
 			if (pLine[0] != '#')
 				v.push_back(pLine);
@@ -4004,8 +4007,6 @@ const char* CServer::GetAnnouncementLine(char const* pFileName)
 
 		m_AnnouncementLastLine = Rand;
 	}
-
-	io_close(File);
 
 	return v[m_AnnouncementLastLine];
 }
@@ -4403,7 +4404,7 @@ void CServer::CTranslateChat::Run()
 #ifdef CONF_FAMILY_WINDOWS
 	if (m_pServer->Config()->m_SvLibreTranslateKey[0])
 		str_format(aKey, sizeof(aKey), ",\\\"api_key\\\":\\\"%s\\\"", m_pServer->Config()->m_SvLibreTranslateKey);
-	str_format(aCmd, sizeof(aCmd), "curl -s -H \"Content-Type:application/json\" -X POST --data \"{\\\"q\\\":\\\"%s\\\",\\\"source\\\":\\\"auto\\\",\\\"target\\\":\\\"%s\\\"%s}\" %s", m_aMessage, m_aLanguage, aKey, m_pServer->Config()->m_SvLibreTranslateURL);
+	str_format(aCmd, sizeof(aCmd), "curl -s -H \"Content-Type:application/json\" -X POST --data \"{\\\"q\\\":\\\"%s\\\",\\\"source\\\":\\\"auto\\\",\\\"target\\\":\\\"%s\\\"%s}\" %s", m_aMessage, m_aChatLanguage, aKey, m_pServer->Config()->m_SvLibreTranslateURL);
 #else
 	if (m_pServer->Config()->m_SvLibreTranslateKey[0])
 		str_format(aKey, sizeof(aKey), ",\"api_key\":\"%s\"", m_pServer->Config()->m_SvLibreTranslateKey);
@@ -4445,7 +4446,7 @@ void CServer::CTranslateChat::Run()
 	{
 		for (int i = 0; i < MAX_CLIENTS; i++)
 		{
-			if (m_pServer->m_aClients[i].m_State != CServer::CClient::STATE_INGAME || str_comp_nocase(m_pServer->GetLanguage(i), m_aLanguage) != 0)
+			if (m_pServer->m_aClients[i].m_State != CServer::CClient::STATE_INGAME || str_comp_nocase(m_pServer->GetLanguage(i), m_aChatLanguage) != 0)
 				continue;
 			int Mode = (m_Mode == CHAT_TEAM || m_Mode == CHAT_LOCAL) ? CHAT_SINGLE_TEAM : CHAT_SINGLE;
 			m_pServer->GameServer()->SendChatMessage(m_ClientID, Mode, i, aResult);

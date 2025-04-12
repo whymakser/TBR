@@ -378,6 +378,9 @@ MACRO_CONFIG_INT(SvGrogForceHammer, sv_grog_force_hammer, 0, 0, 1, CFGFLAG_SERVE
 // Durak
 MACRO_CONFIG_INT(SvDurakTeamColor, sv_durak_team_colors, 1, 0, 1, CFGFLAG_SERVER, "Whether Durak minigame uses team colors for own round", AUTHED_ADMIN)
 
+// Language
+MACRO_CONFIG_STR(SvDefaultLanguage, sv_default_language, 255, "", CFGFLAG_SERVER, "Default server language tag, if not specified use system language tag (RFC 3066)", AUTHED_ADMIN)
+
 // other
 MACRO_CONFIG_INT(SvAllowXSkins, sv_allow_x_skins, 1, 0, 1, CFGFLAG_SERVER, "Whether special skins are allowed (x_ninja, x_spec, ...)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvRainbowNameSpec, sv_rainbowname_spec, 0, 0, 1, CFGFLAG_SERVER, "Whether rainbowname is processed while paused or spectating (annoying in +spectate)", AUTHED_ADMIN)

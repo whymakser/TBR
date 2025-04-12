@@ -312,12 +312,12 @@ void CPickup::Tick()
 				const char *pType = "";
 				if (m_Type == POWERUP_BATTERY)
 				{
-					pType = "battery";
+					pType = pChr->GetPlayer()->Localize("battery");
 					RespawnTimer = m_Subtype != WEAPON_PORTAL_RIFLE;
 				}
 				else if (m_Subtype == WEAPON_PORTAL_RIFLE && Config()->m_SvPortalRifleAmmo)
 				{
-					pType = "portal rifle";
+					pType = pChr->GetPlayer()->Localize("portal rifle");
 				}
 
 				if (!pType[0])
@@ -328,17 +328,17 @@ void CPickup::Tick()
 				{
 					int Seconds = (m_SpawnTick - Server()->Tick()) / Server()->TickSpeed();
 					if (Seconds <= 60)
-						str_format(aBuf, sizeof(aBuf), "This %s will respawn in %d seconds", pType, Seconds);
+						str_format(aBuf, sizeof(aBuf), pChr->GetPlayer()->Localize("This %s will respawn in %d seconds"), pType, Seconds);
 					else
-						str_format(aBuf, sizeof(aBuf), "This %s will respawn in %d minutes", pType, Seconds / 60);
+						str_format(aBuf, sizeof(aBuf), pChr->GetPlayer()->Localize("This %s will respawn in %d minutes"), pType, Seconds / 60);
 				}
 				else
 				{
 					int Seconds = (Server()->Tick() - m_PickupTick) / Server()->TickSpeed();
 					if (Seconds <= 60)
-						str_format(aBuf, sizeof(aBuf), "This %s got picked up %d seconds ago", pType, Seconds);
+						str_format(aBuf, sizeof(aBuf), pChr->GetPlayer()->Localize("This %s got picked up %d seconds ago"), pType, Seconds);
 					else
-						str_format(aBuf, sizeof(aBuf), "This %s got picked up %d minutes ago", pType, Seconds / 60);
+						str_format(aBuf, sizeof(aBuf), pChr->GetPlayer()->Localize("This %s got picked up %d minutes ago"), pType, Seconds / 60);
 				}
 				GameServer()->SendChatTarget(ClientID, aBuf);
 				continue;

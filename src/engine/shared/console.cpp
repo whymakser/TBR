@@ -628,22 +628,17 @@ bool CConsole::ExecuteFile(const char* pFilename, int ClientID, bool LogFailure,
 	m_pFirstExec = &ThisFile;
 
 	// exec the file
-	IOHANDLE File = m_pStorage->OpenFile(pFilename, IOFLAG_READ, StorageType);
-
+	CLineReader LineReader;
 	char aBuf[128];
-	if (File)
+	bool Success = false;
+	if (LineReader.OpenFile(m_pStorage->OpenFile(pFilename, IOFLAG_READ, StorageType)))
 	{
-		char* pLine;
-		CLineReader lr;
-
 		str_format(aBuf, sizeof(aBuf), "executing '%s'", pFilename);
 		Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
-		lr.Init(File);
 
-		while ((pLine = lr.Get()))
+		while(const char *pLine = LineReader.Get())
 			ExecuteLine(pLine, ClientID);
-
-		io_close(File);
+		Success = true;
 	}
 	else if (LogFailure)
 	{
@@ -659,7 +654,7 @@ bool CConsole::ExecuteFile(const char* pFilename, int ClientID, bool LogFailure,
 	}
 
 	m_pFirstExec = pPrev;
-	return (bool)File;
+	return Success;
 }
 
 void CConsole::Con_Echo(IResult *pResult, void *pUserData)

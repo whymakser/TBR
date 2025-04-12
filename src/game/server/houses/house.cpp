@@ -105,7 +105,7 @@ void CHouse::OnLeave(int ClientID)
 	{
 		CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
 		int From = GameServer()->m_World.GetClosestHouseDummy(pChr->GetPos(), pChr, m_Type, ClientID);
-		GameServer()->SendChat(From, CHAT_SINGLE, ClientID, "Bye! Come back if you need something.");
+		GameServer()->SendChat(From, CHAT_SINGLE, ClientID, Localizable("Bye! Come back if you need something."));
 		m_aClients[ClientID].m_NextMsg = Server()->Tick() + Server()->TickSpeed() * 5;
 	}
 

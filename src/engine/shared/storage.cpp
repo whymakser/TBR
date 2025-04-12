@@ -106,11 +106,13 @@ public:
 			}
 		}
 
-		char *pLine;
 		CLineReader LineReader;
-		LineReader.Init(File);
-
-		while((pLine = LineReader.Get()))
+		if(!LineReader.OpenFile(File))
+		{
+			dbg_msg("storage", "couldn't open storage.cfg");
+			return;
+		}
+		while(const char *pLine = LineReader.Get())
 		{
 			const char *pLineWithoutPrefix = str_startswith(pLine, "add_path ");
 			if(pLineWithoutPrefix)

@@ -51,29 +51,20 @@ bool CSaveTee::LoadFile(const char *pFileName, CCharacter *pChr, CGameContext *p
 	if (!pGameServer)
 		return false;
 
-	IOHANDLE File = pGameServer->Storage()->OpenFile(pFileName, IOFLAG_READ, IStorage::TYPE_SAVE);
-	if (File)
+	CLineReader LineReader;
+	if (!LineReader.OpenFile(pGameServer->Storage()->OpenFile(pFileName, IOFLAG_READ, IStorage::TYPE_SAVE)))
+		return false;
+
+	const char *pString = LineReader.Get();
+	if (!pString)
+		return false;
+
+	LoadString(pString);
+	if (pChr)
 	{
-		CLineReader lr;
-		lr.Init(File);
-
-		char *pString = lr.Get();
-		if (!pString)
-		{
-			io_close(File);
-			return false;
-		}
-
-		LoadString(pString);
-		if (pChr)
-		{
-			Load(pChr, 0);
-		}
-
-		io_close(File);
-		return true;
+		Load(pChr, 0);
 	}
-	return false;
+	return true;
 }
 
 void CSaveTee::Save(CCharacter *pChr)
@@ -588,13 +579,13 @@ char* CSaveTee::GetString()
 	return m_aString;
 }
 
-int CSaveTee::LoadString(char* String)
+int CSaveTee::LoadString(const char *pString)
 {
 	char aSavedAddress[NETADDR_MAXSTRSIZE];
 	int64 ExpireDate = 0;
 	char aCheckpointList[128];
 	int Num;
-	Num = sscanf(String,
+	Num = sscanf(pString,
 		"%[^\t]\t%d\t%d\t%d\t%d\t"
 		"%d\t%d\t%d\t"
 		"%d\t%d\t%d\t"

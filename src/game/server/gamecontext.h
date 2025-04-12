@@ -105,7 +105,7 @@ enum
 	MAX_PASSWORD_LENGTH = 128,
 
 	// update this one with every acc change you do
-	ACC_CURRENT_VERSION = 14,
+	ACC_CURRENT_VERSION = 15,
 
 	// vip
 	VIP_CLASSIC = 1,
@@ -590,6 +590,7 @@ public:
 		int m_VoteMenuFlags;
 		int m_DurakWins;
 		int64 m_DurakProfit;
+		char m_aLanguage[32];
 	};
 	std::vector<AccountInfo> m_Accounts;
 
@@ -651,6 +652,7 @@ public:
 		ACC_VOTE_MENU_FLAGS,
 		ACC_DURAK_WINS,
 		ACC_DURAK_PROFIT,
+		ACC_LANGUAGE,
 		NUM_ACCOUNT_VARIABLES
 	};
 
@@ -943,6 +945,7 @@ private:
 	static void ConResumeMoved(IConsole::IResult* pResult, void* pUserData);
 	static void ConMutePlayer(IConsole::IResult* pResult, void* pUserData);
 	static void ConDesign(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatLanguage(IConsole::IResult* pResult, void* pUserData);
 	static void ConLanguage(IConsole::IResult* pResult, void* pUserData);
 	static void ConDiscord(IConsole::IResult* pResult, void* pUserData);
 

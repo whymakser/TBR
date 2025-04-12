@@ -28,8 +28,8 @@ inline vec3 HslToRgb(const vec3 & HSL)
 		return vec3(HueToRgb(v1, v2, HSL.h + (1.0f / 3.0f)), HueToRgb(v1, v2, HSL.h), HueToRgb(v1, v2, HSL.h - (1.0f / 3.0f)));
 	}
 }
-// Attention, obtenir la vraie valeur HSL consiste à récupérer
-// la méthode depuis : src/game/client/components/skins.cpp -> GetColorV3
+// Attention, getting the true HSL value involves retrieving
+// the method from: src/game/client/components/skins.cpp -> GetColorV3
 const int CGameControllerDDRace::ZombieBodyValue = 0x44ff00;
 const int CGameControllerDDRace::ZombieFeetValue = 0x0;
 const vec3 CGameControllerDDRace::ZombieBodyHSL =

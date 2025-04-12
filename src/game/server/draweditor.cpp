@@ -301,7 +301,7 @@ void CDrawEditor::Tick()
 			PlotID = GetCursorPlotID();
 
 		char aBuf[32];
-		str_format(aBuf, sizeof(aBuf), "Objects [%d/%d]", (int)GameServer()->m_aPlots[PlotID].m_vObjects.size(), GameServer()->GetMaxPlotObjects(PlotID));
+		str_format(aBuf, sizeof(aBuf), m_pCharacter->GetPlayer()->Localize("Objects [%d/%d]"), (int)GameServer()->m_aPlots[PlotID].m_vObjects.size(), GameServer()->GetMaxPlotObjects(PlotID));
 		GameServer()->SendBroadcast(aBuf, GetCID(), false);
 	}
 }
@@ -397,11 +397,11 @@ void CDrawEditor::OnPlayerFire()
 					StopTransform();
 					return;
 				}
-				GameServer()->SendChatTarget(GetCID(), "Please enter the name for this preset into the chat");
+				GameServer()->SendChatTarget(GetCID(), m_pCharacter->GetPlayer()->Localize("Please enter the name for this preset into the chat"));
 			}
 			else if (m_Setting == TRANSFORM_LOAD_PRESET)
 			{
-				GameServer()->SendChatTarget(GetCID(), "Please enter the name of the wanted preset into the chat");
+				GameServer()->SendChatTarget(GetCID(), m_pCharacter->GetPlayer()->Localize("Please enter the name of the wanted preset into the chat"));
 				m_Transform.m_vSelected.clear();
 			}
 		}
@@ -1244,7 +1244,7 @@ bool CDrawEditor::TryEnterPresetName(const char *pName)
 				if (str_comp_nocase(GameServer()->m_vPresetList[i].c_str(), pName) == 0)
 				{
 					char aBuf[128];
-					str_format(aBuf, sizeof(aBuf), "Couldn't save preset '%s', a preset with that name already exists", pName);
+					str_format(aBuf, sizeof(aBuf), m_pCharacter->GetPlayer()->Localize("Couldn't save preset '%s', a preset with that name already exists"), pName);
 					GameServer()->SendChatTarget(GetCID(), aBuf);
 					StopTransform(true);
 					return true;
@@ -1262,7 +1262,7 @@ bool CDrawEditor::TryEnterPresetName(const char *pName)
 			}
 
 			GameServer()->m_vPresetList.push_back(pName);
-			str_format(aBuf, sizeof(aBuf), "Successfully saved preset '%s'", pName);
+			str_format(aBuf, sizeof(aBuf), m_pCharacter->GetPlayer()->Localize("Successfully saved preset '%s'"), pName);
 			GameServer()->SendChatTarget(GetCID(), aBuf);
 			StopTransform(true);
 			return true;
@@ -1274,7 +1274,7 @@ bool CDrawEditor::TryEnterPresetName(const char *pName)
 			std::fstream PresetFile(aBuf);
 			if (!PresetFile.is_open())
 			{
-				str_format(aBuf, sizeof(aBuf), "Couldn't load preset '%s'", pName);
+				str_format(aBuf, sizeof(aBuf), m_pCharacter->GetPlayer()->Localize("Couldn't load preset '%s'"), pName);
 				GameServer()->SendChatTarget(GetCID(), aBuf);
 				StopTransform(true);
 				return true;
@@ -1296,7 +1296,7 @@ bool CDrawEditor::TryEnterPresetName(const char *pName)
 				vEntities.erase(vEntities.begin());
 			}
 
-			str_format(aBuf, sizeof(aBuf), "Successfully loaded preset '%s'", pName);
+			str_format(aBuf, sizeof(aBuf), m_pCharacter->GetPlayer()->Localize("Successfully loaded preset '%s'"), pName);
 			GameServer()->SendChatTarget(GetCID(), aBuf);
 			m_Setting = TRANSFORM_COPY;
 			return true;
@@ -1310,9 +1310,9 @@ void CDrawEditor::StopTransform(bool Silent)
 	if (!Silent && m_Transform.m_State == TRANSFORM_STATE_RUNNING)
 	{
 		if (m_Setting == TRANSFORM_SAVE_PRESET)
-			GameServer()->SendChatTarget(GetCID(), "Preset saving aborted");
+			GameServer()->SendChatTarget(GetCID(), m_pCharacter->GetPlayer()->Localize("Preset saving aborted"));
 		else if (m_Setting == TRANSFORM_LOAD_PRESET)
-			GameServer()->SendChatTarget(GetCID(), "Preset loading aborted");
+			GameServer()->SendChatTarget(GetCID(), m_pCharacter->GetPlayer()->Localize("Preset loading aborted"));
 	}
 
 	m_Transform.m_State = m_Setting == TRANSFORM_LOAD_PRESET ? TRANSFORM_STATE_CONFIRM : TRANSFORM_STATE_SETTING_FIRST;

@@ -126,26 +126,26 @@ void CArenas::StartConfiguration(int ClientID, int Participant, int ScoreLimit, 
 {
 	if (ClientID == Participant)
 	{
-		GameServer()->SendChatTarget(ClientID, "You can't fight against yourself");
+		GameServer()->SendChatTarget(ClientID, GameServer()->m_apPlayers[ClientID]->Localize("You can't fight against yourself"));
 		return;
 	}
 
 	if (Participant < 0 && Participant != PARTICIPANT_GLOBAL)
 	{
-		GameServer()->SendChatTarget(ClientID, "Invalid participant");
+		GameServer()->SendChatTarget(ClientID, GameServer()->m_apPlayers[ClientID]->Localize("Invalid participant"));
 		return;
 	}
 
 	if (GetClientFight(ClientID) != -1)
 	{
-		GameServer()->SendChatTarget(ClientID, "Leave the current fight in order to join another one");
+		GameServer()->SendChatTarget(ClientID, GameServer()->m_apPlayers[ClientID]->Localize("Leave the current fight in order to join another one"));
 		return;
 	}
 
 	int FreeArena = GetFreeArena();
 	if (FreeArena == -1)
 	{
-		GameServer()->SendChatTarget(ClientID, "Too many 1vs1 arenas, try again later");
+		GameServer()->SendChatTarget(ClientID, GameServer()->m_apPlayers[ClientID]->Localize("Too many 1vs1 arenas, try again later"));
 		return;
 	}
 
@@ -226,21 +226,21 @@ void CArenas::FinishConfiguration(int Fight, int ClientID)
 		m_GlobalArena.m_Weapons.m_Laser = m_aFights[Fight].m_Weapons.m_Laser;
 
 		EndFight(Fight);
-		GameServer()->SendChatTarget(ClientID, "You successfully created a new global arena");
+		GameServer()->SendChatTarget(ClientID, GameServer()->m_apPlayers[ClientID]->Localize("You successfully created a new global arena"));
 	}
 	else
 	{
 		m_aFights[Fight].m_aParticipants[1].m_Status = PARTICIPANT_INVITED;
 
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "You invited '%s' to a fight", Server()->ClientName(Invited));
+		str_format(aBuf, sizeof(aBuf), GameServer()->m_apPlayers[ClientID]->Localize("You invited '%s' to a fight"), Server()->ClientName(Invited));
 		GameServer()->SendChatTarget(ClientID, aBuf);
 
-		str_format(aBuf, sizeof(aBuf), "You have been invited to a fight by '%s', type '/1vs1 %s' to join", Server()->ClientName(ClientID), Server()->ClientName(ClientID));
+		str_format(aBuf, sizeof(aBuf), GameServer()->m_apPlayers[Invited]->Localize("You have been invited to a fight by '%s', type '/1vs1 %s' to join"), Server()->ClientName(ClientID), Server()->ClientName(ClientID));
 		GameServer()->SendChatTarget(Invited, aBuf);
 
 		if (GameServer()->m_apPlayers[Invited] && GameServer()->m_apPlayers[Invited]->m_Minigame != MINIGAME_1VS1)
-			GameServer()->SendChatTarget(Invited, "Join the 1vs1 lobby using '/1vs1' before you accept the fight");
+			GameServer()->SendChatTarget(Invited, GameServer()->m_apPlayers[Invited]->Localize("Join the 1vs1 lobby using '/1vs1' before you accept the fight"));
 	}
 }
 
@@ -425,10 +425,10 @@ bool CArenas::AcceptFight(int Creator, int ClientID)
 		return false;
 
 	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "You have accepted the invite by '%s'", Server()->ClientName(Creator));
+	str_format(aBuf, sizeof(aBuf), GameServer()->m_apPlayers[ClientID]->Localize("You have accepted the invite by '%s'"), Server()->ClientName(Creator));
 	GameServer()->SendChatTarget(ClientID, aBuf);
 
-	str_format(aBuf, sizeof(aBuf), "'%s' has accepted your invite", Server()->ClientName(ClientID));
+	str_format(aBuf, sizeof(aBuf), GameServer()->m_apPlayers[Creator]->Localize("'%s' has accepted your invite"), Server()->ClientName(ClientID));
 	GameServer()->SendChatTarget(Creator, aBuf);
 
 	StartFight(Fight);
@@ -590,7 +590,7 @@ void CArenas::IncreaseScore(int Fight, int Index)
 	if (m_aFights[Fight].m_aParticipants[Index].m_Score >= m_aFights[Fight].m_ScoreLimit)
 	{
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "'%s' won a 1vs1 round against '%s'! Final scores: %d - %d", Server()->ClientName(ClientID), Server()->ClientName(OtherID), m_aFights[Fight].m_aParticipants[Index].m_Score, m_aFights[Fight].m_aParticipants[Other].m_Score);
+		str_format(aBuf, sizeof(aBuf), Localizable("'%s' won a 1vs1 round against '%s'! Final scores: %d - %d"), Server()->ClientName(ClientID), Server()->ClientName(OtherID), m_aFights[Fight].m_aParticipants[Index].m_Score, m_aFights[Fight].m_aParticipants[Other].m_Score);
 		GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
 		Server()->SendWebhookMessage(GameServer()->Config()->m_SvWebhook1vs1URL, aBuf, GameServer()->Config()->m_SvWebhook1vs1Name, GameServer()->Config()->m_SvWebhook1vs1AvatarURL);
 		GameServer()->m_apPlayers[ClientID]->m_ConfettiWinEffectTick = Server()->Tick();
@@ -635,7 +635,7 @@ void CArenas::OnPlayerLeave(int ClientID, bool Disconnect)
 			int FightScore = m_aFights[Fight].m_aParticipants[Index].m_Score;
 			int OtherScore = m_aFights[Fight].m_aParticipants[Other].m_Score;
 
-			str_format(aBuf, sizeof(aBuf), "'%s' left a 1vs1 round against '%s'! Current scores: %d - %d", Server()->ClientName(ClientID), Server()->ClientName(OtherID), FightScore, OtherScore);
+			str_format(aBuf, sizeof(aBuf), Localizable("'%s' left a 1vs1 round against '%s'! Current scores: %d - %d"), Server()->ClientName(ClientID), Server()->ClientName(OtherID), FightScore, OtherScore);
 			GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
 			if(FightScore > 0 || OtherScore > 0)
 				Server()->SendWebhookMessage(GameServer()->Config()->m_SvWebhook1vs1URL, aBuf, GameServer()->Config()->m_SvWebhook1vs1Name, GameServer()->Config()->m_SvWebhook1vs1AvatarURL);
@@ -712,12 +712,12 @@ void CArenas::Tick()
 				switch (m_aState[ClientID])
 				{
 				case STATE_1VS1_NONE: continue;
-				case STATE_1VS1_PLACE_ARENA: pMsg = "Select your favourite part of the map\nZoom in or out to change the size\nPlace arena by pressing SPACE"; break;
-				case STATE_1VS1_PLACE_FIRST_SPAWN: pMsg = "Set first spawn positions by pressing SPACE"; break;
-				case STATE_1VS1_PLACE_SECOND_SPAWN: pMsg = "Set second spawn positions by pressing SPACE"; break;
-				case STATE_1VS1_SELECT_WEAPONS: pMsg = "Choose a weapon with A/D\nToggle weapon usage by pressing SPACE\nPress SPACE on the heart to confirm"; break;
+				case STATE_1VS1_PLACE_ARENA: pMsg = Localizable("Select your favourite part of the map\nZoom in or out to change the size\nPlace arena by pressing SPACE"); break;
+				case STATE_1VS1_PLACE_FIRST_SPAWN: pMsg = Localizable("Set first spawn positions by pressing SPACE"); break;
+				case STATE_1VS1_PLACE_SECOND_SPAWN: pMsg = Localizable("Set second spawn positions by pressing SPACE"); break;
+				case STATE_1VS1_SELECT_WEAPONS: pMsg = Localizable("Choose a weapon with A/D\nToggle weapon usage by pressing SPACE\nPress SPACE on the heart to confirm"); break;
 				}
-				GameServer()->SendBroadcast(pMsg, ClientID, false);
+				GameServer()->SendBroadcast(pChr->GetPlayer()->Localize(pMsg), ClientID, false);
 			}
 		}
 	}

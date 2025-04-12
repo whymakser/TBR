@@ -30,14 +30,14 @@ void CTavern::OnSuccess(int ClientID)
 	int GrogPrice = GameServer()->Config()->m_SvGrogPrice;
 	if (pPlayer->GetUsableMoney() < GrogPrice)
 	{
-		GameServer()->SendChatTarget(ClientID, "You don't have enough money in your wallet to buy a grog.");
+		GameServer()->SendChatTarget(ClientID, pPlayer->Localize("You don't have enough money in your wallet to buy a grog."));
 		return;
 	}
 
 	if (pPlayer->GetCharacter() && pPlayer->GetCharacter()->AddGrog())
 	{
 		pPlayer->WalletTransaction(-GrogPrice, "bought grog");
-		GameServer()->SendChatTarget(ClientID, "You bought one grog");
+		GameServer()->SendChatTarget(ClientID, pPlayer->Localize("You bought one grog"));
 	}
 }
 

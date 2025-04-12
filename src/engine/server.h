@@ -11,6 +11,7 @@
 #include <generated/protocol.h>
 #include <engine/shared/protocol.h>
 #include <base/math.h>
+#include <game/localization.h>
 
 struct CAntibotRoundData;
 

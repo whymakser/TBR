@@ -37,6 +37,7 @@
 	#define WIN32_LEAN_AND_MEAN
 	#undef _WIN32_WINNT
 	#define _WIN32_WINNT 0x0501 /* required for mingw to get getaddrinfo to work */
+	#define _WIN32_WINNT 0x0600 // required for WC_ERR_INVALID_CHARS etc.
 	#include <windows.h>
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
@@ -2787,6 +2788,11 @@ int str_hex_decode(void *dst, int dst_size, const char *src)
 	return 0;
 }
 
+bool str_isnum(char c)
+{
+	return c >= '0' && c <= '9';
+}
+
 int str_is_number(const char *str)
 {
 	while(*str)
@@ -3262,6 +3268,85 @@ const char *str_next_token(const char *str, const char *delim, char *buffer, int
 	buffer[len] = '\0';
 
 	return tok + len;
+}
+
+#if defined(CONF_FAMILY_WINDOWS)
+std::optional<std::string> windows_wide_to_utf8(const wchar_t *wide_str)
+{
+	const int orig_length = wcslen(wide_str);
+	if(orig_length == 0)
+		return "";
+	const int size_needed = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, wide_str, orig_length, nullptr, 0, nullptr, nullptr);
+	if(size_needed == 0)
+		return {};
+	std::string string(size_needed, '\0');
+	dbg_assert(WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, wide_str, orig_length, string.data(), size_needed, nullptr, nullptr) == size_needed, "WideCharToMultiByte failure");
+	return string;
+}
+#endif
+
+void os_locale_str(char *locale, size_t length)
+{
+#if defined(CONF_FAMILY_WINDOWS)
+	wchar_t wide_buffer[LOCALE_NAME_MAX_LENGTH];
+	dbg_assert(GetUserDefaultLocaleName(wide_buffer, std::size(wide_buffer)) > 0, "GetUserDefaultLocaleName failure");
+
+	const std::optional<std::string> buffer = windows_wide_to_utf8(wide_buffer);
+	dbg_assert(buffer.has_value(), "GetUserDefaultLocaleName returned invalid UTF-16");
+	str_copy(locale, buffer.value().c_str(), length);
+#elif defined(CONF_PLATFORM_MACOS)
+	CFLocaleRef locale_ref = CFLocaleCopyCurrent();
+	CFStringRef locale_identifier_ref = static_cast<CFStringRef>(CFLocaleGetValue(locale_ref, kCFLocaleIdentifier));
+
+	// Count number of UTF16 codepoints, +1 for zero-termination.
+	// Assume maximum possible length for encoding as UTF-8.
+	CFIndex locale_identifier_size = (UTF8_BYTE_LENGTH * CFStringGetLength(locale_identifier_ref) + 1) * sizeof(char);
+	char *locale_identifier = (char *)malloc(locale_identifier_size);
+	dbg_assert(CFStringGetCString(locale_identifier_ref, locale_identifier, locale_identifier_size, kCFStringEncodingUTF8), "CFStringGetCString failure");
+
+	str_copy(locale, locale_identifier, length);
+
+	free(locale_identifier);
+	CFRelease(locale_ref);
+#else
+	static const char *ENV_VARIABLES[] = {
+		"LC_ALL",
+		"LC_MESSAGES",
+		"LANG",
+	};
+
+	locale[0] = '\0';
+	for(const char *env_variable : ENV_VARIABLES)
+	{
+		const char *env_value = getenv(env_variable);
+		if(env_value)
+		{
+			str_copy(locale, env_value, length);
+			break;
+		}
+	}
+#endif
+
+	// Ensure RFC 3066 format:
+	// - use hyphens instead of underscores
+	// - truncate locale string after first non-standard letter
+	for(int i = 0; i < str_length(locale); ++i)
+	{
+		if(locale[i] == '_')
+		{
+			locale[i] = '-';
+		}
+		else if(locale[i] != '-' && !(locale[i] >= 'a' && locale[i] <= 'z') && !(locale[i] >= 'A' && locale[i] <= 'Z') && !(str_isnum(locale[i])))
+		{
+			locale[i] = '\0';
+			break;
+		}
+	}
+
+	// Use default if we could not determine the locale,
+	// i.e. if only the C or POSIX locale is available.
+	if(locale[0] == '\0' || str_comp(locale, "C") == 0 || str_comp(locale, "POSIX") == 0)
+		str_copy(locale, "en-US", length);
 }
 
 struct SECURE_RANDOM_DATA
