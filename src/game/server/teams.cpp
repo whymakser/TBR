@@ -461,7 +461,11 @@ void CGameTeams::SendTeamsState(int ClientID)
 			// try to make hook visible in most cases, i dont want to use TEAM_SUPER cause that would make names red when NONAME e.g. spookyghost
 			// but this right now means, that if u r in a team and ur dummy isnt, and u swap, and both try to hook the flag, one will have invisible hook
 			else if (i == VANILLA_MAX_CLIENTS-1 && Server()->IsSevendown(ClientID))
+			{
 				Team = m_Core.Team(ClientID);
+				if (Team == TEAM_SUPER) // Todo: Rainbowname.cpp, TEAM_SUPER but it's 128
+					Team = VANILLA_MAX_CLIENTS;
+			}
 			
 
 			if (Team != -1)
