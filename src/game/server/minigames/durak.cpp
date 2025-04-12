@@ -773,7 +773,7 @@ const char *CDurak::GetCardSymbol(int Suit, int Rank, CDurakGame *pGame)
 	case CCard::IND_END_MOVE_BUTTON: return "[✓]";
 	case CCard::IND_START_TIMER:
 	{
-		if (pGame->NumParticipants() < MIN_DURAK_PLAYERS) return "Waiting...";
+		if (pGame->NumParticipants() < MIN_DURAK_PLAYERS) return "Waiting…";
 		str_format(aBuf, sizeof(aBuf), "Start in %ds…", (int)(pGame->m_GameStartTick - Server()->Tick()) / Server()->TickSpeed() + 1);
 		return aBuf;
 	}
@@ -799,7 +799,7 @@ const char *CDurak::GetCardSymbol(int Suit, int Rank, CDurakGame *pGame)
 		str_format(aBuf, sizeof(aBuf), "%s", Server()->ClientName(pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_ClientID));
 		return aBuf;
 	}
-	case CCard::IND_TOOLTIP_DEFENDER_PASSED: return "Passed...";
+	case CCard::IND_TOOLTIP_DEFENDER_PASSED: return "Passed…";
 	case CCard::IND_TOOLTIP_NEXT_MOVE:
 	{
 		str_format(aBuf, sizeof(aBuf), "Next move: %llds", (pGame->m_NextMove - Server()->Tick()) / Server()->TickSpeed() + 1);
@@ -1496,10 +1496,8 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bo
 	int64 WinStake = 0;
 	if (WinPos <= 0)
 	{
-		WinStake = max(pGame->m_Stake, pGame->m_LeftPlayersStake);
+		WinStake = pGame->m_Stake;
 		HandleMoneyTransaction(ClientID, WinStake, "Durák win");
-		// Reset m_LeftPlayersStake, no money dupe
-		pGame->m_LeftPlayersStake = 0;
 	}
 	// Reset stake as we have been processed now
 	pSeat->m_Player.m_Stake = -1;
@@ -1535,6 +1533,15 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bo
 		str_append(aBuf, aTemp, sizeof(aBuf));
 	}
 	GameServer()->SendChatTarget(ClientID, aBuf);
+
+	if (pGame->m_LeftPlayersStake)
+	{
+		HandleMoneyTransaction(ClientID, pGame->m_LeftPlayersStake, "Durák stake of left players");
+		str_format(aBuf, sizeof(aBuf), "You got +%lld money from others leaving the game.", pGame->m_LeftPlayersStake);
+		GameServer()->SendChatTarget(ClientID, aBuf);
+		// Reset m_LeftPlayersStake, no money dupe
+		pGame->m_LeftPlayersStake = 0;
+	}
 
 	// Confetti for the winner
 	pPlayer->m_ConfettiWinEffectTick = Server()->Tick();

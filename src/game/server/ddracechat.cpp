@@ -20,9 +20,9 @@ void CGameContext::ConCredits(IConsole::IResult *pResult, void *pUserData)
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credits",
 		"F-DDrace is a mod by fokkonaut");
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credits",
-		"This mod is based on Teeworlds 0.7 and also incorporates features, ideas, and partial implementations");
+		"This mod is based on Teeworlds 0.7 by it's developers and also incorporates features, ideas, and partial implementations");
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credits",
-		"from DDNet++ by ChillerDragon, DDNet by the DDNet developers, and other community projects.");
+		"from DDNet++ by ChillerDragon, DDNet by the DDNet developers, and other community projects, aswell as many custom features!");
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credits",
 		"If you want to check out the code or contribute, feel free to check out F-DDrace on GitHub:");
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credits",
