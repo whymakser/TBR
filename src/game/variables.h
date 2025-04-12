@@ -376,7 +376,7 @@ MACRO_CONFIG_INT(SvGrogMinPermilleLimit, sv_grog_min_permille_limit, 6, 0, 39, C
 MACRO_CONFIG_INT(SvGrogForceHammer, sv_grog_force_hammer, 0, 0, 1, CFGFLAG_SERVER, "Whether holding grog forces to hold hammer, or can have no weapon (new DDNet can render tee without weapon)", AUTHED_ADMIN)
 
 // Durak
-MACRO_CONFIG_INT(SvDurakTeamColor, sv_durak_team_colors, 1, 0, 1, CFGFLAG_SERVER, "Whether Durák minigame uses team colors for own round", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvDurakTeamColor, sv_durak_team_colors, 1, 0, 1, CFGFLAG_SERVER, "Whether Durak minigame uses team colors for own round", AUTHED_ADMIN)
 
 // other
 MACRO_CONFIG_INT(SvAllowXSkins, sv_allow_x_skins, 1, 0, 1, CFGFLAG_SERVER, "Whether special skins are allowed (x_ninja, x_spec, ...)", AUTHED_ADMIN)
