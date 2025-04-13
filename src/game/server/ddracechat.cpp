@@ -2693,21 +2693,7 @@ void CGameContext::ConLanguage(IConsole::IResult* pResult, void* pUserData)
 	str_format(aBuf, sizeof(aBuf), pPlayer->Localize("Current language: %s"), g_Localization.GetLanguageString(pPlayer->m_Language));
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("You can set one of the following languages for server-side translation by using '/language <option>':"));
-	char aTemp[128] = { 0 };
-	for (int i = -1; i < (int)g_Localization.Languages().size(); i++)
-	{
-		const char *pLanguage = g_Localization.GetLanguageFileName(i);
-		if (i == -1)
-		{
-			str_copy(aBuf, pLanguage, sizeof(aBuf));
-		}
-		else if (g_Localization.Languages()[i].m_vStrings.size())
-		{
-			str_format(aTemp, sizeof(aTemp), "%s, ", aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s%s", aTemp, pLanguage);
-		}
-	}
-	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
+	pSelf->SendChatTarget(pResult->m_ClientID, g_Localization.ListAvailable());
 }
 
 void CGameContext::ConChatLanguage(IConsole::IResult* pResult, void* pUserData)

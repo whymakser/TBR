@@ -3743,6 +3743,33 @@ void CServer::ConchainFakeMapCrc(IConsole::IResult *pResult, void *pUserData, IC
 	pThis->LoadUpdateFakeMap();
 }
 
+void CServer::ConchainDefaultLanguage(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
+{
+	CServer *pThis = (CServer *)pUserData;
+	if (!pResult->NumArguments())
+	{
+		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", "Available languages:");
+		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", g_Localization.ListAvailable());
+		pfnCallback(pResult, pCallbackUserData);
+		return;
+	}
+	char aBuf[128];
+	const char *pNewLang = pResult->GetString(0);
+	if (g_Localization.Load(pNewLang, true))
+	{
+		pfnCallback(pResult, pCallbackUserData);
+		str_format(aBuf, sizeof(aBuf), "Successfully changed default language to '%s'", pNewLang);
+		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", aBuf);
+	}
+	else if (str_comp(pNewLang, pThis->Config()->m_SvDefaultLanguage) != 0)
+	{
+		g_Localization.SelectDefaultLanguage(pThis->Config()->m_SvDefaultLanguage, sizeof(pThis->Config()->m_SvDefaultLanguage));
+		g_Localization.Load(pThis->Config()->m_SvDefaultLanguage);
+		str_format(aBuf, sizeof(aBuf), "Couldn't load language, falling back to default '%s'", pThis->Config()->m_SvDefaultLanguage);
+		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", aBuf);
+	}
+}
+
 #if defined(CONF_FAMILY_UNIX)
 void CServer::ConchainConnLoggingServerChange(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
 {
@@ -3809,6 +3836,8 @@ void CServer::RegisterCommands()
 	Console()->Chain("sv_rcon_password", ConchainRconPasswordChange, this);
 	Console()->Chain("sv_rcon_mod_password", ConchainRconModPasswordChange, this);
 	Console()->Chain("sv_rcon_helper_password", ConchainRconHelperPasswordChange, this);
+
+	Console()->Chain("sv_default_language", ConchainDefaultLanguage, this);
 
 	Console()->Chain("fake_map_crc", ConchainFakeMapCrc, this);
 

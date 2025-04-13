@@ -41,10 +41,14 @@ public:
 
 	CLanguage() = default;
 	CLanguage(const char *pName, const char *pFileName, int Code, const std::vector<std::string> &vLanguageCodes, CHeap *pHeap = 0) :
-		m_Name(pName), m_FileName(pFileName), m_CountryCode(Code), m_vLanguageCodes(vLanguageCodes), m_pStringsHeap(pHeap) {}
+		m_Name(pName), m_FileName(pFileName), m_CountryCode(Code), m_vLanguageCodes(vLanguageCodes), m_pStringsHeap(pHeap)
+	{
+		m_Loaded = false;
+	}
 
 	void Unload()
 	{
+		dbg_msg("localization", "un-loaded '%s'", m_FileName.c_str());
 		m_Loaded = false;
 		m_vStrings.clear();
 		if (m_pStringsHeap)
@@ -76,11 +80,12 @@ public:
 	void AddString(const char *pOrgStr, const char *pNewStr, const char *pContext, int Language);
 	const char *FindString(unsigned Hash, unsigned ContextHash, int Language);
 
-	bool Load(const char *pFilename);
+	bool Load(const char *pFilename, bool Force = false);
 	void Unload(int Language);
 	int GetLanguage(const char *pFileName);
 	const char *GetLanguageString(int Language);
 	const char *GetLanguageFileName(int Language);
+	const char *ListAvailable();
 };
 
 extern CLocalizationDatabase g_Localization;

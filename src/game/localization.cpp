@@ -161,17 +161,31 @@ void CLocalizationDatabase::SelectDefaultLanguage(char *pFilename, size_t Length
 	}
 }
 
-bool CLocalizationDatabase::Load(const char *pFilename)
+bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
 {
 	int Language = GetLanguage(pFilename);
-	if (Language == -1 || m_vLanguages[Language].m_Loaded)
+	if (Language == -1)
 		return false;
 
+	if (Force)
+	{
+		if (str_comp(m_vLanguages[Language].m_Name.c_str(), "English") == 0)
+			return true;
+		m_vLanguages[Language].m_Loaded = false;
+	}
+	else if (m_vLanguages[Language].m_Loaded)
+	{
+		return false;
+	}
+
+	char aFile[256];
+	str_format(aFile, sizeof(aFile), "languages/%s.txt", pFilename);
 	CLineReader LineReader;
-	if(!LineReader.OpenFile(m_pStorage->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_ALL)))
+	if(!LineReader.OpenFile(m_pStorage->OpenFile(aFile, IOFLAG_READ, IStorage::TYPE_ALL)))
+	{
 		return false;
+	}
 
-	dbg_msg("localization", "loaded '%s'", pFilename);
 	m_vLanguages[Language].Unload();
 
 	char aContext[512];
@@ -186,10 +200,10 @@ bool CLocalizationDatabase::Load(const char *pFilename)
 		if(pLine[0] == '#') // skip comments
 			continue;
 
-		if(pLine[0] == '[') // context
+		if(pLine[0] == '{') // context
 		{
 			size_t Len = str_length(pLine);
-			if(Len < 1 || pLine[Len - 1] != ']')
+			if(Len < 1 || pLine[Len - 1] != '}')
 			{
 				dbg_msg("localization", "malformed context '%s' on line %d", pLine, Line);
 				continue;
@@ -268,6 +282,26 @@ const char *CLocalizationDatabase::FindString(unsigned Hash, unsigned ContextHas
 void CLocalizationDatabase::Unload(int Language)
 {
 	m_vLanguages[Language].Unload();
+}
+
+const char *CLocalizationDatabase::ListAvailable()
+{
+	static char aBuf[256];
+	char aTemp[128] = { 0 };
+	for (int i = -1; i < (int)g_Localization.Languages().size(); i++)
+	{
+		const char *pLanguage = g_Localization.GetLanguageFileName(i);
+		if (i == -1)
+		{
+			str_copy(aBuf, pLanguage, sizeof(aBuf));
+		}
+		else if (g_Localization.Languages()[i].m_vStrings.size())
+		{
+			str_format(aTemp, sizeof(aTemp), "%s, ", aBuf);
+			str_format(aBuf, sizeof(aBuf), "%s%s", aTemp, pLanguage);
+		}
+	}
+	return aBuf;
 }
 
 const char *CLocalizationDatabase::GetLanguageString(int Language)
