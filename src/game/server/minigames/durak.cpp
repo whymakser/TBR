@@ -243,8 +243,7 @@ bool CDurak::TryEnterBetStake(int ClientID, const char *pMessage)
 		{
 			VALIDATE_WALLET();
 
-			str_format(aBuf, sizeof(aBuf), Localizable("'%s' proposed a new stake, please enter the current stake of '%lld' or propose a new one in the chat."), Server()->ClientName(ClientID), Stake);
-			SendChatToDeployedStakePlayers(Game, aBuf, ClientID);
+			SendChatToDeployedStakePlayers(Game, ClientID, Localizable("'%s' proposed a new stake, please enter the current stake of '%lld' or propose a new one in the chat."), Server()->ClientName(ClientID), Stake);
 
 			pGame->m_Stake = Stake;
 			pPlayer->m_Stake = Stake;
@@ -596,8 +595,8 @@ void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 	}
 }
 
-
-void CDurak::SendChatToDeployedStakePlayers(int Game, const char *pMessage, int NotThisID)
+template<typename... Args>
+void CDurak::SendChatToDeployedStakePlayers(int Game, int NotThisID, const char *pFormat, Args&&... args)
 {
 	if (Game < 0 || Game >= (int)m_vpGames.size())
 		return;
@@ -606,11 +605,17 @@ void CDurak::SendChatToDeployedStakePlayers(int Game, const char *pMessage, int 
 	{
 		int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
 		if (ClientID != -1 && pGame->m_aSeats[i].m_Player.m_Stake != -1 && (NotThisID == -1 || ClientID != NotThisID))
-			GameServer()->SendChatTarget(ClientID, GameServer()->m_apPlayers[ClientID]->Localize(pMessage));
+		{
+			char aBuf[256];
+			CFormatArg aArgs[] = { CFormatArg(std::forward<Args>(args))... };
+			str_format_args(aBuf, sizeof(aBuf), GameServer()->m_apPlayers[ClientID]->Localize(pFormat), aArgs, std::size(aArgs));
+			GameServer()->SendChatTarget(ClientID, aBuf);
+		}
 	}
 }
 
-void CDurak::SendChatToParticipants(int Game, const char *pMessage)
+template<typename... Args>
+void CDurak::SendChatToParticipants(int Game, const char *pFormat, Args&&... args)
 {
 	if (Game < 0 || Game >= (int)m_vpGames.size())
 		return;
@@ -624,7 +629,17 @@ void CDurak::SendChatToParticipants(int Game, const char *pMessage)
 		// Stake can change as soon as players leave, so no money is removed. That means when the game is running, a player is automatically participant
 		if (pGame->m_Running || (pGame->m_Stake != -1 && pGame->m_aSeats[i].m_Player.m_Stake == pGame->m_Stake))
 		{
-			GameServer()->SendChatTarget(ClientID, GameServer()->m_apPlayers[ClientID]->Localize(pMessage));
+			char aBuf[256];
+			if constexpr (sizeof...(args) > 0)
+			{
+				CFormatArg aArgs[] = { CFormatArg(std::forward<Args>(args))... };
+				str_format_args(aBuf, sizeof(aBuf), GameServer()->m_apPlayers[ClientID]->Localize(pFormat), aArgs, std::size(aArgs));
+			}
+			else
+			{
+				str_copy(aBuf, GameServer()->m_apPlayers[ClientID]->Localize(pFormat), sizeof(aBuf));
+			}
+			GameServer()->SendChatTarget(ClientID, aBuf);
 		}
 	}
 }
@@ -1198,9 +1213,7 @@ bool CDurak::UpdateGame(int Game)
 			}
 		}
 
-		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), Localizable("'%s' is the Durák!"), Server()->ClientName(pGame->m_DurakClientID));
-		SendChatToParticipants(Game, aBuf);
+		SendChatToParticipants(Game, Localizable("'%s' is the Durák!"), Server()->ClientName(pGame->m_DurakClientID));
 		EndMove(Game, pGame->GetSeatByClient(pGame->m_DurakClientID), true);
 		pGame->m_GameOverTick = Server()->Tick();
 		std::pair<int, int64> Pair(pGame->m_DurakClientID, pGame->m_GameOverTick);
@@ -1238,8 +1251,7 @@ bool CDurak::UpdateGame(int Game)
 		{
 			char aBuf[128];
 			int DefenderID = pGame->m_aSeats[pGame->m_DefenderIndex].m_Player.m_ClientID;
-			str_format(aBuf, sizeof(aBuf), Localizable("'%s' successfully defended"), Server()->ClientName(DefenderID));
-			SendChatToParticipants(Game, aBuf);
+			SendChatToParticipants(Game, Localizable("'%s' successfully defended"), Server()->ClientName(DefenderID));
 			CCharacter *pChr = GameServer()->GetPlayerChar(DefenderID);
 			if (pChr)
 			{
@@ -1256,8 +1268,7 @@ bool CDurak::UpdateGame(int Game)
 		{
 			char aBuf[128];
 			int AttackerID = pGame->m_aSeats[pGame->m_InitialAttackerIndex].m_Player.m_ClientID;
-			str_format(aBuf, sizeof(aBuf), Localizable("'%s' took too long and was skipped"), Server()->ClientName(AttackerID));
-			SendChatToParticipants(Game, aBuf);
+			SendChatToParticipants(Game, Localizable("'%s' took too long and was skipped"), Server()->ClientName(AttackerID));
 			// Just skip this guy // Emulate successful defense, so that the next guy's turn is now and he is not skipped.
 			StartNextRound(Game, true);
 		}
@@ -1438,8 +1449,7 @@ void CDurak::TakeCardsFromTable(int Game)
 
 	char aBuf[128];
 	int DefenderID = pGame->m_aSeats[pGame->m_DefenderIndex].m_Player.m_ClientID;
-	str_format(aBuf, sizeof(aBuf), Localizable("'%s' couldn't defend all attacks and takes all cards"), Server()->ClientName(DefenderID));
-	SendChatToParticipants(Game, aBuf);
+	SendChatToParticipants(Game, Localizable("'%s' couldn't defend all attacks and takes all cards"), Server()->ClientName(DefenderID));
 
 	// Sort hand cards after taking
 	pGame->SortHand(pGame->m_aSeats[pGame->m_DefenderIndex].m_Player.m_vHandCards, pGame->m_Deck.GetTrumpSuit());
@@ -1505,13 +1515,14 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bo
 	char aBuf[128];
 	char aTemp[128];
 	// Chat message for participants
-	str_format(aBuf, sizeof(aBuf), Localizable("'%s' won the game!"), Server()->ClientName(ClientID));
 	if (WinPos >= 0)
 	{
-		str_format(aTemp, sizeof(aTemp), " (#%d)", WinPos + 1);
-		str_append(aBuf, aTemp, sizeof(aBuf));
+		SendChatToParticipants(Game, Localizable("'%s' won the game! (#%d)"), Server()->ClientName(ClientID), WinPos + 1);
 	}
-	SendChatToParticipants(Game, aBuf);
+	else
+	{
+		SendChatToParticipants(Game, Localizable("'%s' won the game!"), Server()->ClientName(ClientID));
+	}
 
 	// Feedback for winner
 	if (WinPos <= 0)

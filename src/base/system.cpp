@@ -2346,6 +2346,107 @@ int str_format(char* buffer, int buffer_size, const char* format, ...)
 	return length;
 }
 
+int str_format_args(char *pBuffer, int BufferSize, const char *pFormat, CFormatArg *pArgs, int NumArgs)
+{
+	// Safety checks
+	if (!pBuffer || BufferSize <= 0 || !pFormat)
+		return -1;
+	
+	if (!pArgs || NumArgs <= 0)
+	{
+		str_copy(pBuffer, pFormat, BufferSize);
+		return str_length(pBuffer);
+	}
+	
+	char *pOut = pBuffer;
+	const char *pIn = pFormat;
+	int ArgIndex = 0;
+	int RemainingSize = BufferSize - 1; // Reserve space for null terminator
+	
+	while (*pIn && RemainingSize > 0)
+	{
+		// Handle format specifiers
+		if (*pIn == '%' && *(pIn + 1) != '\0')
+		{
+			pIn++; // Skip the '%'
+			
+			// Handle escaped percent sign
+			if (*pIn == '%')
+			{
+				*pOut++ = '%';
+				pIn++;
+				RemainingSize--;
+				continue;
+			}
+			
+			// Check if we have an argument available
+			if (ArgIndex < NumArgs)
+			{
+				char aTemp[256];
+				aTemp[0] = '\0';
+				
+				// Format based on argument type, regardless of format specifier
+				switch (pArgs[ArgIndex].m_Type)
+				{
+					case CFormatArg::FORMAT_INT:
+						str_format(aTemp, sizeof(aTemp), "%d", pArgs[ArgIndex].m_Int);
+						break;
+					case CFormatArg::FORMAT_STRING:
+						str_copy(aTemp, pArgs[ArgIndex].m_pStr ? pArgs[ArgIndex].m_pStr : "(null)", sizeof(aTemp));
+						break;
+					case CFormatArg::FORMAT_INT64:
+						str_format(aTemp, sizeof(aTemp), "%lld", pArgs[ArgIndex].m_Int64);
+						break;
+					case CFormatArg::FORMAT_FLOAT:
+						str_format(aTemp, sizeof(aTemp), "%.2f", pArgs[ArgIndex].m_Float);
+						break;
+					default:
+						str_copy(aTemp, "[invalid]", sizeof(aTemp));
+						break;
+				}
+				
+				// Copy formatted value to output buffer
+				int TempLen = str_length(aTemp);
+				int CopyLen = TempLen < RemainingSize ? TempLen : RemainingSize;
+				
+				if (CopyLen > 0)
+				{
+					memcpy(pOut, aTemp, CopyLen);
+					pOut += CopyLen;
+					RemainingSize -= CopyLen;
+				}
+				
+				ArgIndex++;
+			}
+			else
+			{
+				// No argument available, just copy the format specifier as-is
+				*pOut++ = '%';
+				RemainingSize--;
+				if (RemainingSize > 0)
+				{
+					*pOut++ = *pIn;
+					RemainingSize--;
+				}
+			}
+			
+			// Skip the format specifier
+			pIn++;
+		}
+		else
+		{
+			// Copy regular character
+			*pOut++ = *pIn++;
+			RemainingSize--;
+		}
+	}
+	
+	// Ensure null termination
+	*pOut = '\0';
+	
+	return (int)(pOut - pBuffer);
+}
+
 FILE *pipe_open(const char *cmd, const char *mode)
 {
 #if defined(CONF_FAMILY_WINDOWS)

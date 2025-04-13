@@ -1,5 +1,5 @@
-/* (c) Magnus Auvinen. See licence.txt in the root of the distribution for more information. */
-/* If you are missing that file, acquire a complete release at teeworlds.com.                */
+// made by timakro (initially) and fokkonaut
+
 #ifndef GAME_LOCALIZATION_H
 #define GAME_LOCALIZATION_H
 
@@ -48,7 +48,6 @@ public:
 
 	void Unload()
 	{
-		dbg_msg("localization", "un-loaded '%s'", m_FileName.c_str());
 		m_Loaded = false;
 		m_vStrings.clear();
 		if (m_pStringsHeap)

@@ -304,15 +304,31 @@ public:
 		CHAT_SEVEN = 1<<0,
 		CHAT_SEVENDOWN = 1<<1,
 		CHAT_NO_WEBHOOK = 1<<2,
+
+		CHATFLAG_ALL = CHAT_SEVEN|CHAT_SEVENDOWN,
 	};
 
 	// network
 	void SendChatMsg(CNetMsg_Sv_Chat *pMsg, int Flags, int To);
-	void SendChatTarget(int To, const char* pText, int Flags = CHAT_SEVEN|CHAT_SEVENDOWN);
+	void SendChatTarget(int To, const char* pText, int Flags = CHATFLAG_ALL);
 	void SendChatTeam(int Team, const char* pText);
 	void SendChatMessage(int ChatterClientID, int Mode, int To, const char *pText) override { SendChat(ChatterClientID, Mode, To, pText); }
-	void SendChat(int ChatterClientID, int Mode, int To, const char *pText, int SpamProtectionClientID = -1, int Flags = CHAT_SEVEN|CHAT_SEVENDOWN);
-	void SendBroadcast(const char* pText, int ClientID, bool IsImportant = true);
+	void SendChat(int ChatterClientID, int Mode, int To, const char *pText, int SpamProtectionClientID = -1, int Flags = CHATFLAG_ALL, CFormatArg *pArgs = 0, int NumArgs = 0);
+
+	template<typename... Args>
+	void SendChatFormat(int ChatterClientID, int Mode, int To, int Flags, const char* pFormat, Args&&... args)
+	{
+		CFormatArg aArgs[] = { CFormatArg(std::forward<Args>(args))... };
+		SendChat(ChatterClientID, CHAT_ALL, To, pFormat, -1, Flags, aArgs, std::size(aArgs));
+	}
+
+	void SendBroadcast(const char* pText, int ClientID, bool IsImportant = true, CFormatArg *pArgs = 0, int NumArgs = 0);
+	template<typename... Args>
+	void SendBroadcastFormat(int ClientID, bool IsImportant, const char *pFormat, Args&&... args)
+	{
+		CFormatArg aArgs[] = { CFormatArg(std::forward<Args>(args))... };
+		SendBroadcast(pFormat, ClientID, IsImportant, aArgs, std::size(aArgs));
+	}
 	void SendEmoticon(int ClientID, int Emoticon);
 	void SendWeaponPickup(int ClientID, int Weapon);
 	void SendSettings(int ClientID);
@@ -758,7 +774,13 @@ public:
 	//survival
 	void SurvivalTick();
 	void SetPlayerSurvivalState(int State);
-	void SendSurvivalBroadcast(const char* pMsg, bool Sound = false, bool IsImportant = true);
+	template<typename... Args>
+	void SendSurvivalBroadcastFormat(bool Sound, bool IsImportant, const char *pFormat, Args&&... args)
+	{
+		CFormatArg aArgs[] = { CFormatArg(std::forward<Args>(args))... };
+		SendSurvivalBroadcast(pFormat, Sound, IsImportant, aArgs, std::size(aArgs));
+	}
+	void SendSurvivalBroadcast(const char* pMsg, bool Sound = false, bool IsImportant = true, CFormatArg *pArgs = 0, int NumArgs = 0);
 	int CountSurvivalPlayers(int State);
 	int GetRandomSurvivalPlayer(int State, int NotThis = -1);
 	int m_SurvivalBackgroundState;
@@ -780,6 +802,12 @@ public:
 	void SetMapSpecificOptions();
 
 	// police
+	template<typename... Args>
+	void SendChatPoliceFormat(const char *pFormat, Args&&... args)
+	{
+		CFormatArg aArgs[] = { CFormatArg(std::forward<Args>(args))... };
+		SendChat(-1, CHAT_POLICE_CHANNEL, -1, pFormat, -1, CHATFLAG_ALL, aArgs, std::size(aArgs));
+	}
 	void SendChatPolice(const char *pMessage);
 	bool JailPlayer(int ClientID, int Seconds);
 	bool ForceJailRelease(int ClientID);

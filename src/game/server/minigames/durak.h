@@ -774,8 +774,10 @@ class CDurak : public CMinigame
 	void ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bool ForceEnd = false);
 	bool HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg);
 
-	void SendChatToDeployedStakePlayers(int Game, const char *pMessage, int NotThisID);
-	void SendChatToParticipants(int Game, const char *pMessage);
+	template<typename... Args>
+	void SendChatToDeployedStakePlayers(int Game, int NotThisID, const char *pFormat, Args&&... args);
+	template<typename... Args>
+	void SendChatToParticipants(int Game, const char *pFormat, Args&&... args);
 
 	int GetPlayerState(int ClientID);
 	const char *GetCardSymbol(int Suit, int Rank, CDurakGame *pGame = 0);

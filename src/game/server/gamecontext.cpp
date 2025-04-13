@@ -42,6 +42,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unordered_map>
+#include <cstdarg>
+#include <cstdio>
 
 #include "score.h"
 #include "score/file_score.h"
@@ -569,7 +571,12 @@ const char *CGameContext::GetAvatarURL(int ClientID)
 	return aAvatarURL;
 }
 
-void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *pText, int SpamProtectionClientID, int Flags)
+void CGameContext::SendChatPolice(const char *pMessage)
+{
+	SendChat(-1, CHAT_POLICE_CHANNEL, -1, pMessage);
+}
+
+void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *pText, int SpamProtectionClientID, int Flags, CFormatArg *pArgs, int NumArgs)
 {
 	if (SpamProtectionClientID >= 0 && SpamProtectionClientID < MAX_CLIENTS)
 		if (ProcessSpamProtection(SpamProtectionClientID))
@@ -581,12 +588,12 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 	char aBuf[512], aText[256];
 	if (Mode == CHAT_POLICE_CHANNEL)
 	{
-		str_format(aBuf, sizeof(aBuf), "[POLICE-CHANNEL] %s", pText);
-		str_copy(aText, aBuf, sizeof(aText));
+		str_format_args(aBuf, sizeof(aBuf), pText, pArgs, NumArgs);
+		str_format(aText, sizeof(aText), "[POLICE-CHANNEL] %s", aBuf);
 	}
 	else
 	{
-		str_copy(aText, pText, sizeof(aText));
+		str_format_args(aText, sizeof(aText), pText, pArgs, NumArgs);
 	}
 
 	if(ChatterClientID >= 0 && ChatterClientID < MAX_CLIENTS)
@@ -681,7 +688,8 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 				{
 					if (ChatterClientID == -1)
 					{
-						Msg.m_pMessage = m_apPlayers[i]->Localize(aText);
+						str_format_args(aText, sizeof(aText), m_apPlayers[i]->Localize(pText), pArgs, NumArgs);
+						Msg.m_pMessage = aText;
 					}
 					SendChatMsg(&Msg, MsgFlags|MSGFLAG_VITAL, i);
 				}
@@ -757,10 +765,9 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 		for (int i = 0; i < MAX_CLIENTS; i++)
 			if (m_apPlayers[i] && m_Accounts[m_apPlayers[i]->GetAccID()].m_PoliceLevel)
 			{
-				if (ChatterClientID == -1)
-				{
-					Msg.m_pMessage = m_apPlayers[i]->Localize(aText);
-				}
+				str_format_args(aBuf, sizeof(aBuf), m_apPlayers[i]->Localize(pText), pArgs, NumArgs);
+				str_format(aText, sizeof(aText), "[POLICE-CHANNEL] %s", aBuf);
+				Msg.m_pMessage = aText;
 				SendChatMsg(&Msg, MsgFlags|MSGFLAG_VITAL, i);
 			}
 	}
@@ -799,24 +806,13 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 	}
 }
 
-void CGameContext::SendBroadcast(const char* pText, int ClientID, bool IsImportant)
+void CGameContext::SendBroadcast(const char* pText, int ClientID, bool IsImportant, CFormatArg *pArgs, int NumArgs)
 {
-	CNetMsg_Sv_Broadcast Msg;
-	Msg.m_pMessage = pText;
-
 	if (ClientID == -1)
 	{
 		dbg_assert(IsImportant, "broadcast messages to all players must be important");
-		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-
 		for (int i = 0; i < MAX_CLIENTS; i++)
-		{
-			if (m_apPlayers[i])
-			{
-				m_apPlayers[i]->m_LastBroadcastImportance = true;
-				m_apPlayers[i]->m_LastBroadcast = Server()->Tick();
-			}
-		}
+			SendBroadcast(pText, i);
 		return;
 	}
 
@@ -826,6 +822,10 @@ void CGameContext::SendBroadcast(const char* pText, int ClientID, bool IsImporta
 	if (!IsImportant && m_apPlayers[ClientID]->m_LastBroadcastImportance && m_apPlayers[ClientID]->m_LastBroadcast > Server()->Tick() - Server()->TickSpeed() * 10)
 		return;
 
+	CNetMsg_Sv_Broadcast Msg;
+	char aBuf[256];
+	str_format_args(aBuf, sizeof(aBuf), m_apPlayers[ClientID]->Localize(pText), pArgs, NumArgs);
+	Msg.m_pMessage = aBuf;
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 	m_apPlayers[ClientID]->m_LastBroadcast = Server()->Tick();
 	m_apPlayers[ClientID]->m_LastBroadcastImportance = IsImportant;
@@ -1412,7 +1412,7 @@ void CGameContext::OnTick()
 	{
 		const char* Line = Server()->GetAnnouncementLine(Config()->m_SvAnnouncementFileName);
 		if (Line)
-			SendChat(-1, CHAT_ALL, -1, Line, -1, CHAT_SEVEN|CHAT_SEVENDOWN|CHAT_NO_WEBHOOK);
+			SendChat(-1, CHAT_ALL, -1, Line, -1, CHATFLAG_ALL|CHAT_NO_WEBHOOK);
 	}
 
 	if (Collision()->GetNumAllSwitchers() > 0)
@@ -1703,17 +1703,21 @@ void CGameContext::OnClientEnter(int ClientID)
 	{
 		char aBuf[128];
 		if (m_apPlayers[ClientID]->GetTeam() == TEAM_RED)
-			str_format(aBuf, sizeof(aBuf), Localizable("'%s' entered and joined the game"), Server()->ClientName(ClientID));
+			str_copy(aBuf, Localizable("'%s' entered and joined the game"), sizeof(aBuf));
 		else
-			str_format(aBuf, sizeof(aBuf), Localizable("'%s' entered and joined the spectators"), Server()->ClientName(ClientID));
-		int Flags = CHAT_SEVEN|CHAT_SEVENDOWN;
+			str_copy(aBuf, Localizable("'%s' entered and joined the spectators"), sizeof(aBuf));
+		int Flags = CHATFLAG_ALL;
 		if (m_apPlayers[ClientID]->m_IsDummy)
 			Flags |= CHAT_NO_WEBHOOK;
 
 		if (Config()->m_SvJoinMsgDelay && !m_apPlayers[ClientID]->m_IsDummy)
+		{
 			str_copy(m_apPlayers[ClientID]->m_aDelayedJoinMsg, aBuf, sizeof(m_apPlayers[ClientID]->m_aDelayedJoinMsg));
+		}
 		else
-			SendChat(-1, CHAT_ALL, -1, aBuf, -1, Flags);
+		{
+			SendChatFormat(-1, CHAT_ALL, -1, Flags, aBuf, Server()->ClientName(ClientID));
+		}
 	}
 
 	m_World.InitPlayerMap(ClientID);
@@ -1772,9 +1776,7 @@ void CGameContext::SendStartMessages(int ClientID)
 
 void CGameContext::OnClientRejoin(int ClientID)
 {
-	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), Localizable("'%s' rejoined current session"), Server()->ClientName(ClientID));
-	SendChat(-1, CHAT_ALL, -1, aBuf);
+	SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, Localizable("'%s' rejoined current session"), Server()->ClientName(ClientID));
 
 	if (!m_apPlayers[ClientID])
 		return;
@@ -1875,20 +1877,18 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 
 		if (!Config()->m_SvSilentSpectatorMode || m_apPlayers[ClientID]->GetTeam() != TEAM_SPECTATORS)
 		{
-			char aBuf[128];
+			const char *pFormat = 0;
 			bool HasReason = pReason && *pReason;
 			if (HasReason || m_apPlayers[ClientID]->m_aDelayedJoinMsg[0] == '\0')
 			{
-				char aReason[64] = "";
+				int Flags = CHATFLAG_ALL;
+				if (m_apPlayers[ClientID]->m_IsDummy)
+					Flags |= CHAT_NO_WEBHOOK;
 				if (HasReason)
-					str_format(aReason, sizeof(aReason), " (%s)", pReason);
-				str_format(aBuf, sizeof(aBuf), "%s%s", Localizable("'%s' has left the game"), Server()->ClientName(ClientID), aReason);
+					SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, Localizable("'%s' has left the game (%s)"), Server()->ClientName(ClientID), pReason);
+				else
+					SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, Localizable("'%s' has left the game"), Server()->ClientName(ClientID));
 			}
-
-			int Flags = CHAT_SEVEN|CHAT_SEVENDOWN;
-			if (m_apPlayers[ClientID]->m_IsDummy)
-				Flags |= CHAT_NO_WEBHOOK;
-			SendChat(-1, CHAT_ALL, -1, aBuf, -1, Flags);
 		}
 	}
 
@@ -2207,9 +2207,7 @@ void *CGameContext::PreProcessMsg(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					str_copy(aOldName, Server()->ClientName(ClientID), sizeof(aOldName));
 					Server()->SetClientName(ClientID, pName);
 
-					char aChatText[256];
-					str_format(aChatText, sizeof(aChatText), Localizable("'%s' changed name to '%s'"), aOldName, Server()->ClientName(ClientID));
-					SendChat(-1, CHAT_ALL, -1, aChatText);
+					SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, Localizable("'%s' changed name to '%s'"), aOldName, Server()->ClientName(ClientID));
 					pPlayer->SetName(Server()->ClientName(ClientID));
 
 					// reload scores
@@ -2481,11 +2479,18 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			m_apPlayers[ClientID]->UpdatePlaytime();
 
 			m_VoteType = -1;
-			char aChatmsg[512] = {0};
+			std::pair<const char*, std::pair<CFormatArg[3], int> > ChatMsg;
+			ChatMsg.first = 0;
+			ChatMsg.second.first[0] = 0;
+			ChatMsg.second.first[1] = 0;
+			ChatMsg.second.first[2] = 0;
+			ChatMsg.second.first[3] = 0;
+			ChatMsg.second.second = 0;
 			char aDesc[VOTE_DESC_LENGTH] = {0};
 			char aSevendownDesc[VOTE_DESC_LENGTH] = {0};
 			char aCmd[VOTE_CMD_LENGTH] = {0};
-			char aReason[VOTE_REASON_LENGTH] = "No reason given";
+			char aReason[VOTE_REASON_LENGTH];
+			str_copy(aReason, Localizable("No reason given"), sizeof(aReason));
 			if(!str_utf8_check(pMsg->m_Type) || !str_utf8_check(pMsg->m_Reason) || !str_utf8_check(pMsg->m_Value))
 			{
 				return;
@@ -2513,8 +2518,12 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 							return;
 						}
 
-						str_format(aChatmsg, sizeof(aChatmsg), "'%s' called vote to change server option '%s' (%s)", Server()->ClientName(ClientID),
-							pOption->m_aDescription, aReason);
+						ChatMsg.first = Localizable("'%s' called vote to change server option '%s' (%s)");
+						ChatMsg.second.first[0] = Server()->ClientName(ClientID);
+						ChatMsg.second.first[1] = pOption->m_aDescription;
+						ChatMsg.second.first[2] = aReason;
+						ChatMsg.second.second = 3;
+
 						str_format(aDesc, sizeof(aDesc), "%s", pOption->m_aDescription);
 
 						if((str_endswith(pOption->m_aCommand, "random_map") || str_endswith(pOption->m_aCommand, "random_unfinished_map")) && str_length(aReason) == 1 && aReason[0] >= '0' && aReason[0] <= '5')
@@ -2538,13 +2547,18 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				{
 					if(Authed != AUTHED_ADMIN) // allow admins to call any vote they want
 					{
+						char aChatmsg[256];
 						str_format(aChatmsg, sizeof(aChatmsg), pPlayer->Localize("'%s' isn't an option on this server"), pMsg->m_Value);
 						SendChatTarget(ClientID, aChatmsg);
 						return;
 					}
 					else
 					{
-						str_format(aChatmsg, sizeof(aChatmsg), Localizable("'%s' called vote to change server option '%s'"), Server()->ClientName(ClientID), pMsg->m_Value);
+						ChatMsg.first = Localizable("'%s' called vote to change server option '%s'");
+						ChatMsg.second.first[0] = Server()->ClientName(ClientID);
+						ChatMsg.second.first[1] = pMsg->m_Value;
+						ChatMsg.second.first[2] = 0;
+						ChatMsg.second.second = 2;
 						str_format(aDesc, sizeof(aDesc), "%s", pMsg->m_Value);
 						str_format(aCmd, sizeof(aCmd), "%s", pMsg->m_Value);
 					}
@@ -2559,6 +2573,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					return;
 				else if(!Authed && time_get() < m_apPlayers[ClientID]->m_Last_KickVote + (time_freq() * Config()->m_SvVoteKickDelay))
 				{
+					char aChatmsg[256];
 					str_format(aChatmsg, sizeof(aChatmsg), pPlayer->Localize("There's a %d second wait time between kick votes for each player please wait %d second(s)"),
 						Config()->m_SvVoteKickDelay,
 						(int)(((m_apPlayers[ClientID]->m_Last_KickVote + (m_apPlayers[ClientID]->m_Last_KickVote * time_freq())) / time_freq()) - (time_get() / time_freq())));
@@ -2605,6 +2620,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 
 					if(NumPlayers < Config()->m_SvVoteKickMin)
 					{
+						char aChatmsg[128];
 						str_format(aChatmsg, sizeof(aChatmsg), pPlayer->Localize("Kick voting requires %d players"), Config()->m_SvVoteKickMin);
 						SendChatTarget(ClientID, aChatmsg);
 						return;
@@ -2651,7 +2667,11 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					return;
 				}
 
-				str_format(aChatmsg, sizeof(aChatmsg), "%s (%s)", Localizable("'%s' called for vote to kick '%s'"), Server()->ClientName(ClientID), Server()->ClientName(KickID), aReason);
+				ChatMsg.first = Localizable("'%s' called for vote to kick '%s' (%s)");
+				ChatMsg.second.first[0] = Server()->ClientName(ClientID);
+				ChatMsg.second.first[1] = Server()->ClientName(KickID);
+				ChatMsg.second.first[2] = aReason;
+				ChatMsg.second.second = 3;
 				str_format(aDesc, sizeof(aDesc), "%2d: %s", KickID, Server()->ClientName(KickID));
 				if(!GetDDRaceTeam(ClientID))
 				{
@@ -2713,16 +2733,30 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					return;
 				}
 
+				ChatMsg.first = Localizable("'%s' called for vote to kick '%s' (%s)");
+				ChatMsg.second.first[0] = Server()->ClientName(ClientID);
+				ChatMsg.second.first[1] = Server()->ClientName(SpectateID);
+				ChatMsg.second.first[2] = aReason;
+				ChatMsg.second.second = 3;
 				str_format(aDesc, sizeof(aDesc), "%2d: %s", SpectateID, Server()->ClientName(SpectateID));
 				if(Config()->m_SvPauseable && Config()->m_SvVotePause)
 				{
-					str_format(aChatmsg, sizeof(aChatmsg), "%s (%s)", Localizable("'%s' called for vote to pause '%s' for %d seconds"), Server()->ClientName(ClientID), Server()->ClientName(SpectateID), Config()->m_SvVotePauseTime, aReason);
+					ChatMsg.first = Localizable("'%s' called for vote to pause '%s' for %d seconds (%s)");
+					ChatMsg.second.first[0] = Server()->ClientName(ClientID);
+					ChatMsg.second.first[1] = Server()->ClientName(SpectateID);
+					ChatMsg.second.first[2] = Config()->m_SvVotePauseTime;
+					ChatMsg.second.first[3] = aReason;
+					ChatMsg.second.second = 4;
 					str_format(aSevendownDesc, sizeof(aSevendownDesc), "Pause '%s' (%ds)", Server()->ClientName(SpectateID), Config()->m_SvVotePauseTime);
 					str_format(aCmd, sizeof(aCmd), "uninvite %d %d; force_pause %d %d", SpectateID, GetDDRaceTeam(SpectateID), SpectateID, Config()->m_SvVotePauseTime);
 				}
 				else
 				{
-					str_format(aChatmsg, sizeof(aChatmsg), "%s (%s)", Localizable("'%s' called for vote to move '%s' to spectators"), Server()->ClientName(ClientID), Server()->ClientName(SpectateID), aReason);
+					ChatMsg.first = Localizable("'%s' called for vote to move '%s' to spectators (%s)");
+					ChatMsg.second.first[0] = Server()->ClientName(ClientID);
+					ChatMsg.second.first[1] = Server()->ClientName(SpectateID);
+					ChatMsg.second.first[2] = aReason;
+					ChatMsg.second.second = 3;
 					str_format(aSevendownDesc, sizeof(aSevendownDesc), "Move '%s' to spectators", Server()->ClientName(SpectateID));
 					str_format(aCmd, sizeof(aCmd), "uninvite %d %d; set_team %d -1 %d", SpectateID, GetDDRaceTeam(SpectateID), SpectateID, Config()->m_SvVoteSpectateRejoindelay);
 				}
@@ -2731,7 +2765,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			}
 
 			if(aCmd[0] && str_comp(aCmd, "info") != 0)
-				CallVote(ClientID, aDesc, aCmd, aReason, aChatmsg, aSevendownDesc[0] ? aSevendownDesc : 0);
+				CallVote(ClientID, aDesc, aCmd, aReason, ChatMsg.first, aSevendownDesc[0] ? aSevendownDesc : 0);
 		}
 		else if(MsgID == NETMSGTYPE_CL_VOTE)
 		{
@@ -7117,11 +7151,6 @@ bool CGameContext::LineShouldHighlight(const char *pLine, const char *pName)
 	return false;
 }
 
-void CGameContext::SendChatPolice(const char *pMessage)
-{
-	SendChat(-1, CHAT_POLICE_CHANNEL, -1, pMessage);
-}
-
 bool CGameContext::JailPlayer(int ClientID, int Seconds)
 {
 	CPlayer *pPlayer = m_apPlayers[ClientID];
@@ -7176,9 +7205,7 @@ void CGameContext::ProcessSpawnBlockProtection(int ClientID)
 		{
 			if (pKiller->m_SpawnBlockScore > 5)
 			{
-				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), Localizable("'%s' is spawnblocking. Catch him!"), Server()->ClientName(Killer));
-				SendChatPolice(aBuf);
+				SendChatPoliceFormat(Localizable("'%s' is spawnblocking. Catch him!"), Server()->ClientName(Killer));
 				SendChatTarget(Killer, pKiller->Localize("Police is searching you because of spawnblocking"));
 				pKiller->m_EscapeTime += Server()->TickSpeed() * 120; // + 2 minutes escape time
 			}
@@ -8194,8 +8221,7 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force, bool DoCh
 	{
 		if (DoChatMsg)
 		{
-			str_format(aMsg, sizeof(aMsg), Localizable("'%s' left the minigame '%s'"), Server()->ClientName(ClientID), GetMinigameName(pPlayer->m_Minigame));
-			SendChat(-1, CHAT_ALL, -1, aMsg);
+			SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, Localizable("'%s' left the minigame '%s'"), Server()->ClientName(ClientID), GetMinigameName(pPlayer->m_Minigame));
 		}
 
 		//reset everything
@@ -8219,8 +8245,8 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force, bool DoCh
 	{
 		if (DoChatMsg)
 		{
-			str_format(aMsg, sizeof(aMsg), Localizable("'%s' joined the minigame '%s', use '/%s' to join aswell"), Server()->ClientName(ClientID), GetMinigameName(Minigame), GetMinigameCommand(Minigame));
-			SendChat(-1, CHAT_ALL, -1, aMsg);
+			SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, Localizable("'%s' joined the minigame '%s', use '/%s' to join aswell"),
+				Server()->ClientName(ClientID), GetMinigameName(Minigame), GetMinigameCommand(Minigame));
 			SendChatTarget(ClientID, pPlayer->Localize("Say '/leave' to join the normal area again"));
 		}
 
@@ -8299,8 +8325,7 @@ void CGameContext::SurvivalTick()
 
 		if (m_apPlayers[m_SurvivalWinner])
 		{
-			str_format(aBuf, sizeof(aBuf), Localizable("The winner is '%s'"), Server()->ClientName(m_SurvivalWinner));
-			SendSurvivalBroadcast(aBuf);
+			SendSurvivalBroadcastFormat(true, true, Localizable("The winner is '%s'"), Server()->ClientName(m_SurvivalWinner));
 
 			// send message to winner
 			SendChatTarget(m_SurvivalWinner, m_apPlayers[m_SurvivalWinner]->Localize("You are the winner"));
@@ -8499,7 +8524,7 @@ int CGameContext::GetRandomSurvivalPlayer(int State, int NotThis)
 	return -1;
 }
 
-void CGameContext::SendSurvivalBroadcast(const char *pMsg, bool Sound, bool IsImportant)
+void CGameContext::SendSurvivalBroadcast(const char *pMsg, bool Sound, bool IsImportant, CFormatArg *pArgs, int NumArgs)
 {
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
@@ -8511,7 +8536,7 @@ void CGameContext::SendSurvivalBroadcast(const char *pMsg, bool Sound, bool IsIm
 			// show money broadcast instead of the wanted one if we are on a money tile
 			if (m_apPlayers[i]->GetCharacter() && m_apPlayers[i]->GetCharacter()->m_MoneyTile)
 				continue;
-			SendBroadcast(m_apPlayers[i]->Localize(pMsg), i, IsImportant);
+			SendBroadcast(pMsg, i, IsImportant, pArgs, NumArgs);
 		}
 	}
 }

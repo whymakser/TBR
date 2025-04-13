@@ -470,7 +470,7 @@ void CPlayer::Tick()
 
 	if (m_aDelayedJoinMsg[0] != '\0' && m_JoinTick + Server()->TickSpeed() * GameServer()->Config()->m_SvJoinMsgDelay < Server()->Tick())
 	{
-		GameServer()->SendChat(-1, CHAT_ALL, -1, m_aDelayedJoinMsg);
+		GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, m_aDelayedJoinMsg, Server()->ClientName(m_ClientID));
 		m_aDelayedJoinMsg[0] = '\0';
 	}
 }
@@ -1441,10 +1441,9 @@ void CPlayer::SetTeam(int Team, bool DoChatMsg)
 	if (DoChatMsg)
 	{
 		if (Team == TEAM_RED)
-			str_format(aBuf, sizeof(aBuf), Localizable("'%s' joined the game"), Server()->ClientName(m_ClientID));
+			GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CFGFLAG_CHAT, Localizable("'%s' joined the game"), Server()->ClientName(m_ClientID));
 		else
-			str_format(aBuf, sizeof(aBuf), Localizable("'%s' joined the spectators"), Server()->ClientName(m_ClientID));
-		GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+			GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CFGFLAG_CHAT, Localizable("'%s' joined the spectators"), Server()->ClientName(m_ClientID));
 	}
 }
 
@@ -2716,6 +2715,7 @@ bool CPlayer::ShowDDraceHud()
 
 const char *CPlayer::Localize(const char *pText)
 {
+	if (m_IsDummy) return pText;
 	return ::Localize(pText, m_Language);
 }
 

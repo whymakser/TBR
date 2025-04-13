@@ -1128,6 +1128,31 @@ GNUC_ATTRIBUTE((format(printf, 3, 4)));
 int str_format_v(char *buffer, int buffer_size, const char *format, va_list args)
 GNUC_ATTRIBUTE((format(printf, 3, 0)));
 
+class CFormatArg
+{
+public:
+	enum EFormatType
+	{
+		FORMAT_INT,
+		FORMAT_STRING,
+		FORMAT_INT64,
+		FORMAT_FLOAT,
+	} m_Type;
+	union
+	{
+		int m_Int;
+		const char *m_pStr;
+		int64 m_Int64;
+		float m_Float;
+	};
+	CFormatArg() = default;
+	CFormatArg(int Int) : m_Int(Int), m_Type(FORMAT_INT) {}
+	CFormatArg(const char *pStr) : m_pStr(pStr), m_Type(FORMAT_STRING) {}
+	CFormatArg(int64 Int64) : m_Int64(Int64), m_Type(FORMAT_INT64) {}
+	CFormatArg(float Float) : m_Float(Float), m_Type(FORMAT_FLOAT) {}
+};
+int str_format_args(char *pBuffer, int BufferSize, const char *pFormat, CFormatArg *pArgs, int NumArgs);
+
 FILE *pipe_open(const char *cmd, const char *mode);
 int pipe_close(FILE *stream);
 

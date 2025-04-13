@@ -1681,7 +1681,6 @@ void CCharacter::Die(int Weapon, bool UpdateTeeControl, bool OnArenaDie)
 	if (pKiller)
 	{
 		// killing spree
-		char aBuf[128];
 		bool IsBlock = !pKiller->IsMinigame() || pKiller->m_Minigame == MINIGAME_BLOCK;
 		CCharacter* pKillerChar = pKiller->GetCharacter();
 		if (CountKill && pKillerChar && (!m_pPlayer->m_IsDummy || Config()->m_SvDummyBlocking))
@@ -1690,10 +1689,9 @@ void CCharacter::Die(int Weapon, bool UpdateTeeControl, bool OnArenaDie)
 			if (pKillerChar->m_KillStreak % 5 == 0)
 			{
 				if (IsBlock)
-					str_format(aBuf, sizeof(aBuf), Localizable("%s is on a killing spree with %d blocks"), Server()->ClientName(Killer), pKillerChar->m_KillStreak);
+					GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("%s is on a killing spree with %d blocks"), Server()->ClientName(Killer), pKillerChar->m_KillStreak);
 				else
-					str_format(aBuf, sizeof(aBuf), Localizable("%s is on a killing spree with %d kills"), Server()->ClientName(Killer), pKillerChar->m_KillStreak);
-				GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+					GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("%s is on a killing spree with %d kills"), Server()->ClientName(Killer), pKillerChar->m_KillStreak);
 				GameServer()->CreateFinishConfetti(pKillerChar->GetPos(), pKillerChar->TeamMask());
 			}
 		}
@@ -1701,10 +1699,15 @@ void CCharacter::Die(int Weapon, bool UpdateTeeControl, bool OnArenaDie)
 		if (m_KillStreak >= 5)
 		{
 			if (IsBlock)
-				str_format(aBuf, sizeof(aBuf), Localizable("%s's blocking spree was ended by %s (%d blocks)"), Server()->ClientName(m_pPlayer->GetCID()), Server()->ClientName(Killer), m_KillStreak);
+			{
+				GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("%s's blocking spree was ended by %s (%d blocks)"),
+					Server()->ClientName(m_pPlayer->GetCID()), Server()->ClientName(Killer), m_KillStreak);
+			}
 			else
-				str_format(aBuf, sizeof(aBuf), Localizable("%s's killing spree was ended by %s (%d kills)"), Server()->ClientName(m_pPlayer->GetCID()), Server()->ClientName(Killer), m_KillStreak);
-			GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+			{
+				GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("%s's blocking spree was ended by %s (%d kills)"),
+					Server()->ClientName(m_pPlayer->GetCID()), Server()->ClientName(Killer), m_KillStreak);
+			}
 			pKiller->GiveXP(250, "for ending a killing spree");
 			GameServer()->CreateFinishConfetti(pKillerChar->GetPos(), pKillerChar->TeamMask());
 		}
@@ -2998,9 +3001,7 @@ void CCharacter::HandleTiles(int Index)
 		// special finish
 		if (!m_HasFinishedSpecialRace && m_DDRaceState != DDRACE_NONE && m_DDRaceState != DDRACE_CHEAT && (m_TileIndex == TILE_SPECIAL_FINISH || m_TileFIndex == TILE_SPECIAL_FINISH || FTile1 == TILE_SPECIAL_FINISH || FTile2 == TILE_SPECIAL_FINISH || FTile3 == TILE_SPECIAL_FINISH || FTile4 == TILE_SPECIAL_FINISH || Tile1 == TILE_SPECIAL_FINISH || Tile2 == TILE_SPECIAL_FINISH || Tile3 == TILE_SPECIAL_FINISH || Tile4 == TILE_SPECIAL_FINISH))
 		{
-			char aBuf[64];
-			str_format(aBuf, sizeof(aBuf), Localizable("'%s' finished the special race!"), Server()->ClientName(m_pPlayer->GetCID()));
-			GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+			GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("'%s' finished the special race!"), Server()->ClientName(m_pPlayer->GetCID()));
 			m_pPlayer->GiveXP(750, "for finishing the special race");
 
 			m_HasFinishedSpecialRace = true;
@@ -4760,10 +4761,7 @@ void CCharacter::IncreasePermille(int Permille)
 	{
 		// +5 minutes escape time initially, add 2 minutes for each extra drink over
 		m_pPlayer->m_EscapeTime += Server()->TickSpeed() * (m_pPlayer->m_EscapeTime ? 120 : 300);
-
-		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), Localizable("'%s' has exceeded his legal drinking limit. Catch him!"), Server()->ClientName(m_pPlayer->GetCID()));
-		GameServer()->SendChatPolice(aBuf);
+		GameServer()->SendChatPoliceFormat(Localizable("'%s' has exceeded his legal drinking limit. Catch him!"), Server()->ClientName(m_pPlayer->GetCID()));
 		GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("Police is searching you because you have exceeded your legal drinking limit"));
 	}
 
@@ -5333,9 +5331,7 @@ void CCharacter::IncreaseNoBonusScore(int Summand)
 		{
 			if (!m_NoBonusContext.m_LastAlertTick || m_NoBonusContext.m_LastAlertTick + Server()->TickSpeed() * 20 < Server()->Tick())
 			{
-				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), Localizable("'%s' is using bonus illegally. Catch him!"), Server()->ClientName(m_pPlayer->GetCID()));
-				GameServer()->SendChatPolice(aBuf);
+				GameServer()->SendChatPoliceFormat(Localizable("'%s' is using bonus illegally. Catch him!"), Server()->ClientName(m_pPlayer->GetCID()));
 				m_NoBonusContext.m_LastAlertTick = Server()->Tick();
 			}
 			GameServer()->SendChatTarget(m_pPlayer->GetCID(), m_pPlayer->Localize("Police is searching you because of illegal bonus use"));
@@ -5433,10 +5429,7 @@ bool CCharacter::TrySafelyRedirectClientImpl(int Port)
 	if (IdentityIndex != -1)
 	{
 		// Send msg
-		char aMsg[128];
-		str_format(aMsg, sizeof(aMsg), Localizable("'%s' has been moved to another map"), Server()->ClientName(m_pPlayer->GetCID()));
-		GameServer()->SendChat(-1, CHAT_ALL, -1, aMsg);
-
+		GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("'%s' has been moved to another map"), Server()->ClientName(m_pPlayer->GetCID()));
 		Server()->SendRedirectSaveTeeAdd(m_RedirectTilePort, GameServer()->GetSavedIdentityHash(GameServer()->m_vSavedIdentities[IdentityIndex]));
 		Server()->RedirectClient(m_pPlayer->GetCID(), m_RedirectTilePort);
 		return true;
@@ -5706,9 +5699,8 @@ bool CCharacter::GrogTick()
 				// Reset escape time when a player died from grog, no matter his crimes
 				m_pPlayer->m_EscapeTime = 0;
 				Die(WEAPON_SELF);
-				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), "%s (%.1f‰ / %.1f‰)", Localizable("'%s' died as a result of excessive grog consumption"), Server()->ClientName(m_pPlayer->GetCID()), m_pPlayer->m_Permille / 10.f, GetPermilleLimit() / 10.f);
-				GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+				GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("'%s' died as a result of excessive grog consumption (%.1f‰ / %.1f‰)"),
+					Server()->ClientName(m_pPlayer->GetCID()), m_pPlayer->m_Permille / 10.f, GetPermilleLimit() / 10.f);
 				return true;
 			}
 		}
@@ -5767,12 +5759,10 @@ bool CCharacter::TryCatchingWanted(int TargetCID, vec2 EffectPos)
 		Minutes -= 5;
 	}
 
-	str_format(aBuf, sizeof(aBuf), Localizable("'%s' has been caught by '%s' (%d minutes arrest)"), Server()->ClientName(TargetCID), Server()->ClientName(m_pPlayer->GetCID()), Minutes);
-	GameServer()->SendChatPolice(aBuf);
+	GameServer()->SendChatPoliceFormat(Localizable("'%s' has been caught by '%s' (%d minutes arrest)"), Server()->ClientName(TargetCID), Server()->ClientName(m_pPlayer->GetCID()), Minutes);
 	if (pTarget->m_pPlayer->m_Permille)
 	{
-		str_format(aBuf, sizeof(aBuf), "%s: %.1f‰ / %.1f‰", Localizable("Grog testing results"), pTarget->m_pPlayer->m_Permille / 10.f, pTarget->GetPermilleLimit() / 10.f);
-		GameServer()->SendChatPolice(aBuf);
+		GameServer()->SendChatPoliceFormat(Localizable("Grog testing results: %.1f‰ / %.1f‰"), pTarget->m_pPlayer->m_Permille / 10.f, pTarget->GetPermilleLimit() / 10.f);
 	}
 
 	str_format(aBuf, sizeof(aBuf), pTarget->GetPlayer()->Localize("You were arrested for %d minutes by '%s'"), Minutes, Server()->ClientName(m_pPlayer->GetCID()));

@@ -2312,8 +2312,7 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 		// success
 		int PlotID = pSelf->GetPlotID(pSeller->GetAccID());
 
-		str_format(aBuf, sizeof(aBuf), Localizable("Plot %d has been bought by '%s'"), PlotID, pSelf->Server()->ClientName(pResult->m_ClientID));
-		pSelf->SendChat(-1, CHAT_ALL, -1, aBuf);
+		pSelf->SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, Localizable("Plot %d has been bought by '%s'"), PlotID, pSelf->Server()->ClientName(pResult->m_ClientID));
 
 		// a message to you
 		str_format(aBuf, sizeof(aBuf), pPlayer->Localize("You bought plot %d from %s"), PlotID, pName);
@@ -2408,12 +2407,11 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 		pPlayer->m_PlotAuctionPrice = Price;
 		pPlayer->m_LastPlotAuction = pSelf->Server()->Tick();
 
-		str_format(aBuf, sizeof(aBuf), Localizable("'%s' started an auction on plot %d for %d money (plot expires on %s)"),
+		pSelf->SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, Localizable("'%s' started an auction on plot %d for %d money (plot expires on %s)"),
 			pSelf->Server()->ClientName(pResult->m_ClientID), OwnPlotID, Price, pSelf->GetDate(pSelf->m_aPlots[OwnPlotID].m_ExpireDate));
-		pSelf->SendChat(-1, CHAT_ALL, -1, aBuf);
 
-		str_format(aBuf, sizeof(aBuf), Localizable("Use '/plot buy %d %s' to buy the plot"), Price, pSelf->Server()->ClientName(pResult->m_ClientID));
-		pSelf->SendChat(-1, CHAT_ALL, -1, aBuf);
+		pSelf->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("Use '/plot buy %d %s' to buy the plot"),
+			Price, pSelf->Server()->ClientName(pResult->m_ClientID));
 	}
 	else if (!str_comp_nocase(pCommand, "cancel"))
 	{
