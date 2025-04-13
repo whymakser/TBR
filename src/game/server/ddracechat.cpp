@@ -2172,7 +2172,7 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 	if (!pPlayer)
 		return;
 
-	char aBuf[128];
+	char aBuf[256];
 	const char *pCommand = pResult->GetString(0);
 	bool Help = !str_comp_nocase(pCommand, "help");
 	if (pResult->NumArguments() == 0 || (Help && pResult->NumArguments() == 1))
@@ -2237,8 +2237,6 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 	}
 
 	int Price = pResult->NumArguments() > 1 ? max(1, str_toint(pResult->GetString(1))) : 0; // clamp price to 0
-
-	char aBuf[256];
 	int OwnAccID = pSelf->m_apPlayers[pResult->m_ClientID]->GetAccID();
 	int OwnPlotID = pSelf->GetPlotID(OwnAccID);
 
