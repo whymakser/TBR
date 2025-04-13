@@ -4408,7 +4408,7 @@ void CServer::CTranslateChat::Run()
 #else
 	if (m_pServer->Config()->m_SvLibreTranslateKey[0])
 		str_format(aKey, sizeof(aKey), ",\"api_key\":\"%s\"", m_pServer->Config()->m_SvLibreTranslateKey);
-	str_format(aCmd, sizeof(aCmd), "curl -s -H \"Content-Type:application/json\" -X POST --data '{\"q\":\"%s\",\"source\":\"auto\",\"target\":\"%s\"%s}' %s", m_aMessage, m_aLanguage, aKey, m_pServer->Config()->m_SvLibreTranslateURL);
+	str_format(aCmd, sizeof(aCmd), "curl -s -H \"Content-Type:application/json\" -X POST --data '{\"q\":\"%s\",\"source\":\"auto\",\"target\":\"%s\"%s}' %s", m_aMessage, m_aChatLanguage, aKey, m_pServer->Config()->m_SvLibreTranslateURL);
 #endif
 
 	char aResult[512] = "";
