@@ -2527,7 +2527,7 @@ void CGameContext::ConPoliceInfo(IConsole::IResult *pResult, void *pUserData)
 
 	char aInfo[128];
 	char aPage[128];
-	str_format(aInfo, sizeof(aInfo), pPlayer->Localize("Use '/police <page>' to check out what other police ranks can do."));
+	str_copy(aInfo, pPlayer->Localize("Use '/police <page>' to check out what other police ranks can do."), sizeof(aInfo));
 	str_format(aPage, sizeof(aPage), pPlayer->Localize("-- Page %d/%d --"), Page, MaxPages);
 
 	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("~~~ Police Info ~~~"));

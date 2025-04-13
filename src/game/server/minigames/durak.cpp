@@ -1525,7 +1525,7 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bo
 	}
 	else if (WinPos > 0)
 	{
-		str_format(aBuf, sizeof(aBuf), GameServer()->m_apPlayers[ClientID]->Localize("Congratulations, you are not the Durák!"));
+		str_copy(aBuf, GameServer()->m_apPlayers[ClientID]->Localize("Congratulations, you are not the Durák!"), sizeof(aBuf));
 	}
 	if (ReturnStake)
 	{

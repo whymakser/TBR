@@ -1643,8 +1643,9 @@ set(LIBS_SERVER
   ${CMAKE_THREAD_LIBS_INIT}
 )
 
-# Disable warning for Localization
-add_compile_options(-Wno-format-nonliteral)
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-Wno-format-nonliteral)
+endif()
 
 # Target
 set(TARGET_SERVER ${SERVER_EXECUTABLE})
