@@ -29,13 +29,13 @@ You will now see all tees on this server, no matter the distance
 You will no longer see all tees on this server
 == 
 
-~~~ Score Format ~~~
+Score Format
 == 
 
 Use '/score <format>' to change the displayed score.
 == 
 
-~~~ Accounts ~~~
+Accounts
 == 
 
 Accounts are used to save your stats.
@@ -53,40 +53,34 @@ You can create an account using '/register'.
 Once you are logged in, you can use this command again to see information about your account.
 == 
 
---- Account Info ---
+Account Info
 == 
 
-Account Name: %s
+Account Name
 == 
 
-Registered: %s
+Registered
 == 
 
-Registered: before April 9th 2021
+until
 == 
 
-VIP%s: until %s
-== 
-
-VIP: not bought
+not bought
 == 
 
 Portal Rifle: until %s
 == 
 
-Portal Rifle: not bought
-== 
-
-Contact: %s
+Contact
 == 
 
 Player not found
 == 
 
---- %s's Stats ---
+Stats
 == 
 
-Level [%d] %s
+Level
 == 
 
 (not logged in)
@@ -98,46 +92,37 @@ Bank
 Wallet
 == 
 
-Police [%d]
+Police
 == 
 
 --- Collectables ---
 == 
 
-Taser Battery [%d]
+Taser battery
 == 
 
-Portal Battery [%d]
+Portal Battery
 == 
 
---- Block ---
+Points
 == 
 
---- %s's Block Stats ---
+Kills
 == 
 
-Points: %d
+Deaths
 == 
 
-Kills: %d
+Games won
 == 
 
-Deaths: %d
-== 
-
---- %s's Durák Stats ---
-== 
-
-Games won: %d
-== 
-
-Profit: %s%lld$
+Profit
 == 
 
 --- %s's Survival Stats ---
 == 
 
-Wins: %d
+Wins
 == 
 
 --- %s's Instagib Stats ---
@@ -179,13 +164,13 @@ Each bullet costs 600.000 money.
 ~~~ Your Spawn Weapons ~~~
 == 
 
-Spawn shotgun bullets: %d
+Spawn shotgun bullets
 == 
 
-Spawn grenade bullets: %d
+Spawn grenade bullets
 == 
 
-Spawn rifle bullets: %d
+Spawn rifle bullets
 == 
 
 Accounts are not supported on this server
@@ -248,7 +233,7 @@ Example: '/contact Discord: fokkonaut'
 Successfully updated contact information, check '/account'
 == 
 
-~~~ SECURITY PIN ~~~
+SECURITY PIN
 == 
 
 You should set a security pin to avoid account stealing. The pin itself has to be a 4-digit long number code.
@@ -329,7 +314,7 @@ You can't drop more than 100 portal batteries at the same time
 You don't have enough portal batteries
 == 
 
-~~~ Portal Rifle ~~~
+Portal Rifle
 == 
 
 You can collect portal batteries in the map, which lets you use the portal rifle.
@@ -341,10 +326,7 @@ The portal rifle can shoot two portals at cursor position, which tees, flags and
 ~~~ Your portal stats ~~~
 == 
 
-Portal battery: %d
-== 
-
-Portal blocker: %d
+Portal Blocker
 == 
 
 Drop portal battery: '/portal drop <amount>'
@@ -455,7 +437,7 @@ You bought plot %d from %s
 %s bought your plot, the money is moved to your bank account
 == 
 
-~~~ Plot list ~~~
+Plot list
 == 
 
 Buy from auction: '/plot buy <price> <playername>'
@@ -512,19 +494,16 @@ Offer to swap plots was sent to '%s'
 '%s' has offered to swap plots with you, type '/plot swap %s' to swap
 == 
 
-Use '/police <page>' to check out what other police ranks can do.
+Page
 == 
 
--- Page %d/%d --
-== 
-
-~~~ Police Info ~~~
+Police Info
 == 
 
 [POLICE %d]
 == 
 
-Level needed to buy: [LVL %d]
+Level needed to buy
 == 
 
 Benefits:
@@ -545,7 +524,7 @@ Benefits:
 [GENERAL INFORMATION]
 == 
 
-Police can be bought in shop using '/buy police'.
+Police ranks can be bought in shop.
 == 
 
 There are multiple police ranks, each cost 100.000 money.
@@ -563,13 +542,13 @@ Use '/police <page>' for information about other ranks
 You can't mute yourself
 == 
 
-'%s' muted
+muted
 == 
 
-'%s' unmuted
+unmuted
 == 
 
-~~~ Map Designs ~~~
+Map Designs
 == 
 
 If you have your dummy connected, you need to reconnect it after the design change so it can get back it's state.
@@ -584,7 +563,7 @@ Invalid language
 Successfully changed language to %s
 == 
 
-~~~ Server Language ~~~
+Server Language
 == 
 
 Current language: %s
@@ -599,7 +578,7 @@ This chat language is already selected
 Successfully updated chat language
 == 
 
-~~~ Chat Language ~~~
+Chat Language
 == 
 
 You can set one of the following languages by using '/chatlanguage <option>':
@@ -608,7 +587,7 @@ You can set one of the following languages by using '/chatlanguage <option>':
 This server does not have a linked Discord server
 == 
 
-~~~ Minigames ~~~
+Minigames
 == 
 
 You can join any minigame using '/<minigame>'
@@ -620,22 +599,10 @@ To leave a minigame, just type '/leave'
 Here is a list of all minigames:
 == 
 
-Level
-== 
-
-Points
-== 
-
 Money
 == 
 
 Spree
-== 
-
-Portal Battery
-== 
-
-Portal Blocker
 == 
 
 Durák Wins
@@ -668,7 +635,7 @@ This player is not a police helper
 You removed '%s' from the police helpers
 == 
 
-~~~ WANTED ~~~
+WANTED
 == 
 
 Listing all players that are wanted by the police:
@@ -686,7 +653,7 @@ There are no wanted players right now
 You don't have enough taser batteries
 == 
 
-~~~ Taser ~~~
+Taser
 == 
 
 Police officers with level 3 or higher get a taser license.
@@ -698,28 +665,22 @@ The taser is a rifle that freezes players for a short time.
 You can pick up the taser and taser batteries throughout the map.
 == 
 
-~~~ Your taser stats ~~~
+Your taser stats
 == 
 
-Taser level: %d/%d
+Taser level
 == 
 
-Price for the next level: %d
+Price for the next level
 == 
 
 Freeze time: %.2f seconds
 == 
 
-Taser battery: %d/%d
-== 
-
-Taser shield: %d%%
+Taser shield
 == 
 
 Drop taser battery: '/taser drop <amount>'
-== 
-
-'%s' has been muted for %d seconds (%s)
 == 
 
 '%s' has been muted for %d seconds
@@ -749,7 +710,7 @@ You lost your plot
 You are now owner of plot %d
 == 
 
-Objects [%d/%d]
+Objects
 == 
 
 Please enter the name for this preset into the chat
@@ -803,7 +764,7 @@ This server has an initial chat delay, you will need to wait %d seconds before t
 [WARNING] You need to reconnect your dummy after the design change is done, so it can get back it's old state.
 == 
 
-'%s' has left the game%s
+'%s' has left the game
 == 
 
 You do not have an ongoing conversation. Whisper to someone to start one
@@ -813,9 +774,6 @@ You do not have an ongoing conversation. Whisper to someone to start one
 == 
 
 Following players can't receive your message because either you or they are in local chat mode:
-== 
-
-'%s' called vote to change server option '%s' (%s)
 == 
 
 '%s' isn't an option on this server
@@ -848,7 +806,7 @@ You can't kick authorized players
 You can kick only your team member
 == 
 
-'%s' called for vote to kick '%s' (%s)
+'%s' called for vote to kick '%s'
 == 
 
 Server does not allow voting to move players to spectators
@@ -863,10 +821,10 @@ You can't set dummies to spectator
 You can only move your team member to spectators
 == 
 
-'%s' called for vote to pause '%s' for %d seconds (%s)
+'%s' called for vote to pause '%s' for %d seconds
 == 
 
-'%s' called for vote to move '%s' to spectators (%s)
+'%s' called for vote to move '%s' to spectators
 == 
 
 You are now using the tee controller
@@ -1208,16 +1166,22 @@ Please specify the rainbow speed using the reason field
 You can't close your door because the police destroyed it
 == 
 
-%s is on a killing spree with %d %s
+%s is on a killing spree with %d blocks
 == 
 
-%s's killing spree was ended by %s (%d %s)
+%s is on a killing spree with %d kills
+== 
+
+%s's blocking spree was ended by %s (%d blocks)
+== 
+
+%s's killing spree was ended by %s (%d kills)
 == 
 
 You lost, you can wait for another round or leave the lobby using '/leave'
 == 
 
-Too many players on police tiles [%d/%d]
+Too many players on police tiles
 == 
 
 You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'
@@ -1274,7 +1238,7 @@ Police is searching you because you have exceeded your legal drinking limit
 You can not hold more than %d grogs at once
 == 
 
-Weapon: %s%s
+Weapon
 == 
 
 '%s' is using bonus illegally. Catch him!
@@ -1295,7 +1259,7 @@ Police is searching you because of illegal bonus use
 '%s' has been moved to another map
 == 
 
-'%s' died as a result of excessive grog consumption (%.1f‰ / %.1f‰)
+'%s' died as a result of excessive grog consumption
 == 
 
 You paid %d money to '%s' to reduce your jailtime by 5 minutes
@@ -1307,7 +1271,7 @@ You got %d money from '%s' to reduce his jailtime by 5 minutes
 '%s' has been caught by '%s' (%d minutes arrest)
 == 
 
-Grog testing results: %.1f‰ / %.1f‰
+Grog testing results
 == 
 
 You were arrested for %d minutes by '%s'
@@ -1328,16 +1292,16 @@ battery
 portal rifle
 == 
 
-This %s will respawn in %d seconds
+seconds
 == 
 
-This %s will respawn in %d minutes
+minutes
 == 
 
-This %s got picked up %d seconds ago
+This %s will respawn in %d %s
 == 
 
-This %s got picked up %d minutes ago
+This %s got picked up %d %s ago
 == 
 
 You need to select an amount to deposit or withdraw.
