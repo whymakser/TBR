@@ -22,7 +22,11 @@ def decode(fileobj, elements_per_key):
 			current_context = ""
 			continue
 
-		if line[:3] == "== ":
+		if line[0] == "{":
+			if line[-1] != "}":
+				raise LanguageDecodeError("Invalid context string", fileobj.name, index)
+			current_context = line[1:-1]
+		elif line[:3] == "== ":
 			if len(data[current_key]) >= 1+elements_per_key:
 				raise LanguageDecodeError("Wrong number of elements per key", fileobj.name, index)
 			if current_key:
@@ -39,9 +43,10 @@ def decode(fileobj, elements_per_key):
 				raise LanguageDecodeError("Key defined multiple times: " + line, fileobj.name, index)
 			data[(line, current_context)] = [index - 1 if current_context else index]
 			current_key = (line, current_context)
-	if len(data[current_key]) != 1+elements_per_key:
-		raise LanguageDecodeError("Wrong number of elements per key", fileobj.name, index)
-	data[current_key].append(index+1)
+	if current_key is not None:
+		if len(data[current_key]) != 1 + elements_per_key:
+			raise LanguageDecodeError("Wrong number of elements per key", fileobj.name, index)
+		data[current_key].append(index + 1)
 	new_data = {}
 	for key, value in data.items():
 		if key[0]:

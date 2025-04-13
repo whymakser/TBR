@@ -29,11 +29,11 @@ def copy_fix(infile, delete_unused, append_missing, delete_empty):
 	if append_missing:
 		missing = [index for index in range(len(local)) if index not in supported]
 		if missing:
-			if content[-1] != "\n":
+			if content and content[-1] != "\n":
 				content.append("\n")
 			for miss in missing:
 				if local[miss][1] != "":
-					content.append("["+local[miss][1]+"]\n")
+					content.append("{"+local[miss][1]+"}\n")
 				content.append(local[miss][0]+"\n== \n\n")
 			content[-1] = content[-1][:-1]
 	return "".join(content)
