@@ -1755,7 +1755,7 @@ void CGameContext::ConContact(IConsole::IResult* pResult, void* pUserData)
 	}
 
 	if (pSelf->m_Accounts[pPlayer->GetAccID()].m_aContact[0] == '\0')
-		pPlayer->GiveXP(500, pPlayer->Localize("for setting initial contact info"));
+		pPlayer->GiveXP(500, "for setting initial contact info");
 
 	str_copy(pSelf->m_Accounts[pPlayer->GetAccID()].m_aContact, pContact, sizeof(pSelf->m_Accounts[pPlayer->GetAccID()].m_aContact));
 	pSelf->WriteAccountStats(pPlayer->GetAccID());
@@ -2172,17 +2172,18 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 	if (!pPlayer)
 		return;
 
+	char aBuf[128];
 	const char *pCommand = pResult->GetString(0);
 	bool Help = !str_comp_nocase(pCommand, "help");
 	if (pResult->NumArguments() == 0 || (Help && pResult->NumArguments() == 1))
 	{
-		pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("Plot subcommands: edit, clear, sell, cancel, buy, swap, spawn, list"));
+		str_format(aBuf, sizeof(aBuf), "%s: edit, clear, sell, cancel, buy, swap, spawn, list", pPlayer->Localize("Plot subcommands"));
+		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 		pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("For detailed info, type '/plot help <command>'"));
 		return;
 	}
 	else if (Help)
 	{
-		char aBuf[128];
 		pCommand = pResult->GetString(1);
 		if (!str_comp_nocase(pCommand, "edit"))
 		{
