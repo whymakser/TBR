@@ -410,7 +410,7 @@ Hold SPACE while editing for more control infos
 Clears all objects of your plot
 == 
 
-Starts an auction for your plot, everyone can buy it using the sell command
+Starts an auction for your plot, everyone can buy it using the buy command
 == 
 
 Buys a plot if the given player is running a plot auction
