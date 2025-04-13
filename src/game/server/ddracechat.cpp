@@ -2201,7 +2201,7 @@ void CGameContext::ConPlot(IConsole::IResult* pResult, void* pUserData)
 		{
 			str_format(aBuf, sizeof(aBuf), "%s: /plot sell <price>", pPlayer->Localize("Usage"));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("Starts an auction for your plot, everyone can buy it using the sell command"));
+			pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("Starts an auction for your plot, everyone can buy it using the buy command"));
 		}
 		else if (!str_comp_nocase(pCommand, "buy"))
 		{
