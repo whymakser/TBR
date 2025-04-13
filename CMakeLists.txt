@@ -1643,6 +1643,9 @@ set(LIBS_SERVER
   ${CMAKE_THREAD_LIBS_INIT}
 )
 
+# Disable warning for Localization
+add_compile_options(-Wno-format-nonliteral)
+
 # Target
 set(TARGET_SERVER ${SERVER_EXECUTABLE})
 add_executable(${TARGET_SERVER}
