@@ -301,7 +301,7 @@ void CDrawEditor::Tick()
 			PlotID = GetCursorPlotID();
 
 		char aBuf[32];
-		str_format(aBuf, sizeof(aBuf), m_pCharacter->GetPlayer()->Localize("Objects [%d/%d]"), (int)GameServer()->m_aPlots[PlotID].m_vObjects.size(), GameServer()->GetMaxPlotObjects(PlotID));
+		str_format(aBuf, sizeof(aBuf), "%s [%d/%d]", m_pCharacter->GetPlayer()->Localize("Objects"), (int)GameServer()->m_aPlots[PlotID].m_vObjects.size(), GameServer()->GetMaxPlotObjects(PlotID));
 		GameServer()->SendBroadcast(aBuf, GetCID(), false);
 	}
 }

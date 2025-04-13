@@ -1882,7 +1882,7 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 				char aReason[64] = "";
 				if (HasReason)
 					str_format(aReason, sizeof(aReason), " (%s)", pReason);
-				str_format(aBuf, sizeof(aBuf), Localizable("'%s' has left the game%s"), Server()->ClientName(ClientID), aReason);
+				str_format(aBuf, sizeof(aBuf), "%s%s", Localizable("'%s' has left the game"), Server()->ClientName(ClientID), aReason);
 			}
 
 			int Flags = CHAT_SEVEN|CHAT_SEVENDOWN;
@@ -2513,7 +2513,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 							return;
 						}
 
-						str_format(aChatmsg, sizeof(aChatmsg), Localizable("'%s' called vote to change server option '%s' (%s)"), Server()->ClientName(ClientID),
+						str_format(aChatmsg, sizeof(aChatmsg), "'%s' called vote to change server option '%s' (%s)", Server()->ClientName(ClientID),
 							pOption->m_aDescription, aReason);
 						str_format(aDesc, sizeof(aDesc), "%s", pOption->m_aDescription);
 
@@ -2638,7 +2638,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					SendChatTarget(ClientID, pPlayer->Localize("You can't kick authorized players"));
 					m_apPlayers[ClientID]->m_Last_KickVote = time_get();
 					char aBufKick[128];
-					str_format(aBufKick, sizeof(aBufKick), pPlayer->Localize("'%s' called for vote to kick you"), Server()->ClientName(ClientID));
+					str_format(aBufKick, sizeof(aBufKick), m_apPlayers[KickID]->Localize("'%s' called for vote to kick you"), Server()->ClientName(ClientID));
 					SendChatTarget(KickID, aBufKick);
 					return;
 				}
@@ -2651,7 +2651,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 					return;
 				}
 
-				str_format(aChatmsg, sizeof(aChatmsg), Localizable("'%s' called for vote to kick '%s' (%s)"), Server()->ClientName(ClientID), Server()->ClientName(KickID), aReason);
+				str_format(aChatmsg, sizeof(aChatmsg), "%s (%s)", Localizable("'%s' called for vote to kick '%s'"), Server()->ClientName(ClientID), Server()->ClientName(KickID), aReason);
 				str_format(aDesc, sizeof(aDesc), "%2d: %s", KickID, Server()->ClientName(KickID));
 				if(!GetDDRaceTeam(ClientID))
 				{
@@ -2716,13 +2716,13 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 				str_format(aDesc, sizeof(aDesc), "%2d: %s", SpectateID, Server()->ClientName(SpectateID));
 				if(Config()->m_SvPauseable && Config()->m_SvVotePause)
 				{
-					str_format(aChatmsg, sizeof(aChatmsg), Localizable("'%s' called for vote to pause '%s' for %d seconds (%s)"), Server()->ClientName(ClientID), Server()->ClientName(SpectateID), Config()->m_SvVotePauseTime, aReason);
+					str_format(aChatmsg, sizeof(aChatmsg), "%s (%s)", Localizable("'%s' called for vote to pause '%s' for %d seconds"), Server()->ClientName(ClientID), Server()->ClientName(SpectateID), Config()->m_SvVotePauseTime, aReason);
 					str_format(aSevendownDesc, sizeof(aSevendownDesc), "Pause '%s' (%ds)", Server()->ClientName(SpectateID), Config()->m_SvVotePauseTime);
 					str_format(aCmd, sizeof(aCmd), "uninvite %d %d; force_pause %d %d", SpectateID, GetDDRaceTeam(SpectateID), SpectateID, Config()->m_SvVotePauseTime);
 				}
 				else
 				{
-					str_format(aChatmsg, sizeof(aChatmsg), Localizable("'%s' called for vote to move '%s' to spectators (%s)"), Server()->ClientName(ClientID), Server()->ClientName(SpectateID), aReason);
+					str_format(aChatmsg, sizeof(aChatmsg), "%s (%s)", Localizable("'%s' called for vote to move '%s' to spectators"), Server()->ClientName(ClientID), Server()->ClientName(SpectateID), aReason);
 					str_format(aSevendownDesc, sizeof(aSevendownDesc), "Move '%s' to spectators", Server()->ClientName(SpectateID));
 					str_format(aCmd, sizeof(aCmd), "uninvite %d %d; set_team %d -1 %d", SpectateID, GetDDRaceTeam(SpectateID), SpectateID, Config()->m_SvVoteSpectateRejoindelay);
 				}

@@ -324,21 +324,26 @@ void CPickup::Tick()
 					continue;
 
 				char aBuf[64] = "";
+				const char *pTime = pChr->GetPlayer()->Localize("seconds");
 				if (RespawnTimer)
 				{
 					int Seconds = (m_SpawnTick - Server()->Tick()) / Server()->TickSpeed();
-					if (Seconds <= 60)
-						str_format(aBuf, sizeof(aBuf), pChr->GetPlayer()->Localize("This %s will respawn in %d seconds"), pType, Seconds);
-					else
-						str_format(aBuf, sizeof(aBuf), pChr->GetPlayer()->Localize("This %s will respawn in %d minutes"), pType, Seconds / 60);
+					if (Seconds > 60)
+					{
+						Seconds /= 60;
+						pTime = pChr->GetPlayer()->Localize("minutes");
+					}
+					str_format(aBuf, sizeof(aBuf), pChr->GetPlayer()->Localize("This %s will respawn in %d %s"), pType, Seconds, pTime);
 				}
 				else
 				{
 					int Seconds = (Server()->Tick() - m_PickupTick) / Server()->TickSpeed();
-					if (Seconds <= 60)
-						str_format(aBuf, sizeof(aBuf), pChr->GetPlayer()->Localize("This %s got picked up %d seconds ago"), pType, Seconds);
-					else
-						str_format(aBuf, sizeof(aBuf), pChr->GetPlayer()->Localize("This %s got picked up %d minutes ago"), pType, Seconds / 60);
+					if (Seconds > 60)
+					{
+						Seconds /= 60;
+						pTime = pChr->GetPlayer()->Localize("minutes");
+					}
+					str_format(aBuf, sizeof(aBuf), pChr->GetPlayer()->Localize("This %s got picked up %d %s ago"), pType, Seconds, pTime);
 				}
 				GameServer()->SendChatTarget(ClientID, aBuf);
 				continue;

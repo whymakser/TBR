@@ -466,10 +466,10 @@ void CGameContext::Mute(const NETADDR *pAddr, int Secs, const char *pDisplayName
 		return;
 
 	char aBuf[128];
+	str_format(aBuf, sizeof aBuf, Localizable("'%s' has been muted for %d seconds"), pDisplayName, Secs);
 	if (pReason[0])
-		str_format(aBuf, sizeof aBuf, Localizable("'%s' has been muted for %d seconds (%s)"), pDisplayName, Secs, pReason);
-	else
-		str_format(aBuf, sizeof aBuf, Localizable("'%s' has been muted for %d seconds"), pDisplayName, Secs);
+		str_format(aBuf, sizeof aBuf, "'%s' has been muted for %d seconds (%s)", pDisplayName, Secs, pReason);
+		
 	SendChat(-1, CHAT_ALL, -1, aBuf);
 	SendModLogMessage(ExecutorID, aBuf);
 }

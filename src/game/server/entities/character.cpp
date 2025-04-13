@@ -1689,7 +1689,10 @@ void CCharacter::Die(int Weapon, bool UpdateTeeControl, bool OnArenaDie)
 			pKillerChar->m_KillStreak++;
 			if (pKillerChar->m_KillStreak % 5 == 0)
 			{
-				str_format(aBuf, sizeof(aBuf), Localizable("%s is on a killing spree with %d %s"), Server()->ClientName(Killer), pKillerChar->m_KillStreak, IsBlock ? "blocks" : "kills");
+				if (IsBlock)
+					str_format(aBuf, sizeof(aBuf), Localizable("%s is on a killing spree with %d blocks"), Server()->ClientName(Killer), pKillerChar->m_KillStreak);
+				else
+					str_format(aBuf, sizeof(aBuf), Localizable("%s is on a killing spree with %d kills"), Server()->ClientName(Killer), pKillerChar->m_KillStreak);
 				GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
 				GameServer()->CreateFinishConfetti(pKillerChar->GetPos(), pKillerChar->TeamMask());
 			}
@@ -1697,7 +1700,10 @@ void CCharacter::Die(int Weapon, bool UpdateTeeControl, bool OnArenaDie)
 
 		if (m_KillStreak >= 5)
 		{
-			str_format(aBuf, sizeof(aBuf), Localizable("%s's killing spree was ended by %s (%d %s)"), Server()->ClientName(m_pPlayer->GetCID()), Server()->ClientName(Killer), m_KillStreak, IsBlock ? "blocks" : "kills");
+			if (IsBlock)
+				str_format(aBuf, sizeof(aBuf), Localizable("%s's blocking spree was ended by %s (%d blocks)"), Server()->ClientName(m_pPlayer->GetCID()), Server()->ClientName(Killer), m_KillStreak);
+			else
+				str_format(aBuf, sizeof(aBuf), Localizable("%s's killing spree was ended by %s (%d kills)"), Server()->ClientName(m_pPlayer->GetCID()), Server()->ClientName(Killer), m_KillStreak);
 			GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
 			pKiller->GiveXP(250, "for ending a killing spree");
 			GameServer()->CreateFinishConfetti(pKillerChar->GetPos(), pKillerChar->TeamMask());
@@ -2821,7 +2827,7 @@ void CCharacter::HandleTiles(int Index)
 				if (!IsPoliceFarmActive && (m_LastPoliceFarmActive || Server()->Tick() % Server()->TickSpeed() == 0))
 				{
 					char aBuf[64];
-					str_format(aBuf, sizeof(aBuf), m_pPlayer->Localize("Too many players on police tiles [%d/%d]"), GameWorld()->m_PoliceFarm.m_NumPoliceTilePlayers, GameWorld()->m_PoliceFarm.m_MaxPoliceTilePlayers);
+					str_format(aBuf, sizeof(aBuf), "%s [%d/%d]", m_pPlayer->Localize("Too many players on police tiles"), GameWorld()->m_PoliceFarm.m_NumPoliceTilePlayers, GameWorld()->m_PoliceFarm.m_MaxPoliceTilePlayers);
 					GameServer()->SendBroadcast(aBuf, m_pPlayer->GetCID(), false);
 					m_LastPoliceFarmActive = IsPoliceFarmActive;
 					return;
@@ -5237,7 +5243,7 @@ void CCharacter::UpdateWeaponIndicator()
 	{
 		if (GameServer()->GetClientDDNetVersion(m_pPlayer->GetCID()) < VERSION_DDNET_NEW_HUD)
 		{
-			str_format(aBuf, sizeof(aBuf), m_pPlayer->Localize("Weapon: %s%s"), pName, aAmmo);
+			str_format(aBuf, sizeof(aBuf), "%s: %s%s", m_pPlayer->Localize("Weapon"), pName, aAmmo);
 		}
 		else
 		{
@@ -5701,7 +5707,7 @@ bool CCharacter::GrogTick()
 				m_pPlayer->m_EscapeTime = 0;
 				Die(WEAPON_SELF);
 				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), Localizable("'%s' died as a result of excessive grog consumption (%.1f‰ / %.1f‰)"), Server()->ClientName(m_pPlayer->GetCID()), m_pPlayer->m_Permille / 10.f, GetPermilleLimit() / 10.f);
+				str_format(aBuf, sizeof(aBuf), "%s (%.1f‰ / %.1f‰)", Localizable("'%s' died as a result of excessive grog consumption"), Server()->ClientName(m_pPlayer->GetCID()), m_pPlayer->m_Permille / 10.f, GetPermilleLimit() / 10.f);
 				GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
 				return true;
 			}
@@ -5765,7 +5771,7 @@ bool CCharacter::TryCatchingWanted(int TargetCID, vec2 EffectPos)
 	GameServer()->SendChatPolice(aBuf);
 	if (pTarget->m_pPlayer->m_Permille)
 	{
-		str_format(aBuf, sizeof(aBuf), Localizable("Grog testing results: %.1f‰ / %.1f‰"), pTarget->m_pPlayer->m_Permille / 10.f, pTarget->GetPermilleLimit() / 10.f);
+		str_format(aBuf, sizeof(aBuf), "%s: %.1f‰ / %.1f‰", Localizable("Grog testing results"), pTarget->m_pPlayer->m_Permille / 10.f, pTarget->GetPermilleLimit() / 10.f);
 		GameServer()->SendChatPolice(aBuf);
 	}
 
