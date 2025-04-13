@@ -68,7 +68,7 @@ until
 not bought
 == 
 
-Portal Rifle: until %s
+Portal Rifle
 == 
 
 Contact
@@ -95,7 +95,7 @@ Wallet
 Police
 == 
 
---- Collectables ---
+Collectables
 == 
 
 Taser battery
@@ -119,16 +119,16 @@ Games won
 Profit
 == 
 
---- %s's Survival Stats ---
-== 
-
 Wins
 == 
 
---- %s's Instagib Stats ---
+Toggle
 == 
 
-~~~ Toggle | Spooky Ghost & Portal Blocker ~~~
+Spooky Ghost
+== 
+
+Portal Blocker
 == 
 
 Spooky ghost (gun) and portal blocker (hammer) can be enabled like the following:
@@ -146,7 +146,7 @@ VIP+ includes every feature of VIP Classic.
 Additionally to that you can enter the VIP+ room to farm safely there, aswell as you gain access to the following commands:
 == 
 
-~~~ Spawn Weapons ~~~
+Spawn Weapons
 == 
 
 You can buy spawn weapons in the shop.
@@ -161,7 +161,7 @@ You can have max. 5 bullets per weapon.
 Each bullet costs 600.000 money.
 == 
 
-~~~ Your Spawn Weapons ~~~
+Your Spawn Weapons
 == 
 
 Spawn shotgun bullets
@@ -314,19 +314,13 @@ You can't drop more than 100 portal batteries at the same time
 You don't have enough portal batteries
 == 
 
-Portal Rifle
-== 
-
 You can collect portal batteries in the map, which lets you use the portal rifle.
 == 
 
 The portal rifle can shoot two portals at cursor position, which tees, flags and weapons can use to travel between them.
 == 
 
-~~~ Your portal stats ~~~
-== 
-
-Portal Blocker
+Your portal stats
 == 
 
 Drop portal battery: '/portal drop <amount>'
@@ -566,7 +560,7 @@ Successfully changed language to %s
 Server Language
 == 
 
-Current language: %s
+Current language
 == 
 
 You can set one of the following languages for server-side translation by using '/language <option>':
@@ -683,6 +677,9 @@ Taser shield
 Drop taser battery: '/taser drop <amount>'
 == 
 
+'%s' has been muted for %d seconds (%s)
+== 
+
 '%s' has been muted for %d seconds
 == 
 
@@ -764,6 +761,9 @@ This server has an initial chat delay, you will need to wait %d seconds before t
 [WARNING] You need to reconnect your dummy after the design change is done, so it can get back it's old state.
 == 
 
+'%s' has left the game (%s)
+== 
+
 '%s' has left the game
 == 
 
@@ -774,6 +774,12 @@ You do not have an ongoing conversation. Whisper to someone to start one
 == 
 
 Following players can't receive your message because either you or they are in local chat mode:
+== 
+
+No reason given
+== 
+
+'%s' called vote to change server option '%s' (%s)
 == 
 
 '%s' isn't an option on this server
@@ -806,7 +812,7 @@ You can't kick authorized players
 You can kick only your team member
 == 
 
-'%s' called for vote to kick '%s'
+'%s' called for vote to kick '%s' (%s)
 == 
 
 Server does not allow voting to move players to spectators
@@ -821,10 +827,10 @@ You can't set dummies to spectator
 You can only move your team member to spectators
 == 
 
-'%s' called for vote to pause '%s' for %d seconds
+'%s' called for vote to pause '%s' for %d seconds (%s)
 == 
 
-'%s' called for vote to move '%s' to spectators
+'%s' called for vote to move '%s' to spectators (%s)
 == 
 
 You are now using the tee controller
@@ -1175,7 +1181,7 @@ You can't close your door because the police destroyed it
 %s's blocking spree was ended by %s (%d blocks)
 == 
 
-%s's killing spree was ended by %s (%d kills)
+%s's blocking spree was ended by %s (%d kills)
 == 
 
 You lost, you can wait for another round or leave the lobby using '/leave'
@@ -1259,7 +1265,7 @@ Police is searching you because of illegal bonus use
 '%s' has been moved to another map
 == 
 
-'%s' died as a result of excessive grog consumption
+'%s' died as a result of excessive grog consumption (%.1f‰ / %.1f‰)
 == 
 
 You paid %d money to '%s' to reduce your jailtime by 5 minutes
@@ -1271,7 +1277,7 @@ You got %d money from '%s' to reduce his jailtime by 5 minutes
 '%s' has been caught by '%s' (%d minutes arrest)
 == 
 
-Grog testing results
+Grog testing results: %.1f‰ / %.1f‰
 == 
 
 You were arrested for %d minutes by '%s'
@@ -1482,6 +1488,9 @@ Your stake got collected: -%lld money.
 == 
 
 '%s' couldn't defend all attacks and takes all cards
+== 
+
+'%s' won the game! (#%d)
 == 
 
 '%s' won the game!
