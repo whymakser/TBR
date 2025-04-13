@@ -1333,12 +1333,12 @@ void CGameContext::ConAccount(IConsole::IResult* pResult, void* pUserData)
 	if (pAccount->m_PortalRifle)
 	{
 		tmp = pAccount->m_ExpireDatePortalRifle;
-		str_format(aBuf, sizeof(aBuf), pPlayer->Localize("Portal Rifle: until %s"), pSelf->GetDate(tmp));
+		str_format(aBuf, sizeof(aBuf), "%s: %s %s", pPlayer->Localize("Portal Rifle"), pPlayer->Localize("until"), pSelf->GetDate(tmp));
 		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	}
 	else if (pSelf->Config()->m_SvPortalRifleShop)
 	{
-		str_format(aBuf, sizeof(aBuf), "Portal Rifle: %s", pPlayer->Localize("not bought"));
+		str_format(aBuf, sizeof(aBuf), "%s: %s", pPlayer->Localize("Portal Rifle"), pPlayer->Localize("not bought"));
 		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	}
 
@@ -1402,7 +1402,8 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 			str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Police"), pAccount->m_PoliceLevel);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 
-			pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("--- Collectables ---"));
+			str_format(aBuf, sizeof(aBuf), "--- %s ---", pPlayer->Localize("Collectables"));
+			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Taser battery"), pAccount->m_TaserBattery);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Portal Battery"), pAccount->m_PortalBattery);
@@ -1451,7 +1452,8 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 
 		case MINIGAME_SURVIVAL:
 		{
-			str_format(aBuf, sizeof(aBuf), pPlayer->Localize("--- %s's Survival Stats ---"), pSelf->Server()->ClientName(ID));
+			str_format(aBuf, sizeof(aBuf), "--- %s's Survival %s ---", pSelf->Server()->ClientName(ID), pPlayer->Localize("Stats"));
+			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Wins"), pAccount->m_SurvivalWins);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
@@ -1464,7 +1466,7 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 		case MINIGAME_INSTAGIB_BOOMFNG: // fallthrough
 		case MINIGAME_INSTAGIB_FNG:
 		{
-			str_format(aBuf, sizeof(aBuf), pPlayer->Localize("--- %s's Instagib Stats ---"), pSelf->Server()->ClientName(ID));
+			str_format(aBuf, sizeof(aBuf), "--- %s's Instagib %s ---", pSelf->Server()->ClientName(ID), pPlayer->Localize("Stats"));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Wins"), pAccount->m_InstagibWins);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
@@ -1483,7 +1485,9 @@ void CGameContext::ConHelpToggle(IConsole::IResult* pResult, void* pUserData)
 	if (!pPlayer)
 		return;
 
-	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("~~~ Toggle | Spooky Ghost & Portal Blocker ~~~"));
+	char aBuf[128];
+	str_format(aBuf, sizeof(aBuf), "~~~ %s | %s & %s ~~~", pPlayer->Localize("Toggle"), pPlayer->Localize("Spooky Ghost"), pPlayer->Localize("Portal Blocker"));
+	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("Spooky ghost (gun) and portal blocker (hammer) can be enabled like the following:"));
 	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("Hold TAB (or other scoreboard key) and during that fire your weapon two times."));
 }
@@ -1512,12 +1516,14 @@ void CGameContext::ConSpawnWeaponsInfo(IConsole::IResult* pResult, void* pUserDa
 		return;
 
 	char aBuf[256];
-	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("~~~ Spawn Weapons ~~~"));
+	str_format(aBuf, sizeof(aBuf), "~~~ %s ~~~", pPlayer->Localize("Spawn Weapons"));
+	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("You can buy spawn weapons in the shop."));
 	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("You will have the bought weapon on spawn."));
 	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("You can have max. 5 bullets per weapon."));
 	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("Each bullet costs 600.000 money."));
-	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("~~~ Your Spawn Weapons ~~~"));
+	str_format(aBuf, sizeof(aBuf), "~~~ %s ~~~", pPlayer->Localize("Your Spawn Weapons"));
+	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Spawn shotgun bullets"), pSelf->m_Accounts[pSelf->m_apPlayers[pResult->m_ClientID]->GetAccID()].m_SpawnWeapon[0]);
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Spawn grenade bullets"), pSelf->m_Accounts[pSelf->m_apPlayers[pResult->m_ClientID]->GetAccID()].m_SpawnWeapon[1]);
@@ -2029,7 +2035,8 @@ void CGameContext::ConPortal(IConsole::IResult* pResult, void* pUserData)
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("You can collect portal batteries in the map, which lets you use the portal rifle."));
 	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("The portal rifle can shoot two portals at cursor position, which tees, flags and weapons can use to travel between them."));
-	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("~~~ Your portal stats ~~~"));
+	str_format(aBuf, sizeof(aBuf), "~~~ %s ~~~", pPlayer->Localize("Your portal stats"));
+	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Portal Battery"), pAccount->m_PortalBattery);
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Portal Blocker"), pAccount->m_PortalBlocker);
@@ -2704,7 +2711,7 @@ void CGameContext::ConLanguage(IConsole::IResult* pResult, void* pUserData)
 
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "~~~ %s ~~~", pPlayer->Localize("Server Language"));
-	str_format(aBuf, sizeof(aBuf), pPlayer->Localize("Current language: %s"), g_Localization.GetLanguageString(pPlayer->m_Language));
+	str_format(aBuf, sizeof(aBuf), "%s: %s", pPlayer->Localize("Current language"), g_Localization.GetLanguageString(pPlayer->m_Language));
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("You can set one of the following languages for server-side translation by using '/language <option>':"));
 	pSelf->SendChatTarget(pResult->m_ClientID, g_Localization.ListAvailable());
