@@ -245,9 +245,6 @@ To see your current contact information, use '/account'
 Example: '/contact Discord: fokkonaut'
 == 
 
-for setting initial contact info
-== 
-
 Successfully updated contact information, check '/account'
 == 
 
@@ -401,7 +398,7 @@ You can't use this command while frozen
 You lost 50.000 money for teleporting to spawn
 == 
 
-Plot subcommands: edit, clear, sell, cancel, buy, swap, spawn, list
+Plot subcommands
 == 
 
 For detailed info, type '/plot help <command>'
