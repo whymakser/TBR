@@ -28,11 +28,6 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, CConfig *pConfig)
 	char aFile[256];
 	str_format(aFile, sizeof(aFile), "%s/index.txt", m_pConfig->m_SvLanguagesPath);
 	std::fstream File(aFile);
-	if (!File.is_open())
-	{
-		dbg_msg("localization", "Couldn't open file '%s'", aFile);
-		return;
-	}
 
 	std::string data;
 	while(getline(File, data))
@@ -190,11 +185,6 @@ bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
 	char aFile[256];
 	str_format(aFile, sizeof(aFile), "%s/%s.txt", m_pConfig->m_SvLanguagesPath, pFilename);
 	std::fstream File(aFile);
-	if (!File.is_open())
-	{
-		dbg_msg("localization", "Couldn't open file '%s'", aFile);
-		return false;
-	}
 
 	m_vLanguages[Language].Unload();
 
