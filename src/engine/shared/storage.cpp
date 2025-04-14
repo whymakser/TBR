@@ -356,7 +356,7 @@ public:
 			dbg_msg("storage", "refusing to open path which looks like it could escape those specified in 'storage.cfg': %s", pFilename);
 			return 0;
 		}
-
+		Flags &= ~IOFLAG_UNSAFE;
 		// open file
 		if(Flags&IOFLAG_WRITE)
 		{
