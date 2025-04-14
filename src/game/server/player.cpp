@@ -2090,12 +2090,17 @@ bool CPlayer::GivePortalBattery(int Amount)
 
 void CPlayer::OnLogin(bool ForceDesignLoad)
 {
+	int AccID = GetAccID();
+	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[AccID];
+	// Load language at start, so that login messages get translated aswell
+	if (pAccount->m_aLanguage[0] != '\0')
+	{
+		m_Language = g_Localization.GetLanguage(pAccount->m_aLanguage);
+	}
 	GameServer()->SendChatTarget(m_ClientID, Localize("Successfully logged in"));
 
 	ExpireItems();
 
-	int AccID = GetAccID();
-	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[AccID];
 	if (m_pCharacter)
 	{
 		if (pAccount->m_VIP == VIP_PLUS)
@@ -2138,11 +2143,6 @@ void CPlayer::OnLogin(bool ForceDesignLoad)
 		Server()->ChangeMapDesign(m_ClientID, GameServer()->GetCurrentDesignFromList(AccID));
 	else
 		StartVoteQuestion(CPlayer::VOTE_QUESTION_DESIGN);
-
-	if (pAccount->m_aLanguage[0] != '\0')
-	{
-		m_Language = g_Localization.GetLanguage(pAccount->m_aLanguage);
-	}
 
 	GameServer()->StartResendingVotes(m_ClientID, false);
 
