@@ -3748,9 +3748,11 @@ void CServer::ConchainDefaultLanguage(IConsole::IResult *pResult, void *pUserDat
 	CServer *pThis = (CServer *)pUserData;
 	if (!pResult->NumArguments())
 	{
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "Current default language: %s", pThis->Config()->m_SvDefaultLanguage);
+		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
 		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", "Available languages:");
 		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", g_Localization.ListAvailable());
-		pfnCallback(pResult, pCallbackUserData);
 		return;
 	}
 	char aBuf[128];
