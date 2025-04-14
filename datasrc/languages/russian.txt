@@ -64,7 +64,7 @@ Registered
 
 {/account}
 until
-== действителен до
+== до
 
 not bought
 == не куплено
@@ -504,6 +504,18 @@ Level needed to buy
 Benefits:
 == Преимущества:
 
+The police bot will help you
+== - Полицейский бот поможет вам
+
+taser license ('/taser')
+== - лицензия на тазер ('/taser')
+
+Officers can taser a plot door of a wanted player to deal damage and destroy it
+== - Офицеры могут тазером повредить и уничтожить дверь участка разыскиваемого игрока
+
+Taser will destroy plot objects of a wanted player
+== - Тазер уничтожит объекты участка разыскиваемого игрока
+
 [GENERAL INFORMATION]
 == [ОБЩАЯ ИНФОРМАЦИЯ]
 
@@ -918,6 +930,9 @@ You are not in a minigame
 You are already in minigame '%s'
 == Вы уже находитесь в мини-игре '%s'
 
+This map has no DurÃ¡k lobby, you have to find your way to the table yourself
+== На этой карте нет лобби для игры в Дурака, вам нужно самостоятельно найти путь к столу
+
 '%s' left the minigame '%s'
 == '%s' покинул мини-игру '%s'
 
@@ -1019,6 +1034,9 @@ WARNING
 
 You got frozen by the clan protection.
 == Вас заморозила клановая защита.
+
+Remove your 'Chilli.' clantag and reconnect, or set your skin body to 'greensward'.
+== Удалите клановый тег 'Chilli.' и переподключитесь, или установите вашу модель тела на 'greensward'.
 
 You automatically left the minigame because you were afk for too long
 == Вы автоматически покинули мини-игру, потому что были афк слишком долго
@@ -1248,6 +1266,9 @@ Police is searching you because of illegal bonus use
 '%s' has been moved to another map
 == '%s' был перемещен на другую карту
 
+'%s' died as a result of excessive grog consumption (%.1fâ€° / %.1fâ€°)
+== '%s' умер в результате чрезмерного потребления грога (%.1fâ€° / %.1fâ€°)
+
 You paid %d money to '%s' to reduce your jailtime by 5 minutes
 == Вы заплатили %d денег '%s', чтобы сократить свое время в тюрьме на 5 минут
 
@@ -1256,6 +1277,9 @@ You got %d money from '%s' to reduce his jailtime by 5 minutes
 
 '%s' has been caught by '%s' (%d minutes arrest)
 == '%s' был пойман '%s' (%d минут ареста)
+
+Grog testing results: %.1fâ€° / %.1fâ€°
+== Результаты теста на грог: %.1fâ€° / %.1fâ€°
 
 You were arrested for %d minutes by '%s'
 == Вы были арестованы на %d минут '%s'
@@ -1419,6 +1443,18 @@ Set second spawn positions by pressing SPACE
 Choose a weapon with A/D\nToggle weapon usage by pressing SPACE\nPress SPACE on the heart to confirm
 == Выберите оружие с помощью A/D\nПереключите использование оружия, нажав ПРОБЕЛ\nНажмите ПРОБЕЛ на сердце для подтверждения
 
+Welcome to the DurÃ¡k table, %s! This seat is taken already, please try another one.
+== Добро пожаловать за стол Дурака, %s! Это место уже занято, пожалуйста, попробуйте другое.
+
+Welcome to DurÃ¡k, %s! You are first, please enter a stake in the chat.
+== Добро пожаловать в Дурака, %s! Вы первый, пожалуйста, укажите ставку в чате.
+
+Welcome to DurÃ¡k, %s! You are second, please enter the current stake of '%lld' or propose a new one.
+== Добро пожаловать в Дурака, %s! Вы второй, пожалуйста, введите текущую ставку '%lld' или предложите новую.
+
+Welcome to DurÃ¡k, %s! In order to participate, please enter the current stake of '%lld' in the chat.
+== Добро пожаловать в Дурака, %s! Чтобы участвовать, пожалуйста, введите текущую ставку '%lld' в чате.
+
 Successfully set the stake for the current round to '%lld'.
 == Успешно установлена ставка для текущего раунда на '%lld'.
 
@@ -1443,6 +1479,9 @@ You didn't deploy your stake in time, game started without you
 Your stake got collected: -%lld money.
 == Ваша ставка собрана: -%lld денег.
 
+'%s' is the DurÃ¡k!
+== '%s' - Дурак!
+
 '%s' successfully defended
 == '%s' успешно отбился
 
@@ -1458,50 +1497,11 @@ Your stake got collected: -%lld money.
 '%s' won the game!
 == '%s' выиграл игру!
 
+Congratulations, you are not the DurÃ¡k!
+== Поздравляем, вы не Дурак!
+
 Your stake got returned: +%lld money.
 == Ваша ставка возвращена: +%lld денег.
 
 You got +%lld money from others leaving the game.
 == Вы получили +%lld денег от других покинувших игру.
-
-- The police bot will help you
-== - Полицейский бот вам поможет
-
-- taser license ('/taser')
-== - лицензия на электрошокер ('/taser')
-
-- Officers can taser a plot door of a wanted player to deal damage and destroy it
-== - Офицеры могут применить электрошокер к двери участка разыскиваемого игрока, чтобы нанести урон и уничтожить ее.
-
-- Taser will destroy plot objects of a wanted player
-== - Тазер уничтожит сюжетные объекты разыскиваемого игрока
-
-This map has no Durák lobby, you have to find your way to the table yourself
-== На этой карте нет лобби Дурака, вам придется самостоятельно найти дорогу к столу.
-
-Remove your 'Chilli.*' clantag and reconnect, or set your skin body to 'greensward'.
-== Удалите клантег «Chilli.*» и подключитесь заново или измените цвет скина на «greensward».
-
-'%s' died as a result of excessive grog consumption (%.1f‰ / %.1f‰)
-== '%s' умер в результате чрезмерного употребления грога (%.1f‰ / %.1f‰)
-
-Grog testing results: %.1f‰ / %.1f‰
-== Результаты тестирования грога: %.1f‰ / %.1f‰
-
-Welcome to the Durák table, %s! This seat is taken already, please try another one.
-== Добро пожаловать за стол «Дурака», %s! Это место уже занято, попробуйте другое.
-
-Welcome to Durák, %s! You are first, please enter a stake in the chat.
-== Добро пожаловать в Дурак, %s! Вы первый, пожалуйста, введите ставку в чате.
-
-Welcome to Durák, %s! You are second, please enter the current stake of '%lld' or propose a new one.
-== Добро пожаловать в Дурак, %s! Вы второй, введите текущую ставку «%lld» или предложите новую.
-
-Welcome to Durák, %s! In order to participate, please enter the current stake of '%lld' in the chat.
-== Добро пожаловать в Дурак, %s! Для участия введите текущую ставку «%lld» в чате.
-
-'%s' is the Durák!
-== '%s' — это Дурак!
-
-Congratulations, you are not the Durák!
-== Поздравляю, вы не Дурак!
