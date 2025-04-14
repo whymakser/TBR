@@ -1279,7 +1279,7 @@ You got %d money from '%s' to reduce his jailtime by 5 minutes
 == '%s' был пойман '%s' (%d минут ареста)
 
 Grog testing results: %.1f‰ / %.1f‰
- == Результаты тестирования грога: %.1f‰ / %.1f‰
+ == Результаты теста на грог: %.1f‰ / %.1f‰
 
 You were arrested for %d minutes by '%s'
 == Вы были арестованы на %d минут '%s'
