@@ -1028,7 +1028,7 @@ Your plot swap offer got cancelled
 You got unfrozen by the clan protection.
 == 
 
-~~~ WARNING ~~~
+WARNING
 == 
 
 You got frozen by the clan protection.

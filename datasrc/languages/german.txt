@@ -491,12 +491,6 @@ Offer to swap plots was sent to '%s'
 Page
 == Seite
 
-Police Info
-== 
-
-[POLICE %d]
-== 
-
 Level needed to buy
 == Benötigtes Level zum Kaufen
 
@@ -647,9 +641,6 @@ There are no wanted players right now
 You don't have enough taser batteries
 == Du hast nicht genug Taser-Batterien
 
-Taser
-== 
-
 Police officers with level 3 or higher get a taser license.
 == Polizeibeamte ab Level 3 erhalten eine Taser-Lizenz.
 
@@ -661,9 +652,6 @@ You can pick up the taser and taser batteries throughout the map.
 
 Your taser stats
 == Deine Taser-Statistiken
-
-Taser level
-== 
 
 Price for the next level
 == Preis für das nächste Level
@@ -1504,3 +1492,15 @@ Your stake got returned: +%lld money.
 
 You got +%lld money from others leaving the game.
 == Du hast +%lld Geld von anderen erhalten, die das Spiel verlassen haben.
+
+Police Info
+== 
+
+[POLICE %d]
+== 
+
+Taser
+== 
+
+Taser level
+== 
