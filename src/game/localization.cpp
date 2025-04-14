@@ -118,6 +118,8 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, CConfig *pConfig)
 		Unload(i);
 	}
 	std::sort(m_vLanguages.begin(), m_vLanguages.end());
+
+	dbg_msg("localization", "Following available languages were found: %s", ListAvailable());
 }
 
 void CLocalizationDatabase::SelectDefaultLanguage(char *pFilename, size_t Length)
