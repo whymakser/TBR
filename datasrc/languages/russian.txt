@@ -64,7 +64,7 @@ Registered
 
 {/account}
 until
-== до
+== действителен до
 
 not bought
 == не куплено
