@@ -380,7 +380,7 @@ MACRO_CONFIG_INT(SvDurakTeamColor, sv_durak_team_colors, 1, 0, 1, CFGFLAG_SERVER
 
 // Language
 MACRO_CONFIG_STR(SvDefaultLanguage, sv_default_language, 255, "", CFGFLAG_SERVER, "Default server language tag, if not specified use system language tag (RFC 3066)", AUTHED_ADMIN)
-MACRO_CONFIG_STR(SvLanguagesPath, sv_languages_path, 128, "languages", CFGFLAG_SERVER, "The path where the server searches the for the language index.txt (relative to binary)", AUTHED_ADMIN)
+MACRO_CONFIG_STR(SvLanguagesPath, sv_languages_path, 128, "data/languages", CFGFLAG_SERVER, "The path where the server searches the for the language index.txt (relative to binary)", AUTHED_ADMIN)
 
 // other
 MACRO_CONFIG_INT(SvAllowXSkins, sv_allow_x_skins, 1, 0, 1, CFGFLAG_SERVER, "Whether special skins are allowed (x_ninja, x_spec, ...)", AUTHED_ADMIN)

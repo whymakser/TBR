@@ -7,6 +7,7 @@
 #include <engine/storage.h>
 #include <algorithm>
 #include <engine/shared/config.h>
+#include <fstream>
 
 const char *Localize(const char *pStr, int Language, const char *pContext)
 {
@@ -26,22 +27,26 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, CConfig *pConfig)
 
 	char aFile[256];
 	str_format(aFile, sizeof(aFile), "%s/index.txt", m_pConfig->m_SvLanguagesPath);
-	CLineReader LineReader;
-	if(!LineReader.OpenFile(pStorage->OpenFile(aFile, IOFLAG_READ|IOFLAG_UNSAFE, IStorage::TYPE_ALL)))
+	std::ifstream File(aFile);
+	if (!File.is_open())
 	{
-		dbg_msg("localization", "Couldn't open index file '%s'", aFile);
+		dbg_msg("localization", "Couldn't open file '%s'", aFile);
 		return;
 	}
 
-	while(const char *pLine = LineReader.Get())
+	std::string data;
+	while(getline(File, data))
 	{
+		const char *pLine = data.c_str();
+
 		if(!str_length(pLine) || pLine[0] == '#') // skip empty lines and comments
 			continue;
 
 		char aEnglishName[128];
 		str_copy(aEnglishName, pLine);
 
-		pLine = LineReader.Get();
+		getline(File, data);
+		pLine = data.c_str();
 		if(!pLine)
 		{
 			dbg_msg("localization", "Unexpected end of index file after language '%s'", aEnglishName);
@@ -50,14 +55,15 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, CConfig *pConfig)
 		if(!str_startswith(pLine, "== "))
 		{
 			dbg_msg("localization", "Missing native name for language '%s'", aEnglishName);
-			(void)LineReader.Get();
-			(void)LineReader.Get();
+			(void)getline(File, data);
+			(void)getline(File, data);
 			continue;
 		}
 		char aNativeName[128];
 		str_copy(aNativeName, pLine + 3);
 
-		pLine = LineReader.Get();
+		getline(File, data);
+		pLine = data.c_str();
 		if(!pLine)
 		{
 			dbg_msg("localization", "Unexpected end of index file after language '%s'", aEnglishName);
@@ -66,13 +72,14 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, CConfig *pConfig)
 		if(!str_startswith(pLine, "== "))
 		{
 			dbg_msg("localization", "Missing country code for language '%s'", aEnglishName);
-			(void)LineReader.Get();
+			(void)getline(File, data);
 			continue;
 		}
 		char aCountryCode[128];
 		str_copy(aCountryCode, pLine + 3);
 
-		pLine = LineReader.Get();
+		getline(File, data);
+		pLine = data.c_str();
 		if(!pLine)
 		{
 			dbg_msg("localization", "Unexpected end of index file after language '%s'", aEnglishName);
@@ -182,8 +189,8 @@ bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
 
 	char aFile[256];
 	str_format(aFile, sizeof(aFile), "%s/%s.txt", m_pConfig->m_SvLanguagesPath, pFilename);
-	CLineReader LineReader;
-	if(!LineReader.OpenFile(m_pStorage->OpenFile(aFile, IOFLAG_READ|IOFLAG_UNSAFE, IStorage::TYPE_ALL)))
+	std::ifstream File(aFile);
+	if (!File.is_open())
 	{
 		dbg_msg("localization", "Couldn't open file '%s'", aFile);
 		return false;
@@ -194,8 +201,10 @@ bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
 	char aContext[512];
 	char aOrigin[512];
 	int Line = 0;
-	while(const char *pLine = LineReader.Get())
+	std::string data;
+	while(getline(File, data))
 	{
+		const char *pLine = data.c_str();
 		Line++;
 		if(!str_length(pLine))
 			continue;
@@ -212,7 +221,8 @@ bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
 				continue;
 			}
 			str_truncate(aContext, sizeof(aContext), pLine + 1, Len - 2);
-			pLine = LineReader.Get();
+			getline(File, data);
+			pLine = data.c_str();
 			if(!pLine)
 			{
 				dbg_msg("localization", "unexpected end of file after context line '%s' on line %d", aContext, Line);
@@ -226,7 +236,8 @@ bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
 		}
 
 		str_copy(aOrigin, pLine);
-		const char *pReplacement = LineReader.Get();
+		getline(File, data);
+		const char *pReplacement = data.c_str();
 		if(!pReplacement)
 		{
 			dbg_msg("localization", "unexpected end of file after original '%s' on line %d", aOrigin, Line);

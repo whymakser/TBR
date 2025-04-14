@@ -351,12 +351,12 @@ public:
 		//
 		// E. g. "/etc/passwd" => "/path/to/storage//etc/passwd", which
 		// is safe.
-		if(str_path_unsafe(pFilename) != 0 && (Flags&IOFLAG_UNSAFE) == 0)
+		if(str_path_unsafe(pFilename) != 0)
 		{
 			dbg_msg("storage", "refusing to open path which looks like it could escape those specified in 'storage.cfg': %s", pFilename);
 			return 0;
 		}
-		Flags &= ~IOFLAG_UNSAFE;
+
 		// open file
 		if(Flags&IOFLAG_WRITE)
 		{
