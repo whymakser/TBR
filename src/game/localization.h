@@ -70,9 +70,10 @@ class CLocalizationDatabase
 {
 	std::vector<CLanguage> m_vLanguages;
 	class IStorage *m_pStorage;
+	class CConfig *m_pConfig;
 
 public:
-	void LoadIndexfile(class IStorage *pStorage);
+	void LoadIndexfile(class IStorage *pStorage, class CConfig *pConfig);
 	std::vector<CLanguage> &Languages() { return m_vLanguages; }
 	void SelectDefaultLanguage(char *pFilename, size_t Length);
 

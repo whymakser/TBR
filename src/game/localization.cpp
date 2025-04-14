@@ -6,6 +6,7 @@
 #include <engine/shared/linereader.h>
 #include <engine/storage.h>
 #include <algorithm>
+#include <engine/shared/config.h>
 
 const char *Localize(const char *pStr, int Language, const char *pContext)
 {
@@ -13,20 +14,22 @@ const char *Localize(const char *pStr, int Language, const char *pContext)
 	return pNewStr ? pNewStr : pStr;
 }
 
-void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage)
+void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, CConfig *pConfig)
 {
 	m_pStorage = pStorage;
+	m_pConfig = pConfig;
 	m_vLanguages.clear();
 
 	const std::vector<std::string> vEnglishLanguageCodes = {"en"};
 	m_vLanguages.emplace_back("English", "english", 826, vEnglishLanguageCodes);
 	m_vLanguages[0].m_Loaded = true;
 
-	const char *pFilename = "languages/index.txt";
+	char aFile[256];
+	str_format(aFile, sizeof(aFile), "%s/index.txt", m_pConfig->m_SvLanguagesPath);
 	CLineReader LineReader;
-	if(!LineReader.OpenFile(pStorage->OpenFile(pFilename, IOFLAG_READ, IStorage::TYPE_ALL)))
+	if(!LineReader.OpenFile(pStorage->OpenFile(aFile, IOFLAG_READ, IStorage::TYPE_ALL)))
 	{
-		dbg_msg("localization", "Couldn't open index file '%s'", pFilename);
+		dbg_msg("localization", "Couldn't open index file '%s'", aFile);
 		return;
 	}
 
@@ -178,7 +181,7 @@ bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
 	}
 
 	char aFile[256];
-	str_format(aFile, sizeof(aFile), "languages/%s.txt", pFilename);
+	str_format(aFile, sizeof(aFile), "%s/%s.txt", m_pConfig->m_SvLanguagesPath, pFilename);
 	CLineReader LineReader;
 	if(!LineReader.OpenFile(m_pStorage->OpenFile(aFile, IOFLAG_READ, IStorage::TYPE_ALL)))
 	{

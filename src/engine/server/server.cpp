@@ -2810,7 +2810,7 @@ int CServer::Run()
 	}
 
 	// Language setting, do before command execution, to overridde default language if wanted
-	g_Localization.LoadIndexfile(Storage());
+	g_Localization.LoadIndexfile(Storage(), Config());
 	g_Localization.SelectDefaultLanguage(Config()->m_SvDefaultLanguage, sizeof(Config()->m_SvDefaultLanguage));
 	g_Localization.Load(Config()->m_SvDefaultLanguage);
 
