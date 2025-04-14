@@ -1490,7 +1490,7 @@ Your stake got returned: +%lld money.
 You got +%lld money from others leaving the game.
 == Du hast +%lld Geld von anderen erhalten, die das Spiel verlassen haben.
 
-{/account: Expiration date}
+{/account}
 until
 == 
 

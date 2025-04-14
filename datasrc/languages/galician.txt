@@ -62,7 +62,7 @@ Account Name
 Registered
 == 
 
-{/account: Expiration date}
+{/account}
 until
 == 
 
