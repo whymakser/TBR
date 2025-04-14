@@ -1877,7 +1877,6 @@ void CGameContext::OnClientDrop(int ClientID, const char *pReason)
 
 		if (!Config()->m_SvSilentSpectatorMode || m_apPlayers[ClientID]->GetTeam() != TEAM_SPECTATORS)
 		{
-			const char *pFormat = 0;
 			bool HasReason = pReason && *pReason;
 			if (HasReason || m_apPlayers[ClientID]->m_aDelayedJoinMsg[0] == '\0')
 			{

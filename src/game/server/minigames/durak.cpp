@@ -1249,7 +1249,6 @@ bool CDurak::UpdateGame(int Game)
 
 		if (HasActiveAttacks && AllAttacksDefended)
 		{
-			char aBuf[128];
 			int DefenderID = pGame->m_aSeats[pGame->m_DefenderIndex].m_Player.m_ClientID;
 			SendChatToParticipants(Game, Localizable("'%s' successfully defended"), Server()->ClientName(DefenderID));
 			CCharacter *pChr = GameServer()->GetPlayerChar(DefenderID);
@@ -1266,7 +1265,6 @@ bool CDurak::UpdateGame(int Game)
 		}
 		else if (ProcessMove)
 		{
-			char aBuf[128];
 			int AttackerID = pGame->m_aSeats[pGame->m_InitialAttackerIndex].m_Player.m_ClientID;
 			SendChatToParticipants(Game, Localizable("'%s' took too long and was skipped"), Server()->ClientName(AttackerID));
 			// Just skip this guy // Emulate successful defense, so that the next guy's turn is now and he is not skipped.
@@ -1447,7 +1445,6 @@ void CDurak::TakeCardsFromTable(int Game)
 		}
 	}
 
-	char aBuf[128];
 	int DefenderID = pGame->m_aSeats[pGame->m_DefenderIndex].m_Player.m_ClientID;
 	SendChatToParticipants(Game, Localizable("'%s' couldn't defend all attacks and takes all cards"), Server()->ClientName(DefenderID));
 
