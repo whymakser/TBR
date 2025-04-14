@@ -2141,7 +2141,6 @@ void CPlayer::OnLogin(bool ForceDesignLoad)
 
 	if (pAccount->m_aLanguage[0] != '\0')
 	{
-		g_Localization.Load(pAccount->m_aLanguage);
 		m_Language = g_Localization.GetLanguage(pAccount->m_aLanguage);
 	}
 

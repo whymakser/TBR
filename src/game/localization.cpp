@@ -313,7 +313,7 @@ const char *CLocalizationDatabase::FindString(unsigned Hash, unsigned ContextHas
 
 bool CLocalizationDatabase::TryUnload(CGameContext *pGameServer, int Language)
 {
-	if (!pGameServer || !m_vLanguages[Language].m_Loaded)
+	if (!pGameServer || Language == -1 || !m_vLanguages[Language].m_Loaded)
 		return false;
 
 	bool CanUnloadLanguage = true;
