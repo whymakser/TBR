@@ -185,6 +185,7 @@ bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
 	CLineReader LineReader;
 	if(!LineReader.OpenFile(m_pStorage->OpenFile(aFile, IOFLAG_READ, IStorage::TYPE_ALL)))
 	{
+		dbg_msg("localization", "Couldn't open file '%s'", aFile);
 		return false;
 	}
 
