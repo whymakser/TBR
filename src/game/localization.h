@@ -40,9 +40,10 @@ public:
 	};
 
 	CLanguage() = default;
-	CLanguage(const char *pName, const char *pFileName, int Code, const std::vector<std::string> &vLanguageCodes, CHeap *pHeap = 0) :
-		m_Name(pName), m_FileName(pFileName), m_CountryCode(Code), m_vLanguageCodes(vLanguageCodes), m_pStringsHeap(pHeap)
+	CLanguage(const char *pName, const char *pFileName, int Code, const std::vector<std::string> &vLanguageCodes) :
+		m_Name(pName), m_FileName(pFileName), m_CountryCode(Code), m_vLanguageCodes(vLanguageCodes)
 	{
+		m_pStringsHeap = 0;
 		m_Loaded = false;
 		m_Available = false;
 	}
@@ -52,7 +53,11 @@ public:
 		m_Loaded = false;
 		m_vStrings.clear();
 		if (m_pStringsHeap)
+		{
 			m_pStringsHeap->Reset();
+			delete m_pStringsHeap;
+			m_pStringsHeap = 0;
+		}
 	}
 
 	std::string m_Name;

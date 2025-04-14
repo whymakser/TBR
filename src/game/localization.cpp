@@ -107,7 +107,7 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, CConfig *pConfig)
 			continue;
 		}
 
-		m_vLanguages.emplace_back(aNativeName, aEnglishName, str_toint(aCountryCode), vLanguageCodes, new CHeap());
+		m_vLanguages.emplace_back(aNativeName, aEnglishName, str_toint(aCountryCode), vLanguageCodes);
 	}
 	std::sort(m_vLanguages.begin(), m_vLanguages.end());
 }
@@ -198,6 +198,7 @@ bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
 	}
 
 	m_vLanguages[Language].Unload();
+	m_vLanguages[Language].m_pStringsHeap = new CHeap();
 
 	char aContext[512];
 	char aOrigin[512];
