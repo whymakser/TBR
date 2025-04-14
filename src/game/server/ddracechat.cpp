@@ -2680,28 +2680,14 @@ void CGameContext::ConLanguage(IConsole::IResult* pResult, void* pUserData)
 	{
 		const char *pLanguage = pResult->GetString(0);
 		int Language = g_Localization.GetLanguage(pLanguage);
-		if (Language == -1)
+		if (Language == -1 || !g_Localization.Languages()[Language].m_Available)
 		{
 			pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("Invalid language"));
 			return;
 		}
 
-		bool CanUnloadLanguage = true;
-		for (int i = 0; i < MAX_CLIENTS; i++)
-		{
-			if (pSelf->m_apPlayers[i] && pSelf->m_apPlayers[i]->m_Language == Language)
-			{
-				CanUnloadLanguage = false;
-				break;
-			}
-		}
-
-		// Unload if nobody uses this language
-		if (CanUnloadLanguage)
-			g_Localization.Unload(Language);
-		g_Localization.Load(pLanguage);
-
 		// Update language
+		g_Localization.TryUnload(pSelf, pPlayer->m_Language);
 		pPlayer->m_Language = Language;
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), pPlayer->Localize("Successfully changed language to %s"), g_Localization.GetLanguageString(Language));

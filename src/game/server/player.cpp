@@ -1076,6 +1076,7 @@ void CPlayer::OnDisconnect()
 	Controller->m_Teams.SetForceCharacterTeam(m_ClientID, 0);
 
 	GameServer()->m_VotingMenu.Reset(m_ClientID);
+	g_Localization.TryUnload(GameServer(), m_Language);
 
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{

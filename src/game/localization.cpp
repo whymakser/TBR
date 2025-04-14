@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <engine/shared/config.h>
 #include <fstream>
+#include <game/server/gamecontext.h>
 
 const char *Localize(const char *pStr, int Language, const char *pContext)
 {
@@ -28,6 +29,7 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, CConfig *pConfig)
 
 	char aFile[256];
 	str_format(aFile, sizeof(aFile), "%s/index.txt", m_pConfig->m_SvLanguagesPath);
+	// Use fstream instead of CLineReader and OpenFile, because of paths like this: "../data/languages"
 	std::fstream File(aFile);
 	if (!File.is_open())
 	{
@@ -109,6 +111,12 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, CConfig *pConfig)
 
 		m_vLanguages.emplace_back(aNativeName, aEnglishName, str_toint(aCountryCode), vLanguageCodes);
 	}
+	// Load all files once and check if any strings appear, to set m_Available
+	for (unsigned int i = 1; i < m_vLanguages.size(); i++)
+	{
+		Load(i);
+		Unload(i);
+	}
 	std::sort(m_vLanguages.begin(), m_vLanguages.end());
 }
 
@@ -171,24 +179,13 @@ void CLocalizationDatabase::SelectDefaultLanguage(char *pFilename, size_t Length
 	}
 }
 
-bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
+bool CLocalizationDatabase::Load(int Language)
 {
-	int Language = GetLanguage(pFilename);
-	if (Language == -1)
+	if (m_vLanguages[Language].m_Loaded)
 		return false;
-
-	if (Force)
-	{
-		if (str_comp(m_vLanguages[Language].m_Name.c_str(), "English") == 0)
-			return true;
-	}
-	else if (m_vLanguages[Language].m_Loaded)
-	{
-		return false;
-	}
 
 	char aFile[256];
-	str_format(aFile, sizeof(aFile), "%s/%s.txt", m_pConfig->m_SvLanguagesPath, pFilename);
+	str_format(aFile, sizeof(aFile), "%s/%s.txt", m_pConfig->m_SvLanguagesPath, m_vLanguages[Language].m_FileName.c_str());
 	std::fstream File(aFile);
 	if (!File.is_open())
 	{
@@ -196,7 +193,7 @@ bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
 		return false;
 	}
 
-	m_vLanguages[Language].Unload();
+	Unload(Language);
 	m_vLanguages[Language].m_pStringsHeap = new CHeap();
 
 	char aContext[512];
@@ -264,6 +261,20 @@ bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
 	return true;
 }
 
+bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
+{
+	int Language = GetLanguage(pFilename);
+	if (Language == -1)
+		return false;
+	if (Force)
+	{
+		if (str_comp(m_vLanguages[Language].m_Name.c_str(), "English") == 0)
+			return true;
+		m_vLanguages[Language].m_Loaded = false;
+	}
+	return Load(Language);
+}
+
 void CLocalizationDatabase::AddString(const char *pOrgStr, const char *pNewStr, const char *pContext, int Language)
 {
 	m_vLanguages[Language].m_vStrings.emplace_back(str_quickhash(pOrgStr), str_quickhash(pContext),
@@ -275,7 +286,7 @@ const char *CLocalizationDatabase::FindString(unsigned Hash, unsigned ContextHas
 	if (Language == -1)
 		return nullptr;
 
-	Load(m_vLanguages[Language].m_FileName.c_str());
+	Load(Language);
 
 	CLanguage::CString String;
 	String.m_Hash = Hash;
@@ -298,9 +309,39 @@ const char *CLocalizationDatabase::FindString(unsigned Hash, unsigned ContextHas
 	return nullptr;
 }
 
+bool CLocalizationDatabase::TryUnload(CGameContext *pGameServer, int Language)
+{
+	if (!m_vLanguages[Language].m_Loaded)
+		return false;
+
+	bool CanUnloadLanguage = true;
+	for (int i = 0; i < MAX_CLIENTS; i++)
+	{
+		if (pGameServer->m_apPlayers[i] && pGameServer->m_apPlayers[i]->m_Language == Language)
+		{
+			CanUnloadLanguage = false;
+			break;
+		}
+	}
+
+	// Unload if nobody uses this language
+	if (CanUnloadLanguage)
+	{
+		Unload(Language);
+		return true;
+	}
+	return false;
+}
+
 void CLocalizationDatabase::Unload(int Language)
 {
-	m_vLanguages[Language].Unload();
+	m_vLanguages[Language].m_Loaded = false;
+	m_vLanguages[Language].m_vStrings.clear();
+	if (m_vLanguages[Language].m_pStringsHeap)
+	{
+		delete m_vLanguages[Language].m_pStringsHeap;
+		m_vLanguages[Language].m_pStringsHeap = 0;
+	}
 }
 
 const char *CLocalizationDatabase::ListAvailable()

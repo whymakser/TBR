@@ -3748,8 +3748,8 @@ void CServer::ConchainDefaultLanguage(IConsole::IResult *pResult, void *pUserDat
 	CServer *pThis = (CServer *)pUserData;
 	if (!pResult->NumArguments())
 	{
-		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", "Available languages:");
-		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", g_Localization.ListAvailable());
+		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", "Available languages:");
+		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", g_Localization.ListAvailable());
 		pfnCallback(pResult, pCallbackUserData);
 		return;
 	}
@@ -3759,14 +3759,17 @@ void CServer::ConchainDefaultLanguage(IConsole::IResult *pResult, void *pUserDat
 	{
 		pfnCallback(pResult, pCallbackUserData);
 		str_format(aBuf, sizeof(aBuf), "Successfully changed default language to '%s'", pNewLang);
-		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", aBuf);
+		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
 	}
-	else if (str_comp(pNewLang, pThis->Config()->m_SvDefaultLanguage) != 0)
+	else
 	{
-		g_Localization.SelectDefaultLanguage(pThis->Config()->m_SvDefaultLanguage, sizeof(pThis->Config()->m_SvDefaultLanguage));
-		g_Localization.Load(pThis->Config()->m_SvDefaultLanguage);
+		if (str_comp(pNewLang, pThis->Config()->m_SvDefaultLanguage) != 0)
+		{
+			g_Localization.SelectDefaultLanguage(pThis->Config()->m_SvDefaultLanguage, sizeof(pThis->Config()->m_SvDefaultLanguage));
+			g_Localization.Load(pThis->Config()->m_SvDefaultLanguage);
+		}
 		str_format(aBuf, sizeof(aBuf), "Couldn't load language, falling back to default '%s'", pThis->Config()->m_SvDefaultLanguage);
-		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", aBuf);
+		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
 	}
 }
 

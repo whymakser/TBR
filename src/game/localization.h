@@ -48,18 +48,6 @@ public:
 		m_Available = false;
 	}
 
-	void Unload()
-	{
-		m_Loaded = false;
-		m_vStrings.clear();
-		if (m_pStringsHeap)
-		{
-			m_pStringsHeap->Reset();
-			delete m_pStringsHeap;
-			m_pStringsHeap = 0;
-		}
-	}
-
 	std::string m_Name;
 	std::string m_FileName;
 	int m_CountryCode;
@@ -87,7 +75,9 @@ public:
 	const char *FindString(unsigned Hash, unsigned ContextHash, int Language);
 
 	bool Load(const char *pFilename, bool Force = false);
+	bool Load(int Language);
 	void Unload(int Language);
+	bool TryUnload(class CGameContext *pGameServer, int Language);
 	int GetLanguage(const char *pFileName);
 	const char *GetLanguageString(int Language);
 	const char *GetLanguageFileName(int Language);
