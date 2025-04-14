@@ -1,1506 +1,1506 @@
 #
-# Author:
+# Author: WarHammer
 #
 
 /cmdlist will show a list of all chat commands
-== 
+== /cmdlist tüm sohbet komutlarını gösterir
 
 /help + any command will show you the help for this command
-== 
+== /help + komut sana komut hakkında detaylı bilgi verir
 
 Example /help settings will display the help about /settings
-== 
+== Örneğin /help settings sana /settings hakkında yardımcı bilgi verir
 
 Usage
-== 
+== Kullanım
 
 Command is either unknown or you have given a blank command without any parameters.
-== 
+== Komut bilinmiyor ya da parametre kullanmadın
 
 You can't join the spectators while you are in survival
-== 
+== Hayatta kalma'da iken izleyiciye geçemezsin
 
 Timeout code has to be at least 8 characters long, make sure to use a safe code.
-== 
+== Zaman aşımı kodu en az 8 karakter uzunluğunda olmalı, güvenli bir kod kullandığından emin ol
 
 You will now see all tees on this server, no matter the distance
-== 
+== Artık mesafe farketmeksizin, sunucudaki tüm tee'leri göreceksin
 
 You will no longer see all tees on this server
-== 
+== Artık sunucudaki tüm tee'leri görmeyeceksin
 
 Score Format
-== 
+== Skor formatı
 
 Use '/score <format>' to change the displayed score.
-== 
+== Skor formatını değiştirmek için '/score <format>' kullan
 
 Accounts
-== 
+== Hesaplar
 
 Accounts are used to save your stats.
-== 
+== Hesaplar istatistiklerini kaydetmek için kullanılır
 
 You can farm money and buy things in the shop, kill tees and get points.
-== 
+== Farm yaparak para kazanabilir ve marketten bir şeyler alabilir, tee'leri öldürüp puan kazanabilirsin
 
 These stats will be saved inside of your account.
-== 
+== Bu istatistikler hesabına kaydedilecek
 
 You can create an account using '/register'.
-== 
+== '/register' ile bir hesap açabilirsin
 
 Once you are logged in, you can use this command again to see information about your account.
-== 
+== Giriş yaptığında, bu komutu tekrar kullanıp hesabın ile ilgili bilgiyi görebilirsin
 
 Account Info
-== 
+== Hesap Bilgisi
 
 Account Name
-== 
+== Hesap Adı
 
 Registered
-== 
+== Kaydolundu
 
 until
-== 
+== e kadar
 
 not bought
-== 
+== satın alınmadı
 
 Portal Rifle
-== 
+== Portal Silahı
 
 Contact
-== 
+== Bağlantı
 
 Player not found
-== 
+== Oyuncu bulunamadı
 
 Stats
-== 
+== İstatistikler
 
 Level
-== 
+== Seviye
 
 (not logged in)
-== 
+== (giriş yapılmadı)
 
 Bank
-== 
+== Banka
 
 Wallet
-== 
+== Cüzdan
 
 Police
-== 
+== Polis
 
 Collectables
-== 
+== Toplanabilir
 
 Taser battery
-== 
+== Taser bataryası
 
 Portal Battery
-== 
+== Portal Bataryası
 
 Points
-== 
+== Puanlar
 
 Kills
-== 
+== Katletme
 
 Deaths
-== 
+== Ölümler
 
 Games won
-== 
+== Kazanılan oyunlar
 
 Profit
-== 
+== Kazanç
 
 Wins
-== 
+== Kazanmalar
 
 Toggle
-== 
+== Değiştir
 
 Spooky Ghost
-== 
+== Hayalet
 
 Portal Blocker
-== 
+== Portal Engelleyici
 
 Spooky ghost (gun) and portal blocker (hammer) can be enabled like the following:
-== 
+== Hayalet (tabanca) ve portal engelleyici (çekiç) şu şekilde aktif edilebilir:
 
 Hold TAB (or other scoreboard key) and during that fire your weapon two times.
-== 
+== TAB basılı tut (ya da skor tablosu tuşu) ve iki el ateş et.
 
 With VIP Classic you get an XP and money boost of '+2' per second, aswell as access to the following commands:
-== 
+== VIP Klasik ile şu mokutlara erişim sağladığın müddetçe, saniyede '+2' XP ve Para desteği alırsın:
 
 VIP+ includes every feature of VIP Classic.
-== 
+== VIP+, VIP Klasik'teki tüm özellikleri içerir
 
 Additionally to that you can enter the VIP+ room to farm safely there, aswell as you gain access to the following commands:
-== 
+== Buna ek olarak, VIP+ odasına girerek güvenli bir şekilde farm yapabilir ve aşağıdaki komutlara erişebilirsin:
 
 Spawn Weapons
-== 
+== Spawn Silahları
 
 You can buy spawn weapons in the shop.
-== 
+== Spawn silahlarını marketten satın alabilirsin.
 
 You will have the bought weapon on spawn.
-== 
+== Satın aldığın silahla doğacaksın.
 
 You can have max. 5 bullets per weapon.
-== 
+== Silah başına en fazla 5 mermi taşıyabilirsin.
 
 Each bullet costs 600.000 money.
-== 
+== Her mermi 600.000 para değerindedir.
 
 Your Spawn Weapons
-== 
+== Spawn Silahların
 
 Spawn shotgun bullets
-== 
+== Spawn shotgun mermileri
 
 Spawn grenade bullets
-== 
+== Spawn grenade mermileri
 
 Spawn rifle bullets
-== 
+== Spawn rifle mermileri
 
 Accounts are not supported on this server
-== 
+== Bu sunucuda hesaplar desteklenmiyor
 
 The username is too long or too short
-== 
+== Kullanıcı adı çok uzun veya çok kısa
 
 Your username can only consist of letters and numbers
-== 
+== Kullanıcı adın yalnızca harf ve rakamlardan oluşabilir
 
 The passwords need to be identical
-== 
+== Şifreler aynı olmalıdır
 
 The password is too long or too short
-== 
+== Şifre çok uzun veya çok kısa
 
 Username already exists
-== 
+== Kullanıcı adı zaten mevcut
 
 Successfully registered an account, you can login now
-== 
+== Başarıyla hesap oluşturuldu, şimdi giriş yapabilirsin
 
 Set a security pin to avoid account stealing. For more info, say '/pin'
-== 
+== Hesap hırsızlığını önlemek için bir güvenlik pin'i ayarlayın. Daha fazla bilgi için '/pin' yazın
 
 You are not logged in
-== 
+== Giriş yapılmadı
 
 You can't logout in a minigame
-== 
+== Mini oyundayken çıkış yapamazsın
 
 You can't logout while being arrested
-== 
+== Tutukluyken çıkış yapamazsın
 
 You can't logout while being searched by the police
-== 
+== Polis tarafından aranırken çıkış yapamazsın
 
 Kill logout is activated, kill within %d seconds to logout
-== 
+== Çıkış aktif, çıkış yapmak için %d saniye içinde resetle
 
 You are not verified, please enter your security pin using '/pin'
-== 
+== Doğrulanmadı, lütfen güvenlik pin'ini '/pin' ile girin
 
 Wrong password
-== 
+== Yanlış şifre
 
 Successfully changed password
-== 
+== Şifre başarıyla değiştirildi
 
 You need to enter a way to contact you, for example: Discord, E-Mail, Skype, etc.
-== 
+== Sana ulaşılabilecek bir bilgi girmelisin, örneğin: Discord, E-Mail, Skype vb.
 
 To see your current contact information, use '/account'
-== 
+== Mevcut iletişim bilgilerini görmek için '/account' kullanın
 
 Example: '/contact Discord: fokkonaut'
-== 
+== Örnek: '/contact Discord: fokkonaut'
 
 Successfully updated contact information, check '/account'
-== 
+== İletişim bilgileri başarıyla güncellendi, '/account' ile kontrol edin
 
 SECURITY PIN
-== 
+== GÜVENLİK PİNİ
 
 You should set a security pin to avoid account stealing. The pin itself has to be a 4-digit long number code.
-== 
+== Hesap hırsızlığını önlemek için bir güvenlik pin'i ayarlamalısın. Pin, 4 haneli bir sayı olmalıdır.
 
 This pin will be required to change your contact information or your password.
-== 
+== Bu pin, iletişim bilgilerini veya şifreni değiştirmek için gerekli olacaktır.
 
 If your account is not secured yet, you can set a pin with '/pin <new-pin>'.
-== 
+== Hesabın henüz güvence altında değilse, '/pin <yeni-pin>' ile bir pin ayarlayabilirsin.
 
 If you want to change your pin, you first need to verify using '/pin <account-pin>'.
-== 
+== Pin'ini değiştirmek istiyorsan, önce '/pin <hesap-pin>' ile doğrulama yapmalısın.
 
 After verifying, you can set a new pin with '/pin <new-pin>'.
-== 
+== Doğrulama sonrasında, '/pin <yeni-pin>' ile yeni bir pin ayarlayabilirsin.
 
 You have to enter a 4-digit number
-== 
+== 4 haneli bir sayı girmelisin
 
 Successfully set the security pin
-== 
+== Güvenlik pin'i başarıyla ayarlandı
 
 Verification failed
-== 
+== Doğrulama başarısız
 
 Verification successful
-== 
+== Doğrulama başarılı
 
 Successfully changed the security pin
-== 
+== Güvenlik pin'i başarıyla değiştirildi
 
 You have to be inside of a bank to pay money from your bank account to others
-== 
+== Başkalarına banka hesabınızdan para ödemek için banka içinde olmalısın
 
 You can't pay money that frequently
-== 
+== Bu kadar sık para ödeyemezsin
 
 That player doesn't exist
-== 
+== Bu oyuncu mevcut değil
 
 You can't pay money to yourself
-== 
+== Kendine para ödeyemezsin
 
 That player is not logged in
-== 
+== Bu oyuncu giriş yapmamış
 
 You don't have enough money
-== 
+== Yeterli paran yok
 
 You can't pay nothing
-== 
+== Hiçbir şey ödeyemezsin
 
 You paid %lld money from your bank account to '%s'
-== 
+== Banka hesabından '%s' adlı oyuncuya %lld para ödedin
 
 You got %lld money to your bank account from '%s'
-== 
+== '%s' adlı oyuncudan banka hesabına %lld para geldi
 
 Invalid argument
-== 
+== Geçersiz argüman
 
 You can't drop nothing
-== 
+== Hiçbir şey bırakamazsın
 
 You can't drop money bags over 100.000
-== 
+== 100.000'den fazla para çantası bırakamazsın
 
 You don't have enough money in your wallet
-== 
+== Cüzdanında yeterli para yok
 
 Drop money: '/money drop <amount>'
-== 
+== Para bırak: '/money drop <miktar>'
 
 You can't drop more than 100 portal batteries at the same time
-== 
+== Aynı anda 100'den fazla portal bataryası bırakamazsınız
 
 You don't have enough portal batteries
-== 
+== Yeterli portal bataryanız yok
 
 You can collect portal batteries in the map, which lets you use the portal rifle.
-== 
+== Haritada portal bataryaları toplayarak portal silahını kullanabilirsiniz.
 
 The portal rifle can shoot two portals at cursor position, which tees, flags and weapons can use to travel between them.
-== 
+== Portal silahı, imleç pozisyonuna iki portal ateşler; tee'ler, bayraklar ve silahlar bu portallar arasında seyahat edebilir.
 
 Your portal stats
-== 
+== Portal istatistikleriniz
 
 Drop portal battery: '/portal drop <amount>'
-== 
+== Portal bataryası bırak: '/portal drop <miktar>'
 
 You are not VIP
-== 
+== VIP değilsiniz
 
 You don't have a room key
-== 
+== Bir oda anahtarınız yok
 
 This player has a key already
-== 
+== Bu oyuncunun zaten bir anahtarı var
 
 This player got invited already
-== 
+== Bu oyuncu zaten davet edildi
 
 '%s' invited you to the room
-== 
+== '%s' sizi odaya davet etti
 
 You invited '%s' to the room
-== 
+== '%s' oyuncusunu odaya davet ettiniz
 
 You can't kick others without a key
-== 
+== Anahtarınız olmadan başkalarını atamazsınız
 
 You can't kick a player with a key
-== 
+== Anahtarı olan bir oyuncuyu atamazsınız
 
 This player is not invited
-== 
+== Bu oyuncu davet edilmemiş
 
 '%s' kicked you out of room
-== 
+== '%s' sizi odadan attı
 
 You kicked '%s' out of room
-== 
+== '%s' oyuncusunu odadan attınız
 
 Teleporting to spawn is disabled
-== 
+== Doğuş noktasına ışınlanma devre dışı
 
 You can't use this command in minigames
-== 
+== Bu komutu mini oyunlarda kullanamazsınız
 
 You can't use this command while being arrested
-== 
+== Tutukluyken bu komutu kullanamazsınız
 
 You can't use this command while frozen
-== 
+== Dondurulmuşken bu komutu kullanamazsınız
 
 You lost 50.000 money for teleporting to spawn
-== 
+== Doğuş noktasına ışınlanmak için 50.000 para kaybettiniz
 
 Plot subcommands
-== 
+== Plot alt komutları
 
 For detailed info, type '/plot help <command>'
-== 
+== Detaylı bilgi için '/plot help <komut>' yazın
 
 Hold SPACE while editing for more control infos
-== 
+== Daha fazla kontrol bilgisi için düzenleme yaparken BOŞLUK tuşunu basılı tutun
 
 Clears all objects of your plot
-== 
+== Plotunuzdaki tüm nesneleri temizler
 
 Starts an auction for your plot, everyone can buy it using the buy command
-== 
+== Plotunuz için bir açık artırma başlatır, herkes satın alma komutu ile alabilir
 
 Buys a plot if the given player is running a plot auction
-== 
+== Belirtilen oyuncu bir plot açık artırması yapıyorsa satın alır
 
 Lets you respawn at your plot
-== 
+== Doğuş noktanızı plotunuz olarak ayarlar
 
 Cancels the current running auction on your plot
-== 
+== Plotunuzdaki devam eden açık artırmayı iptal eder
 
 Swaps plot with given player
-== 
+== Belirtilen oyuncu ile plot değiş tokuşu yapar
 
 Shows a list with all currently open plot auctions and swap offers
-== 
+== Şu anda devam eden tüm plot açık artırmalarını ve takas tekliflerini listeler
 
 This player doesn't exists
-== 
+== Bu oyuncu mevcut değil
 
 You can't buy your own plot
-== 
+== Kendi plotunuzu satın alamazsınız
 
 This player doesn't sell a plot
-== 
+== Bu oyuncu bir plot satmıyor
 
 You already have a plot
-== 
+== Zaten bir plotunuz var
 
 The price you entered does not match the offer
-== 
+== Girdiğiniz fiyat teklifle eşleşmiyor
 
 Your IP address already owns one plot
-== 
+== IP adresiniz zaten bir plota sahip
 
 Plot %d has been bought by '%s'
-== 
+== %d numaralı plot '%s' tarafından satın alındı
 
 You bought plot %d from %s
-== 
+== %s oyuncusundan %d numaralı plotunu satın aldınız
 
 %s bought your plot, the money is moved to your bank account
-== 
+== %s plotunuzu satın aldı, para banka hesabınıza aktarıldı
 
 Plot list
-== 
+== Plot listesi
 
 Buy from auction: '/plot buy <price> <playername>'
-== 
+== Açık artırmadan satın al: '/plot buy <fiyat> <oyuncuadı>'
 
 Swap with offer: '/plot swap <playername>'
-== 
+== Teklifle takas yap: '/plot swap <oyuncuadı>'
 
 List of all plot auctions and swap offers:
-== 
+== Tüm plot açık artırmaları ve takas teklifleri listesi:
 
 There are currently no auctions or swap offers
-== 
+== Şu anda hiç açık artırma veya takas teklifi yok
 
 You need a plot to use this command
-== 
+== Bu komutu kullanmak için bir plot sahip olmalısınız
 
 You can't sell your plot when being wanted
-== 
+== Aranıyorken plotunuzu satamazsınız
 
 You can only do auctions once a minute
-== 
+== Dakikada yalnızca bir kez açık artırma yapabilirsiniz
 
 You already sell your plot
-== 
+== Zaten plotunuzu satıyorsunuz
 
 You need to enter a valid price
-== 
+== Geçerli bir fiyat girmelisiniz
 
 '%s' started an auction on plot %d for %d money (plot expires on %s)
-== 
+== '%s', %d numaralı plot için %d para karşılığında açık artırma başlattı (plotun süresi %s tarihinde dolacak)
 
 Use '/plot buy %d %s' to buy the plot
-== 
+== Plotu satın almak için '/plot buy %d %s' kullanın
 
 You can't swap plots when being wanted
-== 
+== Aranıyorken plot takası yapamazsınız
 
 You can't swap with yourself
-== 
+== Kendinizle takas yapamazsınız
 
 This player doesn't own a plot
-== 
+== Bu oyuncunun bir plotu yok
 
 You can only swap once a minute
-== 
+== Dakikada yalnızca bir kez takas yapabilirsiniz
 
 You swapped plots with '%s'
-== 
+== '%s' ile plot takası yaptınız
 
 Offer to swap plots was sent to '%s'
-== 
+== '%s' oyuncusuna plot takas teklifi gönderildi
 
 '%s' has offered to swap plots with you, type '/plot swap %s' to swap
-== 
+== '%s' sizinle plot takası teklif etti, takas yapmak için '/plot swap %s' yazın
 
 Page
-== 
+== Sayfa
 
 Police Info
-== 
+== Polis Bilgisi
 
 [POLICE %d]
-== 
+== [POLİS %d]
 
 Level needed to buy
-== 
+== Satın almak için gereken seviye
 
 Benefits:
-== 
+== Avantajlar:
 
 - The police bot will help you
-== 
+== - Polis botu size yardımcı olacak
 
 - taser license ('/taser')
-== 
+== - taser lisansı ('/taser')
 
 - Officers can taser a plot door of a wanted player to deal damage and destroy it
-== 
+== - Memurlar, aranan bir oyuncunun plot kapısını hasar verip yıkmak için taserlayabilir
 
 - Taser will destroy plot objects of a wanted player
-== 
+== - Taser, aranan bir oyuncunun plot nesnelerini yok eder
 
 [GENERAL INFORMATION]
-== 
+== [GENEL BİLGİLER]
 
 Police ranks can be bought in shop.
-== 
+== Polis rütbeleri marketten satın alınabilir.
 
 There are multiple police ranks, each cost 100.000 money.
-== 
+== Birden fazla polis rütbesi var, her biri 100.000 para.
 
 The policebot will help every police officer.
-== 
+== Polis botu tüm polis memurlarına yardımcı olacaktır.
 
 Every police rank will give you more benefits.
-== 
+== Her polis rütbesi size daha fazla avantaj sağlar.
 
 Use '/police <page>' for information about other ranks
-== 
+== Diğer rütbeler hakkında bilgi için '/police <sayfa>' kullanın
 
 You can't mute yourself
-== 
+== Kendinizi susturamazsınız
 
 muted
-== 
+== susturuldu
 
 unmuted
-== 
+== susturma kaldırıldı
 
 Map Designs
-== 
+== Harita Tasarımları
 
 If you have your dummy connected, you need to reconnect it after the design change so it can get back it's state.
-== 
+== Bağlı bir dummy'niz varsa, tasarım değişikliği sonrası durumunu geri alabilmesi için yeniden bağlamanız gerekir.
 
 You can set one of the following designs by using '/design <name>':
-== 
+== '/design <isim>' kullanarak aşağıdaki tasarımlardan birini ayarlayabilirsiniz:
 
 Invalid language
-== 
+== Geçersiz dil
 
 Successfully changed language to %s
-== 
+== Dil başarıyla %s olarak değiştirildi
 
 Server Language
-== 
+== Sunucu Dili
 
 Current language
-== 
+== Mevcut dil
 
 You can set one of the following languages for server-side translation by using '/language <option>':
-== 
+== Sunucu çevirisi için '/language <seçenek>' kullanarak aşağıdaki dillerden birini ayarlayabilirsiniz:
 
 This chat language is already selected
-== 
+== Bu sohbet dili zaten seçili
 
 Successfully updated chat language
-== 
+== Sohbet dili başarıyla güncellendi
 
 Chat Language
-== 
+== Sohbet Dili
 
 You can set one of the following languages by using '/chatlanguage <option>':
-== 
+== '/chatlanguage <seçenek>' kullanarak aşağıdaki dillerden birini ayarlayabilirsiniz:
 
 This server does not have a linked Discord server
-== 
+== Bu sunucunun bağlı bir Discord sunucusu yok
 
 Minigames
-== 
+== Mini Oyunlar
 
 You can join any minigame using '/<minigame>'
-== 
+== '/<minigame>' kullanarak herhangi bir mini oyuna katılabilirsiniz
 
 To leave a minigame, just type '/leave'
-== 
+== Bir mini oyundan ayrılmak için '/leave' yazın
 
 Here is a list of all minigames:
-== 
+== İşte tüm mini oyunların listesi:
 
 Money
-== 
+== Para
 
 Spree
-== 
+== Seri
 
 Durák Wins
-== 
+== Durák Kazanmaları
 
 Durák Profit
-== 
+== Durák Kârı
 
 You need to be police level 2 to use this command
-== 
+== Bu komutu kullanmak için polis seviye 2 olmalısınız
 
 This player is a police officer
-== 
+== Bu oyuncu bir polis memuru
 
 This player is a police helper already
-== 
+== Bu oyuncu zaten bir polis yardımcısı
 
 '%s' added you to the police helpers
-== 
+== '%s' sizi polis yardımcılarına ekledi
 
 You added '%s' to the police helpers
-== 
+== '%s' oyuncusunu polis yardımcılarına eklediniz
 
 This player is not a police helper
-== 
+== Bu oyuncu bir polis yardımcısı değil
 
 '%s' removed you from the police helpers
-== 
+== '%s' sizi polis yardımcılarından çıkardı
 
 You removed '%s' from the police helpers
-== 
+== '%s' oyuncusunu polis yardımcılarından çıkardınız
 
 WANTED
-== 
+== ARANAN
 
 Listing all players that are wanted by the police:
-== 
+== Polis tarafından aranan tüm oyuncuların listesi:
 
 1 wanted player
-== 
+== 1 aranan oyuncu
 
 %d wanted players
-== 
+== %d aranan oyuncu
 
 There are no wanted players right now
-== 
+== Şu anda aranan oyuncu yok
 
 You don't have enough taser batteries
-== 
+== Yeterli taser bataryanız yok
 
 Taser
-== 
+== Taser
 
 Police officers with level 3 or higher get a taser license.
-== 
+== Seviye 3 veya üzeri polis memurları taser lisansı alır.
 
 The taser is a rifle that freezes players for a short time.
-== 
+== Taser, oyuncuları kısa süreliğine donduran bir tüfektir.
 
 You can pick up the taser and taser batteries throughout the map.
-== 
+== Harita genelinde taser ve taser bataryaları toplayabilirsiniz.
 
 Your taser stats
-== 
+== Taser istatistikleriniz
 
 Taser level
-== 
+== Taser seviyesi
 
 Price for the next level
-== 
+== Sonraki seviye için fiyat
 
 Freeze time: %.2f seconds
-== 
+== Dondurma süresi: %.2f saniye
 
 Taser shield
-== 
+== Taser kalkanı
 
 Drop taser battery: '/taser drop <amount>'
-== 
+== Taser bataryası bırak: '/taser drop <miktar>'
 
 '%s' has been muted for %d seconds (%s)
-== 
+== '%s' %d saniye susturuldu (%s)
 
 '%s' has been muted for %d seconds
-== 
+== '%s' %d saniye susturuldu
 
 Your taser shield has been set to %d%%. Use '/taser' to check later.
-== 
+== Taser kalkanınız %d%% olarak ayarlandı. Kontrol etmek için '/taser' kullanın.
 
 You have been logged out by an admin
-== 
+== Bir yönetici tarafından çıkış yaptırıldınız
 
 You have been logged out due to account deactivation by an admin
-== 
+== Bir yönetici tarafından hesabınız devre dışı bırakıldığı için çıkış yaptınız
 
 You are now in no-bonus area mode
-== 
+== Artık bonus olmayan alan modundasınız
 
 You are no longer in no-bonus area mode
-== 
+== Artık bonus olmayan alan modunda değilsiniz
 
 You were arrested for %d seconds
-== 
+== %d saniye tutuklandınız
 
 You lost your plot
-== 
+== Plotunuzu kaybettiniz
 
 You are now owner of plot %d
-== 
+== Artık %d numaralı plotun sahibisiniz
 
 Objects
-== 
+== Nesneler
 
 Please enter the name for this preset into the chat
-== 
+== Bu ön ayar için sohbete bir isim girin
 
 Please enter the name of the wanted preset into the chat
-== 
+== İstenen ön ayarın ismini sohbete girin
 
 Couldn't save preset '%s', a preset with that name already exists
-== 
+== '%s' ön ayarı kaydedilemedi, bu isimde bir ön ayar zaten var
 
 Successfully saved preset '%s'
-== 
+== '%s' ön ayarı başarıyla kaydedildi
 
 Couldn't load preset '%s'
-== 
+== '%s' ön ayarı yüklenemedi
 
 Successfully loaded preset '%s'
-== 
+== '%s' ön ayarı başarıyla yüklendi
 
 Preset saving aborted
-== 
+== Ön ayar kaydetme iptal edildi
 
 Preset loading aborted
-== 
+== Ön ayar yükleme iptal edildi
 
 Vote aborted
-== 
+== Oylama iptal edildi
 
 Vote passed
-== 
+== Oylama geçti
 
 Vote failed
-== 
+== Oylama reddedildi
 
 Your plot is no longer subject to a search warrant and can no longer be destroyed
-== 
+== Plotunuz artık bir arama emrine tabi değil ve yok edilemez
 
 '%s' entered and joined the game
-== 
+== '%s' oyuna katıldı
 
 '%s' entered and joined the spectators
-== 
+== '%s' izleyici olarak katıldı
 
 This server has an initial chat delay, you will need to wait %d seconds before talking.
-== 
+== Bu sunucuda bir sohbet gecikmesi var, konuşmadan önce %d saniye beklemelisiniz.
 
 '%s' rejoined current session
-== 
+== '%s' mevcut oturuma yeniden katıldı
 
 [WARNING] You need to reconnect your dummy after the design change is done, so it can get back it's old state.
-== 
+== [UYARI] Tasarım değişikliği yapıldıktan sonra dummy'nizi yeniden bağlamanız gerekir, böylece eski durumuna dönebilir.
 
 '%s' has left the game (%s)
-== 
+== '%s' oyundan ayrıldı (%s)
 
 '%s' has left the game
-== 
+== '%s' oyundan ayrıldı
 
 You do not have an ongoing conversation. Whisper to someone to start one
-== 
+== Devam eden bir sohbetiniz yok. Bir sohbet başlatmak için birine fısıldayın
 
 '%s' changed name to '%s'
-== 
+== '%s' ismini '%s' olarak değiştirdi
 
 Following players can't receive your message because either you or they are in local chat mode:
-== 
+== Aşağıdaki oyuncular mesajınızı alamaz çünkü siz veya onlar yerel sohbet modundalar:
 
 No reason given
-== 
+== Sebep belirtilmedi
 
 '%s' called vote to change server option '%s' (%s)
-== 
+== '%s', sunucu seçeneğini '%s' olarak değiştirmek için oylama başlattı (%s)
 
 '%s' isn't an option on this server
-== 
+== '%s' bu sunucuda bir seçenek değil
 
 '%s' called vote to change server option '%s'
-== 
+== '%s', sunucu seçeneğini '%s' olarak değiştirmek için oylama başlattı
 
 There's a %d second wait time between kick votes for each player please wait %d second(s)
-== 
+== Her oyuncu için atma oylamaları arasında %d saniye bekleme süresi var, lütfen %d saniye bekleyin
 
 Server does not allow voting to kick players
-== 
+== Sunucu oyuncuları atma oylamasına izin vermiyor
 
 Kick voting requires %d players
-== 
+== Atma oylaması için %d oyuncu gerekli
 
 You can't kick yourself
-== 
+== Kendinizi atamazsınız
 
 You can't kick dummies
-== 
+== Dummy'leri atamazsınız
 
 You can't kick authorized players
-== 
+== Yetkili oyuncuları atamazsınız
 
 '%s' called for vote to kick you
-== 
+== '%s' sizi atmak için oylama başlattı
 
 You can kick only your team member
-== 
+== Yalnızca takım üyenizi atabilirsiniz
 
 '%s' called for vote to kick '%s' (%s)
-== 
+== '%s', '%s' oyuncusunu atmak için oylama başlattı (%s)
 
 Server does not allow voting to move players to spectators
-== 
+== Sunucu oyuncuları izleyiciye taşıma oylamasına izin vermiyor
 
 You can't move yourself
-== 
+== Kendinizi taşıyamazsınız
 
 You can't set dummies to spectator
-== 
+== Dummy'leri izleyici yapamazsınız
 
 You can only move your team member to spectators
-== 
+== Yalnızca takım üyenizi izleyiciye taşıyabilirsiniz
 
 '%s' called for vote to pause '%s' for %d seconds (%s)
-== 
+== '%s', '%s' oyuncusunu %d saniye duraklatmak için oylama başlattı (%s)
 
 '%s' called for vote to move '%s' to spectators (%s)
-== 
+== '%s', '%s' oyuncusunu izleyiciye taşımak için oylama başlattı (%s)
 
 You are now using the tee controller
-== 
+== Artık tee kontrolcüsünü kullanıyorsunuz
 
 You are no longer using the tee controller
-== 
+== Artık tee kontrolcüsünü kullanmıyorsunuz
 
 Kill Protection enabled. If you really want to join the spectators, first type /kill
-== 
+== Öldürme Koruması aktif. İzleyiciye geçmek istiyorsanız önce /kill yazın
 
 Warning you have %lld money in your wallet! (see /money)
-== 
+== Uyarı! Cüzdanınızda %lld para var! (/money'ye bakın)
 
 Wallet kill Protection enabled. If you really want to join the spectators, first type /kill
-== 
+== Cüzdan Koruması aktif. İzleyiciye geçmek istiyorsanız önce /kill yazın
 
 You can't join the spectators while being searched by the police
-== 
+== Polis tarafından aranırken izleyiciye geçemezsiniz
 
 You need to wait %d seconds before killing again due to escaping
-== 
+== Kaçış nedeniyle tekrar öldürmeden önce %d saniye beklemelisiniz
 
 Kill Protection enabled. If you really want to kill, type /kill
-== 
+== Öldürme Koruması aktif. Öldürmek istiyorsanız /kill yazın
 
 Wallet kill Protection enabled. If you really want to kill, type /kill
-== 
+== Cüzdan Koruması aktif. Öldürmek istiyorsanız /kill yazın
 
 Local chat mode has been disabled, automatically entered public chat
-== 
+== Yerel sohbet modu devre dışı bırakıldı, otomatik olarak genel sohbete geçildi
 
 Automatic wallet to bank due to bank disabling
-== 
+== Banka devre dışı bırakıldığı için otomatik olarak cüzdandan bankaya aktarıldı
 
 You are not permitted to talk for the next %d seconds.
-== 
+== Sonraki %d saniye boyunca konuşmanıza izin verilmiyor.
 
 Your plot expired
-== 
+== Plotunuzun süresi doldu
 
 The police have gained access to your plot in hopes of finding you
-== 
+== Polis, sizi bulma umuduyla plotunuza erişim sağladı
 
 Plot %d Door Health [%d/%d]
-== 
+== %d Numaralı Plot Kapı Sağlığı [%d/%d]
 
 You are already logged in
-== 
+== Zaten giriş yaptınız
 
 That account doesn't exist, please register first
-== 
+== Bu hesap mevcut değil, lütfen önce kayıt olun
 
 This account is already logged in
-== 
+== Bu hesap zaten giriş yapmış
 
 This account is already logged in on another server
-== 
+== Bu hesap başka bir sunucuda zaten giriş yapmış
 
 This account is disabled
-== 
+== Bu hesap devre dışı bırakıldı
 
 You were released from jail
-== 
+== Hapisten serbest bırakıldınız
 
 '%s' is spawnblocking. Catch him!
-== 
+== '%s' doğma noktasını engelliyor. Yakalayın!
 
 Police is searching you because of spawnblocking
-== 
+== Polis seni doğma noktası engellemesi nedeniyle arıyor
 
 [WARNING] Spawnblocking is illegal
-== 
+== [UYARI] Doğma noktası engellemek yasaktır
 
 Registration spam
-== 
+== Kayıt spamı
 
 Too many login fails
-== 
+== Çok fazla giriş hatası
 
 Too many pin fails
-== 
+== Çok fazla pin hatası
 
 You have been banned from the account system for %d seconds (%s)
-== 
+== Hesap sisteminden %d saniye boyunca banlandınız (%s)
 
 You are banned from the account system for the next %d seconds.
-== 
+== Hesap sisteminden önümüzdeki %d saniye boyunca banlısınız
 
 This minigame is disabled
-== 
+== Bu mini oyun devre dışı
 
 You are not in a minigame
-== 
+== Bir mini oyunda değilsiniz
 
 You are already in minigame '%s'
-== 
+== Zaten '%s' mini oyunundasınız
 
 This map has no Durák lobby, you have to find your way to the table yourself
-== 
+== Bu haritada Durák lobisi yok, masayı kendiniz bulmalısınız
 
 '%s' left the minigame '%s'
-== 
+== '%s', '%s' mini oyunundan ayrıldı
 
 '%s' joined the minigame '%s', use '/%s' to join aswell
-== 
+== '%s', '%s' mini oyununa katıldı, katılmak için '/%s' yazın
 
 Say '/leave' to join the normal area again
-== 
+== Normal alana dönmek için '/leave' yazın
 
 Type '/1vs1 <playername>' to start a fight with someone
-== 
+== Biriyle dövüş başlatmak için '/1vs1 <oyuncuadı>' yazın
 
 For custom scorelimits or a kill-border use '/1vs1 <playername> <scorelimit> <killborder>'
-== 
+== Özel skor limiti veya öldürme sınırı için '/1vs1 <oyuncuadı> <skorlimiti> <öldürmesınırı>' kullanın
 
 You have to leave first in order to join another minigame
-== 
+== Başka bir mini oyuna katılmadan önce çıkış yapmalısınız
 
 The winner is '%s'
-== 
+== Kazanan: '%s'
 
 You are the winner
-== 
+== Kazanan sensin
 
 '%s' would have timed out, but can use timeout protection now
-== 
+== '%s' zaman aşımına uğrayacaktı ama şu anda zaman aşımı koruması kullanabilir
 
 You are arrested for %lld seconds
-== 
+== %lld saniyeliğine tutuklandınız
 
 Your life as a gangster is over, you are free now
-== 
+== Gangster hayatınız sona erdi, artık özgürsünüz
 
 Avoid policehammers for the next %lld seconds
-== 
+== Önümüzdeki %lld saniye boyunca polis çekiçlerinden kaçının
 
 Entered local chat
-== 
+== Yerel sohbete girildi
 
 Entered public chat
-== 
+== Genel sohbete girildi
 
 '%s' joined the game
-== 
+== '%s' oyuna katıldı
 
 '%s' joined the spectators
-== 
+== '%s' izleyici olarak katıldı
 
 You have been afk for %d seconds now. Please note that you get kicked after not playing for %d seconds.
-== 
+== %d saniyedir AFK'sınız. Oynamazsanız %d saniye sonra atılırsınız.
 
 You can't pause while you are controlled by someone else
-== 
+== Başkası tarafından kontrol edilirken duraklatamazsınız
 
 You can't pause while you are selecting a tee to control
-== 
+== Kontrol edilecek bir tee seçerken duraklatamazsınız
 
 (doubled xp)
-== 
+== (çift xp)
 
 You are now level %d!
-== 
+== Artık seviye %d'siniz!
 
 Successfully logged in
-== 
+== Başarıyla giriş yaptınız
 
 [WARNING] You did not set a contact, it can be used to recover your password or to get back the account after it got stolen.
-== 
+== [UYARI] İletişim bilgisi ayarlamadınız, bu bilgi şifre kurtarma veya çalınan hesabı geri almak için kullanılabilir.
 
 Set a contact with '/contact <option>' to hide this message and for a free XP reward.
-== 
+== Bu mesajı gizlemek ve ücretsiz XP kazanmak için '/contact <bilgi>' yazın.
 
 [WARNING] You did not set security pin yet. Check '/pin' for more information.
-== 
+== [UYARI] Henüz güvenlik pin'i ayarlamadınız. Daha fazla bilgi için '/pin' komutunu kullanın.
 
 Your previously collected money got added to your account due to login
-== 
+== Daha önce topladığınız para, giriş yaptığınız için hesabınıza eklendi
 
 Successfully logged out
-== 
+== Başarıyla çıkış yapıldı
 
 Load recent design '%s'?
-== 
+== Son tasarım '%s' yüklensin mi?
 
 The plot auction by '%s' is cancelled
-== 
+== '%s' tarafından başlatılan plot açık artırması iptal edildi
 
 Your plot swap offer got cancelled
-== 
+== Plot takas teklifiniz iptal edildi
 
 [WARNING] Your %s expired
-== 
+== [UYARI] %s süresi doldu
 
 You got unfrozen by the clan protection.
-== 
+== Klan koruması tarafından çözülerek serbest bırakıldınız
 
 WARNING
-== 
+== UYARI
 
 You got frozen by the clan protection.
-== 
+== Klan koruması tarafından donduruldunuz
 
 Remove your 'Chilli.*' clantag and reconnect, or set your skin body to 'greensward'.
-== 
+== 'Chilli.*' klan etiketinizi kaldırın ve yeniden bağlanın ya da tee'nizi 'greensward' olarak ayarlayın
 
 You automatically left the minigame because you were afk for too long
-== 
+== Çok uzun süre AFK kaldığınız için mini oyundan otomatik olarak ayrıldınız
 
 You automatically exited the plot editor because you were afk for too long
-== 
+== Çok uzun süre AFK kaldığınız için plot düzenleyicisinden otomatik olarak çıktınız
 
 You can't join a minigame while being searched by the police
-== 
+== Polis tarafından aranırken mini oyuna katılamazsınız
 
 You can't join a minigame while being arrested
-== 
+== Tutukluyken mini oyuna katılamazsınız
 
 You can't join a minigame while being frozen
-== 
+== Dondurulmuşken mini oyuna katılamazsınız
 
 Minigame request sent, please don't move for 5 seconds
-== 
+== Mini oyun isteği gönderildi, lütfen 5 saniye boyunca hareket etmeyin
 
 Your minigame request was cancelled because you are frozen
-== 
+== Donmuş durumda olduğunuz için mini oyun isteğiniz iptal edildi
 
 Your minigame request was cancelled because you moved
-== 
+== Hareket ettiğiniz için mini oyun isteğiniz iptal edildi
 
 Please move within %d seconds or you will leave the minigame
-== 
+== Lütfen %d saniye içinde hareket edin, yoksa mini oyundan ayrılacaksınız
 
 You have %dx double-xp life left
-== 
+== %dx çift-XP hakkınız kaldı
 
 You have no double-xp lifes anymore (last use)
-== 
+== Artık hiç çift-XP hakkınız kalmadı (son kullanım)
 
 You will not receive sounds from the server while farming on a moneytile
-== 
+== Para karosu üzerinde farm yaparken sunucudan ses almayacaksınız
 
 You will receive all sounds again
-== 
+== Tüm sesleri tekrar alacaksınız
 
 You will no longer see drawings
-== 
+== Artık çizimleri görmeyeceksiniz
 
 You will now see drawings again
-== 
+== Artık çizimleri tekrar göreceksiniz
 
 You will no longer see money broadcasts, jail and escape timer will be shown in vote menu instead
-== 
+== Para yayınlarını artık görmeyeceksiniz, onun yerine hapis ve kaçış süreleri oylama menüsünde gösterilecek
 
 You will now see all broadcasts again
-== 
+== Artık tüm yayınları tekrar göreceksiniz
 
 Weapon indicator enabled
-== 
+== Silah göstergesi etkinleştirildi
 
 Weapon indicator disabled
-== 
+== Silah göstergesi devre dışı bırakıldı
 
 Your cursor will now zoom. WARNING: Does not work with dynamic camera if deadzone or follow factor are non-default.
-== 
+== Artık imleciniz yakınlaşacak. UYARI: maksimum alan veya takip faktörü varsayılan değilse dinamik kamerada çalışmaz.
 
 You cursor will no longer be zoomed
-== 
+== Artık imleciniz yakınlaştırılmayacak
 
 You don't have ninjajetpack, buy it in the shop
-== 
+== Ninjajetpack'iniz yok, mağazadan satın alın
 
 Ninjajetpack enabled
-== 
+== Ninjajetpack etkinleştirildi
 
 Ninjajetpack disabled
-== 
+== Ninjajetpack devre dışı bırakıldı
 
 You will now respawn at your plot (TAB+kill to join at normal spawn)
-== 
+== Artık plotunuzda doğacaksınız (Normal doğuş için TAB+kill)
 
 You will no longer respawn at your plot (TAB+kill to join at plot spawn)
-== 
+== Artık plotta doğmayacaksınız (Plotta doğmak için TAB+kill)
 
 You will now resume from pause if your tee gets moved
-== 
+== Tee'niz hareket ettirildiğinde duraklama sona erecek
 
 You will no longer resume from pause if your tee gets moved
-== 
+== Tee'niz hareket ettiğinde duraklama sona ermeyecek
 
 All objects of your plot have been removed
-== 
+== Plotunuzdaki tüm nesneler kaldırıldı
 
 You have to be alive to edit your plot
-== 
+== Plotunuzu düzenlemek için canlı olmalısınız
 
 You have to be inside your plot to edit your plot
-== 
+== Plotunuzu düzenlemek için onun içinde olmalısınız
 
 You can't edit your plot while living the life of a gangster.
-== 
+== Gangster hayatı yaşarken plotunuzu düzenleyemezsiniz
 
 You are now editing your plot, switch to another weapon to exit the editor
-== 
+== Artık plotunuzu düzenliyorsunuz, editörden çıkmak için başka bir silaha geçin
 
 Changed displayed score to '%s'
-== 
+== Görüntülenen skor '%s' olarak değiştirildi
 
 You are not VIP+
-== 
+== VIP+ değilsiniz
 
 Rainbow speed has been updated to %d
-== 
+== Gökkuşağı hızı %d olarak güncellendi
 
 %s finished in: %d minute(s) %5.2f second(s)
-== 
+== %s şu sürede tamamladı: %d dakika %5.2f saniye
 
 New record: %d minute(s) %5.2f second(s) better.
-== 
+== Yeni rekor: %d dakika %5.2f saniye daha iyi
 
 New record: %5.2f second(s) better.
-== 
+== Yeni rekor: %5.2f saniye daha iyi
 
 You finished with your best time.
-== 
+== En iyi sürenle bitirdin
 
 %d minute(s) %5.2f second(s) worse, better luck next time.
-== 
+== %d dakika %5.2f saniye daha kötü, bir dahaki sefere 
 
 %5.2f second(s) worse, better luck next time.
-== 
+== %5.2f saniye daha kötü, bir dahaki sefere
 
 Please specify the page using the reason field
-== 
+== Lütfen sebep kısmında sayfayı belirtin
 
 Please specify the rainbow speed using the reason field
-== 
+== Lütfen sebep kısmında gökkuşağı hızını belirtin
 
 You can't close your door because the police destroyed it
-== 
+== Kapınızı kapatamazsınız çünkü polis onu yok etti
 
 %s is on a killing spree with %d blocks
-== 
+== %s %d blokla öldürme serisinde
 
 %s is on a killing spree with %d kills
-== 
+== %s %d öldürme ile öldürme serisinde
 
 %s's blocking spree was ended by %s (%d blocks)
-== 
+== %s'in engelleme serisi %s tarafından sona erdirildi (%d blok)
 
 %s's blocking spree was ended by %s (%d kills)
-== 
+== %s'in öldürme serisi %s tarafından sona erdirildi (%d öldürme)
 
 You lost, you can wait for another round or leave the lobby using '/leave'
-== 
+== Kaybettiniz, başka bir raundu bekleyebilir veya '/leave' yazarak lobiden çıkabilirsiniz
 
 Too many players on police tiles
-== 
+== Polis alanlarında çok fazla oyuncu var
 
 You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'
-== 
+== Para alanlarını kullanmak için giriş yapmalısınız.\n'/register <ad> <şifre> <şifre>' ile hesap oluşturun
 
 Congratulations, +20%% taser shield, current: %d%%. Use '/taser' to check later.
-== 
+== Tebrikler, +%%20 taser kalkanı, mevcut: %%d. Daha sonra kontrol etmek için '/taser' kullanın
 
 Congratulations, double-xp has been activated for %d lifes
-== 
+== Tebrikler, %d hak için çift XP etkinleştirildi
 
 '%s' finished the special race!
-== 
+== '%s' özel yarışı tamamladı!
 
 This area is for helpers only
-== 
+== Bu alan yalnızca yardımcılar içindir
 
 This area is for moderators only
-== 
+== Bu alan yalnızca moderatörler içindir
 
 This area is for admins only
-== 
+== Bu alan yalnızca yöneticiler içindir
 
 Seems like it's your birthday! You may pick up your present at any time.
-== 
+== Görünüşe göre doğum gününüz! Hediyenizi istediğiniz zaman alabilirsiniz
 
 This gift is only dedicated to humans.
-== 
+== Bu hediye yalnızca insanlar içindir
 
 You've picked up your present already! Come back next year.
-== 
+== Hediyenizi zaten aldınız! Gelecek yıl tekrar gelin
 
 Happy birthday! :) You have jetpack for 45 seconds
-== 
+== Doğum günün kutlu olsun! :) 45 saniyeliğine jetpack'in var
 
 Sorry, someting is missing to get the gift.
-== 
+== Üzgünüm, hediyeyi almak için bir şeyler eksik
 
 You need a key to enter this room, buy one in the shop
-== 
+== Bu odaya girmek için bir anahtara ihtiyacınız var, mağazadan satın alın
 
 This area is for VIP+ only, buy it in the shop
-== 
+== Bu alan yalnızca VIP+ içindir, mağazadan satın alın
 
 Your jetpack is now disabled
-== 
+== Jetpack'iniz artık devre dışı
 
 '%s' has exceeded his legal drinking limit. Catch him!
-== 
+== '%s' yasal içki sınırını aştı. Yakalayın!
 
 Police is searching you because you have exceeded your legal drinking limit
-== 
+== Polis seni yasal içki sınırını aştığın için arıyor
 
 You can not hold more than %d grogs at once
-== 
+== Aynı anda %d'den fazla grog taşıyamazsınız
 
 Weapon
-== 
+== Silah
 
 '%s' is using bonus illegally. Catch him!
-== 
+== '%s' bonusu yasadışı kullanıyor. Yakalayın!
 
 Police is searching you because of illegal bonus use
-== 
+== Polis seni yasadışı bonus kullanımı nedeniyle arıyor
 
 [WARNING] Using bonus in no-bonus area is illegal
-== 
+== [UYARI] Bonus olmayan bölgede bonus kullanmak yasaktır
 
 [WARNING] You need to enter this teleporter with your dummy within 30 seconds in order to get moved safely
-== 
+== [UYARI] Güvenli şekilde taşınmak için bu ışınlayıcıya dummy'nizle 30 saniye içinde girmeniz gerekiyor
 
 [WARNING] Your dummy has to be alive in order to get moved safely
-== 
+== [UYARI] Güvenli taşınma için dummy'nizin canlı olması gerekiyor
 
 '%s' has been moved to another map
-== 
+== '%s' başka bir haritaya taşındı
 
 '%s' died as a result of excessive grog consumption (%.1f‰ / %.1f‰)
-== 
+== '%s' aşırı grog tüketimi sonucu öldü (%.1f‰ / %.1f‰)
 
 You paid %d money to '%s' to reduce your jailtime by 5 minutes
-== 
+== '%s' oyuncusuna hapis sürenizi 5 dakika azaltmak için %d para ödediniz
 
 You got %d money from '%s' to reduce his jailtime by 5 minutes
-== 
+== '%s' oyuncusundan hapis süresini 5 dakika azaltmak için %d para aldınız
 
 '%s' has been caught by '%s' (%d minutes arrest)
-== 
+== '%s', '%s' tarafından yakalandı (%d dakika tutuklama)
 
 Grog testing results: %.1f‰ / %.1f‰
-== 
+== Grog test sonuçları: %.1f‰ / %.1f‰
 
 You were arrested for %d minutes by '%s'
-== 
+== '%s' tarafından %d dakika tutuklandınız
 
 You already have the maximum of 50 meteors
-== 
+== Zaten en fazla 50 meteorunuz var
 
 Taser shield has been used, -5%%, new current: %d%%
-== 
+== Taser kalkanı kullanıldı, -%%5, yeni durum: %%d
 
 Collected %lld money
-== 
+== %lld para toplandı
 
 battery
-== 
+== batarya
 
 portal rifle
-== 
+== portal silahı
 
 seconds
-== 
+== saniye
 
 minutes
-== 
+== dakika
 
 This %s will respawn in %d %s
-== 
+== Bu %s, %d %s içinde yeniden doğacak
 
 This %s got picked up %d %s ago
-== 
+== Bu %s, %d %s önce alındı
 
 You need to select an amount to deposit or withdraw.
-== 
+== Yatırmak veya çekmek için bir miktar seçmelisiniz.
 
 You don't have enough money in your wallet to deposit this amount.
-== 
+== Bu miktarı yatırmak için cüzdanınızda yeterli para yok.
 
 You deposited %d money from your wallet to your bank account.
-== 
+== Cüzdanınızdan banka hesabınıza %d para yatırdınız.
 
 You don't have enough money on your bank account to withdraw this amount.
-== 
+== Bu miktarı çekmek için banka hesabınızda yeterli para yok.
 
 You withdrew %d money from your bank account to your wallet.
-== 
+== Banka hesabınızdan cüzdanınıza %d para çektiniz
 
 Bye! Come back if you need something.
-== 
+== Hoşça kal! Bir şeye ihtiyacın olursa tekrar gel.
 
 Invalid item
-== 
+== Geçersiz eşya
 
 You already have the highest police rank
-== 
+== Zaten en yüksek polis rütbesine sahipsiniz
 
 You already have the maximum amount of bullets
-== 
+== Zaten maksimum sayıda mermiye sahipsiniz
 
 You already have the maximum taser level
-== 
+== Zaten maksimum taser seviyesine sahipsiniz
 
 You already have a fully filled taser battery
-== 
+== Zaten tam dolu bir taser bataryanız var
 
 You already have the %s
-== 
+== Zaten %s'e sahipsiniz
 
 You already have %s
-== 
+== Zaten %s'e sahipsiniz
 
 You need to be police level 3 or higher to get a taser license
-== 
+== Taser lisansı almak için polis seviyesi 3 veya üzeri olmalısınız
 
 You can not buy this VIP level while owning another one
-== 
+== Başka bir VIP seviyesine sahipken bunu satın alamazsınız
 
 You can not buy bloody while specific cosmetics are activated
-== 
+== Belirli kozmetikler aktifken Bloody satın alamazsınız
 
 This plot is already sold to someone else
-== 
+== Bu plot zaten başka birine satıldı
 
 You already own that plot
-== 
+== Bu plota zaten sahipsiniz
 
 You already own another plot
-== 
+== Zaten başka bir plota sahipsiniz
 
 Your level is too low, you need to be level %d to buy %s
-== 
+== Seviyeniz çok düşük, %s satın almak için %d seviye olmalısınız
 
 Taser battery purchase failed
-== 
+== Taser batarya satın alımı başarısız
 
 You bought %s %s
-== 
+== %s adet %s satın aldınız
 
 until death
-== 
+== ölene kadar
 
 until disconnect
-== 
+== bağlantı kopana kadar
 
 Check '/account' for more information about the expiration date
-== 
+== Son kullanma tarihi hakkında daha fazla bilgi için '/account' yazın
 
 The plot will expire on %s
-== 
+== Bu plotun süresi %s tarihinde dolacak
 
 You don't have enough money in your wallet to buy a grog.
-== 
+== Grog satın almak için cüzdanınızda yeterli para yok
 
 You bought one grog
-== 
+== Bir grog satın aldınız
 
 You can't fight against yourself
-== 
+== Kendinize karşı düello yapamazsınız
 
 Invalid participant
-== 
+== Geçersiz katılımcı
 
 Leave the current fight in order to join another one
-== 
+== Başka bir düelloya katılmak için mevcut düellodan ayrılın
 
 Too many 1vs1 arenas, try again later
-== 
+== Çok fazla 1vs1 arenası var, daha sonra tekrar deneyin
 
 You successfully created a new global arena
-== 
+== Yeni bir küresel arena başarıyla oluşturuldu
 
 You invited '%s' to a fight
-== 
+== '%s' adlı oyuncuyu düelloya davet ettiniz
 
 You have been invited to a fight by '%s', type '/1vs1 %s' to join
-== 
+== '%s' sizi bir kavgaya davet etti, katılmak için '/1vs1 %s' yazın
 
 Join the 1vs1 lobby using '/1vs1' before you accept the fight
-== 
+== Daveti kabul etmeden önce '/1vs1' yazarak 1vs1 lobisine katılın
 
 You have accepted the invite by '%s'
-== 
+== '%s' tarafından yapılan daveti kabul ettiniz
 
 '%s' has accepted your invite
-== 
+== '%s' davetinizi kabul etti
 
 '%s' won a 1vs1 round against '%s'! Final scores: %d - %d
-== 
+== '%s', '%s' karşısında 1vs1 raundunu kazandı! Son skor: %d - %d
 
 '%s' left a 1vs1 round against '%s'! Current scores: %d - %d
-== 
+== '%s', '%s' ile olan 1vs1 raundundan ayrıldı! Mevcut skor: %d - %d
 
 Select your favourite part of the map\nZoom in or out to change the size\nPlace arena by pressing SPACE
-== 
+== Haritada favori bölgeni seç\nBoyutu değiştirmek için yakınlaştır veya uzaklaştır\nSPACE ile arenayı yerleştir
 
 Set first spawn positions by pressing SPACE
-== 
+== İlk doğma noktasını SPACE tuşuyla ayarla
 
 Set second spawn positions by pressing SPACE
-== 
+== İkinci doğma noktasını SPACE tuşuyla ayarla
 
 Choose a weapon with A/D\nToggle weapon usage by pressing SPACE\nPress SPACE on the heart to confirm
-== 
+== A/D ile silah seç\nSPACE ile silah kullanımını değiştir\nOnaylamak için kalbin üstünde SPACE'e bas
 
 Welcome to the Durák table, %s! This seat is taken already, please try another one.
-== 
+== Durák masasına hoş geldin, %s! Bu koltuk dolu, lütfen başka birini dene
 
 Welcome to Durák, %s! You are first, please enter a stake in the chat.
-== 
+== Durák'a hoş geldin, %s! İlk sen oynuyorsun, lütfen sohbete bir bahis gir
 
 Welcome to Durák, %s! You are second, please enter the current stake of '%lld' or propose a new one.
-== 
+== Durák'a hoş geldin, %s! İkinci oyuncusun, lütfen '%lld' olan mevcut bahsi gir ya da yeni bir bahis öner
 
 Welcome to Durák, %s! In order to participate, please enter the current stake of '%lld' in the chat.
-== 
+== Durák'a hoş geldin, %s! Katılmak için lütfen sohbete mevcut bahis olan '%lld' değerini yaz
 
 Successfully set the stake for the current round to '%lld'.
-== 
+== Bu raund için bahis başarıyla '%lld' olarak ayarlandı
 
 Successfully deployed your stake.
-== 
+== Bahsiniz başarıyla yatırıldı
 
 '%s' proposed a new stake, please enter the current stake of '%lld' or propose a new one in the chat.
-== 
+== '%s' yeni bir bahis önerdi, lütfen '%lld' olan mevcut bahsi girin veya yeni bir bahis önerin
 
 Successfully updated the stake for the current round to '%lld'.
-== 
+== Bu raund için bahis başarıyla '%lld' olarak güncellendi
 
 You can't currently drop that much money due to your stake
-== 
+== Bahsiniz nedeniyle şu anda bu kadar para bırakamazsınız
 
 Couldn't start game, no empty team found
-== 
+== Oyun başlatılamadı, boş takım bulunamadı
 
 You didn't deploy your stake in time, game started without you
-== 
+== Bahsi zamanında yatırmadınız, oyun siz olmadan başladı
 
 Your stake got collected: -%lld money.
-== 
+== Bahsiniz tahsil edildi: -%lld para
 
 '%s' is the Durák!
-== 
+== '%s' Durák oldu!
 
 '%s' successfully defended
-== 
+== '%s' başarıyla savundu
 
 '%s' took too long and was skipped
-== 
+== '%s' çok uzun sürdü, geçildi
 
 '%s' couldn't defend all attacks and takes all cards
-== 
+== '%s' tüm saldırılara karşı savunma yapamadı ve tüm kartları aldı
 
 '%s' won the game! (#%d)
-== 
+== '%s' oyunu kazandı! (#%d)
 
 '%s' won the game!
-== 
+== '%s' oyunu kazandı!
 
 Congratulations, you are not the Durák!
-== 
+== Tebrikler, Durák olmadınız!
 
 Your stake got returned: +%lld money.
-== 
+== Bahsiniz iade edildi: +%lld para
 
 You got +%lld money from others leaving the game.
-== 
+== Oyundan ayrılanlardan +%lld para kazandınız
