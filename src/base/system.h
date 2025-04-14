@@ -1137,7 +1137,7 @@ public:
 		FORMAT_STRING,
 		FORMAT_INT64,
 		FORMAT_FLOAT,
-	} m_Type;
+	};
 	union
 	{
 		int m_Int;
@@ -1145,6 +1145,7 @@ public:
 		int64 m_Int64;
 		float m_Float;
 	};
+	EFormatType m_Type;
 	CFormatArg() = default;
 	CFormatArg(int Int) : m_Int(Int), m_Type(FORMAT_INT) {}
 	CFormatArg(const char *pStr) : m_pStr(pStr), m_Type(FORMAT_STRING) {}
