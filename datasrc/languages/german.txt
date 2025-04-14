@@ -735,7 +735,7 @@ Your plot is no longer subject to a search warrant and can no longer be destroye
 == Dein Grundstück unterliegt keinem Durchsuchungsbefehl mehr und kann nicht mehr zerstört werden
 
 '%s' entered and joined the game
-== '%s' ist eingetreten und dem Spiel beigetreten
+== '%s' ist dem Spiel beigetreten
 
 '%s' entered and joined the spectators
 == '%s' ist eingetreten und den Zuschauern beigetreten
