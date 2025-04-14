@@ -27,7 +27,7 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, CConfig *pConfig)
 	char aFile[256];
 	str_format(aFile, sizeof(aFile), "%s/index.txt", m_pConfig->m_SvLanguagesPath);
 	CLineReader LineReader;
-	if(!LineReader.OpenFile(pStorage->OpenFile(aFile, IOFLAG_READ, IStorage::TYPE_ALL)))
+	if(!LineReader.OpenFile(pStorage->OpenFile(aFile, IOFLAG_READ|IOFLAG_UNSAFE, IStorage::TYPE_ALL)))
 	{
 		dbg_msg("localization", "Couldn't open index file '%s'", aFile);
 		return;
@@ -183,7 +183,7 @@ bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
 	char aFile[256];
 	str_format(aFile, sizeof(aFile), "%s/%s.txt", m_pConfig->m_SvLanguagesPath, pFilename);
 	CLineReader LineReader;
-	if(!LineReader.OpenFile(m_pStorage->OpenFile(aFile, IOFLAG_READ, IStorage::TYPE_ALL)))
+	if(!LineReader.OpenFile(m_pStorage->OpenFile(aFile, IOFLAG_READ|IOFLAG_UNSAFE, IStorage::TYPE_ALL)))
 	{
 		dbg_msg("localization", "Couldn't open file '%s'", aFile);
 		return false;
