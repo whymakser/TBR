@@ -2478,7 +2478,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			m_apPlayers[ClientID]->UpdatePlaytime();
 
 			m_VoteType = -1;
-			std::pair<const char*, std::pair<CFormatArg[3], int> > ChatMsg;
+			std::pair<const char*, std::pair<CFormatArg[4], int> > ChatMsg;
 			ChatMsg.first = 0;
 			ChatMsg.second.first[0] = 0;
 			ChatMsg.second.first[1] = 0;
