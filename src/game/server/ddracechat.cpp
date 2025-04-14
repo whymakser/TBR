@@ -1321,7 +1321,7 @@ void CGameContext::ConAccount(IConsole::IResult* pResult, void* pUserData)
 	if (pAccount->m_VIP)
 	{
 		tmp = pAccount->m_ExpireDateVIP;
-		str_format(aBuf, sizeof(aBuf), "VIP%s: %s %s", pAccount->m_VIP == VIP_PLUS ? "+" : "", pPlayer->Localize("until"), pSelf->GetDate(tmp));
+		str_format(aBuf, sizeof(aBuf), "VIP%s: %s %s", pAccount->m_VIP == VIP_PLUS ? "+" : "", pPlayer->Localize("until", "/account: Expiration date"), pSelf->GetDate(tmp));
 		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	}
 	else
@@ -1333,7 +1333,7 @@ void CGameContext::ConAccount(IConsole::IResult* pResult, void* pUserData)
 	if (pAccount->m_PortalRifle)
 	{
 		tmp = pAccount->m_ExpireDatePortalRifle;
-		str_format(aBuf, sizeof(aBuf), "%s: %s %s", pPlayer->Localize("Portal Rifle"), pPlayer->Localize("until"), pSelf->GetDate(tmp));
+		str_format(aBuf, sizeof(aBuf), "%s: %s %s", pPlayer->Localize("Portal Rifle"), pPlayer->Localize("until", "/account: Expiration date"), pSelf->GetDate(tmp));
 		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	}
 	else if (pSelf->Config()->m_SvPortalRifleShop)

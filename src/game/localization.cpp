@@ -24,6 +24,7 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, CConfig *pConfig)
 	const std::vector<std::string> vEnglishLanguageCodes = {"en"};
 	m_vLanguages.emplace_back("English", "english", 826, vEnglishLanguageCodes);
 	m_vLanguages[0].m_Loaded = true;
+	m_vLanguages[0].m_Available = true;
 
 	char aFile[256];
 	str_format(aFile, sizeof(aFile), "%s/index.txt", m_pConfig->m_SvLanguagesPath);
@@ -253,6 +254,7 @@ bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
 
 		pReplacement += 3;
 		AddString(aOrigin, pReplacement, aContext, Language);
+		m_vLanguages[Language].m_Available = true;
 	}
 	std::sort(m_vLanguages[Language].m_vStrings.begin(), m_vLanguages[Language].m_vStrings.end());
 	m_vLanguages[Language].m_Loaded = true;
@@ -302,17 +304,21 @@ const char *CLocalizationDatabase::ListAvailable()
 {
 	static char aBuf[256];
 	char aTemp[128] = { 0 };
-	for (int i = -1; i < (int)g_Localization.Languages().size(); i++)
+	bool Append = false;
+	for (int i = 0; i < (int)m_vLanguages.size(); i++)
 	{
-		const char *pLanguage = g_Localization.GetLanguageFileName(i);
-		if (i == -1)
-		{
-			str_copy(aBuf, pLanguage, sizeof(aBuf));
-		}
-		else if (g_Localization.Languages()[i].m_vStrings.size())
+		if (!m_vLanguages[i].m_Available)
+			continue;
+		const char *pLanguage = GetLanguageFileName(i);
+		if (Append)
 		{
 			str_format(aTemp, sizeof(aTemp), "%s, ", aBuf);
 			str_format(aBuf, sizeof(aBuf), "%s%s", aTemp, pLanguage);
+		}
+		else
+		{
+			str_copy(aBuf, pLanguage, sizeof(aBuf));
+			Append = true;
 		}
 	}
 	return aBuf;

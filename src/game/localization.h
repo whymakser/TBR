@@ -44,6 +44,7 @@ public:
 		m_Name(pName), m_FileName(pFileName), m_CountryCode(Code), m_vLanguageCodes(vLanguageCodes), m_pStringsHeap(pHeap)
 	{
 		m_Loaded = false;
+		m_Available = false;
 	}
 
 	void Unload()
@@ -58,10 +59,10 @@ public:
 	std::string m_FileName;
 	int m_CountryCode;
 	std::vector<std::string> m_vLanguageCodes;
-
-	bool m_Loaded;
 	std::vector<CString> m_vStrings;
 	CHeap *m_pStringsHeap;
+	bool m_Loaded;
+	bool m_Available;
 
 	bool operator<(const CLanguage &Other) const { return m_Name < Other.m_Name; }
 };

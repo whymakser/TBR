@@ -2715,7 +2715,7 @@ bool CPlayer::ShowDDraceHud()
 	return !pPlayer->IsMinigame() || pPlayer->m_Minigame == MINIGAME_BLOCK || pPlayer->m_Minigame == MINIGAME_1VS1 || pPlayer->m_Minigame == MINIGAME_DURAK;
 }
 
-const char *CPlayer::Localize(const char *pText)
+const char *CPlayer::Localize(const char *pText, const char *pContext)
 {
 	if (m_IsDummy) return pText;
 	return ::Localize(pText, m_Language);
