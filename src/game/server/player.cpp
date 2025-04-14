@@ -2547,7 +2547,9 @@ bool CPlayer::CheckClanProtection()
 		return false;
 	}
 
-	GameServer()->SendChatTarget(m_ClientID, Localize("~~~ WARNING ~~~"));
+	char aBuf[64];
+	str_format(aBuf, sizeof(aBuf), "~~~ %s ~~~", Localize("WARNING"));
+	GameServer()->SendChatTarget(m_ClientID, aBuf);
 	GameServer()->SendChatTarget(m_ClientID, Localize("You got frozen by the clan protection."));
 	GameServer()->SendChatTarget(m_ClientID, Localize("Remove your 'Chilli.*' clantag and reconnect, or set your skin body to 'greensward'."));
 
