@@ -181,7 +181,6 @@ bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
 	{
 		if (str_comp(m_vLanguages[Language].m_Name.c_str(), "English") == 0)
 			return true;
-		m_vLanguages[Language].m_Loaded = false;
 	}
 	else if (m_vLanguages[Language].m_Loaded)
 	{
@@ -254,8 +253,11 @@ bool CLocalizationDatabase::Load(const char *pFilename, bool Force)
 		}
 
 		pReplacement += 3;
-		AddString(aOrigin, pReplacement, aContext, Language);
-		m_vLanguages[Language].m_Available = true;
+		if (pReplacement && pReplacement[0])
+		{
+			AddString(aOrigin, pReplacement, aContext, Language);
+			m_vLanguages[Language].m_Available = true;
+		}
 	}
 	std::sort(m_vLanguages[Language].m_vStrings.begin(), m_vLanguages[Language].m_vStrings.end());
 	m_vLanguages[Language].m_Loaded = true;
