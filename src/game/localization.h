@@ -69,7 +69,7 @@ class CLocalizationDatabase
 public:
 	void LoadIndexfile(class IStorage *pStorage, class CConfig *pConfig);
 	std::vector<CLanguage> &Languages() { return m_vLanguages; }
-	void SelectDefaultLanguage(char *pFilename, size_t Length);
+	void SelectDefaultLanguage(char *pFilename, int Length);
 
 	void AddString(const char *pOrgStr, const char *pNewStr, const char *pContext, int Language);
 	const char *FindString(unsigned Hash, unsigned ContextHash, int Language);

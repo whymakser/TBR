@@ -122,7 +122,7 @@ void CLocalizationDatabase::LoadIndexfile(IStorage *pStorage, CConfig *pConfig)
 	dbg_msg("localization", "Following available languages were found: %s", ListAvailable());
 }
 
-void CLocalizationDatabase::SelectDefaultLanguage(char *pFilename, size_t Length)
+void CLocalizationDatabase::SelectDefaultLanguage(char *pFilename, int Length)
 {
 	if(Languages().empty())
 		return;
@@ -214,7 +214,7 @@ bool CLocalizationDatabase::Load(int Language)
 
 		if(pLine[0] == '{') // context
 		{
-			size_t Len = str_length(pLine);
+			int Len = str_length(pLine);
 			if(Len < 1 || pLine[Len - 1] != '}')
 			{
 				dbg_msg("localization", "malformed context '%s' on line %d", pLine, Line);
