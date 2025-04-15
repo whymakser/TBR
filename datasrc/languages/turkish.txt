@@ -1507,4 +1507,4 @@ You got +%lld money from others leaving the game.
 == Oyundan ayrılanlardan +%lld para kazandınız
 
 Change language to %s?
-== 
+== Dili %s olarak değiştir?

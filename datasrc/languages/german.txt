@@ -1507,4 +1507,4 @@ You got +%lld money from others leaving the game.
 == Du hast +%lld Geld von anderen erhalten, die das Spiel verlassen haben.
 
 Change language to %s?
-== 
+== Sprache zu %s ändern?
