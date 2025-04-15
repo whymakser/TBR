@@ -1913,3 +1913,11 @@ Mɪɴɪɢᴀᴍᴇs
 {vote-header}
 Sᴄᴏʀᴇ Mᴏᴅᴇ
 == Mᴏᴅᴇ Dᴇ Sᴄᴏʀᴇ
+
+{vote-header}
+Lᴀɴɢᴜᴀɢᴇs
+== 
+
+{vote-header}
+Aᴠᴀɪʟᴀʙʟᴇ Lᴀɴɢᴜᴀɢᴇs
+== 

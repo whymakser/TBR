@@ -1509,6 +1509,102 @@ You got +%lld money from others leaving the game.
 Change language to %s?
 == Zmienić język na %s?
 
+{vote-header}
+Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs
+== 
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ Iɴғᴏ
+== 
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs
+== 
+
+{vote-header}
+Pʟᴏᴛ
+== 
+
+{vote-header}
+Vᴏᴛᴇs
+== 
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ
+== 
+
+{vote-header}
+Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs
+== 
+
+{vote-header}
+Cᴏʟʟᴇᴄᴛᴀʙʟᴇs
+== 
+
+{vote-header}
+Oᴘᴛɪᴏɴs
+== 
+
+{vote-header}
+Dᴇsɪɢɴs
+== 
+
+{vote-header}
+Mɪɴɪɢᴀᴍᴇs
+== 
+
+{vote-header}
+Sᴄᴏʀᴇ Mᴏᴅᴇ
+== 
+
+{vote-header}
+Oᴘᴛɪᴏɴs
+== Oᴘᴄᴊᴇ
+
+{vote-header}
+Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs
+== Pᴏszᴜкɪᴡᴀɴɪ Gʀᴀᴄzᴇ
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ Iɴғᴏ
+== Iɴғᴏʀᴍᴀᴄᴊᴇ ᴏ Kᴏɴᴄɪᴇ
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs
+== Sᴛᴀᴛʏsᴛʏᴋɪ Kᴏɴᴛᴀ
+
+{vote-header}
+Pʟᴏᴛ
+== Dzɪᴀłᴋᴀ
+
+{vote-header}
+Vᴏᴛᴇs
+== Gʟᴏsʏ
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ
+== Kᴏɴᴛᴏ
+
+{vote-header}
+Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs
+== Iɴɴᴇ
+
+{vote-header}
+Cᴏʟʟᴇᴄᴛᴀʙʟᴇs
+== Pʀᴢᴇᴅᴍɪᴏᴛʏ Kᴏʟᴇᴋᴄᴊᴏɴᴇʀsᴋɪᴇ
+
+{vote-header}
+Dᴇsɪɢɴs
+== Pʀᴏᴊᴇᴋᴛʏ
+
+{vote-header}
+Mɪɴɪɢᴀᴍᴇs
+== Mɪɴɪɢʀʏ
+
+{vote-header}
+Sᴄᴏʀᴇ Mᴏᴅᴇ
+== Tʀʏʙ Pᴜɴᴋᴛᴏᴡʏ
+
 F-DDrace is a mod by fokkonaut
 == 
 
@@ -1671,22 +1767,6 @@ Everyone in your locked team was killed because '%s' killed.
 Everyone in your locked team was killed because '%s' died.
 == 
 
-{vote-header}
-Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs
-== 
-
-{vote-header}
-Aᴄᴄᴏᴜɴᴛ Iɴғᴏ
-== 
-
-{vote-header}
-Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs
-== 
-
-{vote-header}
-Pʟᴏᴛ
-== 
-
 Silent Farm
 == 
 
@@ -1757,15 +1837,7 @@ Local Chat
 == 
 
 {vote-header}
-Vᴏᴛᴇs
-== 
-
-{vote-header}
-Aᴄᴄᴏᴜɴᴛ
-== 
-
-{vote-header}
-Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs
+Lᴀɴɢᴜᴀɢᴇs
 == 
 
 No minigame
@@ -1783,10 +1855,6 @@ You're not logged in.
 Use '/login' to see more information about your account.
 == 
 
-{vote-header}
-Cᴏʟʟᴇᴄᴛᴀʙʟᴇs
-== 
-
 Rented until
 == 
 
@@ -1797,19 +1865,7 @@ Destroy Seconds
 == 
 
 {vote-header}
-Oᴘᴛɪᴏɴs
-== 
-
-{vote-header}
-Dᴇsɪɢɴs
-== 
-
-{vote-header}
-Mɪɴɪɢᴀᴍᴇs
-== 
-
-{vote-header}
-Sᴄᴏʀᴇ Mᴏᴅᴇ
+Aᴠᴀɪʟᴀʙʟᴇ Lᴀɴɢᴜᴀɢᴇs
 == 
 
 You have to be in a team with other tees to start
@@ -1913,52 +1969,3 @@ You can jump %d times
 
 ~ T A V E R N ~
 == 
-
-{vote-header}
-Oᴘᴛɪᴏɴs
-== Oᴘᴄᴊᴇ
-
-{vote-header}
-Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs
-== Pᴏszᴜкɪᴡᴀɴɪ Gʀᴀᴄzᴇ
-
-{vote-header}
-Aᴄᴄᴏᴜɴᴛ Iɴғᴏ
-== Iɴғᴏʀᴍᴀᴄᴊᴇ ᴏ Kᴏɴᴄɪᴇ
-
-{vote-header}
-Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs
-== Sᴛᴀᴛʏsᴛʏᴋɪ Kᴏɴᴛᴀ
-
-{vote-header}
-Pʟᴏᴛ
-== Dzɪᴀłᴋᴀ
-
-{vote-header}
-Vᴏᴛᴇs
-== Gʟᴏsʏ
-
-{vote-header}
-Aᴄᴄᴏᴜɴᴛ
-== Kᴏɴᴛᴏ
-
-{vote-header}
-Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs
-== Iɴɴᴇ
-
-{vote-header}
-Cᴏʟʟᴇᴄᴛᴀʙʟᴇs
-== Pʀᴢᴇᴅᴍɪᴏᴛʏ Kᴏʟᴇᴋᴄᴊᴏɴᴇʀsᴋɪᴇ
-
-{vote-header}
-Dᴇsɪɢɴs
-== Pʀᴏᴊᴇᴋᴛʏ
-
-{vote-header}
-Mɪɴɪɢᴀᴍᴇs
-== Mɪɴɪɢʀʏ
-
-{vote-header}
-Sᴄᴏʀᴇ Mᴏᴅᴇ
-== Tʀʏʙ Pᴜɴᴋᴛᴏᴡʏ
-

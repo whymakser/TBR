@@ -642,9 +642,6 @@ You can set one of the following designs by using '/design <name>':
 Invalid language
 == 
 
-Successfully changed language to %s
-== 
-
 Server Language
 == 
 
@@ -1209,6 +1206,9 @@ Your minigame request was cancelled because you moved
 Please move within %d seconds or you will leave the minigame
 == 
 
+Successfully changed language to %s
+== 
+
 You have %dx double-xp life left
 == 
 
@@ -1426,6 +1426,10 @@ Aᴄᴄᴏᴜɴᴛ
 Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs
 == 
 
+{vote-header}
+Lᴀɴɢᴜᴀɢᴇs
+== 
+
 Please specify the page using the reason field
 == 
 
@@ -1474,6 +1478,10 @@ Mɪɴɪɢᴀᴍᴇs
 
 {vote-header}
 Sᴄᴏʀᴇ Mᴏᴅᴇ
+== 
+
+{vote-header}
+Aᴠᴀɪʟᴀʙʟᴇ Lᴀɴɢᴜᴀɢᴇs
 == 
 
 You can't close your door because the police destroyed it
