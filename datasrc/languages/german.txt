@@ -1186,7 +1186,7 @@ You lost, you can wait for another round or leave the lobby using '/leave'
 == Du hast verloren, du kannst auf eine weitere Runde warten oder die Lobby mit '/leave' verlassen
 
 Too many players on police tiles [%d/%d]
- == Zu viele Spieler auf den Polizei-Kacheln [%d/%d]
+== Zu viele Spieler auf den Polizei-Kacheln [%d/%d]
 
 You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'
 == Du musst eingeloggt sein, um Geldkacheln zu nutzen.\nErstelle ein Konto mit '/register <name> <pw> <pw>'
@@ -1426,7 +1426,7 @@ You have accepted the invite by '%s'
 == '%s' hat eine 1vs1-Runde gegen '%s' gewonnen! Endstand: %d - %d
 
 '%s' left a 1vs1 round against '%s'! Current scores: %d - %d
- == '%s' hat eine 1vs1-Runde gegen '%s' verlassen! Aktueller Stand: %d - %d
+== '%s' hat eine 1vs1-Runde gegen '%s' verlassen! Aktueller Stand: %d - %d
 
 Select your favourite part of the map\nZoom in or out to change the size\nPlace arena by pressing SPACE
 == Wähle deinen Lieblingsteil der Karte\nZoome rein oder raus, um die Größe zu ändern\nPlatziere die Arena, indem du SPACE drückst

@@ -1186,7 +1186,7 @@ You lost, you can wait for another round or leave the lobby using '/leave'
 == Kaybettiniz, başka bir raundu bekleyebilir veya '/leave' yazarak lobiden çıkabilirsiniz
 
 Too many players on police tiles [%d/%d]
- == Polis alanlarında çok fazla oyuncu var [%d/%d]
+== Polis alanlarında çok fazla oyuncu var [%d/%d]
 
 You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'
 == Para alanlarını kullanmak için giriş yapmalısınız.\n'/register <ad> <şifre> <şifre>' ile hesap oluşturun
@@ -1426,7 +1426,7 @@ You have accepted the invite by '%s'
 == '%s', '%s' karşısında 1vs1 raundunu kazandı! Son skor: %d - %d
 
 '%s' left a 1vs1 round against '%s'! Current scores: %d - %d
- == '%s', '%s' ile olan 1vs1 raundundan ayrıldı! Mevcut skor: %d - %d
+== '%s', '%s' ile olan 1vs1 raundundan ayrıldı! Mevcut skor: %d - %d
 
 Select your favourite part of the map\nZoom in or out to change the size\nPlace arena by pressing SPACE
 == Haritada favori bölgeni seç\nBoyutu değiştirmek için yakınlaştır veya uzaklaştır\nSPACE ile arenayı yerleştir

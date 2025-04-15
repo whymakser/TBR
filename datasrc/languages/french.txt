@@ -1426,7 +1426,7 @@ You have accepted the invite by '%s'
 == '%s' a gagné une manche 1vs1 contre '%s'! Scores finaux: %d - %d
 
 '%s' left a 1vs1 round against '%s'! Current scores: %d - %d
- == '%s' a quitté une manche 1vs1 contre '%s'! Scores actuels: %d - %d
+== '%s' a quitté une manche 1vs1 contre '%s'! Scores actuels: %d - %d
 
 Select your favourite part of the map\nZoom in or out to change the size\nPlace arena by pressing SPACE
 == Sélectionnez votre partie préférée de la carte\nZoomez ou dézoomez pour changer la taille\nPlacez l'arène en appuyant sur ESPACE

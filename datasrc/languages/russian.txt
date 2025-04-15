@@ -1186,7 +1186,7 @@ You lost, you can wait for another round or leave the lobby using '/leave'
 == Вы проиграли, вы можете дождаться следующего раунда или покинуть лобби с помощью '/leave'
 
 Too many players on police tiles [%d/%d]
- == Слишком много игроков на полицейских плитках [%d/%d]
+== Слишком много игроков на полицейских плитках [%d/%d]
 
 You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'
 == Вы должны быть авторизованы, чтобы использовать денежные плитки.\nПолучите аккаунт с помощью '/register <имя> <пароль> <пароль>'
@@ -1426,7 +1426,7 @@ You have accepted the invite by '%s'
 == '%s' выиграл раунд 1на1 против '%s'! Итоговый счет: %d - %d
 
 '%s' left a 1vs1 round against '%s'! Current scores: %d - %d
- == '%s' покинул раунд 1на1 против '%s'! Текущий счет: %d - %d
+== '%s' покинул раунд 1на1 против '%s'! Текущий счет: %d - %d
 
 Select your favourite part of the map\nZoom in or out to change the size\nPlace arena by pressing SPACE
 == Выберите любимую часть карты\nУвеличивайте или уменьшайте масштаб, чтобы изменить размер\nРазместите арену, нажав ПРОБЕЛ
