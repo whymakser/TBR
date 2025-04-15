@@ -249,6 +249,9 @@ void CGameContext::SetBotDetected(int ClientID)
 
 void CGameContext::OnCountryCodeLookup(int ClientID)
 {
+	// If player got a save drop or shutdown save and got logged in the acc language got loaded already
+	if (m_apPlayers[ClientID]->GetAccID() >= ACC_START)
+		return;
 	m_apPlayers[ClientID]->StartVoteQuestion(CPlayer::VOTE_QUESTION_LANGUAGE_SUGGESTION);
 }
 
