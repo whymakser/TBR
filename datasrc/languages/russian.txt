@@ -1,5 +1,5 @@
 #
-# Author:
+# Author: claude.ai
 #
 
 /cmdlist will show a list of all chat commands
@@ -1510,361 +1510,361 @@ Load recent design?
 == Загрузить недавний дизайн?
 
 F-DDrace is a mod by fokkonaut
-== 
+== F-DDrace - это мод от fokkonaut
 
 This mod is based on Teeworlds 0.7 and also incorporates features, ideas, and partial implementations
-== 
+== Этот мод основан на Teeworlds 0.7 и также включает в себя функции, идеи и частичные реализации
 
 from DDNet++ by ChillerDragon, DDNet, and other community projects, aswell as many custom features!
-== 
+== из DDNet++ от ChillerDragon, DDNet и других проектов сообщества, а также множество собственных функций!
 
 If you want to check out the code or contribute, feel free to check out F-DDrace on GitHub:
-== 
+== Если вы хотите изучить код или внести свой вклад, не стесняйтесь ознакомиться с F-DDrace на GitHub:
 
 For more info, say '/cmdlist' or '/credits'
-== 
+== Для дополнительной информации введите '/cmdlist' или '/credits'
 
 to check a server setting say /settings and setting's name, setting names are:
-== 
+== чтобы проверить настройку сервера, введите /settings и название настройки, названия настроек:
 
 Teams are disabled
-== 
+== Команды отключены
 
 This team can't be locked
-== 
+== Эта команда не может быть заблокирована
 
 '%s' unlocked your team.
-== 
+== '%s' разблокировал вашу команду.
 
 Team locking is disabled on this server
-== 
+== Блокировка команд отключена на этом сервере
 
 '%s' locked your team. After the race started killing will kill everyone in your team.
-== 
+== '%s' заблокировал вашу команду. После начала гонки смерть убьет всех в вашей команде.
 
 Invites are disabled
-== 
+== Приглашения отключены
 
 Player already invited
-== 
+== Игрок уже приглашен
 
 Can't invite this quickly
-== 
+== Нельзя приглашать так быстро
 
 '%s' invited you to team %d.
-== 
+== '%s' пригласил вас в команду %d.
 
 '%s' invited '%s' to your team.
-== 
+== '%s' пригласил '%s' в вашу команду.
 
 You are running a vote please try again after the vote is done!
-== 
+== Вы проводите голосование, пожалуйста, попробуйте снова после завершения голосования!
 
 You must join a team and play with somebody or else you can't play
-== 
+== Вы должны присоединиться к команде и играть с кем-то, иначе вы не сможете играть
 
 You can't change teams while you are dead/a spectator.
-== 
+== Вы не можете менять команды, пока вы мертвы/наблюдатель.
 
 You can't change teams that fast!
-== 
+== Вы не можете менять команды так быстро!
 
 You can't join teams in this minigame
-== 
+== Вы не можете присоединяться к командам в этой мини-игре
 
 This team is locked using /lock. Only members of the team can unlock it using /lock.
-== 
+== Эта команда заблокирована с помощью /lock. Только члены команды могут разблокировать ее с помощью /lock.
 
 This team is locked using /lock. Only members of the team can invite you or unlock it using /lock.
-== 
+== Эта команда заблокирована с помощью /lock. Только члены команды могут пригласить вас или разблокировать ее с помощью /lock.
 
 This team already has the maximum allowed size of %d players
-== 
+== В этой команде уже максимально допустимый размер - %d игроков
 
 %s joined team %d
-== 
+== %s присоединился к команде %d
 
 You cannot join this team at this time
-== 
+== Вы не можете присоединиться к этой команде в данный момент
 
 You can't check your team while you are dead/a spectator.
-== 
+== Вы не можете проверить свою команду, пока вы мертвы/наблюдатель.
 
 /me is disabled on this server
-== 
+== /me отключено на этом сервере
 
 E-Mail
-== 
+== Электронная почта
 
 Discord server
-== 
+== Сервер Discord
 
 %s was killed by %s
-== 
+== %s был убит %s
 
 '%s' banned '%s' for %d seconds from voting.
-== 
+== '%s' запретил '%s' голосовать на %d секунд.
 
 '%s' unbanned '%s' from voting.
-== 
+== '%s' снял запрет на голосование с '%s'.
 
 Use /pause first then you can kill
-== 
+== Сначала используйте /pause, затем вы сможете убивать
 
 Only %d active players are allowed
-== 
+== Разрешено только %d активных игроков
 
 All players were moved to the game
-== 
+== Все игроки были перемещены в игру
 
 All players were moved to the spectators
-== 
+== Все игроки были перемещены в наблюдатели
 
 Authorized player forced server option '%s' (%s)
-== 
+== Авторизованный игрок принудительно изменил параметр сервера '%s' (%s)
 
 '%s' was moved to spectator (%s)
-== 
+== '%s' был перемещен в наблюдатели (%s)
 
 Listing players with "%s" in name:
-== 
+== Список игроков с "%s" в имени:
 
 Listing all players:
-== 
+== Список всех игроков:
 
 You can only vote after logging in.
-== 
+== Вы можете голосовать только после входа в систему.
 
 Wait for current vote to end before calling a new one.
-== 
+== Дождитесь окончания текущего голосования, прежде чем начинать новое.
 
 You must wait %d seconds before making your first vote.
-== 
+== Вы должны подождать %d секунд перед своим первым голосованием.
 
 You must wait %d seconds before making another vote.
-== 
+== Вы должны подождать %d секунд перед следующим голосованием.
 
 You are not permitted to vote for the next %d seconds.
-== 
+== Вам не разрешено голосовать в течение следующих %d секунд.
 
 There's a %d second delay between map-votes, please wait %d seconds.
-== 
+== Между голосованиями за карты есть задержка в %d секунд, пожалуйста, подождите %d секунд.
 
 %s has finished and didn't go through start yet, wait for him or join another team.
-== 
+== %s закончил и еще не прошел через старт, подождите его или присоединитесь к другой команде.
 
 %s wants to start a new round, kill or walk to start.
-== 
+== %s хочет начать новый раунд, убейте или идите к старту.
 
 Team %d started with these %d players:
-== 
+== Команда %d началась с этими %d игроками:
 
 Your team would've finished in: %d minute(s) %5.2f second(s). Since you had practice mode enabled your rank doesn't count.
-== 
+== Ваша команда могла бы финишировать за: %d минут(ы) %5.2f секунд(ы). Поскольку у вас был включен режим практики, ваш ранг не учитывается.
 
 %s joined team 0
-== 
+== %s присоединился к команде 0
 
 Everyone in your locked team was killed because '%s' killed.
-== 
+== Все в вашей заблокированной команде были убиты, потому что '%s' убил.
 
 Everyone in your locked team was killed because '%s' died.
-== 
+== Все в вашей заблокированной команде были убиты, потому что '%s' умер.
 
 Silent Farm
-== 
+== Тихая ферма
 
 Ninjajetpack
-== 
+== Реактивный ранец ниндзя
 
 Plot Spawn
-== 
+== Спаун на участке
 
 Edit Plot
-== 
+== Редактировать участок
 
 Clear Plot
-== 
+== Очистить участок
 
 Rainbow
-== 
+== Радуга
 
 Bloody
-== 
+== Кровавый
 
 Atom
-== 
+== Атом
 
 Trail
-== 
+== След
 
 Spread Gun
-== 
+== Разброс оружия
 
 Rainbow Hook
-== 
+== Радужный крюк
 
 Rotating Ball
-== 
+== Вращающийся шар
 
 Epic Circle
-== 
+== Эпический круг
 
 Lovely
-== 
+== Прекрасный
 
 Rainbow Name
-== 
+== Радужное имя
 
 Rainbow Speed
-== 
+== Радужная скорость
 
 Sparkle
-== 
+== Блеск
 
 Hide Drawings
-== 
+== Скрыть рисунки
 
 Weapon Indicator
-== 
+== Индикатор оружия
 
 Zoom Cursor
-== 
+== Курсор масштабирования
 
 Resume Moved
-== 
+== Возобновить перемещение
 
 Hide Broadcasts
-== 
+== Скрыть трансляции
 
 Local Chat
-== 
+== Локальный чат
 
 No minigame
-== 
+== Нет мини-игры
 
 You are wanted by the police for %lld seconds
-== 
+== Вас разыскивает полиция в течение %lld секунд
 
 Grog permille: %.1f‰ / %.1f‰
-== 
+== Промилле грога: %.1f‰ / %.1f‰
 
 You're not logged in.
-== 
+== Вы не вошли в систему.
 
 Use '/login' to see more information about your account.
-== 
+== Используйте '/login', чтобы увидеть больше информации о своем аккаунте.
 
 Rented until
-== 
+== Арендовано до
 
 Door Health
-== 
+== Здоровье двери
 
 Destroy Seconds
-== 
+== Секунды уничтожения
 
 Oᴘᴛɪᴏɴs
-== 
+== Оᴘцɪɪ
 
 You have to be in a team with other tees to start
-== 
+== Вы должны быть в команде с другими персонажами, чтобы начать
 
 You can't hit others
-== 
+== Вы не можете бить других
 
 You can hit others
-== 
+== Вы можете бить других
 
 You can't collide with others
-== 
+== Вы не можете сталкиваться с другими
 
 You can collide with others
-== 
+== Вы можете сталкиваться с другими
 
 You can't hook others
-== 
+== Вы не можете цеплять других
 
 You can hook others
-== 
+== Вы можете цеплять других
 
 You got +1 jump and can jump %d times now
-== 
+== Вы получили +1 прыжок и теперь можете прыгать %d раз
 
 Your team was unlocked by an unlock team tile
-== 
+== Ваша команда была разблокирована плиткой разблокировки команды
 
 You are now in a solo part
-== 
+== Вы сейчас в одиночной части
 
 You are now out of the solo part
-== 
+== Вы теперь вышли из одиночной части
 
 Teleport gun enabled
-== 
+== Телепорт-пистолет включен
 
 Teleport gun disabled
-== 
+== Телепорт-пистолет отключен
 
 Teleport grenade enabled
-== 
+== Телепорт-граната включена
 
 Teleport grenade disabled
-== 
+== Телепорт-граната отключена
 
 Teleport laser enabled
-== 
+== Телепорт-лазер включен
 
 Teleport laser disabled
-== 
+== Телепорт-лазер отключен
 
 You can hammer hit others
-== 
+== Вы можете бить других молотом
 
 You can't hammer hit others
-== 
+== Вы не можете бить других молотом
 
 You can shoot others with shotgun
-== 
+== Вы можете стрелять в других из дробовика
 
 You can't shoot others with shotgun
-== 
+== Вы не можете стрелять в других из дробовика
 
 You can shoot others with grenade
-== 
+== Вы можете стрелять в других гранатой
 
 You can't shoot others with grenade
-== 
+== Вы не можете стрелять в других гранатой
 
 You can shoot others with rifle
-== 
+== Вы можете стрелять в других из винтовки
 
 You can't shoot others with rifle
-== 
+== Вы не можете стрелять в других из винтовки
 
 Please join a team before you start
-== 
+== Пожалуйста, присоединитесь к команде перед началом
 
 For more info, say '/helptoggle'
-== 
+== Для получения дополнительной информации введите '/helptoggle'
 
 You only have your ground jump now
-== 
+== Теперь у вас есть только прыжок с земли
 
 You can jump 1 time
-== 
+== Вы можете прыгнуть 1 раз
 
 You can jump %d times
-== 
+== Вы можете прыгнуть %d раз
 
 ~ S H O P ~
-== 
+== ~ М А Г А З И Н ~
 
 ~ P L O T - S H O P ~
-== 
+== ~ М А Г А З И Н  У Ч А С Т К О В ~
 
 ~ B A N K ~
-== 
+== ~ Б А Н К ~
 
 ~ T A V E R N ~
-== 
+== ~ Т А В Е Р Н А ~

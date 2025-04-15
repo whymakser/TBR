@@ -1672,13 +1672,13 @@ Everyone in your locked team was killed because '%s' died.
 == '%s' öldüğü için kilitli takımınızdaki herkes öldü
 
 Silent Farm
-== Sessiz Çiftlik
+== Sessiz Farm
 
 Ninjajetpack
 == Ninjajetpack
 
 Plot Spawn
-== Plot Doğuşu
+== Plot Spawn
 
 Edit Plot
 == Plot Düzenle
@@ -1690,16 +1690,16 @@ Rainbow
 == Gökkuşağı
 
 Bloody
-== Kanlı
+== Bloody
 
 Atom
 == Atom
 
 Trail
-== İz
+== Kuyruk
 
 Spread Gun
-== Yayılmalı Silah
+== Üçlü Silah
 
 Rainbow Hook
 == Gökkuşağı Kanca
@@ -1708,10 +1708,10 @@ Rotating Ball
 == Dönen Top
 
 Epic Circle
-== Efsanevi Çember
+== Efsane Çember
 
 Lovely
-== Tatlı
+== Sevimli
 
 Rainbow Name
 == Gökkuşağı İsim

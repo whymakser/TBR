@@ -1510,361 +1510,361 @@ Load recent design?
 == Charger le design récent?
 
 F-DDrace is a mod by fokkonaut
-== 
+== F-DDrace est un mod par fokkonaut
 
 This mod is based on Teeworlds 0.7 and also incorporates features, ideas, and partial implementations
-== 
+== Ce mod est basé sur Teeworlds 0.7 et incorpore également des fonctionnalités, des idées et des implémentations partielles
 
 from DDNet++ by ChillerDragon, DDNet, and other community projects, aswell as many custom features!
-== 
+== de DDNet++ par ChillerDragon, DDNet, et d'autres projets communautaires, ainsi que de nombreuses fonctionnalités personnalisées !
 
 If you want to check out the code or contribute, feel free to check out F-DDrace on GitHub:
-== 
+== Si vous souhaitez consulter le code ou contribuer, n'hésitez pas à consulter F-DDrace sur GitHub :
 
 For more info, say '/cmdlist' or '/credits'
-== 
+== Pour plus d'informations, tapez '/cmdlist' ou '/credits'
 
 to check a server setting say /settings and setting's name, setting names are:
-== 
+== pour vérifier un paramètre du serveur, tapez /settings et le nom du paramètre, les noms des paramètres sont :
 
 Teams are disabled
-== 
+== Les équipes sont désactivées
 
 This team can't be locked
-== 
+== Cette équipe ne peut pas être verrouillée
 
 '%s' unlocked your team.
-== 
+== '%s' a déverrouillé votre équipe.
 
 Team locking is disabled on this server
-== 
+== Le verrouillage d'équipe est désactivé sur ce serveur
 
 '%s' locked your team. After the race started killing will kill everyone in your team.
-== 
+== '%s' a verrouillé votre équipe. Après le début de la course, toute mort tuera tous les membres de votre équipe.
 
 Invites are disabled
-== 
+== Les invitations sont désactivées
 
 Player already invited
-== 
+== Joueur déjà invité
 
 Can't invite this quickly
-== 
+== Impossible d'inviter aussi rapidement
 
 '%s' invited you to team %d.
-== 
+== '%s' vous a invité à rejoindre l'équipe %d.
 
 '%s' invited '%s' to your team.
-== 
+== '%s' a invité '%s' dans votre équipe.
 
 You are running a vote please try again after the vote is done!
-== 
+== Vous êtes en train de lancer un vote, veuillez réessayer une fois le vote terminé !
 
 You must join a team and play with somebody or else you can't play
-== 
+== Vous devez rejoindre une équipe et jouer avec quelqu'un sinon vous ne pouvez pas jouer
 
 You can't change teams while you are dead/a spectator.
-== 
+== Vous ne pouvez pas changer d'équipe lorsque vous êtes mort/spectateur.
 
 You can't change teams that fast!
-== 
+== Vous ne pouvez pas changer d'équipe aussi rapidement !
 
 You can't join teams in this minigame
-== 
+== Vous ne pouvez pas rejoindre d'équipes dans ce mini-jeu
 
 This team is locked using /lock. Only members of the team can unlock it using /lock.
-== 
+== Cette équipe est verrouillée avec /lock. Seuls les membres de l'équipe peuvent la déverrouiller avec /lock.
 
 This team is locked using /lock. Only members of the team can invite you or unlock it using /lock.
-== 
+== Cette équipe est verrouillée avec /lock. Seuls les membres de l'équipe peuvent vous inviter ou la déverrouiller avec /lock.
 
 This team already has the maximum allowed size of %d players
-== 
+== Cette équipe a déjà atteint la taille maximale autorisée de %d joueurs
 
 %s joined team %d
-== 
+== %s a rejoint l'équipe %d
 
 You cannot join this team at this time
-== 
+== Vous ne pouvez pas rejoindre cette équipe pour le moment
 
 You can't check your team while you are dead/a spectator.
-== 
+== Vous ne pouvez pas vérifier votre équipe lorsque vous êtes mort/spectateur.
 
 /me is disabled on this server
-== 
+== /me est désactivé sur ce serveur
 
 E-Mail
-== 
+== E-mail
 
 Discord server
-== 
+== Serveur Discord
 
 %s was killed by %s
-== 
+== %s a été tué par %s
 
 '%s' banned '%s' for %d seconds from voting.
-== 
+== '%s' a banni '%s' du vote pendant %d secondes.
 
 '%s' unbanned '%s' from voting.
-== 
+== '%s' a levé le bannissement de vote de '%s'.
 
 Use /pause first then you can kill
-== 
+== Utilisez d'abord /pause, puis vous pourrez tuer
 
 Only %d active players are allowed
-== 
+== Seuls %d joueurs actifs sont autorisés
 
 All players were moved to the game
-== 
+== Tous les joueurs ont été déplacés dans le jeu
 
 All players were moved to the spectators
-== 
+== Tous les joueurs ont été déplacés vers les spectateurs
 
 Authorized player forced server option '%s' (%s)
-== 
+== Le joueur autorisé a forcé l'option du serveur '%s' (%s)
 
 '%s' was moved to spectator (%s)
-== 
+== '%s' a été déplacé vers les spectateurs (%s)
 
 Listing players with "%s" in name:
-== 
+== Liste des joueurs avec "%s" dans le nom :
 
 Listing all players:
-== 
+== Liste de tous les joueurs :
 
 You can only vote after logging in.
-== 
+== Vous ne pouvez voter qu'après vous être connecté.
 
 Wait for current vote to end before calling a new one.
-== 
+== Attendez la fin du vote en cours avant d'en lancer un nouveau.
 
 You must wait %d seconds before making your first vote.
-== 
+== Vous devez attendre %d secondes avant de faire votre premier vote.
 
 You must wait %d seconds before making another vote.
-== 
+== Vous devez attendre %d secondes avant de faire un autre vote.
 
 You are not permitted to vote for the next %d seconds.
-== 
+== Vous n'êtes pas autorisé à voter pendant les %d prochaines secondes.
 
 There's a %d second delay between map-votes, please wait %d seconds.
-== 
+== Il y a un délai de %d secondes entre les votes de carte, veuillez attendre %d secondes.
 
 %s has finished and didn't go through start yet, wait for him or join another team.
-== 
+== %s a terminé et n'est pas encore passé par le départ, attendez-le ou rejoignez une autre équipe.
 
 %s wants to start a new round, kill or walk to start.
-== 
+== %s veut commencer un nouveau tour, tuez ou marchez pour commencer.
 
 Team %d started with these %d players:
-== 
+== L'équipe %d a commencé avec ces %d joueurs :
 
 Your team would've finished in: %d minute(s) %5.2f second(s). Since you had practice mode enabled your rank doesn't count.
-== 
+== Votre équipe aurait terminé en : %d minute(s) %5.2f seconde(s). Comme vous aviez le mode d'entraînement activé, votre classement ne compte pas.
 
 %s joined team 0
-== 
+== %s a rejoint l'équipe 0
 
 Everyone in your locked team was killed because '%s' killed.
-== 
+== Tout le monde dans votre équipe verrouillée a été tué parce que '%s' a tué.
 
 Everyone in your locked team was killed because '%s' died.
-== 
+== Tout le monde dans votre équipe verrouillée a été tué parce que '%s' est mort.
 
 Silent Farm
-== 
+== Ferme silencieuse
 
 Ninjajetpack
-== 
+== Jetpack de ninja
 
 Plot Spawn
-== 
+== Point d'apparition de parcelle
 
 Edit Plot
-== 
+== Modifier la parcelle
 
 Clear Plot
-== 
+== Effacer la parcelle
 
 Rainbow
-== 
+== Arc-en-ciel
 
 Bloody
-== 
+== Sanglant
 
 Atom
-== 
+== Atome
 
 Trail
-== 
+== Traînée
 
 Spread Gun
-== 
+== Pistolet à dispersion
 
 Rainbow Hook
-== 
+== Grappin arc-en-ciel
 
 Rotating Ball
-== 
+== Balle rotative
 
 Epic Circle
-== 
+== Cercle épique
 
 Lovely
-== 
+== Charmant
 
 Rainbow Name
-== 
+== Nom arc-en-ciel
 
 Rainbow Speed
-== 
+== Vitesse arc-en-ciel
 
 Sparkle
-== 
+== Étincelle
 
 Hide Drawings
-== 
+== Masquer les dessins
 
 Weapon Indicator
-== 
+== Indicateur d'arme
 
 Zoom Cursor
-== 
+== Curseur de zoom
 
 Resume Moved
-== 
+== Reprise déplacée
 
 Hide Broadcasts
-== 
+== Masquer les diffusions
 
 Local Chat
-== 
+== Chat local
 
 No minigame
-== 
+== Pas de mini-jeu
 
 You are wanted by the police for %lld seconds
-== 
+== Vous êtes recherché par la police pendant %lld secondes
 
 Grog permille: %.1f‰ / %.1f‰
-== 
+== Grog pour mille : %.1f‰ / %.1f‰
 
 You're not logged in.
-== 
+== Vous n'êtes pas connecté.
 
 Use '/login' to see more information about your account.
-== 
+== Utilisez '/login' pour voir plus d'informations sur votre compte.
 
 Rented until
-== 
+== Loué jusqu'au
 
 Door Health
-== 
+== Santé de la porte
 
 Destroy Seconds
-== 
+== Secondes de destruction
 
 Oᴘᴛɪᴏɴs
-== 
+== Oᴘᴛɪᴏɴs
 
 You have to be in a team with other tees to start
-== 
+== Vous devez être dans une équipe avec d'autres tees pour commencer
 
 You can't hit others
-== 
+== Vous ne pouvez pas frapper les autres
 
 You can hit others
-== 
+== Vous pouvez frapper les autres
 
 You can't collide with others
-== 
+== Vous ne pouvez pas entrer en collision avec les autres
 
 You can collide with others
-== 
+== Vous pouvez entrer en collision avec les autres
 
 You can't hook others
-== 
+== Vous ne pouvez pas accrocher les autres
 
 You can hook others
-== 
+== Vous pouvez accrocher les autres
 
 You got +1 jump and can jump %d times now
-== 
+== Vous avez obtenu +1 saut et pouvez maintenant sauter %d fois
 
 Your team was unlocked by an unlock team tile
-== 
+== Votre équipe a été déverrouillée par une tuile de déverrouillage d'équipe
 
 You are now in a solo part
-== 
+== Vous êtes maintenant dans une partie solo
 
 You are now out of the solo part
-== 
+== Vous êtes maintenant hors de la partie solo
 
 Teleport gun enabled
-== 
+== Pistolet de téléportation activé
 
 Teleport gun disabled
-== 
+== Pistolet de téléportation désactivé
 
 Teleport grenade enabled
-== 
+== Grenade de téléportation activée
 
 Teleport grenade disabled
-== 
+== Grenade de téléportation désactivée
 
 Teleport laser enabled
-== 
+== Laser de téléportation activé
 
 Teleport laser disabled
-== 
+== Laser de téléportation désactivé
 
 You can hammer hit others
-== 
+== Vous pouvez frapper les autres avec le marteau
 
 You can't hammer hit others
-== 
+== Vous ne pouvez pas frapper les autres avec le marteau
 
 You can shoot others with shotgun
-== 
+== Vous pouvez tirer sur les autres avec le fusil à pompe
 
 You can't shoot others with shotgun
-== 
+== Vous ne pouvez pas tirer sur les autres avec le fusil à pompe
 
 You can shoot others with grenade
-== 
+== Vous pouvez tirer sur les autres avec des grenades
 
 You can't shoot others with grenade
-== 
+== Vous ne pouvez pas tirer sur les autres avec des grenades
 
 You can shoot others with rifle
-== 
+== Vous pouvez tirer sur les autres avec le fusil
 
 You can't shoot others with rifle
-== 
+== Vous ne pouvez pas tirer sur les autres avec le fusil
 
 Please join a team before you start
-== 
+== Veuillez rejoindre une équipe avant de commencer
 
 For more info, say '/helptoggle'
-== 
+== Pour plus d'informations, tapez '/helptoggle'
 
 You only have your ground jump now
-== 
+== Vous n'avez plus que votre saut au sol maintenant
 
 You can jump 1 time
-== 
+== Vous pouvez sauter 1 fois
 
 You can jump %d times
-== 
+== Vous pouvez sauter %d fois
 
 ~ S H O P ~
-== 
+== ~ B O U T I Q U E ~
 
 ~ P L O T - S H O P ~
-== 
+== ~ B O U T I Q U E  D E  P A R C E L L E S ~
 
 ~ B A N K ~
-== 
+== ~ B A N Q U E ~
 
 ~ T A V E R N ~
-== 
+== ~ T A V E R N E ~
