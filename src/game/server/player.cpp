@@ -2119,7 +2119,12 @@ void CPlayer::OnLogin(bool ForceDesignLoad)
 	// Load language at start, so that login messages get translated aswell
 	if (pAccount->m_aLanguage[0] != '\0')
 	{
-		SetLanguage(g_Localization.GetLanguage(pAccount->m_aLanguage));
+		int DummyID = Server()->GetDummy(m_ClientID);
+		if (DummyID == -1 || GameServer()->m_apPlayers[DummyID]->GetAccID() < ACC_START)
+		{
+			// Only set language when other dummy is not logged in
+			SetLanguage(g_Localization.GetLanguage(pAccount->m_aLanguage));
+		}
 	}
 	GameServer()->SendChatTarget(m_ClientID, Localize("Successfully logged in"));
 
@@ -2306,7 +2311,7 @@ void CPlayer::OnEndVoteQuestion(int Result)
 		int Language = g_Localization.GetLanguageByCode(Server()->GetCountryCode(m_ClientID));
 		if (Result == 1)
 		{
-			m_Language = Language;
+			SetLanguage(Language);
 			char aBuf[VOTE_DESC_LENGTH];
 			str_format(aBuf, sizeof(aBuf), Localize("Successfully changed language to %s"), g_Localization.GetLanguageString(m_Language));
 			GameServer()->SendChatTarget(m_ClientID, aBuf);
