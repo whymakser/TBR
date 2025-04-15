@@ -463,20 +463,21 @@ void CGameContext::Mute(const NETADDR *pAddr, int Secs, const char *pDisplayName
 		return;
 
 	char aBuf[128];
+	char aFormat[128];
 	if (pReason[0])
 	{
-		str_copy(aBuf, Localizable("'%s' has been muted for %d seconds (%s)"), sizeof(aBuf));
-		SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, aBuf, pDisplayName, Secs, pReason);
+		str_copy(aFormat, Localizable("'%s' has been muted for %d seconds (%s)"), sizeof(aFormat));
+		SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, aFormat, pDisplayName, Secs, pReason);
 
-		str_format(aBuf, sizeof(aBuf), "'%s' has been muted for %d seconds (%s)", pDisplayName, Secs, pReason);
+		str_format(aBuf, sizeof(aBuf), aFormat, pDisplayName, Secs, pReason);
 		SendModLogMessage(ExecutorID, aBuf);
 	}
 	else
 	{
-		str_copy(aBuf, Localizable("'%s' has been muted for %d seconds"), sizeof(aBuf));
-		SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, aBuf, pDisplayName, Secs);
+		str_copy(aFormat, Localizable("'%s' has been muted for %d seconds"), sizeof(aFormat));
+		SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, aFormat, pDisplayName, Secs);
 
-		str_format(aBuf, sizeof(aBuf), "'%s' has been muted for %d seconds", pDisplayName, Secs);
+		str_format(aBuf, sizeof(aBuf), aFormat, pDisplayName, Secs);
 		SendModLogMessage(ExecutorID, aBuf);
 	}
 }
