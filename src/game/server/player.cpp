@@ -2304,9 +2304,6 @@ void CPlayer::OnEndVoteQuestion(int Result)
 		if (Result == 1)
 		{
 			SetLanguage(Language);
-			char aBuf[VOTE_DESC_LENGTH];
-			str_format(aBuf, sizeof(aBuf), Localize("Successfully changed language to %s"), g_Localization.GetLanguageString(m_Language));
-			GameServer()->SendChatTarget(m_ClientID, aBuf);
 		}
 		else if (Result == -1)
 		{
@@ -2773,7 +2770,7 @@ const char *CPlayer::Localize(const char *pText, const char *pContext)
 	return ::Localize(pText, m_Language);
 }
 
-void CPlayer::SetLanguage(int Language)
+void CPlayer::SetLanguage(int Language, bool Silent)
 {
 	if (Language == m_Language)
 		return;
@@ -2788,6 +2785,13 @@ void CPlayer::SetLanguage(int Language)
 	int PrevLanguage = m_Language;
 	m_Language = Language;
 	g_Localization.TryUnload(GameServer(), PrevLanguage);
+
+	if (!Silent)
+	{
+		char aBuf[VOTE_DESC_LENGTH];
+		str_format(aBuf, sizeof(aBuf), Localize("Successfully changed language to %s"), g_Localization.GetLanguageString(m_Language));
+		GameServer()->SendChatTarget(m_ClientID, aBuf);
+	}
 }
 
 void CPlayer::UpdateDoubleXpLifes()

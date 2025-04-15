@@ -66,6 +66,7 @@ void CVotingMenu::Init(CGameContext *pGameServer)
 	str_copy(m_aPages[PAGE_VOTES].m_aName, Localizable("Vᴏᴛᴇs", "vote-header"), sizeof(m_aPages[PAGE_VOTES].m_aName));
 	str_copy(m_aPages[PAGE_ACCOUNT].m_aName, Localizable("Aᴄᴄᴏᴜɴᴛ", "vote-header"), sizeof(m_aPages[PAGE_ACCOUNT].m_aName));
 	str_copy(m_aPages[PAGE_MISCELLANEOUS].m_aName, Localizable("Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs", "vote-header"), sizeof(m_aPages[PAGE_MISCELLANEOUS].m_aName));
+	str_copy(m_aPages[PAGE_LANGUAGES].m_aName, Localizable("Lᴀɴɢᴜᴀɢᴇs", "vote-header"), sizeof(m_aPages[PAGE_LANGUAGES].m_aName));
 
 	for (int i = 0; i < NUM_PAGE_MAX_VOTES; i++)
 		m_aaTempDesc[i][0] = 0;
@@ -467,6 +468,17 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc, const char *
 			return true;
 		}
 	}
+	else if (GetPage(ClientID) == PAGE_LANGUAGES)
+	{
+		for (unsigned int i = 0; i < g_Localization.Languages().size(); i++)
+		{
+			const char *pLanguage = g_Localization.GetLanguageString(i);
+			if (!IsOption(pDesc, pLanguage))
+				continue;
+			pPlayer->SetLanguage(i);
+			return true;
+		}
+	}
 
 	return false;
 }
@@ -521,6 +533,10 @@ int CVotingMenu::PrepareTempDescriptions(int ClientID)
 	else if (GetPage(ClientID) == PAGE_MISCELLANEOUS)
 	{
 		DoPageMiscellaneous(ClientID, &NumOptions);
+	}
+	else if (GetPage(ClientID) == PAGE_LANGUAGES)
+	{
+		DoPageLanguages(ClientID, &NumOptions);
 	}
 
 	return NumOptions;
@@ -821,6 +837,24 @@ void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 	}
 }
 
+void CVotingMenu::DoPageLanguages(int ClientID, int *pNumOptions)
+{
+	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
+	int Page = GetPage(ClientID);
+
+	DoLineTextSubheader(Page, pNumOptions, pPlayer->Localize("Aᴠᴀɪʟᴀʙʟᴇ Lᴀɴɢᴜᴀɢᴇs", "vote-header"));
+	const char *pOwnLanguage = g_Localization.GetLanguageString(pPlayer->m_Language);
+	for (unsigned int i = 0; i < g_Localization.Languages().size(); i++)
+	{
+		if (g_Localization.Languages()[i].m_Available)
+		{
+			const char *pLanguage = g_Localization.GetLanguageString(i);
+			bool CurLang = str_comp(pOwnLanguage, pLanguage) == 0;
+			DoLineToggleOption(Page, pNumOptions, pLanguage, CurLang);
+		}
+	}
+}
+
 void CVotingMenu::Tick()
 {
 	// Check once per second if we have to auto update
@@ -1041,6 +1075,8 @@ void CVotingMenu::ApplyFlags(int ClientID, int Flags)
 		m_aClients[ClientID].m_Page = PAGE_ACCOUNT;
 	if (Flags & VOTEFLAG_PAGE_MISCELLANEOUS)
 		m_aClients[ClientID].m_Page = PAGE_MISCELLANEOUS;
+	if (Flags & VOTEFLAG_PAGE_LANGUAGES)
+		m_aClients[ClientID].m_Page = PAGE_LANGUAGES;
 	if (Flags & VOTEFLAG_SHOW_ACC_STATS)
 		m_aClients[ClientID].m_ShowAccountStats = true;
 	if (Flags & VOTEFLAG_SHOW_PLOT_INFO)
@@ -1059,6 +1095,8 @@ int CVotingMenu::GetFlags(int ClientID)
 		Flags |= VOTEFLAG_PAGE_ACCOUNT;
 	else if (Page == PAGE_MISCELLANEOUS)
 		Flags |= VOTEFLAG_PAGE_MISCELLANEOUS;
+	else if (Page == PAGE_LANGUAGES)
+		Flags |= VOTEFLAG_PAGE_LANGUAGES;
 	if (m_aClients[ClientID].m_ShowAccountInfo)
 		Flags |= VOTEFLAG_SHOW_ACC_INFO;
 	if (m_aClients[ClientID].m_ShowAccountStats)

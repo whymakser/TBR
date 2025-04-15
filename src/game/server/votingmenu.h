@@ -23,6 +23,7 @@ class CVotingMenu
 		VOTEFLAG_SHOW_ACC_STATS = 1 << 4,
 		VOTEFLAG_SHOW_PLOT_INFO = 1 << 5,
 		VOTEFLAG_SHOW_WANTED_PLAYERS = 1 << 6,
+		VOTEFLAG_PAGE_LANGUAGES = 1 << 7,
 	};
 
 	enum EVotingPage
@@ -30,6 +31,7 @@ class CVotingMenu
 		PAGE_VOTES = 0,
 		PAGE_ACCOUNT,
 		PAGE_MISCELLANEOUS,
+		PAGE_LANGUAGES,
 		NUM_PAGES,
 
 		NUM_PAGE_SEPERATORS = 2,
@@ -140,6 +142,7 @@ class CVotingMenu
 	int PrepareTempDescriptions(int ClientID);
 	void DoPageAccount(int ClientID, int *pNumOptions);
 	void DoPageMiscellaneous(int ClientID, int *pNumOptions);
+	void DoPageLanguages(int ClientID, int *pNumOptions);
 	void DoLineToggleOption(int Page, int *pNumOptions, const char *pDescription, bool Value);
 	void DoLineValueOption(int Page, int *pNumOptions, const char *pDescription, int Value, int Max = -1, int BulletPoint = BULLET_NONE);
 	void DoLineSeperator(int Page, int* pNumOptions);
