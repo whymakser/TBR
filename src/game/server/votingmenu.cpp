@@ -12,17 +12,14 @@ CGameContext *CVotingMenu::GameServer() const { return m_pGameServer; }
 IServer *CVotingMenu::Server() const { return GameServer()->Server(); }
 
 // Font: https://fsymbols.com/generators/smallcaps/
-#define VOTE_HEADER "vote-header"
-#define LocalizableHeader(str) Localizable((str), VOTE_HEADER)
-#define LocalizeHeader(header) Localize((header), VOTE_HEADER)
 
 // Not a normal space: https://www.cogsci.ed.ac.uk/~richard/utf-8.cgi?input=%E2%80%8A&mode=char
 static const char *PLACEHOLDER_DESC = " ";
 // Acc
-static const char *COLLAPSE_HEADER_WANTED_PLAYERS = LocalizableHeader("Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs");
-static const char *COLLAPSE_HEADER_ACC_INFO = LocalizableHeader("Aᴄᴄᴏᴜɴᴛ Iɴғᴏ");
-static const char *COLLAPSE_HEADER_ACC_STATS = LocalizableHeader("Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs");
-static const char *COLLAPSE_HEADER_PLOT_INFO = LocalizableHeader("Pʟᴏᴛ");
+static const char *COLLAPSE_HEADER_WANTED_PLAYERS = Localizable("Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs", "vote-header");
+static const char *COLLAPSE_HEADER_ACC_INFO = Localizable("Aᴄᴄᴏᴜɴᴛ Iɴғᴏ", "vote-header");
+static const char *COLLAPSE_HEADER_ACC_STATS = Localizable("Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs", "vote-header");
+static const char *COLLAPSE_HEADER_PLOT_INFO = Localizable("Pʟᴏᴛ", "vote-header");
 // Wanted // careful when adding another "Page", it has to differ somehow
 static const char *ACC_WANTED_PLAYERS_PAGE = Localizable("Page");
 // Acc Misc
@@ -66,9 +63,9 @@ void CVotingMenu::Init(CGameContext *pGameServer)
 		Reset(i);
 	}
 
-	str_copy(m_aPages[PAGE_VOTES].m_aName, LocalizableHeader("Vᴏᴛᴇs"), sizeof(m_aPages[PAGE_VOTES].m_aName));
-	str_copy(m_aPages[PAGE_ACCOUNT].m_aName, LocalizableHeader("Aᴄᴄᴏᴜɴᴛ"), sizeof(m_aPages[PAGE_ACCOUNT].m_aName));
-	str_copy(m_aPages[PAGE_MISCELLANEOUS].m_aName, LocalizableHeader("Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs"), sizeof(m_aPages[PAGE_MISCELLANEOUS].m_aName));
+	str_copy(m_aPages[PAGE_VOTES].m_aName, Localizable("Vᴏᴛᴇs", "vote-header"), sizeof(m_aPages[PAGE_VOTES].m_aName));
+	str_copy(m_aPages[PAGE_ACCOUNT].m_aName, Localizable("Aᴄᴄᴏᴜɴᴛ", "vote-header"), sizeof(m_aPages[PAGE_ACCOUNT].m_aName));
+	str_copy(m_aPages[PAGE_MISCELLANEOUS].m_aName, Localizable("Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs", "vote-header"), sizeof(m_aPages[PAGE_MISCELLANEOUS].m_aName));
 
 	for (int i = 0; i < NUM_PAGE_MAX_VOTES; i++)
 		m_aaTempDesc[i][0] = 0;
@@ -681,7 +678,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 		str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Police"), pAccount->m_PoliceLevel);
 		DoLineText(Page, pNumOptions, aBuf);
 
-		DoLineTextSubheader(Page, pNumOptions, pPlayer->LocalizeHeader("Cᴏʟʟᴇᴄᴛᴀʙʟᴇs"));
+		DoLineTextSubheader(Page, pNumOptions, pPlayer->Localize("Cᴏʟʟᴇᴄᴛᴀʙʟᴇs", "vote-header"));
 		str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Taser battery"), pAccount->m_TaserBattery);
 		DoLineText(Page, pNumOptions, aBuf);
 		str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Portal Battery"), pAccount->m_PortalBattery);
@@ -767,7 +764,7 @@ void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 	int Page = GetPage(ClientID);
 
-	DoLineTextSubheader(Page, pNumOptions, pPlayer->LocalizeHeader("Oᴘᴛɪᴏɴs"));
+	DoLineTextSubheader(Page, pNumOptions, pPlayer->Localize("Oᴘᴛɪᴏɴs", "vote-header"));
 	DoLineToggleOption(Page, pNumOptions, MISC_HIDEDRAWINGS, pPlayer->m_HideDrawings);
 	DoLineToggleOption(Page, pNumOptions, MISC_WEAPONINDICATOR, pPlayer->m_WeaponIndicator);
 	DoLineToggleOption(Page, pNumOptions, MISC_ZOOMCURSOR, pPlayer->m_ZoomCursor);
@@ -792,7 +789,7 @@ void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 	if (vpDesigns.size() > 1)
 	{
 		DoLineSeperator(Page, pNumOptions);
-		DoLineTextSubheader(Page, pNumOptions, pPlayer->LocalizeHeader("Dᴇsɪɢɴs"));
+		DoLineTextSubheader(Page, pNumOptions, pPlayer->Localize("Dᴇsɪɢɴs", "vote-header"));
 		// I have no idea what happens when a design has the same name as another vote, but it'll probably take the first and it'll be bugged out. try to avoid that xd
 		const char *pOwnDesign = Server()->GetMapDesign(ClientID);
 		for (unsigned int i = 0; i < vpDesigns.size(); i++)
@@ -803,7 +800,7 @@ void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 	}
 
 	DoLineSeperator(Page, pNumOptions);
-	DoLineTextSubheader(Page, pNumOptions, pPlayer->LocalizeHeader("Mɪɴɪɢᴀᴍᴇs"));
+	DoLineTextSubheader(Page, pNumOptions, pPlayer->Localize("Mɪɴɪɢᴀᴍᴇs", "vote-header"));
 	for (int i = -1; i < NUM_MINIGAMES; i++)
 	{
 		if (i != -1 && GameServer()->m_aMinigameDisabled[i])
@@ -814,7 +811,7 @@ void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 	}
 
 	DoLineSeperator(Page, pNumOptions);
-	DoLineTextSubheader(Page, pNumOptions, pPlayer->LocalizeHeader("Sᴄᴏʀᴇ Mᴏᴅᴇ"));
+	DoLineTextSubheader(Page, pNumOptions, pPlayer->Localize("Sᴄᴏʀᴇ Mᴏᴅᴇ", "vote-header"));
 	for (int i = 0; i < NUM_SCORE_MODES; i++)
 	{
 		if (i == SCORE_BONUS && !GameServer()->Config()->m_SvAllowBonusScoreMode)
