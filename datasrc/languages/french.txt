@@ -1507,4 +1507,4 @@ Account Info
 == Informations sur le compte
 
 Load recent design?
-== Charger conception récente?
+== Charger le design récent?
