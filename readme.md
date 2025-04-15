@@ -92,6 +92,11 @@ You can play Durák by mouse or via keyboarc controls (+left, +right, +jump, +sh
 	Defender: You can either defend by dragging a card onto an offense card, or you can place a card with the same rank next to it in the table area to push the attack to the next person. <br>
 	If you can't defend or do not want to, you can click in the table area to take the cards in order to speed up the process. Otherwise wait 1min.
 
+* **Server-side translation** <br>
+F-DDrace has a server-side translation feature using '/language'. <br>
+You can specify a default language using 'sv_default_language' or turn on 'sv_language_suggestion' to receive a vote question on join. <br>
+Language files are stored in datasrc/languages and are moved to data/languages upon compiling, like the rest of datasrc/.
+
 * **Flags and weapon drops** <br>
 You can drop flags using `F3` key (vote yes key) and weapons using `F4` key (vote no key). <br>
 They interact with explosions, shotgun, speedups, teleporters, doors and portals, and can be collected by other players again. <br>
