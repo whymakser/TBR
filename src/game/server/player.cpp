@@ -2753,6 +2753,14 @@ void CPlayer::SetLanguage(int Language)
 {
 	if (Language == m_Language)
 		return;
+
+	int DummyID = Server()->GetDummy(m_ClientID);
+	if (DummyID != -1)
+	{
+		// Always keep track of dummy language
+		GameServer()->m_apPlayers[DummyID]->m_Language = Language;
+	}
+
 	int PrevLanguage = m_Language;
 	m_Language = Language;
 	g_Localization.TryUnload(GameServer(), PrevLanguage);

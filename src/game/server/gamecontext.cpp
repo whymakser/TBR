@@ -1761,6 +1761,13 @@ void CGameContext::OnClientEnter(int ClientID)
 		Server()->GetClientAddr(ClientID, &Addr);
 		Mute(&Addr, Seconds, Server()->ClientName(ClientID), "Initial chat delay", -1, true);
 	}
+
+	int DummyID = Server()->GetDummy(ClientID);
+	if (DummyID != -1)
+	{
+		// Always keep track of dummy language
+		m_apPlayers[DummyID]->SetLanguage(m_apPlayers[ClientID]->m_Language);
+	}
 }
 
 void CGameContext::SendStartMessages(int ClientID)
