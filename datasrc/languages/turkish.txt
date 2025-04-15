@@ -1014,9 +1014,6 @@ Your previously collected money got added to your account due to login
 Successfully logged out
 == Başarıyla çıkış yapıldı
 
-Load recent design '%s'?
-== Son tasarım '%s' yüklensin mi?
-
 The plot auction by '%s' is cancelled
 == '%s' tarafından başlatılan plot açık artırması iptal edildi
 
@@ -1508,3 +1505,6 @@ You got +%lld money from others leaving the game.
 
 Change language to %s?
 == Dili %s olarak değiştir?
+
+Load recent design?
+== Önceki tasarım yüklensin mi?

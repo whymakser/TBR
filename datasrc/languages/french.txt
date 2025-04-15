@@ -1011,9 +1011,6 @@ Your previously collected money got added to your account due to login
 Successfully logged out
 == Déconnecté avec succès
 
-Load recent design '%s'?
-== Charger le design récent '%s'?
-
 Change language to %s?
 == Changer la langue en %s?
 
@@ -1508,3 +1505,6 @@ You got +%lld money from others leaving the game.
 
 Account Info
 == Informations sur le compte
+
+Load recent design?
+== Charger conception récente?

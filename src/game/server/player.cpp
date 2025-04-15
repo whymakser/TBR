@@ -474,7 +474,7 @@ void CPlayer::Tick()
 		}
 		else
 		{
-			const int TimeoutSec = 30;
+			const int TimeoutSec = 15;
 			const int Freq = Server()->GetMaxClients(m_ClientID) / TimeoutSec;
 			int Max = TimeoutSec * Freq;
 			const int IntervalTicks = Server()->TickSpeed() / Freq;
@@ -2237,7 +2237,8 @@ void CPlayer::OnLogout()
 
 void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 {
-	char aText[128] = { 0 };
+	char aText[VOTE_DESC_LENGTH] = { 0 };
+	char aReason[VOTE_REASON_LENGTH] = { 0 };
 	switch ((int)Type)
 	{
 	case CPlayer::VOTE_QUESTION_DESIGN:
@@ -2246,7 +2247,8 @@ void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 		if (!pDesign[0] || !str_comp(pDesign, Server()->GetMapDesign(m_ClientID)))
 			return;
 
-		str_format(aText, sizeof(aText), Localize("Load recent design '%s'?"), pDesign);
+		str_copy(aText, Localize("Load recent design?"), sizeof(aText));
+		str_copy(aReason, pDesign, sizeof(aReason));
 		break;
 	}
 	case CPlayer::VOTE_QUESTION_LANGUAGE_SUGGESTION:
@@ -2260,7 +2262,7 @@ void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 	}
 	}
 
-	const int TimeoutSec = 30;
+	const int TimeoutSec = 15;
 
 	m_VoteQuestionRunning = true;
 	m_VoteQuestionType = Type;
@@ -2273,7 +2275,7 @@ void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 		Msg.m_Timeout = TimeoutSec;
 		Msg.m_ClientID = Server()->GetMaxClients(m_ClientID)-1;
 		Msg.m_pDescription = aText;
-		Msg.m_pReason = "";
+		Msg.m_pReason = aReason;
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOTRANSLATE, m_ClientID);
 	}
 	else
@@ -2281,7 +2283,7 @@ void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 		CMsgPacker Msg(NETMSGTYPE_SV_VOTESET);
 		Msg.AddInt(TimeoutSec);
 		Msg.AddString(aText, -1);
-		Msg.AddString("", -1);
+		Msg.AddString(aReason, -1);
 		Server()->SendMsg(&Msg, MSGFLAG_VITAL, m_ClientID);
 	}
 	GameServer()->SendVoteStatus(m_ClientID, 2, 2, 0);

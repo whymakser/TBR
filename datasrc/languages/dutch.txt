@@ -1014,7 +1014,7 @@ Your previously collected money got added to your account due to login
 Successfully logged out
 == 
 
-Load recent design '%s'?
+Load recent design?
 == 
 
 Change language to %s?

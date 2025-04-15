@@ -1014,9 +1014,6 @@ Your previously collected money got added to your account due to login
 Successfully logged out
 == Erfolgreich ausgeloggt
 
-Load recent design '%s'?
-== Vorheriges Design laden '%s'?
-
 The plot auction by '%s' is cancelled
 == Die Grundstücksauktion von '%s' wurde abgebrochen
 
@@ -1508,3 +1505,6 @@ You got +%lld money from others leaving the game.
 
 Change language to %s?
 == Sprache auf %s ändern?
+
+Load recent design?
+== Lade vorheriges Design?

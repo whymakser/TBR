@@ -1014,9 +1014,6 @@ Your previously collected money got added to your account due to login
 Successfully logged out
 == Успешный выход из системы
 
-Load recent design '%s'?
-== Загрузить недавний дизайн '%s'?
-
 The plot auction by '%s' is cancelled
 == Аукцион участка от '%s' отменен
 
@@ -1508,3 +1505,6 @@ You got +%lld money from others leaving the game.
 
 Change language to %s?
 == Изменить язык на %s?
+
+Load recent design?
+== Загрузить последний дизайн?
