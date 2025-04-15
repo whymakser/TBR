@@ -1838,7 +1838,7 @@ Local Chat
 
 {vote-header}
 Lᴀɴɢᴜᴀɢᴇs
-== 
+== Jᴇ̨ᴢʏᴋɪ
 
 No minigame
 == 
@@ -1866,7 +1866,7 @@ Destroy Seconds
 
 {vote-header}
 Aᴠᴀɪʟᴀʙʟᴇ Lᴀɴɢᴜᴀɢᴇs
-== 
+== Dᴏsᴛᴇ̨ᴘɴᴇ ᴊᴇ̨ᴢʏᴋɪ
 
 You have to be in a team with other tees to start
 == 
