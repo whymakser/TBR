@@ -1175,6 +1175,7 @@ private:
 	static void ConPlotInfo(IConsole::IResult* pResult, void* pUserData);
 	static void ConPresetList(IConsole::IResult* pResult, void* pUserData);
 
+	static void ConReloadLanguages(IConsole::IResult* pResult, void* pUserData);
 	static void ConReloadDesigns(IConsole::IResult* pResult, void* pUserData);
 	static void ConAddGrog(IConsole::IResult* pResult, void* pUserData);
 	static void ConSetPermille(IConsole::IResult* pResult, void* pUserData);

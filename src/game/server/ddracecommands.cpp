@@ -2433,3 +2433,13 @@ void CGameContext::ConReloadDesigns(IConsole::IResult *pResult, void *pUserData)
 	pSelf->Server()->LoadMapDesigns();
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "designs", "Reloaded map designs");
 }
+
+void CGameContext::ConReloadLanguages(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	// If unloaded, load again
+	for (unsigned int i = 1; i < g_Localization.Languages().size(); i++)
+		if (g_Localization.TryUnload(pSelf, i))
+			g_Localization.Load(i);
+	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", "Reloaded languages");
+}
