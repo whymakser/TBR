@@ -302,9 +302,7 @@ void CPlayer::Tick()
 
 	if(Server()->GetNetErrorString(m_ClientID)[0])
 	{
-		char aBuf[512];
-		str_format(aBuf, sizeof(aBuf), Localizable("'%s' would have timed out, but can use timeout protection now"), Server()->ClientName(m_ClientID));
-		GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+		GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("'%s' would have timed out, but can use timeout protection now"), Server()->ClientName(m_ClientID));
 		Server()->ResetNetErrorString(m_ClientID);
 	}
 
@@ -1801,9 +1799,7 @@ int CPlayer::ForcePause(int Time)
 
 	if (GameServer()->Config()->m_SvPauseMessages)
 	{
-		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "'%s' was force-paused for %ds", Server()->ClientName(m_ClientID), Time);
-		GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+		GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, "'%s' was force-paused for %ds", Server()->ClientName(m_ClientID), Time);
 	}
 
 	return Pause(PAUSE_SPEC, true);

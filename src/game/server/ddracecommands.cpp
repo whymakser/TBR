@@ -81,11 +81,8 @@ void CGameContext::ConKillPlayer(IConsole::IResult *pResult, void *pUserData)
 	if (pSelf->m_apPlayers[Victim])
 	{
 		pSelf->m_apPlayers[Victim]->KillCharacter(WEAPON_GAME);
-		char aBuf[512];
-		str_format(aBuf, sizeof(aBuf), "%s was killed by %s",
-				pSelf->Server()->ClientName(Victim),
-				pSelf->Server()->ClientName(pResult->m_ClientID));
-		pSelf->SendChat(-1, CHAT_ALL, -1, aBuf);
+		pSelf->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("%s was killed by %s"),
+			pSelf->Server()->ClientName(Victim), pSelf->Server()->ClientName(pResult->m_ClientID));
 	}
 }
 
@@ -503,10 +500,8 @@ void CGameContext::ConVoteMute(IConsole::IResult* pResult, void* pUserData)
 
 	if (Found)
 	{
-		char aBuf[128];
-		str_format(aBuf, sizeof aBuf, "'%s' banned '%s' for %d seconds from voting.",
+		pSelf->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("'%s' banned '%s' for %d seconds from voting."),
 			pSelf->Server()->ClientName(pResult->m_ClientID), pSelf->Server()->ClientName(Victim), Seconds);
-		pSelf->SendChat(-1, CHAT_ALL, -1, aBuf);
 	}
 }
 
@@ -527,10 +522,8 @@ void CGameContext::ConVoteUnmute(IConsole::IResult* pResult, void* pUserData)
 	bool Found = pSelf->VoteUnmute(&Addr, pSelf->Server()->ClientName(Victim), pResult->m_ClientID);
 	if (Found)
 	{
-		char aBuf[128];
-		str_format(aBuf, sizeof aBuf, "'%s' unbanned '%s' from voting.",
+		pSelf->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("'%s' unbanned '%s' from voting."),
 			pSelf->Server()->ClientName(pResult->m_ClientID), pSelf->Server()->ClientName(Victim));
-		pSelf->SendChat(-1, CHAT_ALL, -1, aBuf);
 	}
 }
 

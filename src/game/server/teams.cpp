@@ -65,7 +65,7 @@ void CGameTeams::OnCharacterStart(int ClientID)
 			str_format(
 					aBuf,
 					sizeof(aBuf),
-					"%s has finished and didn't go through start yet, wait for him or join another team.",
+					pStartingChar->GetPlayer()->Localize("%s has finished and didn't go through start yet, wait for him or join another team."),
 					Server()->ClientName(i));
 			GameServer()->SendChatTarget(ClientID, aBuf);
 			m_LastChat[ClientID] = Tick;
@@ -77,7 +77,7 @@ void CGameTeams::OnCharacterStart(int ClientID)
 			str_format(
 					aBuf,
 					sizeof(aBuf),
-					"%s wants to start a new round, kill or walk to start.",
+					pPlayer->Localize("%s wants to start a new round, kill or walk to start."),
 					Server()->ClientName(ClientID));
 			GameServer()->SendChatTarget(i, aBuf);
 			m_LastChat[i] = Tick;
@@ -92,7 +92,7 @@ void CGameTeams::OnCharacterStart(int ClientID)
 		str_format(
 				aBuf,
 				sizeof(aBuf),
-				"Team %d started with these %d players: ",
+				Localizable("Team %d started with these %d players:"),
 				m_Core.Team(ClientID),
 				Count(m_Core.Team(ClientID)));
 
@@ -110,9 +110,15 @@ void CGameTeams::OnCharacterStart(int ClientID)
 					SetStartTime(pPlayer, Tick);
 
 					if(First)
+					{
+						// For translation, removed space at end
+						str_append(aBuf, " ", sizeof(aBuf));
 						First = false;
+					}
 					else
+					{
 						str_append(aBuf, ", ", sizeof(aBuf));
+					}
 
 					str_append(aBuf, GameServer()->Server()->ClientName(i), sizeof(aBuf));
 				}
@@ -195,14 +201,14 @@ void CGameTeams::CheckTeamFinished(int Team)
 
 				char aBuf[256];
 				str_format(aBuf, sizeof(aBuf),
-					"Your team would've finished in: %d minute(s) %5.2f second(s). Since you had practice mode enabled your rank doesn't count.",
+					Localizable("Your team would've finished in: %d minute(s) %5.2f second(s). Since you had practice mode enabled your rank doesn't count."),
 					(int)Time / 60, Time - ((int)Time / 60 * 60));
 
 				for(int i = 0; i < MAX_CLIENTS; i++)
 				{
 					if(m_Core.Team(i) == Team && GameServer()->m_apPlayers[i])
 					{
-						GameServer()->SendChatTarget(i, aBuf);
+						GameServer()->SendChatTarget(i, GameServer()->m_apPlayers[i]->Localize(aBuf));
 					}
 				}
 
@@ -615,10 +621,8 @@ void CGameTeams::OnTeamFinish(CPlayer** Players, unsigned int Size, float Time, 
 		if(GameServer()->Config()->m_SvRejoinTeam0 && GameServer()->Config()->m_SvTeam != 3 && (m_Core.Team(Players[i]->GetCID()) >= TEAM_SUPER || !m_TeamLocked[m_Core.Team(Players[i]->GetCID())]))
 		{
 			SetForceCharacterTeam(Players[i]->GetCID(), 0);
-			char aBuf[512];
-			str_format(aBuf, sizeof(aBuf), "%s joined team 0",
-					GameServer()->Server()->ClientName(Players[i]->GetCID()));
-			GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+			GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("%s joined team 0"),
+				GameServer()->Server()->ClientName(Players[i]->GetCID()));
 		}
 	}
 
@@ -649,16 +653,25 @@ void CGameTeams::OnFinish(CPlayer* Player, float Time, const char *pTimestamp)
 	{
 		// new record \o/
 
+		CFormatArg aArgs[2];
+		int NumArgs = 1;
 		if (Diff >= 60)
-			str_format(aBuf, sizeof(aBuf), Player->Localize("New record: %d minute(s) %5.2f second(s) better."),
-					(int)Diff / 60, Diff - ((int)Diff / 60 * 60));
+		{
+			str_copy(aBuf, Localizable("New record: %d minute(s) %5.2f second(s) better."), sizeof(aBuf));
+			aArgs[0] = (int)Diff / 60;
+			aArgs[1] = Diff - ((int)Diff / 60 * 60);
+			NumArgs++;
+		}
 		else
-			str_format(aBuf, sizeof(aBuf), Player->Localize("New record: %5.2f second(s) better."),
-					Diff);
+		{
+			str_copy(aBuf, Localizable("New record: %5.2f second(s) better."), sizeof(aBuf));
+			aArgs[0] = Diff;
+			aArgs[1] = 0;
+		}
 		if (GameServer()->Config()->m_SvHideScore || !GameServer()->Config()->m_SvSaveWorseScores)
-			GameServer()->SendChatTarget(Player->GetCID(), aBuf);
+			GameServer()->SendChat(-1, CHAT_ALL, Player->GetCID(), aBuf, -1, CGameContext::CHATFLAG_ALL, aArgs, NumArgs);
 		else
-			GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+			GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf, -1, CGameContext::CHATFLAG_ALL, aArgs, NumArgs);
 	}
 	else if (pData->m_BestTime != 0) // tee has already finished?
 	{
@@ -764,7 +777,10 @@ void CGameTeams::OnCharacterDeath(int ClientID, int Weapon)
 			ChangeTeamState(Team, CGameTeams::TEAMSTATE_OPEN);
 
 			char aBuf[512];
-			str_format(aBuf, sizeof(aBuf), "Everyone in your locked team was killed because '%s' %s.", Server()->ClientName(ClientID), Weapon == WEAPON_SELF ? "killed" : "died");
+			if (Weapon == WEAPON_SELF)
+				str_copy(aBuf, Localizable("Everyone in your locked team was killed because '%s' killed."), sizeof(aBuf));
+			else
+				str_copy(aBuf, Localizable("Everyone in your locked team was killed because '%s' died."), sizeof(aBuf));
 
 			m_Practice[Team] = false;
 
@@ -780,7 +796,7 @@ void CGameTeams::OnCharacterDeath(int ClientID, int Weapon)
 							GameServer()->m_apPlayers[i]->Respawn(true); // spawn the rest of team with weak hook on the killer
 					}
 					if(m_MembersCount[Team] > 1)
-						GameServer()->SendChatTarget(i, aBuf);
+						GameServer()->SendChatTarget(i, GameServer()->m_apPlayers[i]->Localize(aBuf));
 				}
 		}
 	}

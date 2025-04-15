@@ -532,11 +532,17 @@ void CGameContext::SendChatTarget(int To, const char *pText, int Flags)
 	}
 }
 
-void CGameContext::SendChatTeam(int Team, const char *pText)
+void CGameContext::SendChatTeam(int Team, const char *pText, CFormatArg *pArgs, int NumArgs)
 {
-	for(int i = 0; i<MAX_CLIENTS; i++)
-		if(((CGameControllerDDRace*)m_pController)->m_Teams.m_Core.Team(i) == Team)
-			SendChatTarget(i, pText);
+	for(int i = 0; i < MAX_CLIENTS; i++)
+	{
+		if(m_apPlayers[i] && ((CGameControllerDDRace*)m_pController)->m_Teams.m_Core.Team(i) == Team)
+		{
+			char aBuf[256];
+			str_format_args(aBuf, sizeof(aBuf), m_apPlayers[i]->Localize(pText), pArgs, NumArgs);
+			SendChatTarget(i, aBuf);
+		}
+	}
 }
 
 void CGameContext::SendModLogMessage(int ClientID, const char *pMsg)
@@ -2777,7 +2783,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			}
 
 			if(aCmd[0] && str_comp(aCmd, "info") != 0)
-				CallVote(ClientID, aDesc, aCmd, aReason, ChatMsg.first, aSevendownDesc[0] ? aSevendownDesc : 0);
+				CallVote(ClientID, aDesc, aCmd, aReason, ChatMsg.first, aSevendownDesc[0] ? aSevendownDesc : 0, ChatMsg.second.first, ChatMsg.second.second);
 		}
 		else if(MsgID == NETMSGTYPE_CL_VOTE)
 		{
@@ -2934,7 +2940,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			if(m_pController->CanJoinTeam(pMsg->m_Team, ClientID))
 			{
 				if (pPlayer->IsPaused())
-					SendChatTarget(ClientID, "Use /pause first then you can kill");
+					SendChatTarget(ClientID, pPlayer->Localize("Use /pause first then you can kill"));
 				else
 				{
 					if (pPlayer->GetTeam() == TEAM_SPECTATORS || pMsg->m_Team == TEAM_SPECTATORS)
@@ -3561,10 +3567,10 @@ void CGameContext::ConSetTeamAll(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext* pSelf = (CGameContext*)pUserData;
 	int Team = clamp(pResult->GetInteger(0), -1, 1);
-
-	char aBuf[256];
-	str_format(aBuf, sizeof(aBuf), "All players were moved to the %s", pSelf->m_pController->GetTeamName(Team));
-	pSelf->SendChat(-1, CHAT_ALL, -1, aBuf);
+	if (Team == TEAM_RED)
+		pSelf->SendChat(-1, CHAT_ALL, -1, Localizable("All players were moved to the game"));
+	else
+		pSelf->SendChat(-1, CHAT_ALL, -1, Localizable("All players were moved to the spectators"));
 
 	for (int i = 0; i < MAX_CLIENTS; ++i)
 		if (pSelf->m_apPlayers[i])
@@ -3586,8 +3592,7 @@ void CGameContext::ConForceVote(IConsole::IResult *pResult, void *pUserData)
 		{
 			if(str_comp_nocase(pValue, pOption->m_aDescription) == 0)
 			{
-				str_format(aBuf, sizeof(aBuf), "authorized player forced server option '%s' (%s)", pValue, pReason);
-				pSelf->SendChatTarget(-1, aBuf);
+				pSelf->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("Authorized player forced server option '%s' (%s)"), pValue, pReason);
 				pSelf->Console()->ExecuteLine(pOption->m_aCommand);
 				break;
 			}
@@ -3597,7 +3602,7 @@ void CGameContext::ConForceVote(IConsole::IResult *pResult, void *pUserData)
 
 		if(!pOption)
 		{
-			str_format(aBuf, sizeof(aBuf), "'%s' isn't an option on this server", pValue);
+			str_format(aBuf, sizeof(aBuf),  "'%s' isn't an option on this server", pValue);
 			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 			return;
 		}
@@ -3637,8 +3642,7 @@ void CGameContext::ConForceVote(IConsole::IResult *pResult, void *pUserData)
 			return;
 		}
 
-		str_format(aBuf, sizeof(aBuf), "'%s' was moved to spectator (%s)", pSelf->Server()->ClientName(SpectateID), pReason);
-		pSelf->SendChatTarget(-1, aBuf);
+		pSelf->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("'%s' was moved to spectator (%s)"), pSelf->Server()->ClientName(SpectateID), pReason);
 		str_format(aBuf, sizeof(aBuf), "set_team %d -1 %d", SpectateID, pSelf->Config()->m_SvVoteSpectateRejoindelay);
 		pSelf->Console()->ExecuteLine(aBuf);
 	}
@@ -4981,7 +4985,7 @@ void CGameContext::List(int ClientID, const char* pFilter)
 			if (ClientID == -1) \
 				Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", str); \
 			else \
-				SendChatTarget(ClientID, str); \
+				SendChatTarget(ClientID, m_apPlayers[ClientID]->Localize(str)); \
 		} while(0)
 
 	int Total = 0;
@@ -4989,9 +4993,9 @@ void CGameContext::List(int ClientID, const char* pFilter)
 	char aBuf[128];
 	int Bufcnt = 0;
 	if (pFilter[0])
-		str_format(aBuf, sizeof(aBuf), "Listing players with \"%s\" in name:", pFilter);
+		str_format(aBuf, sizeof(aBuf), Localizable("Listing players with \"%s\" in name:"), pFilter);
 	else
-		str_format(aBuf, sizeof(aBuf), "Listing all players:");
+		str_format(aBuf, sizeof(aBuf), Localizable("Listing all players:"));
 	SEND(aBuf);
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
@@ -5058,20 +5062,20 @@ bool CGameContext::RateLimitPlayerVote(int ClientID)
 
 	if(Config()->m_SvRconVote && !Server()->GetAuthedState(ClientID))
 	{
-		SendChatTarget(ClientID, "You can only vote after logging in.");
+		SendChatTarget(ClientID, pPlayer->Localize("You can only vote after logging in."));
 		return true;
 	}
 
 	if(m_VoteCloseTime)
 	{
-		SendChatTarget(ClientID, "Wait for current vote to end before calling a new one.");
+		SendChatTarget(ClientID, pPlayer->Localize("Wait for current vote to end before calling a new one."));
 		return true;
 	}
 
 	if(Now < pPlayer->m_FirstVoteTick)
 	{
 		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "You must wait %d seconds before making your first vote.", (int)((pPlayer->m_FirstVoteTick - Now) / TickSpeed) + 1);
+		str_format(aBuf, sizeof(aBuf), pPlayer->Localize("You must wait %d seconds before making your first vote."), (int)((pPlayer->m_FirstVoteTick - Now) / TickSpeed) + 1);
 		SendChatTarget(ClientID, aBuf);
 		return true;
 	}
@@ -5080,7 +5084,7 @@ bool CGameContext::RateLimitPlayerVote(int ClientID)
 	if(pPlayer->m_LastVoteCall && TimeLeft > 0)
 	{
 		char aChatmsg[64];
-		str_format(aChatmsg, sizeof(aChatmsg), "You must wait %d seconds before making another vote.", (int)(TimeLeft / TickSpeed) + 1);
+		str_format(aChatmsg, sizeof(aChatmsg), pPlayer->Localize("You must wait %d seconds before making another vote."), (int)(TimeLeft / TickSpeed) + 1);
 		SendChatTarget(ClientID, aChatmsg);
 		return true;
 	}
@@ -5094,7 +5098,7 @@ bool CGameContext::RateLimitPlayerVote(int ClientID)
 	if(VoteMuted > 0)
 	{
 		char aChatmsg[64];
-		str_format(aChatmsg, sizeof(aChatmsg), "You are not permitted to vote for the next %d seconds.", VoteMuted);
+		str_format(aChatmsg, sizeof(aChatmsg), pPlayer->Localize("You are not permitted to vote for the next %d seconds."), VoteMuted);
 		SendChatTarget(ClientID, aChatmsg);
 		return true;
 	}
@@ -5106,7 +5110,7 @@ bool CGameContext::RateLimitPlayerMapVote(int ClientID)
 	if(!Server()->GetAuthedState(ClientID) && time_get() < m_LastMapVote + (time_freq() * Config()->m_SvVoteMapTimeDelay))
 	{
 		char aChatmsg[512] = {0};
-		str_format(aChatmsg, sizeof(aChatmsg), "There's a %d second delay between map-votes, please wait %d seconds.",
+		str_format(aChatmsg, sizeof(aChatmsg), m_apPlayers[ClientID]->Localize("There's a %d second delay between map-votes, please wait %d seconds."),
 				Config()->m_SvVoteMapTimeDelay, (int)((m_LastMapVote + Config()->m_SvVoteMapTimeDelay * time_freq() - time_get())/time_freq()));
 		SendChatTarget(ClientID, aChatmsg);
 		return true;
@@ -5187,7 +5191,7 @@ void CGameContext::OnUpdatePlayerServerInfo(char *aBuf, int BufSize, int ID)
 
 // DDRace
 
-void CGameContext::CallVote(int ClientID, const char *pDesc, const char *pCmd, const char *pReason, const char *pChatmsg, const char *pSevendownDesc)
+void CGameContext::CallVote(int ClientID, const char *pDesc, const char *pCmd, const char *pReason, const char *pChatmsg, const char *pSevendownDesc, CFormatArg *pArgs, int NumArgs)
 {
 	// check if a vote is already running
 	if(m_VoteCloseTime)
@@ -5195,11 +5199,10 @@ void CGameContext::CallVote(int ClientID, const char *pDesc, const char *pCmd, c
 
 	int64 Now = Server()->Tick();
 	CPlayer *pPlayer = m_apPlayers[ClientID];
-
 	if(!pPlayer)
 		return;
 
-	SendChat(-1, CHAT_ALL, -1, pChatmsg, -1, CHAT_SEVENDOWN);
+	SendChat(-1, CHAT_ALL, -1, pChatmsg, -1, CHAT_SEVENDOWN, pArgs, NumArgs);
 	if(!pSevendownDesc)
 		pSevendownDesc = pDesc;
 

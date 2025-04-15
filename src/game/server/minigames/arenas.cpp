@@ -589,9 +589,17 @@ void CArenas::IncreaseScore(int Fight, int Index)
 	m_aFights[Fight].m_aParticipants[Index].m_Score++;
 	if (m_aFights[Fight].m_aParticipants[Index].m_Score >= m_aFights[Fight].m_ScoreLimit)
 	{
+		// First, send to clients
+		char aFormat[128];
+		str_copy(aFormat, Localizable("'%s' won a 1vs1 round against '%s'! Final scores: %d - %d"), sizeof(aFormat));
+		GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, aFormat, Server()->ClientName(ClientID), Server()->ClientName(OtherID),
+			m_aFights[Fight].m_aParticipants[Index].m_Score, m_aFights[Fight].m_aParticipants[Other].m_Score);
+
+		// Then fill untranslated format
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), Localizable("'%s' won a 1vs1 round against '%s'! Final scores: %d - %d"), Server()->ClientName(ClientID), Server()->ClientName(OtherID), m_aFights[Fight].m_aParticipants[Index].m_Score, m_aFights[Fight].m_aParticipants[Other].m_Score);
-		GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+		str_format(aBuf, sizeof(aBuf), aFormat, Server()->ClientName(ClientID), Server()->ClientName(OtherID),
+			m_aFights[Fight].m_aParticipants[Index].m_Score, m_aFights[Fight].m_aParticipants[Other].m_Score);
+
 		Server()->SendWebhookMessage(GameServer()->Config()->m_SvWebhook1vs1URL, aBuf, GameServer()->Config()->m_SvWebhook1vs1Name, GameServer()->Config()->m_SvWebhook1vs1AvatarURL);
 		GameServer()->m_apPlayers[ClientID]->m_ConfettiWinEffectTick = Server()->Tick();
 
@@ -635,10 +643,20 @@ void CArenas::OnPlayerLeave(int ClientID, bool Disconnect)
 			int FightScore = m_aFights[Fight].m_aParticipants[Index].m_Score;
 			int OtherScore = m_aFights[Fight].m_aParticipants[Other].m_Score;
 
-			str_format(aBuf, sizeof(aBuf), Localizable("'%s' left a 1vs1 round against '%s'! Current scores: %d - %d"), Server()->ClientName(ClientID), Server()->ClientName(OtherID), FightScore, OtherScore);
-			GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+			// First, send to clients
+			char aFormat[128];
+			str_copy(aFormat, Localizable("'%s' won a 1vs1 round against '%s'! Final scores: %d - %d"), sizeof(aFormat));
+			GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, aFormat, Server()->ClientName(ClientID), Server()->ClientName(OtherID),
+				m_aFights[Fight].m_aParticipants[Index].m_Score, m_aFights[Fight].m_aParticipants[Other].m_Score);
+
 			if(FightScore > 0 || OtherScore > 0)
+			{
+				// Then fill untranslated format
+				char aBuf[128];
+				str_format(aBuf, sizeof(aBuf), aFormat, Server()->ClientName(ClientID), Server()->ClientName(OtherID),
+					m_aFights[Fight].m_aParticipants[Index].m_Score, m_aFights[Fight].m_aParticipants[Other].m_Score);
 				Server()->SendWebhookMessage(GameServer()->Config()->m_SvWebhook1vs1URL, aBuf, GameServer()->Config()->m_SvWebhook1vs1Name, GameServer()->Config()->m_SvWebhook1vs1AvatarURL);
+			}
 			GameServer()->m_apPlayers[OtherID]->m_ConfettiWinEffectTick = Server()->Tick();
 		}
 
