@@ -1069,7 +1069,7 @@ You have no double-xp lifes anymore (last use)
 == Artık hiç çift-XP hakkınız kalmadı (son kullanım)
 
 You will not receive sounds from the server while farming on a moneytile
-== Para karosu üzerinde farm yaparken sunucudan ses almayacaksınız
+== Para alanı üzerinde farm yaparken sunucudan ses almayacaksınız
 
 You will receive all sounds again
 == Tüm sesleri tekrar alacaksınız
@@ -1729,7 +1729,7 @@ Weapon Indicator
 == Silah Göstergesi
 
 Zoom Cursor
-== Yakınlaştırmalı İmleç
+== Yakın İmleç
 
 Resume Moved
 == Hareketle Devam Et
@@ -1789,7 +1789,7 @@ You got +1 jump and can jump %d times now
 == +1 zıplama kazandınız, artık %d kez zıplayabilirsiniz
 
 Your team was unlocked by an unlock team tile
-== Takımınız bir kilit açma karosu tarafından açıldı
+== Takımınız bir kilit açma alanı tarafından açıldı
 
 You are now in a solo part
 == Artık solo bölümdesiniz
@@ -1884,7 +1884,7 @@ Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs
 
 {vote-header}
 Pʟᴏᴛ
-== Aʀsᴀ
+== Pʟᴏᴛ
 
 {vote-header}
 Vᴏᴛᴇs
@@ -1896,7 +1896,7 @@ Aᴄᴄᴏᴜɴᴛ
 
 {vote-header}
 Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs
-== Çᴇşɪᴛʟɪ
+== Dɪğᴇʀ
 
 {vote-header}
 Cᴏʟʟᴇᴄᴛᴀʙʟᴇs
@@ -1912,7 +1912,7 @@ Mɪɴɪɢᴀᴍᴇs
 
 {vote-header}
 Sᴄᴏʀᴇ Mᴏᴅᴇ
-== Pᴜᴀɴ Mᴏᴅᴜ
+== Sᴋᴏʀ Mᴏᴅᴜ
 
 {vote-header}
 Lᴀɴɢᴜᴀɢᴇs
