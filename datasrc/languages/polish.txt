@@ -1960,3 +1960,11 @@ Mɪɴɪɢᴀᴍᴇs
 {vote-header}
 Sᴄᴏʀᴇ Mᴏᴅᴇ
 == Tʀʏʙ Pᴜɴᴋᴛᴏᴡʏ
+
+{vote-header}
+Lᴀɴɢᴜᴀɢᴇs
+== 
+
+{vote-header}
+Aᴠᴀɪʟᴀʙʟᴇ Lᴀɴɢᴜᴀɢᴇs
+== 
