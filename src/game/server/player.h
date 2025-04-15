@@ -513,6 +513,7 @@ public:
 	bool m_VoteQuestionRunning;
 	VoteQuestionType m_VoteQuestionType;
 	int64 m_VoteQuestionEndTick;
+	int64 m_LastVoteStatusUpdateTick;
 
 private:
 	int64 m_WalletMoney;

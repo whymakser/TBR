@@ -240,6 +240,7 @@ void CPlayer::Reset()
 	m_VoteQuestionRunning = false;
 	m_VoteQuestionType = CPlayer::VOTE_QUESTION_NONE;
 	m_VoteQuestionEndTick = 0;
+	m_LastVoteStatusUpdateTick = 0;
 	m_LastRedirectTryTick = 0;
 	m_LastMoneyPay = 0;
 	m_DoSeeOthersByVote = false;
@@ -465,8 +466,31 @@ void CPlayer::Tick()
 	MinigameAfkCheck();
 
 	// Automatic close/stop after 30 seconds
-	if (m_VoteQuestionEndTick && Server()->Tick() > m_VoteQuestionEndTick)
-		OnEndVoteQuestion();
+	if (m_VoteQuestionEndTick)
+	{
+		if (Server()->Tick() >= m_VoteQuestionEndTick)
+		{
+			OnEndVoteQuestion();
+		}
+		else
+		{
+			const int TimeoutSec = 30;
+			const int Freq = Server()->GetMaxClients(m_ClientID) / TimeoutSec;
+			int Max = TimeoutSec * Freq;
+			const int IntervalTicks = Server()->TickSpeed() / Freq;
+			int RemainingTicks = m_VoteQuestionEndTick - Server()->Tick();
+			if (Server()->Tick() - m_LastVoteStatusUpdateTick >= IntervalTicks)
+			{
+				m_LastVoteStatusUpdateTick = Server()->Tick();
+				int Yes = RemainingTicks * Freq / Server()->TickSpeed() + 1;
+				if (Yes <= 1)
+				{
+					Max = Yes = 0;
+				}
+				GameServer()->SendVoteStatus(m_ClientID, Max, Yes, 0/*Max-Yes*/);
+			}
+		}
+	}
 
 	if (m_aDelayedJoinMsg[0] != '\0' && m_JoinTick + Server()->TickSpeed() * GameServer()->Config()->m_SvJoinMsgDelay < Server()->Tick())
 	{
@@ -2260,6 +2284,7 @@ void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 		Msg.AddString("", -1);
 		Server()->SendMsg(&Msg, MSGFLAG_VITAL, m_ClientID);
 	}
+	GameServer()->SendVoteStatus(m_ClientID, 2, 2, 0);
 }
 
 void CPlayer::OnEndVoteQuestion(int Result)

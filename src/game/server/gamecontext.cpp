@@ -1132,9 +1132,7 @@ void CGameContext::SendVoteStatus(int ClientID, int Total, int Yes, int No)
 	Msg.m_Yes = Yes;
 	Msg.m_No = No;
 	Msg.m_Pass = Total - (Yes+No);
-
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
-
 }
 
 void CGameContext::AbortVoteOnDisconnect(int ClientID)
