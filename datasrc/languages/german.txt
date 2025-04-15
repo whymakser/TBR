@@ -1867,49 +1867,50 @@ You can jump %d times
 == ~ T A V E R N E ~
 
 {vote-header}
+Oᴘᴛɪᴏɴs
+== Oᴘᴛɪᴏɴᴇɴ
+
+{vote-header}
 Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs
-== 
+== Gᴇsᴜᴄʜᴛᴇ Sᴘɪᴇʟᴇʀ
 
 {vote-header}
 Aᴄᴄᴏᴜɴᴛ Iɴғᴏ
-== 
+== Kᴏɴᴛᴏɪɴғᴏʀᴍᴀᴛɪᴏɴᴇɴ
 
 {vote-header}
 Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs
-== 
+== Kᴏɴᴛᴏsᴛᴀᴛɪsᴛɪᴋᴇɴ
 
 {vote-header}
 Pʟᴏᴛ
-== 
+== Gʀᴜɴᴅsᴛüᴄᴋ
 
 {vote-header}
 Vᴏᴛᴇs
-== 
+== Aʙsᴛɪᴍᴍᴜɴɢᴇɴ
 
 {vote-header}
 Aᴄᴄᴏᴜɴᴛ
-== 
+== Kᴏɴᴛᴏ
 
 {vote-header}
 Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs
-== 
+== Sᴏɴsᴛɪɢᴇs
 
 {vote-header}
 Cᴏʟʟᴇᴄᴛᴀʙʟᴇs
-== 
-
-{vote-header}
-Oᴘᴛɪᴏɴs
-== 
+== Sᴀᴍᴍᴇʟᴏʙᴊᴇᴋᴛᴇ
 
 {vote-header}
 Dᴇsɪɢɴs
-== 
+== Dᴇsɪɢɴs
 
 {vote-header}
 Mɪɴɪɢᴀᴍᴇs
-== 
+== Mɪɴɪsᴘɪᴇʟᴇ
 
 {vote-header}
 Sᴄᴏʀᴇ Mᴏᴅᴇ
-== 
+== Pᴜɴᴋᴛᴇᴍᴏᴅᴜs
+
