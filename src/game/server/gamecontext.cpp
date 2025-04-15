@@ -1471,10 +1471,8 @@ void CGameContext::OnTick()
 		char aCmd[256];
 		str_format(aCmd, sizeof(aCmd), "sv_reset_file types/%s/flexreset.cfg; change_map \"%s\"", m_pMapVoteResult->m_aServer, m_pMapVoteResult->m_aMap);
 
-		char aChatmsg[512];
-		str_format(aChatmsg, sizeof(aChatmsg), "'%s' called vote to change server option '%s' (%s)", Server()->ClientName(m_pMapVoteResult->m_ClientID), m_pMapVoteResult->m_aMap, "/map");
-
-		CallVote(m_pMapVoteResult->m_ClientID, m_pMapVoteResult->m_aMap, aCmd, "/map", aChatmsg, 0);
+		CFormatArg aArgs[3] = { Server()->ClientName(m_pMapVoteResult->m_ClientID), m_pMapVoteResult->m_aMap, "/map" };
+		CallVote(m_pMapVoteResult->m_ClientID, m_pMapVoteResult->m_aMap, aCmd, "/map", Localizable("'%s' called vote to change server option '%s' (%s)"), 0, aArgs, 3);
 
 		m_pMapVoteResult = nullptr;
 	}
