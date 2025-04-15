@@ -1764,9 +1764,6 @@ Door Health
 Destroy Seconds
 == Zerstörungssekunden
 
-Oᴘᴛɪᴏɴs
-== Oᴘᴛɪᴏɴᴇɴ
-
 You have to be in a team with other tees to start
 == Du musst in einem Team mit anderen Tees sein, um zu starten
 

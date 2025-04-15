@@ -1764,9 +1764,6 @@ Door Health
 Destroy Seconds
 == Yıkım Süresi
 
-Oᴘᴛɪᴏɴs
-== Sᴇᴄᴇɴᴇᴋʟᴇʀ
-
 You have to be in a team with other tees to start
 == Başlamak için diğer tee'lerle aynı takımda olmalısınız
 

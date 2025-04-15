@@ -1796,9 +1796,6 @@ Door Health
 Destroy Seconds
 == 
 
-Oᴘᴛɪᴏɴs
-== 
-
 {vote-header}
 Oᴘᴛɪᴏɴs
 == 

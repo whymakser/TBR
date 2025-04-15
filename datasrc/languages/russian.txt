@@ -1764,9 +1764,6 @@ Door Health
 Destroy Seconds
 == Секунды уничтожения
 
-Oᴘᴛɪᴏɴs
-== Оᴘцɪɪ
-
 You have to be in a team with other tees to start
 == Вы должны быть в команде с другими персонажами, чтобы начать
 

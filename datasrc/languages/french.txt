@@ -1764,9 +1764,6 @@ Door Health
 Destroy Seconds
 == Secondes de destruction
 
-Oᴘᴛɪᴏɴs
-== Oᴘᴛɪᴏɴs
-
 You have to be in a team with other tees to start
 == Vous devez être dans une équipe avec d'autres tees pour commencer
 
