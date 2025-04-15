@@ -2977,6 +2977,7 @@ int CServer::Run()
 						}
 						else
 						{
+							dbg_msg("hi", "%s", pResult);
 							Language = g_Localization.GetLanguageByCode(pResult);
 						}
 
