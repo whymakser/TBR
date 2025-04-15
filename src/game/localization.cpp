@@ -1,4 +1,4 @@
-// made by timakro (initially) and fokkonaut
+// made by fokkonaut
 
 #include "localization.h"
 

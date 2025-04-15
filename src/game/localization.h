@@ -1,4 +1,4 @@
-// made by timakro (initially) and fokkonaut
+// made by fokkonaut
 
 #ifndef GAME_LOCALIZATION_H
 #define GAME_LOCALIZATION_H
