@@ -2687,8 +2687,7 @@ void CGameContext::ConLanguage(IConsole::IResult* pResult, void* pUserData)
 		}
 
 		// Update language
-		g_Localization.TryUnload(pSelf, pPlayer->m_Language);
-		pPlayer->m_Language = Language;
+		pPlayer->SetLanguage(Language);
 		char aBuf[128];
 		str_format(aBuf, sizeof(aBuf), pPlayer->Localize("Successfully changed language to %s"), g_Localization.GetLanguageString(Language));
 		pSelf->SendChatTarget(ClientID, aBuf);

@@ -2095,7 +2095,7 @@ void CPlayer::OnLogin(bool ForceDesignLoad)
 	// Load language at start, so that login messages get translated aswell
 	if (pAccount->m_aLanguage[0] != '\0')
 	{
-		m_Language = g_Localization.GetLanguage(pAccount->m_aLanguage);
+		SetLanguage(g_Localization.GetLanguage(pAccount->m_aLanguage));
 	}
 	GameServer()->SendChatTarget(m_ClientID, Localize("Successfully logged in"));
 
@@ -2747,6 +2747,15 @@ const char *CPlayer::Localize(const char *pText, const char *pContext)
 {
 	if (m_IsDummy) return pText;
 	return ::Localize(pText, m_Language);
+}
+
+void CPlayer::SetLanguage(int Language)
+{
+	if (Language == m_Language)
+		return;
+	int PrevLanguage = m_Language;
+	m_Language = Language;
+	g_Localization.TryUnload(GameServer(), PrevLanguage);
 }
 
 void CPlayer::UpdateDoubleXpLifes()

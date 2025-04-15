@@ -402,6 +402,7 @@ public:
 
 	// Language
 	const char *Localize(const char *pText, const char *pContext = ""); // Never change this function name
+	void SetLanguage(int Language);
 	int m_Language;
 
 	// Moved to player from character, because jail should keep permille xd
