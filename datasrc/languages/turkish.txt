@@ -1510,361 +1510,361 @@ Load recent design?
 == Önceki tasarım yüklensin mi?
 
 F-DDrace is a mod by fokkonaut
-== 
+== F-DDrace, fokkonaut tarafından yapılmış bir moddur
 
 This mod is based on Teeworlds 0.7 and also incorporates features, ideas, and partial implementations
-== 
+== Bu mod, Teeworlds 0.7 tabanlıdır ve çeşitli özellikler, fikirler ve kısmi uygulamalar içerir
 
 from DDNet++ by ChillerDragon, DDNet, and other community projects, aswell as many custom features!
-== 
+== ChillerDragon'un DDNet++'inden, DDNet'ten ve diğer topluluk projelerinden alınmış ve birçok özel özellikle zenginleştirilmiştir!
 
 If you want to check out the code or contribute, feel free to check out F-DDrace on GitHub:
-== 
+== Koda göz atmak veya katkıda bulunmak istersen, GitHub üzerindeki F-DDrace projesine göz atabilirsin:
 
 For more info, say '/cmdlist' or '/credits'
-== 
+== Daha fazla bilgi için '/cmdlist' ya da '/credits' yaz
 
 to check a server setting say /settings and setting's name, setting names are:
-== 
+== Sunucu ayarlarını görmek için '/settings' ve ayar adını yazın. Ayar adları şunlardır:
 
 Teams are disabled
-== 
+== Takımlar devre dışı
 
 This team can't be locked
-== 
+== Bu takım kilitlenemez
 
 '%s' unlocked your team.
-== 
+== '%s' takımınızın kilidini açtı
 
 Team locking is disabled on this server
-== 
+== Bu sunucuda takım kilitleme devre dışı
 
 '%s' locked your team. After the race started killing will kill everyone in your team.
-== 
+== '%s' takımınızı kilitledi. Yarış başladıktan sonra öldürmek tüm takımınızı öldürür
 
 Invites are disabled
-== 
+== Davetler devre dışı
 
 Player already invited
-== 
+== Oyuncu zaten davet edilmiş
 
 Can't invite this quickly
-== 
+== Bu kadar hızlı davet gönderemezsiniz
 
 '%s' invited you to team %d.
-== 
+== '%s' seni %d numaralı takıma davet etti
 
 '%s' invited '%s' to your team.
-== 
+== '%s', '%s' oyuncusunu takımına davet etti
 
 You are running a vote please try again after the vote is done!
-== 
+== Bir oylama yapılıyor, lütfen oylama bittikten sonra tekrar deneyin!
 
 You must join a team and play with somebody or else you can't play
-== 
+== Oynamak için bir takıma katılmalı ve biriyle birlikte oynamalısınız
 
 You can't change teams while you are dead/a spectator.
-== 
+== Ölü veya izleyici modundayken takım değiştiremezsiniz
 
 You can't change teams that fast!
-== 
+== Takımı bu kadar hızlı değiştiremezsiniz!
 
 You can't join teams in this minigame
-== 
+== Bu mini oyunda takımlara katılamazsınız
 
 This team is locked using /lock. Only members of the team can unlock it using /lock.
-== 
+== Bu takım /lock ile kilitlenmiş. Sadece takım üyeleri /lock komutuyla kilidini açabilir
 
 This team is locked using /lock. Only members of the team can invite you or unlock it using /lock.
-== 
+== Bu takım /lock ile kilitlenmiş. Sadece takım üyeleri seni davet edebilir veya kilidi açabilir
 
 This team already has the maximum allowed size of %d players
-== 
+== Bu takım zaten izin verilen maksimum %d oyuncuya sahip
 
 %s joined team %d
-== 
+== %s, %d numaralı takıma katıldı
 
 You cannot join this team at this time
-== 
+== Şu anda bu takıma katılamazsınız
 
 You can't check your team while you are dead/a spectator.
-== 
+== Ölü ya da izleyici durumdayken takımınızı kontrol edemezsiniz
 
 /me is disabled on this server
-== 
+== /me komutu bu sunucuda devre dışı
 
 E-Mail
-== 
+== E-Posta
 
 Discord server
-== 
+== Discord sunucusu
 
 %s was killed by %s
-== 
+== %s, %s tarafından öldürüldü
 
 '%s' banned '%s' for %d seconds from voting.
-== 
+== '%s', '%s' oyuncusunu oylamalardan %d saniye boyunca men etti
 
 '%s' unbanned '%s' from voting.
-== 
+== '%s', '%s' oyuncusunun oylama yasağını kaldırdı
 
 Use /pause first then you can kill
-== 
+== Önce /pause komutunu kullan, sonra öldürebilirsin
 
 Only %d active players are allowed
-== 
+== Sadece %d aktif oyuncuya izin veriliyor
 
 All players were moved to the game
-== 
+== Tüm oyuncular oyuna aktarıldı
 
 All players were moved to the spectators
-== 
+== Tüm oyuncular izleyiciye aktarıldı
 
 Authorized player forced server option '%s' (%s)
-== 
+== Yetkili bir oyuncu '%s' (%s) sunucu seçeneğini zorla uyguladı
 
 '%s' was moved to spectator (%s)
-== 
+== '%s' izleyiciye taşındı (%s)
 
 Listing players with "%s" in name:
-== 
+== İsmi "%s" içeren oyuncular listeleniyor:
 
 Listing all players:
-== 
+== Tüm oyuncular listeleniyor:
 
 You can only vote after logging in.
-== 
+== Sadece giriş yaptıktan sonra oylama yapabilirsiniz
 
 Wait for current vote to end before calling a new one.
-== 
+== Yeni bir oylama başlatmadan önce mevcut oylamanın bitmesini bekleyin
 
 You must wait %d seconds before making your first vote.
-== 
+== İlk oylamayı başlatmadan önce %d saniye beklemelisiniz
 
 You must wait %d seconds before making another vote.
-== 
+== Yeni bir oylama başlatmak için %d saniye beklemelisiniz
 
 You are not permitted to vote for the next %d seconds.
-== 
+== Sonraki %d saniye boyunca oylama yapmanıza izin verilmiyor
 
 There's a %d second delay between map-votes, please wait %d seconds.
-== 
+== Harita oylamaları arasında %d saniye gecikme vardır, lütfen %d saniye bekleyin
 
 %s has finished and didn't go through start yet, wait for him or join another team.
-== 
+== %s bitirdi ama başlangıçtan geçmedi, onu bekleyin ya da başka bir takıma katılın
 
 %s wants to start a new round, kill or walk to start.
-== 
+== %s yeni bir raund başlatmak istiyor, başlamak için öldür ya da yürü
 
 Team %d started with these %d players:
-== 
+== Takım %d şu %d oyuncuyla başladı:
 
 Your team would've finished in: %d minute(s) %5.2f second(s). Since you had practice mode enabled your rank doesn't count.
-== 
+== Takımınız şu sürede bitirmiş olacaktı: %d dakika %5.2f saniye. Antrenman modu açık olduğundan sıralamanız sayılmadı
 
 %s joined team 0
-== 
+== %s, 0 numaralı takıma katıldı
 
 Everyone in your locked team was killed because '%s' killed.
-== 
+== '%s' öldürdüğü için kilitli takımınızdaki herkes öldü
 
 Everyone in your locked team was killed because '%s' died.
-== 
+== '%s' öldüğü için kilitli takımınızdaki herkes öldü
 
 Silent Farm
-== 
+== Sessiz Çiftlik
 
 Ninjajetpack
-== 
+== Ninjajetpack
 
 Plot Spawn
-== 
+== Plot Doğuşu
 
 Edit Plot
-== 
+== Plot Düzenle
 
 Clear Plot
-== 
+== Plot Temizle
 
 Rainbow
-== 
+== Gökkuşağı
 
 Bloody
-== 
+== Kanlı
 
 Atom
-== 
+== Atom
 
 Trail
-== 
+== İz
 
 Spread Gun
-== 
+== Yayılmalı Silah
 
 Rainbow Hook
-== 
+== Gökkuşağı Kanca
 
 Rotating Ball
-== 
+== Dönen Top
 
 Epic Circle
-== 
+== Efsanevi Çember
 
 Lovely
-== 
+== Tatlı
 
 Rainbow Name
-== 
+== Gökkuşağı İsim
 
 Rainbow Speed
-== 
+== Gökkuşağı Hızı
 
 Sparkle
-== 
+== Parıltı
 
 Hide Drawings
-== 
+== Çizimleri Gizle
 
 Weapon Indicator
-== 
+== Silah Göstergesi
 
 Zoom Cursor
-== 
+== Yakınlaştırmalı İmleç
 
 Resume Moved
-== 
+== Hareketle Devam Et
 
 Hide Broadcasts
-== 
+== Yayınları Gizle
 
 Local Chat
-== 
+== Yerel Sohbet
 
 No minigame
-== 
+== Mini oyun yok
 
 You are wanted by the police for %lld seconds
-== 
+== Polis tarafından %lld saniyeliğine aranıyorsunuz
 
 Grog permille: %.1f‰ / %.1f‰
-== 
+== Grog oranı: %.1f‰ / %.1f‰
 
 You're not logged in.
-== 
+== Giriş yapmadınız
 
 Use '/login' to see more information about your account.
-== 
+== Hesabınızla ilgili daha fazla bilgi için '/login' yazın
 
 Rented until
-== 
+== Kiralandığı tarih
 
 Door Health
-== 
+== Kapı Sağlığı
 
 Destroy Seconds
-== 
+== Yıkım Süresi
 
 Oᴘᴛɪᴏɴs
-== 
+== Sᴇᴄᴇɴᴇᴋʟᴇʀ
 
 You have to be in a team with other tees to start
-== 
+== Başlamak için diğer tee'lerle aynı takımda olmalısınız
 
 You can't hit others
-== 
+== Başkalarına vuramazsınız
 
 You can hit others
-== 
+== Başkalarına vurabilirsiniz
 
 You can't collide with others
-== 
+== Başkalarıyla çarpışamazsınız
 
 You can collide with others
-== 
+== Başkalarıyla çarpışabilirsiniz
 
 You can't hook others
-== 
+== Başkalarına kanca atamazsınız
 
 You can hook others
-== 
+== Başkalarına kanca atabilirsiniz
 
 You got +1 jump and can jump %d times now
-== 
+== +1 zıplama kazandınız, artık %d kez zıplayabilirsiniz
 
 Your team was unlocked by an unlock team tile
-== 
+== Takımınız bir kilit açma karosu tarafından açıldı
 
 You are now in a solo part
-== 
+== Artık solo bölümdesiniz
 
 You are now out of the solo part
-== 
+== Solo bölümden çıktınız
 
 Teleport gun enabled
-== 
+== Işınlanma silahı etkinleştirildi
 
 Teleport gun disabled
-== 
+== Işınlanma silahı devre dışı bırakıldı
 
 Teleport grenade enabled
-== 
+== Işınlanma bombası etkinleştirildi
 
 Teleport grenade disabled
-== 
+== Işınlanma bombası devre dışı bırakıldı
 
 Teleport laser enabled
-== 
+== Işınlanma lazeri etkinleştirildi
 
 Teleport laser disabled
-== 
+== Işınlanma lazeri devre dışı bırakıldı
 
 You can hammer hit others
-== 
+== Çekiçle başkalarına vurabilirsiniz
 
 You can't hammer hit others
-== 
+== Çekiçle başkalarına vuramazsınız
 
 You can shoot others with shotgun
-== 
+== Pompalı ile başkalarına ateş edebilirsiniz
 
 You can't shoot others with shotgun
-== 
+== Pompalı ile başkalarına ateş edemezsiniz
 
 You can shoot others with grenade
-== 
+== Bomba ile başkalarına ateş edebilirsiniz
 
 You can't shoot others with grenade
-== 
+== Bomba ile başkalarına ateş edemezsiniz
 
 You can shoot others with rifle
-== 
+== Tüfekle başkalarına ateş edebilirsiniz
 
 You can't shoot others with rifle
-== 
+== Tüfekle başkalarına ateş edemezsiniz
 
 Please join a team before you start
-== 
+== Başlamadan önce bir takıma katılın
 
 For more info, say '/helptoggle'
-== 
+== Daha fazla bilgi için '/helptoggle' yazın
 
 You only have your ground jump now
-== 
+== Artık sadece yer zıplamanız var
 
 You can jump 1 time
-== 
+== 1 kez zıplayabilirsiniz
 
 You can jump %d times
-== 
+== %d kez zıplayabilirsiniz
 
 ~ S H O P ~
-== 
+== ~ M A Ğ A Z A ~
 
 ~ P L O T - S H O P ~
-== 
+== ~ P L O T - M A Ğ A Z A S I ~
 
 ~ B A N K ~
-== 
+== ~ B A N K A ~
 
 ~ T A V E R N ~
-== 
+== ~ M E Y H A N E ~
