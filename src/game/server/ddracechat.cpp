@@ -1352,10 +1352,12 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 {
 	CGameContext* pSelf = (CGameContext*)pUserData;
 	int ID = pResult->NumArguments() ? pSelf->GetCIDByName(pResult->GetString(0)) : pResult->m_ClientID;
-	CPlayer* pPlayer = pSelf->m_apPlayers[ID];
-	if (ID == -1 || !pPlayer)
+	int AskerID = pResult->m_ClientID;
+	CPlayer *pPlayer = pSelf->m_apPlayers[ID];
+	CPlayer *pAsker = pSelf->m_apPlayers[AskerID];
+	if (ID == -1 || !pPlayer || !pAsker)
 	{
-		pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("Player not found"));
+		pSelf->SendChatTarget(pResult->m_ClientID, pAsker->Localize("Player not found"));
 		return;
 	}
 
@@ -1375,13 +1377,13 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 		case MINIGAME_1VS1:
 		case MINIGAME_NONE:
 		{
-			str_format(aBuf, sizeof(aBuf), "--- %s's %s ---", pSelf->Server()->ClientName(ID), pPlayer->Localize("Stats"));
+			str_format(aBuf, sizeof(aBuf), "--- %s's %s ---", pSelf->Server()->ClientName(ID), pAsker->Localize("Stats"));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s [%d] %s", pPlayer->Localize("Level"), pAccount->m_Level, pPlayer->GetAccID() < ACC_START ? pPlayer->Localize("(not logged in)") : "");
+			str_format(aBuf, sizeof(aBuf), "%s [%d] %s", pAsker->Localize("Level"), pAccount->m_Level, pPlayer->GetAccID() < ACC_START ? pAsker->Localize("(not logged in)") : "");
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			str_format(aBuf, sizeof(aBuf), "XP [%lld/%lld]", pAccount->m_XP, pSelf->GetNeededXP(pAccount->m_Level));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s [%lld]", BankEnabled ? pPlayer->Localize("Bank") : pPlayer->Localize("Wallet"), pPlayer->GetWalletOrBankDisplay());
+			str_format(aBuf, sizeof(aBuf), "%s [%lld]", BankEnabled ? pAsker->Localize("Bank") : pAsker->Localize("Wallet"), pPlayer->GetWalletOrBankDisplay());
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 
 			// dont expose some info to other players than you
@@ -1389,7 +1391,7 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 			{
 				if (BankEnabled)
 				{
-					str_format(aBuf, sizeof(aBuf), "%s [%lld]", pPlayer->Localize("Wallet"), pPlayer->GetWalletMoney());
+					str_format(aBuf, sizeof(aBuf), "%s [%lld]", pAsker->Localize("Wallet"), pPlayer->GetWalletMoney());
 					pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 				}
 				if (pSelf->Config()->m_SvEuroMode || pAccount->m_Euros > 0)
@@ -1399,14 +1401,14 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 				}
 			}
 
-			str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Police"), pAccount->m_PoliceLevel);
+			str_format(aBuf, sizeof(aBuf), "%s [%d]", pAsker->Localize("Police"), pAccount->m_PoliceLevel);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 
-			str_format(aBuf, sizeof(aBuf), "--- %s ---", pPlayer->Localize("Collectables"));
+			str_format(aBuf, sizeof(aBuf), "--- %s ---", pAsker->Localize("Collectables"));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Taser battery"), pAccount->m_TaserBattery);
+			str_format(aBuf, sizeof(aBuf), "%s [%d]", pAsker->Localize("Taser battery"), pAccount->m_TaserBattery);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Portal Battery"), pAccount->m_PortalBattery);
+			str_format(aBuf, sizeof(aBuf), "%s [%d]", pAsker->Localize("Portal Battery"), pAccount->m_PortalBattery);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 		} //fallthrough
 
@@ -1418,14 +1420,14 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 			}
 			else
 			{
-				str_format(aBuf, sizeof(aBuf), "--- %s's Block %s ---", pSelf->Server()->ClientName(ID), pPlayer->Localize("Stats"));
+				str_format(aBuf, sizeof(aBuf), "--- %s's Block %s ---", pSelf->Server()->ClientName(ID), pAsker->Localize("Stats"));
 				pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			}
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Points"), pAccount->m_BlockPoints);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Points"), pAccount->m_BlockPoints);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Kills"), pAccount->m_Kills);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Kills"), pAccount->m_Kills);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Deaths"), pAccount->m_Deaths);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Deaths"), pAccount->m_Deaths);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 		} break;
 
@@ -1433,46 +1435,46 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 		{
 			if (ID == pResult->m_ClientID)
 			{
-				str_format(aBuf, sizeof(aBuf), "--- %s's %s ---", pSelf->Server()->ClientName(ID), pPlayer->Localize("Stats"));
+				str_format(aBuf, sizeof(aBuf), "--- %s's %s ---", pSelf->Server()->ClientName(ID), pAsker->Localize("Stats"));
 				pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-				str_format(aBuf, sizeof(aBuf), "%s [%lld]", pPlayer->Localize("Wallet"), pPlayer->GetUsableMoney());
+				str_format(aBuf, sizeof(aBuf), "%s [%lld]", pAsker->Localize("Wallet"), pPlayer->GetUsableMoney());
 				pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 				pSelf->SendChatTarget(pResult->m_ClientID, "--- Durák ---");
 			}
 			else
 			{
-				str_format(aBuf, sizeof(aBuf), "--- %s's Durák %s ---", pSelf->Server()->ClientName(ID), pPlayer->Localize("Stats"));
+				str_format(aBuf, sizeof(aBuf), "--- %s's Durák %s ---", pSelf->Server()->ClientName(ID), pAsker->Localize("Stats"));
 				pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			}
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Games won"), pAccount->m_DurakWins);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Games won"), pAccount->m_DurakWins);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %s%lld$", pPlayer->Localize("Profit"), pAccount->m_DurakProfit > 0 ? "+" : "", pAccount->m_DurakProfit);
+			str_format(aBuf, sizeof(aBuf), "%s: %s%lld$", pAsker->Localize("Profit"), pAccount->m_DurakProfit > 0 ? "+" : "", pAccount->m_DurakProfit);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 		} break;
 
 		case MINIGAME_SURVIVAL:
 		{
-			str_format(aBuf, sizeof(aBuf), "--- %s's Survival %s ---", pSelf->Server()->ClientName(ID), pPlayer->Localize("Stats"));
+			str_format(aBuf, sizeof(aBuf), "--- %s's Survival %s ---", pSelf->Server()->ClientName(ID), pAsker->Localize("Stats"));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Wins"), pAccount->m_SurvivalWins);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Wins"), pAccount->m_SurvivalWins);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Kills"), pAccount->m_SurvivalKills);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Kills"), pAccount->m_SurvivalKills);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Deaths"), pAccount->m_SurvivalDeaths);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Deaths"), pAccount->m_SurvivalDeaths);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 		} break;
 
 		case MINIGAME_INSTAGIB_BOOMFNG: // fallthrough
 		case MINIGAME_INSTAGIB_FNG:
 		{
-			str_format(aBuf, sizeof(aBuf), "--- %s's Instagib %s ---", pSelf->Server()->ClientName(ID), pPlayer->Localize("Stats"));
+			str_format(aBuf, sizeof(aBuf), "--- %s's Instagib %s ---", pSelf->Server()->ClientName(ID), pAsker->Localize("Stats"));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Wins"), pAccount->m_InstagibWins);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Wins"), pAccount->m_InstagibWins);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Kills"), pAccount->m_InstagibKills);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Kills"), pAccount->m_InstagibKills);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Deaths"), pAccount->m_InstagibDeaths);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Deaths"), pAccount->m_InstagibDeaths);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 		} break;
 	}
