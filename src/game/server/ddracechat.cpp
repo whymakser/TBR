@@ -2698,6 +2698,7 @@ void CGameContext::ConLanguage(IConsole::IResult* pResult, void* pUserData)
 
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "~~~ %s ~~~", pPlayer->Localize("Server Language"));
+	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	str_format(aBuf, sizeof(aBuf), "%s: %s", pPlayer->Localize("Current language"), g_Localization.GetLanguageString(pPlayer->m_Language));
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("You can set one of the following languages for server-side translation by using '/language <option>':"));
