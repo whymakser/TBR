@@ -2276,12 +2276,17 @@ void CPlayer::OnEndVoteQuestion(int Result)
 	}
 	case CPlayer::VOTE_QUESTION_LANGUAGE_SUGGESTION:
 	{
+		int Language = g_Localization.GetLanguageByCode(Server()->GetCountryCode(m_ClientID));
 		if (Result == 1)
 		{
-			m_Language = g_Localization.GetLanguageByCode(Server()->GetCountryCode(m_ClientID));
+			m_Language = Language;
 			char aBuf[VOTE_DESC_LENGTH];
 			str_format(aBuf, sizeof(aBuf), Localize("Successfully changed language to %s"), g_Localization.GetLanguageString(m_Language));
 			GameServer()->SendChatTarget(m_ClientID, aBuf);
+		}
+		else if (Result == -1)
+		{
+			g_Localization.TryUnload(GameServer(), Language);
 		}
 		break;
 	}
