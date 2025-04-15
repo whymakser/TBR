@@ -2966,7 +2966,6 @@ int CServer::Run()
 						net_addr_str(m_NetServer.ClientAddr(i), aAddrStr, sizeof(aAddrStr), true);
 
 						// Process result
-						int Language = -2; // -2, because Language can become -1 if the return value of the lookup was actually valid, but just not in the list
 						const char *pResult = m_aClients[i].m_pCountryLookup->m_aResult;
 						if (pResult[0] == '{')
 						{
@@ -2977,18 +2976,14 @@ int CServer::Run()
 						}
 						else
 						{
-							dbg_msg("hi", "%s", pResult);
-							Language = g_Localization.GetLanguageByCode(pResult);
-						}
-
-						char aBuf[256];
-						const char *pLanguage = g_Localization.GetLanguageFileName(Language);
-						if(Language != -2 && str_comp(pLanguage, Config()->m_SvDefaultLanguage) != 0)
-						{
-							// Copy country code and notify game
-							const char *pCode = Language != -1 ? m_aClients[i].m_aCountryCode : "en";
-							str_copy(m_aClients[i].m_aCountryCode, pResult, sizeof(m_aClients[i].m_aCountryCode));
-							str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> fetched country code=%s, suggesting '%s'", i, aAddrStr, pCode, pLanguage);
+							int Language = g_Localization.GetLanguageByCode(pResult);
+							char aBuf[256];
+							const char *pLanguage = g_Localization.GetLanguageFileName(Language);
+							if (str_comp(pLanguage, Config()->m_SvDefaultLanguage) != 0)
+							{
+								str_copy(m_aClients[i].m_aCountryCode, pResult, sizeof(m_aClients[i].m_aCountryCode));
+							}
+							str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> fetched country code=%s, suggesting '%s'", i, aAddrStr, pResult, pLanguage);
 							Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 						}
 

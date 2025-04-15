@@ -379,8 +379,7 @@ const char *CLocalizationDatabase::GetLanguageString(int Language)
 
 const char *CLocalizationDatabase::GetLanguageFileName(int Language)
 {
-	// Language can be -2 see server.cpp implementations
-	if (Language <= -1)
+	if (Language == -1)
 		return "english";
 	return m_vLanguages[Language].m_FileName.c_str();
 }
