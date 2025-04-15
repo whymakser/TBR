@@ -2767,7 +2767,7 @@ bool CPlayer::ShowDDraceHud()
 const char *CPlayer::Localize(const char *pText, const char *pContext)
 {
 	if (m_IsDummy) return pText;
-	return ::Localize(pText, m_Language);
+	return ::Localize(pText, m_Language, pContext);
 }
 
 void CPlayer::SetLanguage(int Language, bool Silent)
