@@ -49,11 +49,14 @@ private:
 
 	STrail m_aTrails[NUM_TRAILS];
 	SBone m_aBones[NUM_BONES];
-	CHelicopterTurret* m_pTurretAttachment;
+	CHelicopterTurret *m_pTurretAttachment;
 
 	SBone *Body() { return &m_aBones[0]; } // size: NUM_BONES_BODY
 	SBone *TopPropeller() { return &m_aBones[NUM_BONES_BODY]; } // size: NUM_BONES_PROPELLERS_TOP
-	SBone *BackPropeller() { return &m_aBones[NUM_BONES_BODY+NUM_BONES_PROPELLERS_TOP]; } // size: NUM_BONES_PROPELLERS_BACK
+	SBone *BackPropeller()
+	{
+		return &m_aBones[NUM_BONES_BODY + NUM_BONES_PROPELLERS_TOP];
+	} // size: NUM_BONES_PROPELLERS_BACK
 	void PutTurretToForeground();
 
 public:
@@ -65,7 +68,7 @@ public:
 	[[nodiscard]] float Angle() { return m_Angle; }
 
 	// Manipulating
-	bool AttachTurret(CHelicopterTurret* helicopterTurret);
+	bool AttachTurret(CHelicopterTurret *helicopterTurret);
 	void DestroyTurret();
 	void FlingTee(CCharacter *pChar);
 

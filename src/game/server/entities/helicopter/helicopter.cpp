@@ -34,9 +34,12 @@ bool MovingCircleHitsMovingSegment_Analytical(
 
 	float t, s;
 
-	if (denom != 0.0f) {
+	if (denom != 0.0f)
+	{
 		t = (b * e - c * d1) / denom;
-	} else {
+	}
+	else
+	{
 		t = 0.0f; // Parallel
 	}
 
@@ -47,9 +50,12 @@ bool MovingCircleHitsMovingSegment_Analytical(
 
 	// Find closest point on segment
 	float segmentLenSq = dot(d, d);
-	if (segmentLenSq != 0.0f) {
+	if (segmentLenSq != 0.0f)
+	{
 		s = clamp(dot(circlePosAtT - L0, d) / segmentLenSq, 0.0f, 1.0f);
-	} else {
+	}
+	else
+	{
 		s = 0.0f;
 	}
 
@@ -62,7 +68,7 @@ bool MovingCircleHitsMovingSegment_Analytical(
 }
 
 CHelicopter::CHelicopter(CGameWorld *pGameWorld, vec2 Pos)
-: CAdvancedEntity(pGameWorld, CGameWorld::ENTTYPE_HELICOPTER, Pos, vec2(80, 128))
+	: CAdvancedEntity(pGameWorld, CGameWorld::ENTTYPE_HELICOPTER, Pos, vec2(80, 128))
 {
 	m_AllowVipPlus = false;
 	m_Elasticity = 0.f;
@@ -89,7 +95,7 @@ CHelicopter::CHelicopter(CGameWorld *pGameWorld, vec2 Pos)
 	m_Size *= scaleFactor;
 	m_BackPropellerRadius *= scaleFactor;
 	m_TopPropellerRadius *= scaleFactor;
-	for (SBone &Bone : m_aBones)
+	for (SBone& Bone : m_aBones)
 		Bone.Scale(scaleFactor);
 	//
 
@@ -116,7 +122,8 @@ void CHelicopter::Reset()
 	GameWorld()->DestroyEntity(this);
 }
 
-bool CHelicopter::AttachTurret(CHelicopterTurret* helicopterTurret) {
+bool CHelicopter::AttachTurret(CHelicopterTurret *helicopterTurret)
+{
 	if (helicopterTurret == nullptr)
 	{
 		DestroyTurret();
@@ -135,12 +142,14 @@ bool CHelicopter::AttachTurret(CHelicopterTurret* helicopterTurret) {
 	return false;
 }
 
-void CHelicopter::DestroyTurret() {
+void CHelicopter::DestroyTurret()
+{
 	delete m_pTurretAttachment;
 	m_pTurretAttachment = nullptr;
 }
 
-void CHelicopter::FlingTee(CCharacter *pChar) {
+void CHelicopter::FlingTee(CCharacter *pChar)
+{
 	if (!pChar->IsAlive())
 		return;
 
@@ -230,34 +239,40 @@ void CHelicopter::ApplyAcceleration()
 	if (((m_InputDirection == -1 && !m_Flipped && m_Vel.x < 0.f) ||
 		(m_InputDirection == 1 && m_Flipped && m_Vel.x > 0.f)) &&
 		(!m_pTurretAttachment || !m_pTurretAttachment->m_Shooting ||
-		(m_Flipped != m_pTurretAttachment->m_AimPosition.x < 0.f)))
+			(m_Flipped != m_pTurretAttachment->m_AimPosition.x < 0.f)))
 		Flip();
 
 	SetAngle(m_Vel.x);
 }
 
-void CHelicopter::DestroyThingsInItsPath() {
+void CHelicopter::DestroyThingsInItsPath()
+{
 	if (!GetOwner() && IsGrounded())
 		return;
 
-	CCharacter* aPossibleCollisions[5];
-	int numFound = GameWorld()->FindEntities(m_Pos, m_TopPropellerRadius + 200.f, (CEntity**)aPossibleCollisions, 5, CGameWorld::ENTTYPE_CHARACTER);
+	CCharacter *aPossibleCollisions[5];
+	int numFound = GameWorld()->FindEntities(m_Pos,
+											 m_TopPropellerRadius + 200.f,
+											 (CEntity **)aPossibleCollisions,
+											 5,
+											 CGameWorld::ENTTYPE_CHARACTER);
 	if (!numFound)
 		return;
 
 	for (int i = 0; i < numFound; i++)
 	{
-		CCharacter* pChar = aPossibleCollisions[i];
+		CCharacter *pChar = aPossibleCollisions[i];
 		int cID = pChar->GetPlayer()->GetCID();
 		if (Server()->Tick() - m_aBonedCharacters[cID] <= 10)
 			return;
 
 		vec2 propellerPosA, propellerPosB;
 		GetFullPropellerPositions(propellerPosA, propellerPosB);
-		bool collisionDetected = MovingCircleHitsMovingSegment_Analytical(pChar->m_PrevPos - m_Pos, pChar->GetPos() - m_Pos,
-																		  pChar->GetProximityRadius(),
-																		  m_LastTopPropellerA, propellerPosA,
-																		  m_LastTopPropellerB, propellerPosB);
+		bool collisionDetected =
+			MovingCircleHitsMovingSegment_Analytical(pChar->m_PrevPos - m_Pos, pChar->GetPos() - m_Pos,
+													 pChar->GetProximityRadius(),
+													 m_LastTopPropellerA, propellerPosA,
+													 m_LastTopPropellerB, propellerPosB);
 		if (collisionDetected)
 		{
 			m_aBonedCharacters[cID] = Server()->Tick();
@@ -370,36 +385,37 @@ void CHelicopter::Snap(int SnappingClient)
 	if (!CmaskIsSet(m_TeamMask, SnappingClient))
 		return;
 
-	for (const SBone &Bone : m_aBones)
+	for (SBone& Bone : m_aBones)
 		Bone.Snap(SnappingClient, this);
 
 	if (GetOwner() || !IsGrounded())
-		for (const auto &m_aTrail : m_aTrails)
+		for (STrail& m_aTrail : m_aTrails)
 			m_aTrail.Snap(this);
 
 	if (m_pTurretAttachment)
 		m_pTurretAttachment->Snap(SnappingClient);
 }
 
-void CHelicopter::PutTurretToForeground() { // meant for adding turret later, not specifically at initialization
+void CHelicopter::PutTurretToForeground()
+{ // meant for adding turret later, not specifically at initialization
 	if (!m_pTurretAttachment)
 		return; // what turret?
 
 	size_t numBonesTurret = m_pTurretAttachment->GetNumBones();
 
 	// Get current IDs
-	int* apIDs = new int[NUM_BONES + numBonesTurret];
+	int *apIDs = new int[NUM_BONES + numBonesTurret];
 	for (int i = 0; i < NUM_BONES; i++)
 		apIDs[i] = m_aBones[i].m_ID;
 	for (int i = 0; i < numBonesTurret; i++)
-		apIDs[NUM_BONES+i] = m_pTurretAttachment->Bones()[i].m_ID;
+		apIDs[NUM_BONES + i] = m_pTurretAttachment->Bones()[i].m_ID;
 	std::sort(apIDs, apIDs + (NUM_BONES + numBonesTurret));
 
 	// Update sorted IDs (low -> high | ascending)
 	for (int i = 0; i < NUM_BONES; i++)
 		m_aBones[i].m_ID = apIDs[i];
 	for (int i = 0; i < CMinigunTurret::NUM_BONES; i++)
-		m_pTurretAttachment->Bones()[i].m_ID = apIDs[NUM_BONES+i];
+		m_pTurretAttachment->Bones()[i].m_ID = apIDs[NUM_BONES + i];
 	delete[] apIDs;
 }
 
@@ -421,7 +437,7 @@ void CHelicopter::InitBody()
 		SBone(-105, 20, -120, -30),
 		SBone(-35, 40, -105, 20),
 	}; // 0-4: base, 5: propeller bottom, 6-10: body, 11-13: tail
-	mem_copy(Body(), aBones, sizeof(SBone)*NUM_BONES_BODY);
+	mem_copy(Body(), aBones, sizeof(SBone) * NUM_BONES_BODY);
 }
 
 void CHelicopter::InitPropellers()
@@ -437,13 +453,14 @@ void CHelicopter::InitPropellers()
 	Radius = m_BackPropellerRadius;
 	for (int i = 0; i < NUM_BONES_PROPELLERS_BACK; i++)
 	{
-		BackPropeller()[i] = SBone(vec2(-110.f+Radius, -10.f), vec2(-110.f, -10.f));
+		BackPropeller()[i] = SBone(vec2(-110.f + Radius, -10.f), vec2(-110.f, -10.f));
 		Radius *= -1;
 		m_aTrails[i].m_pPos = &BackPropeller()[i].m_From;
 	}
 }
 
-void CHelicopter::ResetTopPropellers() {
+void CHelicopter::ResetTopPropellers()
+{
 	m_TopPropellersReset = true;
 
 	float Radius = m_TopPropellerRadius;
