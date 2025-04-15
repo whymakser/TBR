@@ -56,7 +56,7 @@ def decode(fileobj, elements_per_key):
 
 def check_file(path):
 	with open(path, encoding="utf-8") as fileobj:
-		matches = re.findall(r"(Localize|Localizable)\s*\(\s*\"((?:(?:\\\")|[^\"])+)\"\s*(?:,\s*(?:\"((?:(?:\\\")|[^\"])+)\"|([a-zA-Z_][a-zA-Z0-9_]*)))?\s*\)", fileobj.read())
+		matches = re.findall(r"(Localize|Localizable|LocalizeHeader|LocalizableHeader)\s*\(\s*\"((?:(?:\\\")|[^\"])+)\"\s*(?:,\s*(?:\"((?:(?:\\\")|[^\"])+)\"|([a-zA-Z_][a-zA-Z0-9_]*)))?\s*\)", fileobj.read())
 	return matches
 
 
