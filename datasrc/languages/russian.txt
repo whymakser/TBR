@@ -1921,3 +1921,102 @@ Lᴀɴɢᴜᴀɢᴇs
 {vote-header}
 Aᴠᴀɪʟᴀʙʟᴇ Lᴀɴɢᴜᴀɢᴇs
 == Дᴏsᴛᴜᴘɴʏᴇ яᴢʏᴋɪ
+
+Rainbow will make your tee change the color very fast.
+== 
+
+Bloody will give your tee a permanent kill effect.
+== 
+
+Police officers get help from the police bot. For more information about the specific police ranks, please say '/police'.
+== 
+
+Using this item you can hide from other players behind bushes. If your ghost is activated you will be able to shoot plasma projectiles. How it works: '/helptoggle'
+== 
+
+If you have the room key you can enter the room. It's under the spawn and there is a money tile.
+== 
+
+VIP Classic gives you some benefits, check '/vip'.
+== 
+
+VIP+ gives you even more benefits than VIP Classic, check '/vip'.
+== 
+
+You will have shotgun if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
+== 
+
+You will have grenade if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
+== 
+
+You will have rifle if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
+== 
+
+It will make your jetpack gun be a ninja. Toggle it using '/ninjajetpack'.
+== 
+
+Taser is a rifle that freezes a player. For more information about the taser and your taser stats, plase visit '/taser'.
+== 
+
+Taser battery is required to use the taser. Maximum amount of ammo is 100. Plase visit '/taser'.
+== 
+
+With Portal Rifle you can create two portals where your cursor is, then teleport between them.
+== 
+
+Create portal blockers hammer and this ammo with your cursor. See '/portal' for your current amount. How it works: '/helptoggle'
+== 
+
+Welcome to the shop, %s! Press F4 to start shopping.
+== 
+
+Are you sure you want to buy this item?
+== 
+
+You canceled the purchase.
+== 
+
+You own this item until you die.
+== 
+
+You own this item until\nyou disconnect.
+== 
+
+You own this item forever.
+== 
+
+You own this item for 30 days.
+== 
+
+You own this item for 20 days.
+== 
+
+You own this item for 7 days.
+== 
+
+You own this item for 5 days.
+== 
+
+Welcome to the shop!\n\nBy shooting to the right you go one site forward, and by shooting left you go one site back.
+== 
+
+for sale
+== 
+
+discount
+== 
+
+If you want to buy an item, press F3
+== 
+
+Welcome to the tavern, %s! Press F4 to buy a grog.
+== 
+
+Are you sure you want to buy a grog?
+== 
+
+Press F3 to confirm your assignment.
+== 
+
+Welcome to the tavern!\n\nIf you would like to buy a grog for %d money, please press F3.
+== 
