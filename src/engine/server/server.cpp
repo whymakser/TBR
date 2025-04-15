@@ -2977,13 +2977,13 @@ int CServer::Run()
 						else
 						{
 							int Language = g_Localization.GetLanguageByCode(pResult);
-							char aBuf[256];
 							const char *pLanguage = g_Localization.GetLanguageFileName(Language);
 							if (str_comp(pLanguage, Config()->m_SvDefaultLanguage) != 0)
 							{
 								str_copy(m_aClients[i].m_aCountryCode, pResult, sizeof(m_aClients[i].m_aCountryCode));
 							}
-							str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> fetched country code=%s, suggesting '%s'", i, aAddrStr, pResult, pLanguage);
+							char aBuf[256];
+							str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> fetched country code=%s, suggesting '%s'", i, aAddrStr, m_aClients[i].m_aCountryCode, pLanguage);
 							Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 						}
 
@@ -4366,6 +4366,7 @@ void CServer::CClient::CCountryLookup::Run()
 	if (fgets(aResult, sizeof(aResult), pStream))
 	{
 		str_copy(m_aResult, aResult, sizeof(m_aResult));
+		m_aResult[str_length(m_aResult) - 1] = 0;
 	}
 	pipe_close(pStream);
 }
