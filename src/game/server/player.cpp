@@ -2230,7 +2230,8 @@ void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 		int LanguageFromCode = g_Localization.GetLanguageByCode(Server()->GetCountryCode(m_ClientID));
 		if (str_comp(g_Localization.GetLanguageFileName(LanguageFromCode), GameServer()->Config()->m_SvDefaultLanguage) == 0)
 			return;
-		str_format(aText, sizeof(aText), Localize("Change language to %s?"), g_Localization.GetLanguageString(LanguageFromCode));
+
+		str_format(aText, sizeof(aText), ::Localize("Change language to %s?", LanguageFromCode), g_Localization.GetLanguageString(LanguageFromCode));
 		break;
 	}
 	}
