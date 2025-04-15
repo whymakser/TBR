@@ -1189,6 +1189,7 @@ void CGameContext::ConPlayerInfo(IConsole::IResult *pResult, void *pUserData)
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
 	}
 	str_format(aBuf, sizeof(aBuf), "Design: %s", pSelf->Server()->GetMapDesign(ID));
+	str_format(aBuf, sizeof(aBuf), "Language: %s", g_Localization.GetLanguageString(pPlayer->m_Language));
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
 	if (pChr)
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", "Status: Ingame");

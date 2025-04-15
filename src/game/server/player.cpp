@@ -2099,6 +2099,11 @@ void CPlayer::OnLogin(bool ForceDesignLoad)
 	}
 	GameServer()->SendChatTarget(m_ClientID, Localize("Successfully logged in"));
 
+	if (m_VoteQuestionType == CPlayer::VOTE_QUESTION_LANGUAGE_SUGGESTION)
+	{
+		OnEndVoteQuestion();
+	}
+
 	ExpireItems();
 
 	if (m_pCharacter)
@@ -2179,7 +2184,6 @@ void CPlayer::OnLogout()
 
 	if (m_TimeoutCode[0] != '\0')
 		str_copy(pAccount->m_aTimeoutCode, m_TimeoutCode, sizeof(pAccount->m_aTimeoutCode));
-
 	m_aSecurityPin[0] = '\0';
 
 	pAccount->m_Flags = 0;
@@ -2195,16 +2199,15 @@ void CPlayer::OnLogout()
 		pAccount->m_Flags |= CGameContext::ACCFLAG_RESUMEMOVED;
 	if (m_HideBroadcasts)
 		pAccount->m_Flags |= CGameContext::ACCFLAG_HIDEBROADCASTS;
-
 	pAccount->m_VoteMenuFlags = GameServer()->m_VotingMenu.GetFlags(m_ClientID);
 
 	GameServer()->UpdateDesignList(AccID, Server()->GetMapDesign(m_ClientID));
-
 	str_copy(pAccount->m_aLanguage, g_Localization.GetLanguageFileName(m_Language), sizeof(pAccount->m_aLanguage));
 
 	if (m_VoteQuestionType == CPlayer::VOTE_QUESTION_DESIGN)
+	{
 		OnEndVoteQuestion();
-
+	}
 	GameServer()->StartResendingVotes(m_ClientID, false);
 }
 
@@ -2220,6 +2223,14 @@ void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 			return;
 
 		str_format(aText, sizeof(aText), Localize("Load recent design '%s'?"), pDesign);
+		break;
+	}
+	case CPlayer::VOTE_QUESTION_LANGUAGE_SUGGESTION:
+	{
+		int LanguageFromCode = g_Localization.GetLanguageByCode(Server()->GetCountryCode(m_ClientID));
+		if (str_comp(g_Localization.GetLanguageFileName(LanguageFromCode), GameServer()->Config()->m_SvDefaultLanguage) == 0)
+			return;
+		str_format(aText, sizeof(aText), Localize("Change language to %s?"), g_Localization.GetLanguageString(LanguageFromCode));
 		break;
 	}
 	}
@@ -2259,6 +2270,17 @@ void CPlayer::OnEndVoteQuestion(int Result)
 		if (Result == 1)
 		{
 			Server()->ChangeMapDesign(m_ClientID, GameServer()->GetCurrentDesignFromList(GetAccID()));
+		}
+		break;
+	}
+	case CPlayer::VOTE_QUESTION_LANGUAGE_SUGGESTION:
+	{
+		if (Result == 1)
+		{
+			m_Language = g_Localization.GetLanguageByCode(Server()->GetCountryCode(m_ClientID));
+			char aBuf[VOTE_DESC_LENGTH];
+			str_format(aBuf, sizeof(aBuf), Localize("Successfully changed language to %s"), g_Localization.GetLanguageString(m_Language));
+			GameServer()->SendChatTarget(m_ClientID, aBuf);
 		}
 		break;
 	}

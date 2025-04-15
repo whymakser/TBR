@@ -247,6 +247,11 @@ void CGameContext::SetBotDetected(int ClientID)
 		m_apPlayers[ClientID]->m_BotDetected = true;
 }
 
+void CGameContext::OnCountryCodeLookup(int ClientID)
+{
+	m_apPlayers[ClientID]->StartVoteQuestion(CPlayer::VOTE_QUESTION_LANGUAGE_SUGGESTION);
+}
+
 void CGameContext::FillAntibot(CAntibotRoundData *pData)
 {
 	if(!pData->m_Map.m_pTiles)

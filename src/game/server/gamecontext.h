@@ -400,6 +400,7 @@ public:
 	const char *NetVersion() const override;
 	const char *NetVersionSevendown() const override;
 
+	void OnCountryCodeLookup(int ClientID) override;
 	void SetBotDetected(int ClientID) override;
 	void FillAntibot(CAntibotRoundData *pData) override;
 	bool OnClientDDNetVersionKnown(int ClientID);

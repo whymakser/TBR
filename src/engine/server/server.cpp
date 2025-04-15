@@ -327,6 +327,8 @@ void CServer::CClient::ResetContent()
 	m_Sevendown = false;
 	m_Socket = SOCKET_MAIN;
 	m_DnsblState = CClient::DNSBL_STATE_NONE;
+	m_CountryLookupState = CClient::COUNTRYLOOKUP_STATE_NONE;
+	str_copy(m_aCountryCode, "en", sizeof(m_aCountryCode));
 	m_PgscState = CClient::PGSC_STATE_NONE;
 	m_IdleDummy = false;
 	m_DummyHammer = false;
@@ -2947,6 +2949,52 @@ int CServer::Run()
 						}
 					}
 				}
+
+				if (Config()->m_SvLanguageSuggestion)
+				{
+					if(m_aClients[i].m_CountryLookupState == CClient::COUNTRYLOOKUP_STATE_NONE)
+					{
+						// initiate country code lookup
+						CountryLookup(i);
+					}
+					else if(m_aClients[i].m_CountryLookupState == CClient::COUNTRYLOOKUP_STATE_PENDING && m_aClients[i].m_pCountryLookup->Status() == IJob::STATE_DONE)
+					{
+						m_aClients[i].m_CountryLookupState = CClient::COUNTRYLOOKUP_STATE_DONE;
+
+						// Console outut
+						char aAddrStr[NETADDR_MAXSTRSIZE];
+						net_addr_str(m_NetServer.ClientAddr(i), aAddrStr, sizeof(aAddrStr), true);
+
+						// Process result
+						int Language = -2; // -2, because Language can become -1 if the return value of the lookup was actually valid, but just not in the list
+						const char *pResult = m_aClients[i].m_pCountryLookup->m_aResult;
+						if (pResult[0] == '{')
+						{
+							/// Error, returned some json object, error 400
+							char aBuf[256];
+							str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> fetching country code failed, suggesting 'english'", i, aAddrStr);
+							Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
+						}
+						else
+						{
+							Language = g_Localization.GetLanguageByCode(pResult);
+						}
+
+						char aBuf[256];
+						const char *pLanguage = g_Localization.GetLanguageFileName(Language);
+						if(Language != -2 && str_comp(pLanguage, Config()->m_SvDefaultLanguage) != 0)
+						{
+							// Copy country code and notify game
+							const char *pCode = Language != -1 ? m_aClients[i].m_aCountryCode : "en";
+							str_copy(m_aClients[i].m_aCountryCode, pResult, sizeof(m_aClients[i].m_aCountryCode));
+							str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> fetched country code=%s, suggesting '%s'", i, aAddrStr, pCode, pLanguage);
+							Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
+						}
+
+						// Notify game and process language suggestion
+						GameServer()->OnCountryCodeLookup(i);
+					}
+				}
 			}
 
 			int64 Now = time_get();
@@ -4295,6 +4343,35 @@ void CServer::PrintBotLookup()
 	IEngine *pEngine = Kernel()->RequestInterface<IEngine>();
 	pEngine->AddJob(std::make_shared<CBotLookup>(this));
 	m_BotLookupState = BOTLOOKUP_STATE_PENDING;
+}
+
+void CServer::CountryLookup(int ClientID)
+{
+	if (m_aClients[ClientID].m_CountryLookupState != CClient::COUNTRYLOOKUP_STATE_NONE)
+		return;
+
+	char aAddrStr[NETADDR_MAXSTRSIZE];
+	net_addr_str(m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), false);
+
+	IEngine *pEngine = Kernel()->RequestInterface<IEngine>();
+	pEngine->AddJob(m_aClients[ClientID].m_pCountryLookup = std::make_shared<CClient::CCountryLookup>(aAddrStr));
+	m_aClients[ClientID].m_CountryLookupState = CClient::COUNTRYLOOKUP_STATE_PENDING;
+}
+
+void CServer::CClient::CCountryLookup::Run()
+{
+	char aBuf[512];
+	str_format(aBuf, 512, "curl -s https://ipinfo.io/%s/country", m_aAddr);
+	FILE *pStream = pipe_open(aBuf, "r");
+	if (!pStream)
+		return;
+
+	char aResult[512] = "";
+	if (fgets(aResult, sizeof(aResult), pStream))
+	{
+		str_copy(m_aResult, aResult, sizeof(m_aResult));
+	}
+	pipe_close(pStream);
 }
 
 void CServer::CClient::CPgscLookup::Run()

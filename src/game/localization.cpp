@@ -379,7 +379,8 @@ const char *CLocalizationDatabase::GetLanguageString(int Language)
 
 const char *CLocalizationDatabase::GetLanguageFileName(int Language)
 {
-	if (Language == -1)
+	// Language can be -2 see server.cpp implementations
+	if (Language <= -1)
 		return "english";
 	return m_vLanguages[Language].m_FileName.c_str();
 }
@@ -389,6 +390,15 @@ int CLocalizationDatabase::GetLanguage(const char *pFileName)
 	for (unsigned int i = 0; i < m_vLanguages.size(); i++)
 		if (str_comp_nocase(m_vLanguages[i].m_FileName.c_str(), pFileName) == 0)
 			return i;
+	return -1;
+}
+
+int CLocalizationDatabase::GetLanguageByCode(const char *pLanguageCode)
+{
+	for (unsigned int i = 0; i < m_vLanguages.size(); i++)
+		for (unsigned int c = 0; c < m_vLanguages[i].m_vLanguageCodes.size(); c++)
+			if (str_comp_nocase(m_vLanguages[i].m_vLanguageCodes[c].c_str(), pLanguageCode) == 0)
+				return i;
 	return -1;
 }
 

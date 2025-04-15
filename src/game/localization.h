@@ -79,6 +79,7 @@ public:
 	void Unload(int Language);
 	bool TryUnload(class CGameContext *pGameServer, int Language);
 	int GetLanguage(const char *pFileName);
+	int GetLanguageByCode(const char *pLanguageCode);
 	const char *GetLanguageString(int Language);
 	const char *GetLanguageFileName(int Language);
 	const char *ListAvailable();

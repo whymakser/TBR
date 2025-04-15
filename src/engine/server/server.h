@@ -218,7 +218,31 @@ public:
 		bool m_Rejoining;
 
 		char m_aChatLanguage[5]; // would be 2, but "none" is 4
-		char m_aLanguageCode[32];
+
+		enum
+		{
+			COUNTRYCODE_STRSIZE = 36,
+			COUNTRYLOOKUP_STATE_NONE,
+			COUNTRYLOOKUP_STATE_PENDING,
+			COUNTRYLOOKUP_STATE_DONE
+		};
+		char m_aCountryCode[COUNTRYCODE_STRSIZE];
+
+		class CCountryLookup : public IJob
+		{
+			void Run() override;
+		public:
+			CCountryLookup() {};
+			CCountryLookup(const char *pAddress)
+			{
+				str_copy(m_aAddr, pAddress, sizeof(m_aAddr));
+				m_aResult[0] = '\0';
+			}
+			char m_aResult[512];
+			char m_aAddr[NETADDR_MAXSTRSIZE];
+		};
+		int m_CountryLookupState;
+		std::shared_ptr<CCountryLookup> m_pCountryLookup;
 
 		class CDnsblLookup : public IJob
 		{
@@ -530,6 +554,9 @@ public:
 	unsigned m_AnnouncementLastLine;
 
 	bool IsBrowserScoreFix();
+
+	void CountryLookup(int ClientID) override;
+	const char *GetCountryCode(int ClientID) override { return m_aClients[ClientID].m_aCountryCode; }
 
 	class CBotLookup : public IJob
 	{

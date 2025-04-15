@@ -504,6 +504,7 @@ public:
 	{
 		VOTE_QUESTION_NONE = -1,
 		VOTE_QUESTION_DESIGN,
+		VOTE_QUESTION_LANGUAGE_SUGGESTION,
 	};
 
 	void StartVoteQuestion(VoteQuestionType Type);
