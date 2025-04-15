@@ -2346,159 +2346,6 @@ int str_format(char* buffer, int buffer_size, const char* format, ...)
 	return length;
 }
 
-int str_format_args(char *pBuffer, int BufferSize, const char *pFormat, CFormatArg *pArgs, int NumArgs)
-{
-	// Input parameter validation
-	if (!pBuffer || BufferSize <= 0 || !pFormat)
-		return -1;
-
-	// If there are no arguments, simply copy the format string
-	if (!pArgs || NumArgs <= 0)
-	{
-		str_copy(pBuffer, pFormat, BufferSize);
-		return str_length(pBuffer);
-	}
-
-	char *pOut = pBuffer;
-	const char *pIn = pFormat;
-	int ArgIndex = 0;
-	int RemainingSize = BufferSize - 1; // Reserve 1 byte for the null terminator
-	
-	while (*pIn && RemainingSize > 0)
-	{
-		// Process formatting options
-		if (*pIn == '%' && *(pIn + 1) != '\0')
-		{
-			pIn++; // Skip '%' character
-			
-			// Handle escaped percent signs (%%)
-			if (*pIn == '%')
-			{
-				*pOut++ = '%';
-				pIn++;
-				RemainingSize--;
-				continue;
-			}
-			
-			// Check if there are still arguments available
-			if (ArgIndex < NumArgs)
-			{
-				char aTemp[512] = {0}; // Larger buffer for temporary results
-				char aFormat[64] = {0}; // Larger and initialized format string buffer
-				
-				aFormat[0] = '%'; // Format string always begins with '%'
-				int FormatLen = 1;
-				
-				// Safe function to append to the format string
-				#define APPEND_FORMAT(ch) do { \
-					if (FormatLen < sizeof(aFormat) - 2) { \
-						aFormat[FormatLen++] = (ch); \
-						aFormat[FormatLen] = '\0'; \
-					} \
-				} while (0)
-				
-				// Parse width, flags, and precision for all types
-				while (*pIn && (*pIn == '+' || *pIn == '-' || *pIn == ' ' || 
-						*pIn == '#' || *pIn == '0' || isdigit(*pIn) || *pIn == '.')) {
-					APPEND_FORMAT(*pIn);
-					pIn++;
-				}
-				
-				// Helper macro for valid format specifiers
-				#define HANDLE_SPECIFIER(valid_chars, default_char) do { \
-					if (*pIn && strchr(valid_chars, *pIn)) { \
-						APPEND_FORMAT(*pIn); \
-						pIn++; \
-					} else { \
-						APPEND_FORMAT(default_char); \
-					} \
-				} while (0)
-				
-				// Process format based on argument type
-				switch (pArgs[ArgIndex].m_Type)
-				{
-					case CFormatArg::FORMAT_INT:
-						HANDLE_SPECIFIER("dioxXu", 'd');
-						str_format(aTemp, sizeof(aTemp), aFormat, pArgs[ArgIndex].m_Int);
-						break;
-					
-					case CFormatArg::FORMAT_STRING:
-						HANDLE_SPECIFIER("s", 's');
-						str_format(aTemp, sizeof(aTemp), aFormat, 
-							pArgs[ArgIndex].m_pStr ? pArgs[ArgIndex].m_pStr : "(null)");
-						break;
-					
-					case CFormatArg::FORMAT_INT64:
-						// Check if 'll' is already in the format
-						if (*pIn == 'l' && *(pIn + 1) == 'l') {
-							APPEND_FORMAT('l');
-							APPEND_FORMAT('l');
-							pIn += 2;
-						} else {
-							// Add 'll' modifier if not already present
-							APPEND_FORMAT('l');
-							APPEND_FORMAT('l');
-						}
-						
-						HANDLE_SPECIFIER("dioxXu", 'd');
-						str_format(aTemp, sizeof(aTemp), aFormat, pArgs[ArgIndex].m_Int64);
-						break;
-					
-					case CFormatArg::FORMAT_FLOAT:
-						HANDLE_SPECIFIER("fFeEgGaA", 'f');
-						str_format(aTemp, sizeof(aTemp), aFormat, pArgs[ArgIndex].m_Float);
-						break;
-					
-					default:
-						str_copy(aTemp, "[invalid type]", sizeof(aTemp));
-						// Skip remaining format specifiers
-						while (*pIn && !isspace(*pIn) && *pIn != '%')
-							pIn++;
-						break;
-				}
-				
-				#undef APPEND_FORMAT
-				#undef HANDLE_SPECIFIER
-				
-				// Copy the formatted result to the output buffer
-				int TempLen = str_length(aTemp);
-				int CopyLen = TempLen < RemainingSize ? TempLen : RemainingSize;
-				
-				if (CopyLen > 0)
-				{
-					memcpy(pOut, aTemp, CopyLen);
-					pOut += CopyLen;
-					RemainingSize -= CopyLen;
-				}
-				
-				ArgIndex++;
-			}
-			else
-			{
-				// No argument available, simply copy the format specifier
-				*pOut++ = '%';
-				RemainingSize--;
-				if (RemainingSize > 0 && *pIn)
-				{
-					*pOut++ = *pIn++;
-					RemainingSize--;
-				}
-			}
-		}
-		else
-		{
-			// Copy normal characters
-			*pOut++ = *pIn++;
-			RemainingSize--;
-		}
-	}
-	
-	// Ensure the string is null-terminated
-	*pOut = '\0';
-	
-	return (int)(pOut - pBuffer);
-}
-
 FILE *pipe_open(const char *cmd, const char *mode)
 {
 #if defined(CONF_FAMILY_WINDOWS)
@@ -2978,6 +2825,158 @@ void str_timestamp_format(char *buffer, int buffer_size, const char *format)
 void str_timestamp(char *buffer, int buffer_size)
 {
 	str_timestamp_format(buffer, buffer_size, FORMAT_NOSPACE);
+}
+
+int str_format_args(char *pBuffer, int BufferSize, const char *pFormat, CFormatArg *pArgs, int NumArgs)
+{
+	// Input parameter validation
+	if (!pBuffer || BufferSize <= 0 || !pFormat)
+		return -1;
+
+	// If there are no arguments, simply copy the format string
+	if (!pArgs || NumArgs <= 0)
+	{
+		str_copy(pBuffer, pFormat, BufferSize);
+		return str_length(pBuffer);
+	}
+
+	char *pOut = pBuffer;
+	const char *pIn = pFormat;
+	int ArgIndex = 0;
+	int RemainingSize = BufferSize - 1; // Reserve 1 byte for the null terminator
+	
+	while (*pIn && RemainingSize > 0)
+	{
+		// Process formatting options
+		if (*pIn == '%' && *(pIn + 1) != '\0')
+		{
+			pIn++; // Skip '%' character
+			
+			// Handle escaped percent signs (%%)
+			if (*pIn == '%')
+			{
+				*pOut++ = '%';
+				pIn++;
+				RemainingSize--;
+				continue;
+			}
+			
+			// Check if there are still arguments available
+			if (ArgIndex < NumArgs)
+			{
+				char aTemp[512] = {0}; // Larger buffer for temporary results
+				char aFormat[64] = {0}; // Larger and initialized format string buffer
+				
+				aFormat[0] = '%'; // Format string always begins with '%'
+				int FormatLen = 1;
+				
+				// Safe function to append to the format string
+				#define APPEND_FORMAT(ch) do { \
+					if (FormatLen < (int)sizeof(aFormat) - 2) { \
+						aFormat[FormatLen++] = (ch); \
+						aFormat[FormatLen] = '\0'; \
+					} \
+				} while (0)
+				
+				// Parse width, flags, and precision for all types
+				while (*pIn && (*pIn == '+' || *pIn == '-' || *pIn == ' ' || 
+						*pIn == '#' || *pIn == '0' || isdigit(*pIn) || *pIn == '.')) {
+					APPEND_FORMAT(*pIn);
+					pIn++;
+				}
+				
+				// Helper macro for valid format specifiers
+				#define HANDLE_SPECIFIER(valid_chars, default_char) do { \
+					if (*pIn && strchr(valid_chars, *pIn)) { \
+						APPEND_FORMAT(*pIn); \
+						pIn++; \
+					} else { \
+						APPEND_FORMAT(default_char); \
+					} \
+				} while (0)
+				
+				// Process format based on argument type
+				switch (pArgs[ArgIndex].m_Type)
+				{
+					case CFormatArg::FORMAT_INT:
+						HANDLE_SPECIFIER("dioxXu", 'd');
+						str_format(aTemp, sizeof(aTemp), aFormat, pArgs[ArgIndex].m_Int);
+						break;
+					
+					case CFormatArg::FORMAT_STRING:
+						HANDLE_SPECIFIER("s", 's');
+						str_format(aTemp, sizeof(aTemp), aFormat, pArgs[ArgIndex].m_pStr ? pArgs[ArgIndex].m_pStr : "(null)");
+						break;
+					
+					case CFormatArg::FORMAT_INT64:
+						// Check if 'll' is already in the format
+						if (*pIn == 'l' && *(pIn + 1) == 'l') {
+							APPEND_FORMAT('l');
+							APPEND_FORMAT('l');
+							pIn += 2;
+						} else {
+							// Add 'll' modifier if not already present
+							APPEND_FORMAT('l');
+							APPEND_FORMAT('l');
+						}
+						
+						HANDLE_SPECIFIER("dioxXu", 'd');
+						str_format(aTemp, sizeof(aTemp), aFormat, pArgs[ArgIndex].m_Int64);
+						break;
+					
+					case CFormatArg::FORMAT_FLOAT:
+						HANDLE_SPECIFIER("fFeEgGaA", 'f');
+						str_format(aTemp, sizeof(aTemp), aFormat, pArgs[ArgIndex].m_Float);
+						break;
+					
+					default:
+						str_copy(aTemp, "[invalid type]", sizeof(aTemp));
+						// Skip remaining format specifiers
+						while (*pIn && !isspace(*pIn) && *pIn != '%')
+							pIn++;
+						break;
+				}
+				
+				#undef APPEND_FORMAT
+				#undef HANDLE_SPECIFIER
+				
+				// Copy the formatted result to the output buffer
+				int TempLen = str_length(aTemp);
+				int CopyLen = TempLen < RemainingSize ? TempLen : RemainingSize;
+				
+				if (CopyLen > 0)
+				{
+					memcpy(pOut, aTemp, CopyLen);
+					pOut += CopyLen;
+					RemainingSize -= CopyLen;
+				}
+				
+				ArgIndex++;
+			}
+			else
+			{
+				// No argument available, simply copy the format specifier
+				*pOut++ = '%';
+				RemainingSize--;
+				if (RemainingSize > 0 && *pIn)
+				{
+					*pOut++ = *pIn++;
+					RemainingSize--;
+				}
+			}
+		}
+		else
+		{
+			// Copy normal characters
+			*pOut++ = *pIn++;
+			RemainingSize--;
+		}
+	}
+	
+	// Ensure the string is null-terminated
+	*pOut = '\0';
+	
+	return (int)(pOut - pBuffer);
 }
 #ifdef __GNUC__
 #pragma GCC diagnostic pop

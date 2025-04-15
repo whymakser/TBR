@@ -2875,11 +2875,12 @@ int CServer::Run()
 			}
 
 			// remove after 24 hours because iphub.info has 1000 free requests within 24 hours
-			// actually lets use 48 hours just to be safe
-			if (Tick() % (TickSpeed() * 60 * 60 * 48))
+			// actually lets use 36 hours just to be safe
+			if (Tick() % (TickSpeed() * 60 * 60 * 36) == 0)
 			{
 				m_DnsblCache.m_vBlacklist.clear();
 				m_DnsblCache.m_vWhitelist.clear();
+				m_CountryCache.clear();
 			}
 
 			for (int i = 0; i < MAX_CLIENTS; i++)
@@ -2963,7 +2964,7 @@ int CServer::Run()
 
 						// Console outut
 						char aAddrStr[NETADDR_MAXSTRSIZE];
-						net_addr_str(m_NetServer.ClientAddr(i), aAddrStr, sizeof(aAddrStr), true);
+						net_addr_str(m_NetServer.ClientAddr(i), aAddrStr, sizeof(aAddrStr), false);
 
 						// Process result
 						const char *pResult = m_aClients[i].m_pCountryLookup->m_aResult;
@@ -2987,6 +2988,7 @@ int CServer::Run()
 							Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 						}
 
+						m_CountryCache[aAddrStr] = m_aClients[i].m_aCountryCode;
 						// Notify game and process language suggestion
 						GameServer()->OnCountryCodeLookup(i);
 					}
@@ -4348,6 +4350,22 @@ void CServer::CountryLookup(int ClientID)
 
 	char aAddrStr[NETADDR_MAXSTRSIZE];
 	net_addr_str(m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), false);
+
+	auto it = m_CountryCache.find(aAddrStr);
+	if (it != m_CountryCache.end())
+	{
+		m_aClients[ClientID].m_CountryLookupState = CClient::COUNTRYLOOKUP_STATE_DONE;
+		str_copy(m_aClients[ClientID].m_aCountryCode, it->second.c_str(), sizeof(m_aClients[ClientID].m_aCountryCode));
+
+		// Console output
+		char aBuf[256];
+		str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> found cached country=%s, suggesting '%s'", ClientID, aAddrStr, m_aClients[ClientID].m_aCountryCode,
+			g_Localization.GetLanguageFileName(g_Localization.GetLanguageByCode(m_aClients[ClientID].m_aCountryCode)));
+		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
+
+		GameServer()->OnCountryCodeLookup(ClientID);
+		return;
+	}
 
 	IEngine *pEngine = Kernel()->RequestInterface<IEngine>();
 	pEngine->AddJob(m_aClients[ClientID].m_pCountryLookup = std::make_shared<CClient::CCountryLookup>(aAddrStr));

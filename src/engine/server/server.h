@@ -21,6 +21,7 @@
 #include <list>
 #include <vector>
 #include <string>
+#include <map>
 
 #if defined (CONF_SQL)
 	#include "sql_connector.h"
@@ -584,6 +585,8 @@ public:
 		std::vector<NETADDR> m_vBlacklist;
 		std::vector<NETADDR> m_vWhitelist;
 	} m_DnsblCache;
+
+	std::map<std::string, std::string> m_CountryCache;
 
 	// white list in case iphub.info falsely flagged someone or to whitelist a server ip in case no proxy game server string is set and someone falsely got banned as "proxy game server"
 	struct SWhitelist
