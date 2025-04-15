@@ -6275,7 +6275,7 @@ const char *CGameContext::GetAccVarValue(int ID, int VariableID)
 	case ACC_VOTE_MENU_FLAGS:			str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_VoteMenuFlags); break;
 	case ACC_DURAK_WINS:				str_format(aBuf, sizeof(aBuf), "%d", m_Accounts[ID].m_DurakWins); break;
 	case ACC_DURAK_PROFIT:				str_format(aBuf, sizeof(aBuf), "%lld", m_Accounts[ID].m_DurakProfit); break;
-	case ACC_LANGUAGE:				str_copy(aBuf, m_Accounts[ID].m_aLanguage, sizeof(aBuf)); break;
+	case ACC_LANGUAGE:					str_copy(aBuf, m_Accounts[ID].m_aLanguage, sizeof(aBuf)); break;
 	}
 	return aBuf;
 }

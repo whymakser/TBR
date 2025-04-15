@@ -1592,9 +1592,13 @@ void CDurak::Snap(int SnappingClient)
 	{
 		if (m_vpGames.size())
 		{
-			// Abusing tooltip and keyboard control for stats
 			vec2 Pos = m_vpGames[0]->m_TablePos;
 			Pos.y += DURAK_CARD_NAME_OFFSET;
+
+			if (::NetworkClipped(GameServer(), SnappingClient, m_vpGames[0]->m_TablePos))
+				return;
+
+			// Abusing tooltip and keyboard control for stats
 			if (m_aStaticCards[DURAK_TEXT_TOOLTIP].m_Active)
 			{
 				if (pSeat)
