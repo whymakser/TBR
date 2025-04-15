@@ -905,48 +905,45 @@ set(EXPECTED_DATA
   emoticons.png
   fonts/DejaVuSans.ttf
   game.png
-  languages/belarusian.json
-  languages/bosnian.json
-  languages/brazilian_portuguese.json
-  languages/breton.json
-  languages/bulgarian.json
-  languages/catalan.json
-  languages/chuvash.json
-  languages/czech.json
-  languages/danish.json
-  languages/dutch.json
-  languages/esperanto.json
-  languages/estonian.json
-  languages/finnish.json
-  languages/french.json
-  languages/gaelic_scottish.json
-  languages/galician.json
-  languages/german.json
-  languages/greek.json
-  languages/hungarian.json
-  languages/index.json
-  languages/irish.json
-  languages/italian.json
-  languages/japanese.json
-  languages/korean.json
-  languages/kyrgyz.json
-  languages/license.txt
-  languages/lithuanian.json
-  languages/norwegian.json
-  languages/polish.json
-  languages/portuguese.json
-  languages/readme.txt
-  languages/romanian.json
-  languages/russian.json
-  languages/serbian.json
-  languages/simplified_chinese.json
-  languages/slovak.json
-  languages/slovenian.json
-  languages/spanish.json
-  languages/swedish.json
-  languages/traditional_chinese.json
-  languages/turkish.json
-  languages/ukrainian.json
+  languages/arabic.txt
+  languages/azerbaijani.txt
+  languages/belarusian.txt
+  languages/bosnian.txt
+  languages/brazilian_portuguese.txt
+  languages/bulgarian.txt
+  languages/catalan.txt
+  languages/chuvash.txt
+  languages/czech.txt
+  languages/danish.txt
+  languages/dutch.txt
+  languages/esperanto.txt
+  languages/estonian.txt
+  languages/finnish.txt
+  languages/french.txt
+  languages/galician.txt
+  languages/german.txt
+  languages/greek.txt
+  languages/hungarian.txt
+  languages/index.txt
+  languages/italian.txt
+  languages/japanese.txt
+  languages/korean.txt
+  languages/kyrgyz.txt
+  languages/norwegian.txt
+  languages/persian.txt
+  languages/polish.txt
+  languages/portuguese.txt
+  languages/romanian.txt
+  languages/russian.txt
+  languages/serbian.txt
+  languages/serbian_cyrillic.txt
+  languages/simplified_chinese.txt
+  languages/slovak.txt
+  languages/spanish.txt
+  languages/swedish.txt
+  languages/traditional_chinese.txt
+  languages/turkish.txt
+  languages/ukrainian.txt
   mapres/bg_cloud1.png
   mapres/bg_cloud2.png
   mapres/bg_cloud3.png
@@ -1193,8 +1190,8 @@ set(EXPECTED_DATA
   ui/themes/winter_night.map
 )
 
-if(NOT EXISTS ${PROJECT_SOURCE_DIR}/datasrc/languages/index.json)
-  message(WARNING "Missing datasrc/languages submodule. Please download a source release or update your git submodules with `git submodule update --init`")
+if(NOT EXISTS ${PROJECT_SOURCE_DIR}/datasrc/languages/index.txt)
+  message(WARNING "Missing datasrc/languages/index.txt, please clone again")
   foreach(item ${EXPECTED_DATA})
     if(item MATCHES "^languages/")
       list(REMOVE_ITEM EXPECTED_DATA ${item})
@@ -1412,6 +1409,8 @@ set_src(GAME_SHARED GLOB src/game
   gamecore.h
   layers.cpp
   layers.h
+  localization.cpp
+  localization.h
   mapitems.h
   teamscore.cpp
   teamscore.h
@@ -1594,6 +1593,8 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   mask128.h
   minigames/arenas.cpp
   minigames/arenas.h
+  minigames/durak.cpp
+  minigames/durak.h
   minigames/minigame.cpp
   minigames/minigame.h
   player.cpp
@@ -1647,6 +1648,10 @@ set(LIBS_SERVER
   # on it.
   ${CMAKE_THREAD_LIBS_INIT}
 )
+
+if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-Wno-format-nonliteral)
+endif()
 
 # Target
 set(TARGET_SERVER ${SERVER_EXECUTABLE})

@@ -51,29 +51,20 @@ bool CSaveTee::LoadFile(const char *pFileName, CCharacter *pChr, CGameContext *p
 	if (!pGameServer)
 		return false;
 
-	IOHANDLE File = pGameServer->Storage()->OpenFile(pFileName, IOFLAG_READ, IStorage::TYPE_SAVE);
-	if (File)
+	CLineReader LineReader;
+	if (!LineReader.OpenFile(pGameServer->Storage()->OpenFile(pFileName, IOFLAG_READ, IStorage::TYPE_SAVE)))
+		return false;
+
+	const char *pString = LineReader.Get();
+	if (!pString)
+		return false;
+
+	LoadString(pString);
+	if (pChr)
 	{
-		CLineReader lr;
-		lr.Init(File);
-
-		char *pString = lr.Get();
-		if (!pString)
-		{
-			io_close(File);
-			return false;
-		}
-
-		LoadString(pString);
-		if (pChr)
-		{
-			Load(pChr, 0);
-		}
-
-		io_close(File);
-		return true;
+		Load(pChr, 0);
 	}
-	return false;
+	return true;
 }
 
 void CSaveTee::Save(CCharacter *pChr)
@@ -204,7 +195,7 @@ void CSaveTee::Save(CCharacter *pChr)
 	m_Confetti = pChr->m_Confetti;
 	m_InNoBonusArea = pChr->m_NoBonusContext.m_InArea;
 	m_NumGrogsHolding = pChr->m_NumGrogsHolding;
-	m_Permille = pChr->m_Permille;
+	m_Permille = pChr->GetPlayer()->m_Permille;
 	if (pChr->m_FirstPermilleTick)
 		m_TicksSinceFirstPermille = pChr->Server()->Tick() - pChr->m_FirstPermilleTick;
 	else
@@ -414,7 +405,7 @@ void CSaveTee::Load(CCharacter *pChr, int Team)
 		pChr->OnNoBonusArea(m_InNoBonusArea, true);
 		for (int i = 0; i < m_NumGrogsHolding; i++)
 			pChr->AddGrog();
-		pChr->m_Permille = m_Permille;
+		pChr->GetPlayer()->m_Permille = m_Permille;
 		if (m_TicksSinceFirstPermille)
 		{
 			pChr->m_FirstPermilleTick = pChr->Server()->Tick() - m_TicksSinceFirstPermille;
@@ -588,13 +579,13 @@ char* CSaveTee::GetString()
 	return m_aString;
 }
 
-int CSaveTee::LoadString(char* String)
+int CSaveTee::LoadString(const char *pString)
 {
 	char aSavedAddress[NETADDR_MAXSTRSIZE];
 	int64 ExpireDate = 0;
 	char aCheckpointList[128];
 	int Num;
-	Num = sscanf(String,
+	Num = sscanf(pString,
 		"%[^\t]\t%d\t%d\t%d\t%d\t"
 		"%d\t%d\t%d\t"
 		"%d\t%d\t%d\t"

@@ -42,7 +42,7 @@ public:
 	void Save(CCharacter* pchr);
 	void Load(CCharacter* pchr, int Team);
 	char* GetString();
-	int LoadString(char* String);
+	int LoadString(const char *pString);
 	vec2 GetPos() { return m_Pos; }
 	char* GetName() { return m_aName; }
 

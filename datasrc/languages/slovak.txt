@@ -1,0 +1,1507 @@
+#
+# Author:
+#
+
+/cmdlist will show a list of all chat commands
+== 
+
+/help + any command will show you the help for this command
+== 
+
+Example /help settings will display the help about /settings
+== 
+
+Usage
+== 
+
+Command is either unknown or you have given a blank command without any parameters.
+== 
+
+You can't join the spectators while you are in survival
+== 
+
+Timeout code has to be at least 8 characters long, make sure to use a safe code.
+== 
+
+You will now see all tees on this server, no matter the distance
+== 
+
+You will no longer see all tees on this server
+== 
+
+Score Format
+== 
+
+Use '/score <format>' to change the displayed score.
+== 
+
+Accounts
+== 
+
+Accounts are used to save your stats.
+== 
+
+You can farm money and buy things in the shop, kill tees and get points.
+== 
+
+These stats will be saved inside of your account.
+== 
+
+You can create an account using '/register'.
+== 
+
+Once you are logged in, you can use this command again to see information about your account.
+== 
+
+Account Info
+== 
+
+Account Name
+== 
+
+Registered
+== 
+
+{/account}
+until
+== 
+
+not bought
+== 
+
+Portal Rifle
+== 
+
+Contact
+== 
+
+Player not found
+== 
+
+Stats
+== 
+
+Level
+== 
+
+(not logged in)
+== 
+
+Bank
+== 
+
+Wallet
+== 
+
+Police
+== 
+
+Collectables
+== 
+
+Taser battery
+== 
+
+Portal Battery
+== 
+
+Points
+== 
+
+Kills
+== 
+
+Deaths
+== 
+
+Games won
+== 
+
+Profit
+== 
+
+Wins
+== 
+
+Toggle
+== 
+
+Spooky Ghost
+== 
+
+Portal Blocker
+== 
+
+Spooky ghost (gun) and portal blocker (hammer) can be enabled like the following:
+== 
+
+Hold TAB (or other scoreboard key) and during that fire your weapon two times.
+== 
+
+With VIP Classic you get an XP and money boost of '+2' per second, aswell as access to the following commands:
+== 
+
+VIP+ includes every feature of VIP Classic.
+== 
+
+Additionally to that you can enter the VIP+ room to farm safely there, aswell as you gain access to the following commands:
+== 
+
+Spawn Weapons
+== 
+
+You can buy spawn weapons in the shop.
+== 
+
+You will have the bought weapon on spawn.
+== 
+
+You can have max. 5 bullets per weapon.
+== 
+
+Each bullet costs 600.000 money.
+== 
+
+Your Spawn Weapons
+== 
+
+Spawn shotgun bullets
+== 
+
+Spawn grenade bullets
+== 
+
+Spawn rifle bullets
+== 
+
+Accounts are not supported on this server
+== 
+
+The username is too long or too short
+== 
+
+Your username can only consist of letters and numbers
+== 
+
+The passwords need to be identical
+== 
+
+The password is too long or too short
+== 
+
+Username already exists
+== 
+
+Successfully registered an account, you can login now
+== 
+
+Set a security pin to avoid account stealing. For more info, say '/pin'
+== 
+
+You are not logged in
+== 
+
+You can't logout in a minigame
+== 
+
+You can't logout while being arrested
+== 
+
+You can't logout while being searched by the police
+== 
+
+Kill logout is activated, kill within %d seconds to logout
+== 
+
+You are not verified, please enter your security pin using '/pin'
+== 
+
+Wrong password
+== 
+
+Successfully changed password
+== 
+
+You need to enter a way to contact you, for example: Discord, E-Mail, Skype, etc.
+== 
+
+To see your current contact information, use '/account'
+== 
+
+Example: '/contact Discord: fokkonaut'
+== 
+
+Successfully updated contact information, check '/account'
+== 
+
+SECURITY PIN
+== 
+
+You should set a security pin to avoid account stealing. The pin itself has to be a 4-digit long number code.
+== 
+
+This pin will be required to change your contact information or your password.
+== 
+
+If your account is not secured yet, you can set a pin with '/pin <new-pin>'.
+== 
+
+If you want to change your pin, you first need to verify using '/pin <account-pin>'.
+== 
+
+After verifying, you can set a new pin with '/pin <new-pin>'.
+== 
+
+You have to enter a 4-digit number
+== 
+
+Successfully set the security pin
+== 
+
+Verification failed
+== 
+
+Verification successful
+== 
+
+Successfully changed the security pin
+== 
+
+You have to be inside of a bank to pay money from your bank account to others
+== 
+
+You can't pay money that frequently
+== 
+
+That player doesn't exist
+== 
+
+You can't pay money to yourself
+== 
+
+That player is not logged in
+== 
+
+You don't have enough money
+== 
+
+You can't pay nothing
+== 
+
+You paid %lld money from your bank account to '%s'
+== 
+
+You got %lld money to your bank account from '%s'
+== 
+
+Invalid argument
+== 
+
+You can't drop nothing
+== 
+
+You can't drop money bags over 100.000
+== 
+
+You don't have enough money in your wallet
+== 
+
+Drop money: '/money drop <amount>'
+== 
+
+You can't drop more than 100 portal batteries at the same time
+== 
+
+You don't have enough portal batteries
+== 
+
+You can collect portal batteries in the map, which lets you use the portal rifle.
+== 
+
+The portal rifle can shoot two portals at cursor position, which tees, flags and weapons can use to travel between them.
+== 
+
+Your portal stats
+== 
+
+Drop portal battery: '/portal drop <amount>'
+== 
+
+You are not VIP
+== 
+
+You don't have a room key
+== 
+
+This player has a key already
+== 
+
+This player got invited already
+== 
+
+'%s' invited you to the room
+== 
+
+You invited '%s' to the room
+== 
+
+You can't kick others without a key
+== 
+
+You can't kick a player with a key
+== 
+
+This player is not invited
+== 
+
+'%s' kicked you out of room
+== 
+
+You kicked '%s' out of room
+== 
+
+Teleporting to spawn is disabled
+== 
+
+You can't use this command in minigames
+== 
+
+You can't use this command while being arrested
+== 
+
+You can't use this command while frozen
+== 
+
+You lost 50.000 money for teleporting to spawn
+== 
+
+Plot subcommands
+== 
+
+For detailed info, type '/plot help <command>'
+== 
+
+Hold SPACE while editing for more control infos
+== 
+
+Clears all objects of your plot
+== 
+
+Starts an auction for your plot, everyone can buy it using the buy command
+== 
+
+Buys a plot if the given player is running a plot auction
+== 
+
+Lets you respawn at your plot
+== 
+
+Cancels the current running auction on your plot
+== 
+
+Swaps plot with given player
+== 
+
+Shows a list with all currently open plot auctions and swap offers
+== 
+
+This player doesn't exists
+== 
+
+You can't buy your own plot
+== 
+
+This player doesn't sell a plot
+== 
+
+You already have a plot
+== 
+
+The price you entered does not match the offer
+== 
+
+Your IP address already owns one plot
+== 
+
+Plot %d has been bought by '%s'
+== 
+
+You bought plot %d from %s
+== 
+
+%s bought your plot, the money is moved to your bank account
+== 
+
+Plot list
+== 
+
+Buy from auction: '/plot buy <price> <playername>'
+== 
+
+Swap with offer: '/plot swap <playername>'
+== 
+
+List of all plot auctions and swap offers:
+== 
+
+There are currently no auctions or swap offers
+== 
+
+You need a plot to use this command
+== 
+
+You can't sell your plot when being wanted
+== 
+
+You can only do auctions once a minute
+== 
+
+You already sell your plot
+== 
+
+You need to enter a valid price
+== 
+
+'%s' started an auction on plot %d for %d money (plot expires on %s)
+== 
+
+Use '/plot buy %d %s' to buy the plot
+== 
+
+You can't swap plots when being wanted
+== 
+
+You can't swap with yourself
+== 
+
+This player doesn't own a plot
+== 
+
+You can only swap once a minute
+== 
+
+You swapped plots with '%s'
+== 
+
+Offer to swap plots was sent to '%s'
+== 
+
+'%s' has offered to swap plots with you, type '/plot swap %s' to swap
+== 
+
+Page
+== 
+
+Police Info
+== 
+
+[POLICE %d]
+== 
+
+Level needed to buy
+== 
+
+Benefits:
+== 
+
+- The police bot will help you
+== 
+
+- taser license ('/taser')
+== 
+
+- Officers can taser a plot door of a wanted player to deal damage and destroy it
+== 
+
+- Taser will destroy plot objects of a wanted player
+== 
+
+[GENERAL INFORMATION]
+== 
+
+Police ranks can be bought in shop.
+== 
+
+There are multiple police ranks, each cost 100.000 money.
+== 
+
+The policebot will help every police officer.
+== 
+
+Every police rank will give you more benefits.
+== 
+
+Use '/police <page>' for information about other ranks
+== 
+
+You can't mute yourself
+== 
+
+muted
+== 
+
+unmuted
+== 
+
+Map Designs
+== 
+
+If you have your dummy connected, you need to reconnect it after the design change so it can get back it's state.
+== 
+
+You can set one of the following designs by using '/design <name>':
+== 
+
+Invalid language
+== 
+
+Successfully changed language to %s
+== 
+
+Server Language
+== 
+
+Current language
+== 
+
+You can set one of the following languages for server-side translation by using '/language <option>':
+== 
+
+This chat language is already selected
+== 
+
+Successfully updated chat language
+== 
+
+Chat Language
+== 
+
+You can set one of the following languages by using '/chatlanguage <option>':
+== 
+
+This server does not have a linked Discord server
+== 
+
+Minigames
+== 
+
+You can join any minigame using '/<minigame>'
+== 
+
+To leave a minigame, just type '/leave'
+== 
+
+Here is a list of all minigames:
+== 
+
+Money
+== 
+
+Spree
+== 
+
+Durák Wins
+== 
+
+Durák Profit
+== 
+
+You need to be police level 2 to use this command
+== 
+
+This player is a police officer
+== 
+
+This player is a police helper already
+== 
+
+'%s' added you to the police helpers
+== 
+
+You added '%s' to the police helpers
+== 
+
+This player is not a police helper
+== 
+
+'%s' removed you from the police helpers
+== 
+
+You removed '%s' from the police helpers
+== 
+
+WANTED
+== 
+
+Listing all players that are wanted by the police:
+== 
+
+1 wanted player
+== 
+
+%d wanted players
+== 
+
+There are no wanted players right now
+== 
+
+You don't have enough taser batteries
+== 
+
+Taser
+== 
+
+Police officers with level 3 or higher get a taser license.
+== 
+
+The taser is a rifle that freezes players for a short time.
+== 
+
+You can pick up the taser and taser batteries throughout the map.
+== 
+
+Your taser stats
+== 
+
+Taser level
+== 
+
+Price for the next level
+== 
+
+Freeze time: %.2f seconds
+== 
+
+Taser shield
+== 
+
+Drop taser battery: '/taser drop <amount>'
+== 
+
+'%s' has been muted for %d seconds (%s)
+== 
+
+'%s' has been muted for %d seconds
+== 
+
+Your taser shield has been set to %d%%. Use '/taser' to check later.
+== 
+
+You have been logged out by an admin
+== 
+
+You have been logged out due to account deactivation by an admin
+== 
+
+You are now in no-bonus area mode
+== 
+
+You are no longer in no-bonus area mode
+== 
+
+You were arrested for %d seconds
+== 
+
+You lost your plot
+== 
+
+You are now owner of plot %d
+== 
+
+Objects
+== 
+
+Please enter the name for this preset into the chat
+== 
+
+Please enter the name of the wanted preset into the chat
+== 
+
+Couldn't save preset '%s', a preset with that name already exists
+== 
+
+Successfully saved preset '%s'
+== 
+
+Couldn't load preset '%s'
+== 
+
+Successfully loaded preset '%s'
+== 
+
+Preset saving aborted
+== 
+
+Preset loading aborted
+== 
+
+Vote aborted
+== 
+
+Vote passed
+== 
+
+Vote failed
+== 
+
+Your plot is no longer subject to a search warrant and can no longer be destroyed
+== 
+
+'%s' entered and joined the game
+== 
+
+'%s' entered and joined the spectators
+== 
+
+This server has an initial chat delay, you will need to wait %d seconds before talking.
+== 
+
+'%s' rejoined current session
+== 
+
+[WARNING] You need to reconnect your dummy after the design change is done, so it can get back it's old state.
+== 
+
+'%s' has left the game (%s)
+== 
+
+'%s' has left the game
+== 
+
+You do not have an ongoing conversation. Whisper to someone to start one
+== 
+
+'%s' changed name to '%s'
+== 
+
+Following players can't receive your message because either you or they are in local chat mode:
+== 
+
+No reason given
+== 
+
+'%s' called vote to change server option '%s' (%s)
+== 
+
+'%s' isn't an option on this server
+== 
+
+'%s' called vote to change server option '%s'
+== 
+
+There's a %d second wait time between kick votes for each player please wait %d second(s)
+== 
+
+Server does not allow voting to kick players
+== 
+
+Kick voting requires %d players
+== 
+
+You can't kick yourself
+== 
+
+You can't kick dummies
+== 
+
+You can't kick authorized players
+== 
+
+'%s' called for vote to kick you
+== 
+
+You can kick only your team member
+== 
+
+'%s' called for vote to kick '%s' (%s)
+== 
+
+Server does not allow voting to move players to spectators
+== 
+
+You can't move yourself
+== 
+
+You can't set dummies to spectator
+== 
+
+You can only move your team member to spectators
+== 
+
+'%s' called for vote to pause '%s' for %d seconds (%s)
+== 
+
+'%s' called for vote to move '%s' to spectators (%s)
+== 
+
+You are now using the tee controller
+== 
+
+You are no longer using the tee controller
+== 
+
+Kill Protection enabled. If you really want to join the spectators, first type /kill
+== 
+
+Warning you have %lld money in your wallet! (see /money)
+== 
+
+Wallet kill Protection enabled. If you really want to join the spectators, first type /kill
+== 
+
+You can't join the spectators while being searched by the police
+== 
+
+You need to wait %d seconds before killing again due to escaping
+== 
+
+Kill Protection enabled. If you really want to kill, type /kill
+== 
+
+Wallet kill Protection enabled. If you really want to kill, type /kill
+== 
+
+Local chat mode has been disabled, automatically entered public chat
+== 
+
+Automatic wallet to bank due to bank disabling
+== 
+
+You are not permitted to talk for the next %d seconds.
+== 
+
+Your plot expired
+== 
+
+The police have gained access to your plot in hopes of finding you
+== 
+
+Plot %d Door Health [%d/%d]
+== 
+
+You are already logged in
+== 
+
+That account doesn't exist, please register first
+== 
+
+This account is already logged in
+== 
+
+This account is already logged in on another server
+== 
+
+This account is disabled
+== 
+
+You were released from jail
+== 
+
+'%s' is spawnblocking. Catch him!
+== 
+
+Police is searching you because of spawnblocking
+== 
+
+[WARNING] Spawnblocking is illegal
+== 
+
+Registration spam
+== 
+
+Too many login fails
+== 
+
+Too many pin fails
+== 
+
+You have been banned from the account system for %d seconds (%s)
+== 
+
+You are banned from the account system for the next %d seconds.
+== 
+
+This minigame is disabled
+== 
+
+You are not in a minigame
+== 
+
+You are already in minigame '%s'
+== 
+
+This map has no Durák lobby, you have to find your way to the table yourself
+== 
+
+'%s' left the minigame '%s'
+== 
+
+'%s' joined the minigame '%s', use '/%s' to join aswell
+== 
+
+Say '/leave' to join the normal area again
+== 
+
+Type '/1vs1 <playername>' to start a fight with someone
+== 
+
+For custom scorelimits or a kill-border use '/1vs1 <playername> <scorelimit> <killborder>'
+== 
+
+You have to leave first in order to join another minigame
+== 
+
+The winner is '%s'
+== 
+
+You are the winner
+== 
+
+'%s' would have timed out, but can use timeout protection now
+== 
+
+You are arrested for %lld seconds
+== 
+
+Your life as a gangster is over, you are free now
+== 
+
+Avoid policehammers for the next %lld seconds
+== 
+
+Entered local chat
+== 
+
+Entered public chat
+== 
+
+'%s' joined the game
+== 
+
+'%s' joined the spectators
+== 
+
+You have been afk for %d seconds now. Please note that you get kicked after not playing for %d seconds.
+== 
+
+You can't pause while you are controlled by someone else
+== 
+
+You can't pause while you are selecting a tee to control
+== 
+
+(doubled xp)
+== 
+
+You are now level %d!
+== 
+
+Successfully logged in
+== 
+
+[WARNING] You did not set a contact, it can be used to recover your password or to get back the account after it got stolen.
+== 
+
+Set a contact with '/contact <option>' to hide this message and for a free XP reward.
+== 
+
+[WARNING] You did not set security pin yet. Check '/pin' for more information.
+== 
+
+Your previously collected money got added to your account due to login
+== 
+
+Successfully logged out
+== 
+
+Load recent design '%s'?
+== 
+
+The plot auction by '%s' is cancelled
+== 
+
+Your plot swap offer got cancelled
+== 
+
+[WARNING] Your %s expired
+== 
+
+You got unfrozen by the clan protection.
+== 
+
+WARNING
+== 
+
+You got frozen by the clan protection.
+== 
+
+Remove your 'Chilli.*' clantag and reconnect, or set your skin body to 'greensward'.
+== 
+
+You automatically left the minigame because you were afk for too long
+== 
+
+You automatically exited the plot editor because you were afk for too long
+== 
+
+You can't join a minigame while being searched by the police
+== 
+
+You can't join a minigame while being arrested
+== 
+
+You can't join a minigame while being frozen
+== 
+
+Minigame request sent, please don't move for 5 seconds
+== 
+
+Your minigame request was cancelled because you are frozen
+== 
+
+Your minigame request was cancelled because you moved
+== 
+
+Please move within %d seconds or you will leave the minigame
+== 
+
+You have %dx double-xp life left
+== 
+
+You have no double-xp lifes anymore (last use)
+== 
+
+You will not receive sounds from the server while farming on a moneytile
+== 
+
+You will receive all sounds again
+== 
+
+You will no longer see drawings
+== 
+
+You will now see drawings again
+== 
+
+You will no longer see money broadcasts, jail and escape timer will be shown in vote menu instead
+== 
+
+You will now see all broadcasts again
+== 
+
+Weapon indicator enabled
+== 
+
+Weapon indicator disabled
+== 
+
+Your cursor will now zoom. WARNING: Does not work with dynamic camera if deadzone or follow factor are non-default.
+== 
+
+You cursor will no longer be zoomed
+== 
+
+You don't have ninjajetpack, buy it in the shop
+== 
+
+Ninjajetpack enabled
+== 
+
+Ninjajetpack disabled
+== 
+
+You will now respawn at your plot (TAB+kill to join at normal spawn)
+== 
+
+You will no longer respawn at your plot (TAB+kill to join at plot spawn)
+== 
+
+You will now resume from pause if your tee gets moved
+== 
+
+You will no longer resume from pause if your tee gets moved
+== 
+
+All objects of your plot have been removed
+== 
+
+You have to be alive to edit your plot
+== 
+
+You have to be inside your plot to edit your plot
+== 
+
+You can't edit your plot while living the life of a gangster.
+== 
+
+You are now editing your plot, switch to another weapon to exit the editor
+== 
+
+Changed displayed score to '%s'
+== 
+
+You are not VIP+
+== 
+
+Rainbow speed has been updated to %d
+== 
+
+%s finished in: %d minute(s) %5.2f second(s)
+== 
+
+New record: %d minute(s) %5.2f second(s) better.
+== 
+
+New record: %5.2f second(s) better.
+== 
+
+You finished with your best time.
+== 
+
+%d minute(s) %5.2f second(s) worse, better luck next time.
+== 
+
+%5.2f second(s) worse, better luck next time.
+== 
+
+Please specify the page using the reason field
+== 
+
+Please specify the rainbow speed using the reason field
+== 
+
+You can't close your door because the police destroyed it
+== 
+
+%s is on a killing spree with %d blocks
+== 
+
+%s is on a killing spree with %d kills
+== 
+
+%s's blocking spree was ended by %s (%d blocks)
+== 
+
+%s's blocking spree was ended by %s (%d kills)
+== 
+
+You lost, you can wait for another round or leave the lobby using '/leave'
+== 
+
+Too many players on police tiles
+== 
+
+You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'
+== 
+
+Congratulations, +20%% taser shield, current: %d%%. Use '/taser' to check later.
+== 
+
+Congratulations, double-xp has been activated for %d lifes
+== 
+
+'%s' finished the special race!
+== 
+
+This area is for helpers only
+== 
+
+This area is for moderators only
+== 
+
+This area is for admins only
+== 
+
+Seems like it's your birthday! You may pick up your present at any time.
+== 
+
+This gift is only dedicated to humans.
+== 
+
+You've picked up your present already! Come back next year.
+== 
+
+Happy birthday! :) You have jetpack for 45 seconds
+== 
+
+Sorry, someting is missing to get the gift.
+== 
+
+You need a key to enter this room, buy one in the shop
+== 
+
+This area is for VIP+ only, buy it in the shop
+== 
+
+Your jetpack is now disabled
+== 
+
+'%s' has exceeded his legal drinking limit. Catch him!
+== 
+
+Police is searching you because you have exceeded your legal drinking limit
+== 
+
+You can not hold more than %d grogs at once
+== 
+
+Weapon
+== 
+
+'%s' is using bonus illegally. Catch him!
+== 
+
+Police is searching you because of illegal bonus use
+== 
+
+[WARNING] Using bonus in no-bonus area is illegal
+== 
+
+[WARNING] You need to enter this teleporter with your dummy within 30 seconds in order to get moved safely
+== 
+
+[WARNING] Your dummy has to be alive in order to get moved safely
+== 
+
+'%s' has been moved to another map
+== 
+
+'%s' died as a result of excessive grog consumption (%.1f‰ / %.1f‰)
+== 
+
+You paid %d money to '%s' to reduce your jailtime by 5 minutes
+== 
+
+You got %d money from '%s' to reduce his jailtime by 5 minutes
+== 
+
+'%s' has been caught by '%s' (%d minutes arrest)
+== 
+
+Grog testing results: %.1f‰ / %.1f‰
+== 
+
+You were arrested for %d minutes by '%s'
+== 
+
+You already have the maximum of 50 meteors
+== 
+
+Taser shield has been used, -5%%, new current: %d%%
+== 
+
+Collected %lld money
+== 
+
+battery
+== 
+
+portal rifle
+== 
+
+seconds
+== 
+
+minutes
+== 
+
+This %s will respawn in %d %s
+== 
+
+This %s got picked up %d %s ago
+== 
+
+You need to select an amount to deposit or withdraw.
+== 
+
+You don't have enough money in your wallet to deposit this amount.
+== 
+
+You deposited %d money from your wallet to your bank account.
+== 
+
+You don't have enough money on your bank account to withdraw this amount.
+== 
+
+You withdrew %d money from your bank account to your wallet.
+== 
+
+Bye! Come back if you need something.
+== 
+
+Invalid item
+== 
+
+You already have the highest police rank
+== 
+
+You already have the maximum amount of bullets
+== 
+
+You already have the maximum taser level
+== 
+
+You already have a fully filled taser battery
+== 
+
+You already have the %s
+== 
+
+You already have %s
+== 
+
+You need to be police level 3 or higher to get a taser license
+== 
+
+You can not buy this VIP level while owning another one
+== 
+
+You can not buy bloody while specific cosmetics are activated
+== 
+
+This plot is already sold to someone else
+== 
+
+You already own that plot
+== 
+
+You already own another plot
+== 
+
+Your level is too low, you need to be level %d to buy %s
+== 
+
+Taser battery purchase failed
+== 
+
+You bought %s %s
+== 
+
+until death
+== 
+
+until disconnect
+== 
+
+Check '/account' for more information about the expiration date
+== 
+
+The plot will expire on %s
+== 
+
+You don't have enough money in your wallet to buy a grog.
+== 
+
+You bought one grog
+== 
+
+You can't fight against yourself
+== 
+
+Invalid participant
+== 
+
+Leave the current fight in order to join another one
+== 
+
+Too many 1vs1 arenas, try again later
+== 
+
+You successfully created a new global arena
+== 
+
+You invited '%s' to a fight
+== 
+
+You have been invited to a fight by '%s', type '/1vs1 %s' to join
+== 
+
+Join the 1vs1 lobby using '/1vs1' before you accept the fight
+== 
+
+You have accepted the invite by '%s'
+== 
+
+'%s' has accepted your invite
+== 
+
+'%s' won a 1vs1 round against '%s'! Final scores: %d - %d
+== 
+
+'%s' left a 1vs1 round against '%s'! Current scores: %d - %d
+== 
+
+Select your favourite part of the map\nZoom in or out to change the size\nPlace arena by pressing SPACE
+== 
+
+Set first spawn positions by pressing SPACE
+== 
+
+Set second spawn positions by pressing SPACE
+== 
+
+Choose a weapon with A/D\nToggle weapon usage by pressing SPACE\nPress SPACE on the heart to confirm
+== 
+
+Welcome to the Durák table, %s! This seat is taken already, please try another one.
+== 
+
+Welcome to Durák, %s! You are first, please enter a stake in the chat.
+== 
+
+Welcome to Durák, %s! You are second, please enter the current stake of '%lld' or propose a new one.
+== 
+
+Welcome to Durák, %s! In order to participate, please enter the current stake of '%lld' in the chat.
+== 
+
+Successfully set the stake for the current round to '%lld'.
+== 
+
+Successfully deployed your stake.
+== 
+
+'%s' proposed a new stake, please enter the current stake of '%lld' or propose a new one in the chat.
+== 
+
+Successfully updated the stake for the current round to '%lld'.
+== 
+
+You can't currently drop that much money due to your stake
+== 
+
+Couldn't start game, no empty team found
+== 
+
+You didn't deploy your stake in time, game started without you
+== 
+
+Your stake got collected: -%lld money.
+== 
+
+'%s' is the Durák!
+== 
+
+'%s' successfully defended
+== 
+
+'%s' took too long and was skipped
+== 
+
+'%s' couldn't defend all attacks and takes all cards
+== 
+
+'%s' won the game! (#%d)
+== 
+
+'%s' won the game!
+== 
+
+Congratulations, you are not the Durák!
+== 
+
+Your stake got returned: +%lld money.
+== 
+
+You got +%lld money from others leaving the game.
+== 

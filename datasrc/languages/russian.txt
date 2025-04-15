@@ -1,0 +1,1507 @@
+#
+# Author:
+#
+
+/cmdlist will show a list of all chat commands
+== /cmdlist покажет список всех чат-команд
+
+/help + any command will show you the help for this command
+== /help + любая команда покажет вам справку по этой команде
+
+Example /help settings will display the help about /settings
+== Пример /help settings отобразит справку о /settings
+
+Usage
+== Использование
+
+Command is either unknown or you have given a blank command without any parameters.
+== Команда неизвестна или вы ввели пустую команду без параметров.
+
+You can't join the spectators while you are in survival
+== Вы не можете присоединиться к зрителям, пока находитесь в режиме выживания
+
+Timeout code has to be at least 8 characters long, make sure to use a safe code.
+== Код тайм-аута должен содержать не менее 8 символов, убедитесь, что используете безопасный код.
+
+You will now see all tees on this server, no matter the distance
+== Теперь вы будете видеть всех персонажей на этом сервере, независимо от расстояния
+
+You will no longer see all tees on this server
+== Вы больше не будете видеть всех персонажей на этом сервере
+
+Score Format
+== Формат счёта
+
+Use '/score <format>' to change the displayed score.
+== Используйте '/score <формат>', чтобы изменить отображаемый счёт.
+
+Accounts
+== Аккаунты
+
+Accounts are used to save your stats.
+== Аккаунты используются для сохранения вашей статистики.
+
+You can farm money and buy things in the shop, kill tees and get points.
+== Вы можете фармить деньги и покупать вещи в магазине, убивать персонажей и получать очки.
+
+These stats will be saved inside of your account.
+== Эта статистика будет сохранена в вашем аккаунте.
+
+You can create an account using '/register'.
+== Вы можете создать аккаунт с помощью '/register'.
+
+Once you are logged in, you can use this command again to see information about your account.
+== После входа в систему вы можете использовать эту команду снова, чтобы увидеть информацию о своём аккаунте.
+
+Account Info
+== Информация об аккаунте
+
+Account Name
+== Имя аккаунта
+
+Registered
+== Зарегистрирован
+
+{/account}
+until
+== действителен до
+
+not bought
+== не куплено
+
+Portal Rifle
+== Портальная винтовка
+
+Contact
+== Контакт
+
+Player not found
+== Игрок не найден
+
+Stats
+== Статистика
+
+Level
+== Уровень
+
+(not logged in)
+== (не авторизован)
+
+Bank
+== Банк
+
+Wallet
+== Кошелёк
+
+Police
+== Полиция
+
+Collectables
+== Коллекционные предметы
+
+Taser battery
+== Батарея тазера
+
+Portal Battery
+== Портальная батарея
+
+Points
+== Очки
+
+Kills
+== Убийства
+
+Deaths
+== Смерти
+
+Games won
+== Выигранные игры
+
+Profit
+== Прибыль
+
+Wins
+== Победы
+
+Toggle
+== Переключение
+
+Spooky Ghost
+== Жуткий призрак
+
+Portal Blocker
+== Блокиратор порталов
+
+Spooky ghost (gun) and portal blocker (hammer) can be enabled like the following:
+== Жуткий призрак (пистолет) и блокиратор порталов (молот) можно включить следующим образом:
+
+Hold TAB (or other scoreboard key) and during that fire your weapon two times.
+== Удерживайте TAB (или другую клавишу таблицы результатов) и во время этого дважды выстрелите из оружия.
+
+With VIP Classic you get an XP and money boost of '+2' per second, aswell as access to the following commands:
+== С VIP Classic вы получаете бонус к опыту и деньгам '+2' в секунду, а также доступ к следующим командам:
+
+VIP+ includes every feature of VIP Classic.
+== VIP+ включает в себя все функции VIP Classic.
+
+Additionally to that you can enter the VIP+ room to farm safely there, aswell as you gain access to the following commands:
+== Дополнительно к этому вы можете войти в комнату VIP+, чтобы безопасно фармить там, а также получаете доступ к следующим командам:
+
+Spawn Weapons
+== Оружие для спавна
+
+You can buy spawn weapons in the shop.
+== Вы можете купить оружие для спавна в магазине.
+
+You will have the bought weapon on spawn.
+== У вас будет купленное оружие при спавне.
+
+You can have max. 5 bullets per weapon.
+== Вы можете иметь максимум 5 патронов на оружие.
+
+Each bullet costs 600.000 money.
+== Каждый патрон стоит 600.000 денег.
+
+Your Spawn Weapons
+== Ваше оружие для спавна
+
+Spawn shotgun bullets
+== Патроны для дробовика при спавне
+
+Spawn grenade bullets
+== Патроны для гранатомёта при спавне
+
+Spawn rifle bullets
+== Патроны для винтовки при спавне
+
+Accounts are not supported on this server
+== Аккаунты не поддерживаются на этом сервере
+
+The username is too long or too short
+== Имя пользователя слишком длинное или слишком короткое
+
+Your username can only consist of letters and numbers
+== Ваше имя пользователя может состоять только из букв и цифр
+
+The passwords need to be identical
+== Пароли должны быть идентичными
+
+The password is too long or too short
+== Пароль слишком длинный или слишком короткий
+
+Username already exists
+== Имя пользователя уже существует
+
+Successfully registered an account, you can login now
+== Аккаунт успешно зарегистрирован, теперь вы можете войти в систему
+
+Set a security pin to avoid account stealing. For more info, say '/pin'
+== Установите защитный PIN-код, чтобы избежать кражи аккаунта. Для получения дополнительной информации введите '/pin'
+
+You are not logged in
+== Вы не авторизованы
+
+You can't logout in a minigame
+== Вы не можете выйти из системы в мини-игре
+
+You can't logout while being arrested
+== Вы не можете выйти из системы, пока находитесь под арестом
+
+You can't logout while being searched by the police
+== Вы не можете выйти из системы, пока вас разыскивает полиция
+
+Kill logout is activated, kill within %d seconds to logout
+== Активирован выход через убийство, убейте в течение %d секунд, чтобы выйти
+
+You are not verified, please enter your security pin using '/pin'
+== Вы не подтверждены, пожалуйста, введите ваш защитный PIN-код, используя '/pin'
+
+Wrong password
+== Неверный пароль
+
+Successfully changed password
+== Пароль успешно изменен
+
+You need to enter a way to contact you, for example: Discord, E-Mail, Skype, etc.
+== Вам нужно указать способ связи с вами, например: Discord, E-Mail, Skype и т.д.
+
+To see your current contact information, use '/account'
+== Чтобы увидеть текущую контактную информацию, используйте '/account'
+
+Example: '/contact Discord: fokkonaut'
+== Пример: '/contact Discord: fokkonaut'
+
+Successfully updated contact information, check '/account'
+== Контактная информация успешно обновлена, проверьте '/account'
+
+SECURITY PIN
+== ЗАЩИТНЫЙ PIN-КОД
+
+You should set a security pin to avoid account stealing. The pin itself has to be a 4-digit long number code.
+== Вам следует установить защитный PIN-код, чтобы избежать кражи аккаунта. PIN-код должен быть 4-значным числом.
+
+This pin will be required to change your contact information or your password.
+== Этот PIN-код потребуется для изменения вашей контактной информации или пароля.
+
+If your account is not secured yet, you can set a pin with '/pin <new-pin>'.
+== Если ваш аккаунт еще не защищен, вы можете установить PIN-код с помощью '/pin <новый-пин>'.
+
+If you want to change your pin, you first need to verify using '/pin <account-pin>'.
+== Если вы хотите изменить PIN-код, сначала вам нужно подтвердить с помощью '/pin <текущий-пин>'.
+
+After verifying, you can set a new pin with '/pin <new-pin>'.
+== После подтверждения вы можете установить новый PIN-код с помощью '/pin <новый-пин>'.
+
+You have to enter a 4-digit number
+== Вы должны ввести 4-значное число
+
+Successfully set the security pin
+== Защитный PIN-код успешно установлен
+
+Verification failed
+== Проверка не удалась
+
+Verification successful
+== Проверка успешна
+
+Successfully changed the security pin
+== Защитный PIN-код успешно изменен
+
+You have to be inside of a bank to pay money from your bank account to others
+== Вы должны находиться в банке, чтобы переводить деньги с вашего банковского счета другим
+
+You can't pay money that frequently
+== Вы не можете так часто переводить деньги
+
+That player doesn't exist
+== Этот игрок не существует
+
+You can't pay money to yourself
+== Вы не можете перевести деньги самому себе
+
+That player is not logged in
+== Этот игрок не авторизован
+
+You don't have enough money
+== У вас недостаточно денег
+
+You can't pay nothing
+== Вы не можете перевести ничего
+
+You paid %lld money from your bank account to '%s'
+== Вы перевели %lld денег с вашего банковского счета игроку '%s'
+
+You got %lld money to your bank account from '%s'
+== Вы получили %lld денег на ваш банковский счет от '%s'
+
+Invalid argument
+== Недопустимый аргумент
+
+You can't drop nothing
+== Вы не можете выбросить ничего
+
+You can't drop money bags over 100.000
+== Вы не можете выбросить мешки с деньгами больше 100.000
+
+You don't have enough money in your wallet
+== У вас недостаточно денег в кошельке
+
+Drop money: '/money drop <amount>'
+== Выбросить деньги: '/money drop <количество>'
+
+You can't drop more than 100 portal batteries at the same time
+== Вы не можете выбросить более 100 портальных батарей одновременно
+
+You don't have enough portal batteries
+== У вас недостаточно портальных батарей
+
+You can collect portal batteries in the map, which lets you use the portal rifle.
+== Вы можете собирать портальные батареи на карте, что позволяет использовать портальную винтовку.
+
+The portal rifle can shoot two portals at cursor position, which tees, flags and weapons can use to travel between them.
+== Портальная винтовка может выстрелить два портала в позиции курсора, которые персонажи, флаги и оружие могут использовать для перемещения между ними.
+
+Your portal stats
+== Ваша портальная статистика
+
+Drop portal battery: '/portal drop <amount>'
+== Выбросить портальную батарею: '/portal drop <количество>'
+
+You are not VIP
+== Вы не VIP
+
+You don't have a room key
+== У вас нет ключа от комнаты
+
+This player has a key already
+== У этого игрока уже есть ключ
+
+This player got invited already
+== Этот игрок уже приглашен
+
+'%s' invited you to the room
+== '%s' пригласил вас в комнату
+
+You invited '%s' to the room
+== Вы пригласили '%s' в комнату
+
+You can't kick others without a key
+== Вы не можете выгнать других без ключа
+
+You can't kick a player with a key
+== Вы не можете выгнать игрока с ключом
+
+This player is not invited
+== Этот игрок не приглашен
+
+'%s' kicked you out of room
+== '%s' выгнал вас из комнаты
+
+You kicked '%s' out of room
+== Вы выгнали '%s' из комнаты
+
+Teleporting to spawn is disabled
+== Телепортация на спавн отключена
+
+You can't use this command in minigames
+== Вы не можете использовать эту команду в мини-играх
+
+You can't use this command while being arrested
+== Вы не можете использовать эту команду, пока находитесь под арестом
+
+You can't use this command while frozen
+== Вы не можете использовать эту команду, пока заморожены
+
+You lost 50.000 money for teleporting to spawn
+== Вы потеряли 50.000 денег за телепортацию на спавн
+
+Plot subcommands
+== Подкоманды участка
+
+For detailed info, type '/plot help <command>'
+== Для подробной информации введите '/plot help <команда>'
+
+Hold SPACE while editing for more control infos
+== Удерживайте ПРОБЕЛ во время редактирования для получения дополнительной информации об управлении
+
+Clears all objects of your plot
+== Очищает все объекты вашего участка
+
+Starts an auction for your plot, everyone can buy it using the buy command
+== Начинает аукцион на ваш участок, каждый может купить его с помощью команды buy
+
+Buys a plot if the given player is running a plot auction
+== Покупает участок, если указанный игрок проводит аукцион участка
+
+Lets you respawn at your plot
+== Позволяет возродиться на вашем участке
+
+Cancels the current running auction on your plot
+== Отменяет текущий аукцион на вашем участке
+
+Swaps plot with given player
+== Обменивает участок с указанным игроком
+
+Shows a list with all currently open plot auctions and swap offers
+== Показывает список всех текущих открытых аукционов участков и предложений обмена
+
+This player doesn't exists
+== Этот игрок не существует
+
+You can't buy your own plot
+== Вы не можете купить свой собственный участок
+
+This player doesn't sell a plot
+== Этот игрок не продает участок
+
+You already have a plot
+== У вас уже есть участок
+
+The price you entered does not match the offer
+== Цена, которую вы ввели, не соответствует предложению
+
+Your IP address already owns one plot
+== Ваш IP-адрес уже владеет одним участком
+
+Plot %d has been bought by '%s'
+== Участок %d был куплен игроком '%s'
+
+You bought plot %d from %s
+== Вы купили участок %d у %s
+
+%s bought your plot, the money is moved to your bank account
+== %s купил ваш участок, деньги переведены на ваш банковский счет
+
+Plot list
+== Список участков
+
+Buy from auction: '/plot buy <price> <playername>'
+== Купить на аукционе: '/plot buy <цена> <имя_игрока>'
+
+Swap with offer: '/plot swap <playername>'
+== Обменяться с предложением: '/plot swap <имя_игрока>'
+
+List of all plot auctions and swap offers:
+== Список всех аукционов участков и предложений обмена:
+
+There are currently no auctions or swap offers
+== В настоящее время нет аукционов или предложений обмена
+
+You need a plot to use this command
+== Вам нужен участок, чтобы использовать эту команду
+
+You can't sell your plot when being wanted
+== Вы не можете продать свой участок, когда находитесь в розыске
+
+You can only do auctions once a minute
+== Вы можете проводить аукционы только раз в минуту
+
+You already sell your plot
+== Вы уже продаете свой участок
+
+You need to enter a valid price
+== Вам нужно ввести действительную цену
+
+'%s' started an auction on plot %d for %d money (plot expires on %s)
+== '%s' начал аукцион на участок %d за %d денег (срок действия участка истекает %s)
+
+Use '/plot buy %d %s' to buy the plot
+== Используйте '/plot buy %d %s', чтобы купить участок
+
+You can't swap plots when being wanted
+== Вы не можете обменять участки, когда находитесь в розыске
+
+You can't swap with yourself
+== Вы не можете обменяться с самим собой
+
+This player doesn't own a plot
+== У этого игрока нет участка
+
+You can only swap once a minute
+== Вы можете обменяться только раз в минуту
+
+You swapped plots with '%s'
+== Вы обменялись участками с '%s'
+
+Offer to swap plots was sent to '%s'
+== Предложение обменяться участками было отправлено '%s'
+
+'%s' has offered to swap plots with you, type '/plot swap %s' to swap
+== '%s' предложил обменяться участками с вами, введите '/plot swap %s', чтобы обменяться
+
+Page
+== Страница
+
+Police Info
+== Информация о полиции
+
+[POLICE %d]
+== [ПОЛИЦИЯ %d]
+
+Level needed to buy
+== Необходимый уровень для покупки
+
+Benefits:
+== Преимущества:
+
+- The police bot will help you
+== - Полицейский бот поможет вам
+
+- taser license ('/taser')
+== - лицензия на тазер ('/taser')
+
+- Officers can taser a plot door of a wanted player to deal damage and destroy it
+== - Офицеры могут тазером повредить и уничтожить дверь участка разыскиваемого игрока
+
+- Taser will destroy plot objects of a wanted player
+== - Тазер уничтожит объекты участка разыскиваемого игрока
+
+[GENERAL INFORMATION]
+== [ОБЩАЯ ИНФОРМАЦИЯ]
+
+Police ranks can be bought in shop.
+== Полицейские звания можно купить в магазине.
+
+There are multiple police ranks, each cost 100.000 money.
+== Существует несколько полицейских званий, каждое стоит 100.000 денег.
+
+The policebot will help every police officer.
+== Полицейский бот поможет каждому офицеру полиции.
+
+Every police rank will give you more benefits.
+== Каждое полицейское звание дает вам больше преимуществ.
+
+Use '/police <page>' for information about other ranks
+== Используйте '/police <страница>' для информации о других званиях
+
+You can't mute yourself
+== Вы не можете заглушить себя
+
+muted
+== заглушен
+
+unmuted
+== разглушен
+
+Map Designs
+== Дизайны карты
+
+If you have your dummy connected, you need to reconnect it after the design change so it can get back it's state.
+== Если у вас подключен манекен, вам нужно переподключить его после изменения дизайна, чтобы он вернулся в свое состояние.
+
+You can set one of the following designs by using '/design <name>':
+== Вы можете установить один из следующих дизайнов, используя '/design <имя>':
+
+Invalid language
+== Недопустимый язык
+
+Successfully changed language to %s
+== Язык успешно изменен на %s
+
+Server Language
+== Язык сервера
+
+Current language
+== Текущий язык
+
+You can set one of the following languages for server-side translation by using '/language <option>':
+== Вы можете установить один из следующих языков для перевода на стороне сервера, используя '/language <вариант>':
+
+This chat language is already selected
+== Этот язык чата уже выбран
+
+Successfully updated chat language
+== Язык чата успешно обновлен
+
+Chat Language
+== Язык чата
+
+You can set one of the following languages by using '/chatlanguage <option>':
+== Вы можете установить один из следующих языков, используя '/chatlanguage <вариант>':
+
+This server does not have a linked Discord server
+== Этот сервер не имеет связанного сервера Discord
+
+Minigames
+== Мини-игры
+
+You can join any minigame using '/<minigame>'
+== Вы можете присоединиться к любой мини-игре, используя '/<мини-игра>'
+
+To leave a minigame, just type '/leave'
+== Чтобы покинуть мини-игру, просто введите '/leave'
+
+Here is a list of all minigames:
+== Вот список всех мини-игр:
+
+Money
+== Деньги
+
+Spree
+== Серия
+
+Durák Wins
+== Победы в Дурака
+
+Durák Profit
+== Прибыль в Дураке
+
+You need to be police level 2 to use this command
+== Вам нужно быть полицейским уровня 2, чтобы использовать эту команду
+
+This player is a police officer
+== Этот игрок - офицер полиции
+
+This player is a police helper already
+== Этот игрок уже помощник полиции
+
+'%s' added you to the police helpers
+== '%s' добавил вас в помощники полиции
+
+You added '%s' to the police helpers
+== Вы добавили '%s' в помощники полиции
+
+This player is not a police helper
+== Этот игрок не является помощником полиции
+
+'%s' removed you from the police helpers
+== '%s' удалил вас из помощников полиции
+
+You removed '%s' from the police helpers
+== Вы удалили '%s' из помощников полиции
+
+WANTED
+== РАЗЫСКИВАЕТСЯ
+
+Listing all players that are wanted by the police:
+== Список всех игроков, разыскиваемых полицией:
+
+1 wanted player
+== 1 разыскиваемый игрок
+
+%d wanted players
+== %d разыскиваемых игроков
+
+There are no wanted players right now
+== Сейчас нет разыскиваемых игроков
+
+You don't have enough taser batteries
+== У вас недостаточно батарей для тазера
+
+Taser
+== Тазер
+
+Police officers with level 3 or higher get a taser license.
+== Офицеры полиции с уровнем 3 или выше получают лицензию на тазер.
+
+The taser is a rifle that freezes players for a short time.
+== Тазер - это винтовка, которая замораживает игроков на короткое время.
+
+You can pick up the taser and taser batteries throughout the map.
+== Вы можете подобрать тазер и батареи для тазера по всей карте.
+
+Your taser stats
+== Ваша статистика тазера
+
+Taser level
+== Уровень тазера
+
+Price for the next level
+== Цена за следующий уровень
+
+Freeze time: %.2f seconds
+== Время заморозки: %.2f секунд
+
+Taser shield
+== Щит тазера
+
+Drop taser battery: '/taser drop <amount>'
+== Выбросить батарею тазера: '/taser drop <количество>'
+
+'%s' has been muted for %d seconds (%s)
+== '%s' был заглушен на %d секунд (%s)
+
+'%s' has been muted for %d seconds
+== '%s' был заглушен на %d секунд
+
+Your taser shield has been set to %d%%. Use '/taser' to check later.
+== Ваш щит тазера был установлен на %d%%. Используйте '/taser' для проверки позже.
+
+You have been logged out by an admin
+== Вы были выведены из системы администратором
+
+You have been logged out due to account deactivation by an admin
+== Вы были выведены из системы из-за деактивации аккаунта администратором
+
+You are now in no-bonus area mode
+== Теперь вы находитесь в режиме зоны без бонусов
+
+You are no longer in no-bonus area mode
+== Вы больше не находитесь в режиме зоны без бонусов
+
+You were arrested for %d seconds
+== Вы были арестованы на %d секунд
+
+You lost your plot
+== Вы потеряли свой участок
+
+You are now owner of plot %d
+== Теперь вы владелец участка %d
+
+Objects
+== Объекты
+
+Please enter the name for this preset into the chat
+== Пожалуйста, введите имя для этого пресета в чат
+
+Please enter the name of the wanted preset into the chat
+== Пожалуйста, введите имя нужного пресета в чат
+
+Couldn't save preset '%s', a preset with that name already exists
+== Не удалось сохранить пресет '%s', пресет с таким именем уже существует
+
+Successfully saved preset '%s'
+== Пресет '%s' успешно сохранен
+
+Couldn't load preset '%s'
+== Не удалось загрузить пресет '%s'
+
+Successfully loaded preset '%s'
+== Пресет '%s' успешно загружен
+
+Preset saving aborted
+== Сохранение пресета прервано
+
+Preset loading aborted
+== Загрузка пресета прервана
+
+Vote aborted
+== Голосование прервано
+
+Vote passed
+== Голосование пройдено
+
+Vote failed
+== Голосование не удалось
+
+Your plot is no longer subject to a search warrant and can no longer be destroyed
+== Ваш участок больше не является объектом ордера на обыск и больше не может быть разрушен
+
+'%s' entered and joined the game
+== '%s' вошел и присоединился к игре
+
+'%s' entered and joined the spectators
+== '%s' вошел и присоединился к зрителям
+
+This server has an initial chat delay, you will need to wait %d seconds before talking.
+== На этом сервере есть начальная задержка чата, вам нужно подождать %d секунд, прежде чем говорить.
+
+'%s' rejoined current session
+== '%s' повторно присоединился к текущей сессии
+
+[WARNING] You need to reconnect your dummy after the design change is done, so it can get back it's old state.
+== [ПРЕДУПРЕЖДЕНИЕ] Вам нужно переподключить ваш манекен после завершения изменения дизайна, чтобы он вернулся в свое прежнее состояние.
+
+'%s' has left the game (%s)
+== '%s' покинул игру (%s)
+
+'%s' has left the game
+== '%s' покинул игру
+
+You do not have an ongoing conversation. Whisper to someone to start one
+== У вас нет текущего разговора. Шепните кому-нибудь, чтобы начать
+
+'%s' changed name to '%s'
+== '%s' изменил имя на '%s'
+
+Following players can't receive your message because either you or they are in local chat mode:
+== Следующие игроки не могут получить ваше сообщение, потому что либо вы, либо они находятся в режиме локального чата:
+
+No reason given
+== Причина не указана
+
+'%s' called vote to change server option '%s' (%s)
+== '%s' вызвал голосование для изменения опции сервера '%s' (%s)
+
+'%s' isn't an option on this server
+== '%s' не является опцией на этом сервере
+
+'%s' called vote to change server option '%s'
+== '%s' вызвал голосование для изменения опции сервера '%s'
+
+There's a %d second wait time between kick votes for each player please wait %d second(s)
+== Существует %d секунд ожидания между голосованиями на кик для каждого игрока, пожалуйста, подождите %d секунд(ы)
+
+Server does not allow voting to kick players
+== Сервер не разрешает голосование для кика игроков
+
+Kick voting requires %d players
+== Голосование для кика требует %d игроков
+
+You can't kick yourself
+== Вы не можете выгнать себя
+
+You can't kick dummies
+== Вы не можете выгнать манекены
+
+You can't kick authorized players
+== Вы не можете выгнать авторизованных игроков
+
+'%s' called for vote to kick you
+== '%s' вызвал голосование, чтобы выгнать вас
+
+You can kick only your team member
+== Вы можете выгнать только члена своей команды
+
+'%s' called for vote to kick '%s' (%s)
+== '%s' вызвал голосование, чтобы выгнать '%s' (%s)
+
+Server does not allow voting to move players to spectators
+== Сервер не разрешает голосование для перемещения игроков в зрители
+
+You can't move yourself
+== Вы не можете переместить себя
+
+You can't set dummies to spectator
+== Вы не можете установить манекены как зрители
+
+You can only move your team member to spectators
+== Вы можете переместить только члена своей команды в зрители
+
+'%s' called for vote to pause '%s' for %d seconds (%s)
+== '%s' вызвал голосование для паузы '%s' на %d секунд (%s)
+
+'%s' called for vote to move '%s' to spectators (%s)
+== '%s' вызвал голосование для перемещения '%s' в зрители (%s)
+
+You are now using the tee controller
+== Теперь вы используете контроллер персонажей
+
+You are no longer using the tee controller
+== Вы больше не используете контроллер персонажей
+
+Kill Protection enabled. If you really want to join the spectators, first type /kill
+== Защита от убийства включена. Если вы действительно хотите присоединиться к наблюдателям, сначала введите /kill
+
+Warning you have %lld money in your wallet! (see /money)
+== Внимание, у вас %lld денег в кошельке! (см. /money)
+
+Wallet kill Protection enabled. If you really want to join the spectators, first type /kill
+== Защита кошелька от убийства включена. Если вы действительно хотите присоединиться к наблюдателям, сначала введите /kill
+
+You can't join the spectators while being searched by the police
+== Вы не можете присоединиться к наблюдателям, пока вас разыскивает полиция
+
+You need to wait %d seconds before killing again due to escaping
+== Вам нужно подождать %d секунд перед повторным убийством из-за побега
+
+Kill Protection enabled. If you really want to kill, type /kill
+== Защита от убийства включена. Если вы действительно хотите убить, введите /kill
+
+Wallet kill Protection enabled. If you really want to kill, type /kill
+== Защита кошелька от убийства включена. Если вы действительно хотите убить, введите /kill
+
+Local chat mode has been disabled, automatically entered public chat
+== Режим локального чата отключен, автоматически включен публичный чат
+
+Automatic wallet to bank due to bank disabling
+== Автоматический перевод из кошелька в банк из-за отключения банка
+
+You are not permitted to talk for the next %d seconds.
+== Вам запрещено говорить в течение следующих %d секунд.
+
+Your plot expired
+== Ваш участок истёк
+
+The police have gained access to your plot in hopes of finding you
+== Полиция получила доступ к вашему участку в надежде найти вас
+
+Plot %d Door Health [%d/%d]
+== Здоровье двери участка %d [%d/%d]
+
+You are already logged in
+== Вы уже вошли в систему
+
+That account doesn't exist, please register first
+== Такого аккаунта не существует, пожалуйста, сначала зарегистрируйтесь
+
+This account is already logged in
+== Этот аккаунт уже активен
+
+This account is already logged in on another server
+== Этот аккаунт уже активен на другом сервере
+
+This account is disabled
+== Этот аккаунт отключен
+
+You were released from jail
+== Вас выпустили из тюрьмы
+
+'%s' is spawnblocking. Catch him!
+== '%s' блокирует спавн. Поймайте его!
+
+Police is searching you because of spawnblocking
+== Полиция разыскивает вас за блокировку спавна
+
+[WARNING] Spawnblocking is illegal
+== [ПРЕДУПРЕЖДЕНИЕ] Блокировка спавна запрещена
+
+Registration spam
+== Спам регистрации
+
+Too many login fails
+== Слишком много неудачных попыток входа
+
+Too many pin fails
+== Слишком много неудачных попыток ввода пин-кода
+
+You have been banned from the account system for %d seconds (%s)
+== Вы были заблокированы в системе аккаунтов на %d секунд (%s)
+
+You are banned from the account system for the next %d seconds.
+== Вы заблокированы в системе аккаунтов на следующие %d секунд.
+
+This minigame is disabled
+== Эта мини-игра отключена
+
+You are not in a minigame
+== Вы не в мини-игре
+
+You are already in minigame '%s'
+== Вы уже находитесь в мини-игре '%s'
+
+This map has no Durák lobby, you have to find your way to the table yourself
+== На этой карте нет лобби для игры в Дурака, вам нужно самостоятельно найти путь к столу
+
+'%s' left the minigame '%s'
+== '%s' покинул мини-игру '%s'
+
+'%s' joined the minigame '%s', use '/%s' to join aswell
+== '%s' присоединился к мини-игре '%s', используйте '/%s', чтобы тоже присоединиться
+
+Say '/leave' to join the normal area again
+== Напишите '/leave', чтобы вернуться в обычную зону
+
+Type '/1vs1 <playername>' to start a fight with someone
+== Напишите '/1vs1 <имя игрока>', чтобы начать бой с кем-то
+
+For custom scorelimits or a kill-border use '/1vs1 <playername> <scorelimit> <killborder>'
+== Для настройки лимита очков или границы убийств используйте '/1vs1 <имя игрока> <лимит очков> <граница убийств>'
+
+You have to leave first in order to join another minigame
+== Сначала вам нужно выйти, чтобы присоединиться к другой мини-игре
+
+The winner is '%s'
+== Победитель - '%s'
+
+You are the winner
+== Вы победитель
+
+'%s' would have timed out, but can use timeout protection now
+== '%s' мог бы выйти по таймауту, но теперь может использовать защиту от таймаута
+
+You are arrested for %lld seconds
+== Вы арестованы на %lld секунд
+
+Your life as a gangster is over, you are free now
+== Ваша жизнь в качестве гангстера окончена, теперь вы свободны
+
+Avoid policehammers for the next %lld seconds
+== Избегайте полицейских молотов в течение следующих %lld секунд
+
+Entered local chat
+== Вход в локальный чат
+
+Entered public chat
+== Вход в публичный чат
+
+'%s' joined the game
+== '%s' присоединился к игре
+
+'%s' joined the spectators
+== '%s' присоединился к наблюдателям
+
+You have been afk for %d seconds now. Please note that you get kicked after not playing for %d seconds.
+== Вы бездействуете уже %d секунд. Обратите внимание, что вас исключат из игры после бездействия в течение %d секунд.
+
+You can't pause while you are controlled by someone else
+== Вы не можете поставить на паузу, когда вами управляет кто-то другой
+
+You can't pause while you are selecting a tee to control
+== Вы не можете поставить на паузу во время выбора персонажа для управления
+
+(doubled xp)
+== (удвоенный опыт)
+
+You are now level %d!
+== Теперь у вас уровень %d!
+
+Successfully logged in
+== Успешный вход в систему
+
+[WARNING] You did not set a contact, it can be used to recover your password or to get back the account after it got stolen.
+== [ПРЕДУПРЕЖДЕНИЕ] Вы не указали контактные данные, они могут использоваться для восстановления пароля или возврата аккаунта после кражи.
+
+Set a contact with '/contact <option>' to hide this message and for a free XP reward.
+== Установите контакт с помощью '/contact <опция>', чтобы скрыть это сообщение и получить бесплатную награду XP.
+
+[WARNING] You did not set security pin yet. Check '/pin' for more information.
+== [ПРЕДУПРЕЖДЕНИЕ] Вы еще не установили пин-код безопасности. Проверьте '/pin' для получения дополнительной информации.
+
+Your previously collected money got added to your account due to login
+== Ваши ранее собранные деньги были добавлены на ваш счет при входе в систему
+
+Successfully logged out
+== Успешный выход из системы
+
+Load recent design '%s'?
+== Загрузить недавний дизайн '%s'?
+
+The plot auction by '%s' is cancelled
+== Аукцион участка от '%s' отменен
+
+Your plot swap offer got cancelled
+== Ваше предложение обмена участками отменено
+
+[WARNING] Your %s expired
+== [ПРЕДУПРЕЖДЕНИЕ] Ваш %s истек
+
+You got unfrozen by the clan protection.
+== Вас разморозила клановая защита.
+
+WARNING
+== ПРЕДУПРЕЖДЕНИЕ
+
+You got frozen by the clan protection.
+== Вас заморозила клановая защита.
+
+Remove your 'Chilli.*' clantag and reconnect, or set your skin body to 'greensward'.
+== Удалите клановый тег 'Chilli.*' и переподключитесь, или установите вашу модель тела на 'greensward'.
+
+You automatically left the minigame because you were afk for too long
+== Вы автоматически покинули мини-игру, потому что были афк слишком долго
+
+You automatically exited the plot editor because you were afk for too long
+== Вы автоматически вышли из редактора участка, потому что были афк слишком долго
+
+You can't join a minigame while being searched by the police
+== Вы не можете присоединиться к мини-игре, пока вас разыскивает полиция
+
+You can't join a minigame while being arrested
+== Вы не можете присоединиться к мини-игре, пока вы арестованы
+
+You can't join a minigame while being frozen
+== Вы не можете присоединиться к мини-игре, пока вы заморожены
+
+Minigame request sent, please don't move for 5 seconds
+== Запрос на мини-игру отправлен, пожалуйста, не двигайтесь в течение 5 секунд
+
+Your minigame request was cancelled because you are frozen
+== Ваш запрос на мини-игру был отменен, потому что вы заморожены
+
+Your minigame request was cancelled because you moved
+== Ваш запрос на мини-игру был отменен, потому что вы двигались
+
+Please move within %d seconds or you will leave the minigame
+== Пожалуйста, двигайтесь в течение %d секунд, иначе вы покинете мини-игру
+
+You have %dx double-xp life left
+== У вас осталось %dx жизней с двойным опытом
+
+You have no double-xp lifes anymore (last use)
+== У вас больше нет жизней с двойным опытом (последнее использование)
+
+You will not receive sounds from the server while farming on a moneytile
+== Вы не будете получать звуки с сервера во время фарма на денежной плитке
+
+You will receive all sounds again
+== Вы снова будете получать все звуки
+
+You will no longer see drawings
+== Вы больше не будете видеть рисунки
+
+You will now see drawings again
+== Теперь вы снова будете видеть рисунки
+
+You will no longer see money broadcasts, jail and escape timer will be shown in vote menu instead
+== Вы больше не будете видеть денежные оповещения, таймер тюрьмы и побега будет показан в меню голосования
+
+You will now see all broadcasts again
+== Теперь вы снова будете видеть все оповещения
+
+Weapon indicator enabled
+== Индикатор оружия включен
+
+Weapon indicator disabled
+== Индикатор оружия отключен
+
+Your cursor will now zoom. WARNING: Does not work with dynamic camera if deadzone or follow factor are non-default.
+== Ваш курсор теперь будет масштабироваться. ПРЕДУПРЕЖДЕНИЕ: Не работает с динамической камерой, если мертвая зона или коэффициент слежения не стандартные.
+
+You cursor will no longer be zoomed
+== Ваш курсор больше не будет масштабироваться
+
+You don't have ninjajetpack, buy it in the shop
+== У вас нет ниндзя-джетпака, купите его в магазине
+
+Ninjajetpack enabled
+== Ниндзя-джетпак включен
+
+Ninjajetpack disabled
+== Ниндзя-джетпак отключен
+
+You will now respawn at your plot (TAB+kill to join at normal spawn)
+== Теперь вы будете возрождаться на своем участке (TAB+kill, чтобы появиться на обычном спавне)
+
+You will no longer respawn at your plot (TAB+kill to join at plot spawn)
+== Вы больше не будете возрождаться на своем участке (TAB+kill, чтобы появиться на спавне участка)
+
+You will now resume from pause if your tee gets moved
+== Теперь вы будете выходить из паузы, если ваш персонаж будет перемещен
+
+You will no longer resume from pause if your tee gets moved
+== Вы больше не будете выходить из паузы, если ваш персонаж будет перемещен
+
+All objects of your plot have been removed
+== Все объекты с вашего участка были удалены
+
+You have to be alive to edit your plot
+== Вы должны быть живы, чтобы редактировать свой участок
+
+You have to be inside your plot to edit your plot
+== Вы должны находиться внутри своего участка, чтобы редактировать его
+
+You can't edit your plot while living the life of a gangster.
+== Вы не можете редактировать свой участок, живя жизнью гангстера.
+
+You are now editing your plot, switch to another weapon to exit the editor
+== Теперь вы редактируете свой участок, переключитесь на другое оружие, чтобы выйти из редактора
+
+Changed displayed score to '%s'
+== Отображаемый счет изменен на '%s'
+
+You are not VIP+
+== Вы не VIP+
+
+Rainbow speed has been updated to %d
+== Скорость радуги обновлена до %d
+
+%s finished in: %d minute(s) %5.2f second(s)
+== %s финишировал за: %d минут(ы) %5.2f секунд(ы)
+
+New record: %d minute(s) %5.2f second(s) better.
+== Новый рекорд: на %d минут(ы) %5.2f секунд(ы) лучше.
+
+New record: %5.2f second(s) better.
+== Новый рекорд: на %5.2f секунд(ы) лучше.
+
+You finished with your best time.
+== Вы финишировали с вашим лучшим временем.
+
+%d minute(s) %5.2f second(s) worse, better luck next time.
+== На %d минут(ы) %5.2f секунд(ы) хуже, удачи в следующий раз.
+
+%5.2f second(s) worse, better luck next time.
+== На %5.2f секунд(ы) хуже, удачи в следующий раз.
+
+Please specify the page using the reason field
+== Пожалуйста, укажите страницу, используя поле причины
+
+Please specify the rainbow speed using the reason field
+== Пожалуйста, укажите скорость радуги, используя поле причины
+
+You can't close your door because the police destroyed it
+== Вы не можете закрыть свою дверь, потому что полиция разрушила её
+
+%s is on a killing spree with %d blocks
+== %s находится в серии блокировок с %d блоками
+
+%s is on a killing spree with %d kills
+== %s находится в серии убийств с %d убийствами
+
+%s's blocking spree was ended by %s (%d blocks)
+== Серия блокировок %s была прервана %s (%d блоков)
+
+%s's blocking spree was ended by %s (%d kills)
+== Серия убийств %s была прервана %s (%d убийств)
+
+You lost, you can wait for another round or leave the lobby using '/leave'
+== Вы проиграли, вы можете дождаться следующего раунда или покинуть лобби с помощью '/leave'
+
+Too many players on police tiles
+== Слишком много игроков на полицейских плитках
+
+You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'
+== Вы должны быть авторизованы, чтобы использовать денежные плитки.\nПолучите аккаунт с помощью '/register <имя> <пароль> <пароль>'
+
+Congratulations, +20%% taser shield, current: %d%%. Use '/taser' to check later.
+== Поздравляем, +20%% защиты от тазера, текущая: %d%%. Используйте '/taser' для проверки позже.
+
+Congratulations, double-xp has been activated for %d lifes
+== Поздравляем, двойной опыт активирован на %d жизней
+
+'%s' finished the special race!
+== '%s' закончил особую гонку!
+
+This area is for helpers only
+== Эта зона только для помощников
+
+This area is for moderators only
+== Эта зона только для модераторов
+
+This area is for admins only
+== Эта зона только для администраторов
+
+Seems like it's your birthday! You may pick up your present at any time.
+== Похоже, у вас день рождения! Вы можете забрать свой подарок в любое время.
+
+This gift is only dedicated to humans.
+== Этот подарок предназначен только для людей.
+
+You've picked up your present already! Come back next year.
+== Вы уже забрали свой подарок! Приходите в следующем году.
+
+Happy birthday! :) You have jetpack for 45 seconds
+== С днем рождения! :) У вас есть джетпак на 45 секунд
+
+Sorry, someting is missing to get the gift.
+== Извините, чего-то не хватает для получения подарка.
+
+You need a key to enter this room, buy one in the shop
+== Вам нужен ключ, чтобы войти в эту комнату, купите его в магазине
+
+This area is for VIP+ only, buy it in the shop
+== Эта зона только для VIP+, купите его в магазине
+
+Your jetpack is now disabled
+== Ваш джетпак теперь отключен
+
+'%s' has exceeded his legal drinking limit. Catch him!
+== '%s' превысил свой законный лимит потребления алкоголя. Поймайте его!
+
+Police is searching you because you have exceeded your legal drinking limit
+== Полиция разыскивает вас, потому что вы превысили свой законный лимит потребления алкоголя
+
+You can not hold more than %d grogs at once
+== Вы не можете держать более %d грогов одновременно
+
+Weapon
+== Оружие
+
+'%s' is using bonus illegally. Catch him!
+== '%s' незаконно использует бонус. Поймайте его!
+
+Police is searching you because of illegal bonus use
+== Полиция разыскивает вас из-за незаконного использования бонуса
+
+[WARNING] Using bonus in no-bonus area is illegal
+== [ПРЕДУПРЕЖДЕНИЕ] Использование бонуса в зоне без бонусов незаконно
+
+[WARNING] You need to enter this teleporter with your dummy within 30 seconds in order to get moved safely
+== [ПРЕДУПРЕЖДЕНИЕ] Вам нужно войти в этот телепорт с вашим дублем в течение 30 секунд, чтобы безопасно переместиться
+
+[WARNING] Your dummy has to be alive in order to get moved safely
+== [ПРЕДУПРЕЖДЕНИЕ] Ваш дубль должен быть жив, чтобы безопасно переместиться
+
+'%s' has been moved to another map
+== '%s' был перемещен на другую карту
+
+'%s' died as a result of excessive grog consumption (%.1f‰ / %.1f‰)
+== '%s' умер в результате чрезмерного потребления грога (%.1f‰ / %.1f‰)
+
+You paid %d money to '%s' to reduce your jailtime by 5 minutes
+== Вы заплатили %d денег '%s', чтобы сократить свое время в тюрьме на 5 минут
+
+You got %d money from '%s' to reduce his jailtime by 5 minutes
+== Вы получили %d денег от '%s' за сокращение его времени в тюрьме на 5 минут
+
+'%s' has been caught by '%s' (%d minutes arrest)
+== '%s' был пойман '%s' (%d минут ареста)
+
+Grog testing results: %.1f‰ / %.1f‰
+== Результаты теста на грог: %.1f‰ / %.1f‰
+
+You were arrested for %d minutes by '%s'
+== Вы были арестованы на %d минут '%s'
+
+You already have the maximum of 50 meteors
+== У вас уже максимальное количество метеоритов - 50
+
+Taser shield has been used, -5%%, new current: %d%%
+== Защита от тазера использована, -5%%, новое текущее значение: %d%%
+
+Collected %lld money
+== Собрано %lld денег
+
+battery
+== батарея
+
+portal rifle
+== портальная винтовка
+
+seconds
+== секунд
+
+minutes
+== минут
+
+This %s will respawn in %d %s
+== Этот %s появится через %d %s
+
+This %s got picked up %d %s ago
+== Этот %s был подобран %d %s назад
+
+You need to select an amount to deposit or withdraw.
+== Вам нужно выбрать сумму для внесения или снятия.
+
+You don't have enough money in your wallet to deposit this amount.
+== У вас недостаточно денег в кошельке, чтобы внести эту сумму.
+
+You deposited %d money from your wallet to your bank account.
+== Вы внесли %d денег из своего кошелька на свой банковский счет.
+
+You don't have enough money on your bank account to withdraw this amount.
+== У вас недостаточно денег на банковском счете, чтобы снять эту сумму.
+
+You withdrew %d money from your bank account to your wallet.
+== Вы сняли %d денег со своего банковского счета в свой кошелек.
+
+Bye! Come back if you need something.
+== До свидания! Возвращайтесь, если вам что-то понадобится.
+
+Invalid item
+== Недопустимый предмет
+
+You already have the highest police rank
+== У вас уже высший полицейский ранг
+
+You already have the maximum amount of bullets
+== У вас уже максимальное количество пуль
+
+You already have the maximum taser level
+== У вас уже максимальный уровень тазера
+
+You already have a fully filled taser battery
+== У вас уже полностью заряженная батарея тазера
+
+You already have the %s
+== У вас уже есть %s
+
+You already have %s
+== У вас уже есть %s
+
+You need to be police level 3 or higher to get a taser license
+== Вам нужен полицейский уровень 3 или выше, чтобы получить лицензию на тазер
+
+You can not buy this VIP level while owning another one
+== Вы не можете купить этот уровень VIP, владея другим
+
+You can not buy bloody while specific cosmetics are activated
+== Вы не можете купить кровавый эффект, пока активированы специфические косметические предметы
+
+This plot is already sold to someone else
+== Этот участок уже продан кому-то другому
+
+You already own that plot
+== Вы уже владеете этим участком
+
+You already own another plot
+== Вы уже владеете другим участком
+
+Your level is too low, you need to be level %d to buy %s
+== Ваш уровень слишком низкий, вам нужен уровень %d, чтобы купить %s
+
+Taser battery purchase failed
+== Покупка батареи тазера не удалась
+
+You bought %s %s
+== Вы купили %s %s
+
+until death
+== до смерти
+
+until disconnect
+== до отключения
+
+Check '/account' for more information about the expiration date
+== Проверьте '/account' для получения дополнительной информации о дате истечения срока
+
+The plot will expire on %s
+== Срок действия участка истекает %s
+
+You don't have enough money in your wallet to buy a grog.
+== У вас недостаточно денег в кошельке, чтобы купить грог.
+
+You bought one grog
+== Вы купили один грог
+
+You can't fight against yourself
+== Вы не можете сражаться против себя
+
+Invalid participant
+== Недопустимый участник
+
+Leave the current fight in order to join another one
+== Покиньте текущий бой, чтобы присоединиться к другому
+
+Too many 1vs1 arenas, try again later
+== Слишком много арен 1на1, попробуйте позже
+
+You successfully created a new global arena
+== Вы успешно создали новую глобальную арену
+
+You invited '%s' to a fight
+== Вы пригласили '%s' на бой
+
+You have been invited to a fight by '%s', type '/1vs1 %s' to join
+== Вас пригласил на бой '%s', введите '/1vs1 %s', чтобы присоединиться
+
+Join the 1vs1 lobby using '/1vs1' before you accept the fight
+== Присоединитесь к лобби 1на1, используя '/1vs1', прежде чем принять бой
+
+You have accepted the invite by '%s'
+== Вы приняли приглашение от '%s'
+
+'%s' has accepted your invite
+== '%s' принял ваше приглашение
+
+'%s' won a 1vs1 round against '%s'! Final scores: %d - %d
+== '%s' выиграл раунд 1на1 против '%s'! Итоговый счет: %d - %d
+
+'%s' left a 1vs1 round against '%s'! Current scores: %d - %d
+== '%s' покинул раунд 1на1 против '%s'! Текущий счет: %d - %d
+
+Select your favourite part of the map\nZoom in or out to change the size\nPlace arena by pressing SPACE
+== Выберите любимую часть карты\nУвеличивайте или уменьшайте масштаб, чтобы изменить размер\nРазместите арену, нажав ПРОБЕЛ
+
+Set first spawn positions by pressing SPACE
+== Установите первые позиции появления, нажав ПРОБЕЛ
+
+Set second spawn positions by pressing SPACE
+== Установите вторые позиции появления, нажав ПРОБЕЛ
+
+Choose a weapon with A/D\nToggle weapon usage by pressing SPACE\nPress SPACE on the heart to confirm
+== Выберите оружие с помощью A/D\nПереключите использование оружия, нажав ПРОБЕЛ\nНажмите ПРОБЕЛ на сердце для подтверждения
+
+Welcome to the Durák table, %s! This seat is taken already, please try another one.
+== Добро пожаловать за стол Дурака, %s! Это место уже занято, пожалуйста, попробуйте другое.
+
+Welcome to Durák, %s! You are first, please enter a stake in the chat.
+== Добро пожаловать в Дурака, %s! Вы первый, пожалуйста, укажите ставку в чате.
+
+Welcome to Durák, %s! You are second, please enter the current stake of '%lld' or propose a new one.
+== Добро пожаловать в Дурака, %s! Вы второй, пожалуйста, введите текущую ставку '%lld' или предложите новую.
+
+Welcome to Durák, %s! In order to participate, please enter the current stake of '%lld' in the chat.
+== Добро пожаловать в Дурака, %s! Чтобы участвовать, пожалуйста, введите текущую ставку '%lld' в чате.
+
+Successfully set the stake for the current round to '%lld'.
+== Успешно установлена ставка для текущего раунда на '%lld'.
+
+Successfully deployed your stake.
+== Ваша ставка успешно размещена.
+
+'%s' proposed a new stake, please enter the current stake of '%lld' or propose a new one in the chat.
+== '%s' предложил новую ставку, пожалуйста, введите текущую ставку '%lld' или предложите новую в чате.
+
+Successfully updated the stake for the current round to '%lld'.
+== Успешно обновлена ставка для текущего раунда на '%lld'.
+
+You can't currently drop that much money due to your stake
+== В данный момент вы не можете выбросить столько денег из-за вашей ставки
+
+Couldn't start game, no empty team found
+== Не удалось начать игру, не найдена пустая команда
+
+You didn't deploy your stake in time, game started without you
+== Вы не успели разместить свою ставку вовремя, игра началась без вас
+
+Your stake got collected: -%lld money.
+== Ваша ставка собрана: -%lld денег.
+
+'%s' is the Durák!
+== '%s' - Дурак!
+
+'%s' successfully defended
+== '%s' успешно отбился
+
+'%s' took too long and was skipped
+== '%s' потратил слишком много времени и был пропущен
+
+'%s' couldn't defend all attacks and takes all cards
+== '%s' не смог отбить все атаки и забирает все карты
+
+'%s' won the game! (#%d)
+== '%s' выиграл игру! (#%d)
+
+'%s' won the game!
+== '%s' выиграл игру!
+
+Congratulations, you are not the Durák!
+== Поздравляем, вы не Дурак!
+
+Your stake got returned: +%lld money.
+== Ваша ставка возвращена: +%lld денег.
+
+You got +%lld money from others leaving the game.
+== Вы получили +%lld денег от других покинувших игру.

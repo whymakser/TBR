@@ -327,6 +327,8 @@ void CServer::CClient::ResetContent()
 	m_Sevendown = false;
 	m_Socket = SOCKET_MAIN;
 	m_DnsblState = CClient::DNSBL_STATE_NONE;
+	m_CountryLookupState = CClient::COUNTRYLOOKUP_STATE_NONE;
+	str_copy(m_aCountryCode, "en", sizeof(m_aCountryCode));
 	m_PgscState = CClient::PGSC_STATE_NONE;
 	m_IdleDummy = false;
 	m_DummyHammer = false;
@@ -335,7 +337,7 @@ void CServer::CClient::ResetContent()
 		m_aIdleDummyTrack[i] = 0;
 	m_CurrentIdleTrackPos = 0;
 
-	str_copy(m_aLanguage, "none", sizeof(m_aLanguage));
+	str_copy(m_aChatLanguage, "none", sizeof(m_aChatLanguage));
 	m_Main = true;
 
 	m_Rejoining = false;
@@ -2701,12 +2703,13 @@ int CServer::LoadMap(const char *pMapName)
 	str_copy(m_aCurrentMap, pMapName, sizeof(m_aCurrentMap));
 
 	// load complete map into memory for download
+	IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
+	if (File)
 	{
-		IOHANDLE File = Storage()->OpenFile(aBuf, IOFLAG_READ, IStorage::TYPE_ALL);
 		m_CurrentMapSize = (unsigned int)io_length(File);
-		if(m_pCurrentMapData)
+		if (m_pCurrentMapData)
 			mem_free(m_pCurrentMapData);
-		m_pCurrentMapData = (unsigned char *)mem_alloc(m_CurrentMapSize, 1);
+		m_pCurrentMapData = (unsigned char*)mem_alloc(m_CurrentMapSize, 1);
 		io_read(File, m_pCurrentMapData, m_CurrentMapSize);
 		io_close(File);
 	}
@@ -2807,6 +2810,11 @@ int CServer::Run()
 		str_format(aBuf, sizeof(aBuf), "git revision hash: %s", GIT_SHORTREV_HASH);
 		Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 	}
+
+	// Language setting, do before command execution, to overridde default language if wanted
+	g_Localization.LoadIndexfile(Storage(), Config());
+	g_Localization.SelectDefaultLanguage(Config()->m_SvDefaultLanguage, sizeof(Config()->m_SvDefaultLanguage));
+	g_Localization.Load(Config()->m_SvDefaultLanguage);
 
 	// process pending commands
 	m_pConsole->StoreCommands(false);
@@ -2939,6 +2947,48 @@ int CServer::Run()
 
 							m_NetServer.NetBan()->BanAddr(m_NetServer.ClientAddr(i), 60*60*6, "Proxy server, try connecting to the real server. Contact admin if mistaken");
 						}
+					}
+				}
+
+				if (Config()->m_SvLanguageSuggestion)
+				{
+					if(m_aClients[i].m_CountryLookupState == CClient::COUNTRYLOOKUP_STATE_NONE)
+					{
+						// initiate country code lookup
+						CountryLookup(i);
+					}
+					else if(m_aClients[i].m_CountryLookupState == CClient::COUNTRYLOOKUP_STATE_PENDING && m_aClients[i].m_pCountryLookup->Status() == IJob::STATE_DONE)
+					{
+						m_aClients[i].m_CountryLookupState = CClient::COUNTRYLOOKUP_STATE_DONE;
+
+						// Console outut
+						char aAddrStr[NETADDR_MAXSTRSIZE];
+						net_addr_str(m_NetServer.ClientAddr(i), aAddrStr, sizeof(aAddrStr), true);
+
+						// Process result
+						const char *pResult = m_aClients[i].m_pCountryLookup->m_aResult;
+						if (pResult[0] == '{')
+						{
+							/// Error, returned some json object, error 400
+							char aBuf[256];
+							str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> fetching country code failed, suggesting 'english'", i, aAddrStr);
+							Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
+						}
+						else
+						{
+							int Language = g_Localization.GetLanguageByCode(pResult);
+							char aBuf[256];
+							const char *pLanguage = g_Localization.GetLanguageFileName(Language);
+							if (str_comp(pLanguage, Config()->m_SvDefaultLanguage) != 0)
+							{
+								str_copy(m_aClients[i].m_aCountryCode, pResult, sizeof(m_aClients[i].m_aCountryCode));
+							}
+							str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> fetched country code=%s, suggesting '%s'", i, aAddrStr, pResult, pLanguage);
+							Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
+						}
+
+						// Notify game and process language suggestion
+						GameServer()->OnCountryCodeLookup(i);
 					}
 				}
 			}
@@ -3737,6 +3787,38 @@ void CServer::ConchainFakeMapCrc(IConsole::IResult *pResult, void *pUserData, IC
 	pThis->LoadUpdateFakeMap();
 }
 
+void CServer::ConchainDefaultLanguage(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
+{
+	CServer *pThis = (CServer *)pUserData;
+	if (!pResult->NumArguments())
+	{
+		char aBuf[128];
+		str_format(aBuf, sizeof(aBuf), "Current default language: %s", pThis->Config()->m_SvDefaultLanguage);
+		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
+		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", "Available languages:");
+		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", g_Localization.ListAvailable());
+		return;
+	}
+	char aBuf[128];
+	const char *pNewLang = pResult->GetString(0);
+	if (g_Localization.Load(pNewLang, true))
+	{
+		pfnCallback(pResult, pCallbackUserData);
+		str_format(aBuf, sizeof(aBuf), "Successfully changed default language to '%s'", pNewLang);
+		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
+	}
+	else
+	{
+		if (str_comp(pNewLang, pThis->Config()->m_SvDefaultLanguage) != 0)
+		{
+			g_Localization.SelectDefaultLanguage(pThis->Config()->m_SvDefaultLanguage, sizeof(pThis->Config()->m_SvDefaultLanguage));
+			g_Localization.Load(pThis->Config()->m_SvDefaultLanguage);
+		}
+		str_format(aBuf, sizeof(aBuf), "Couldn't load language, falling back to default '%s'", pThis->Config()->m_SvDefaultLanguage);
+		pThis->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
+	}
+}
+
 #if defined(CONF_FAMILY_UNIX)
 void CServer::ConchainConnLoggingServerChange(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData)
 {
@@ -3803,6 +3885,8 @@ void CServer::RegisterCommands()
 	Console()->Chain("sv_rcon_password", ConchainRconPasswordChange, this);
 	Console()->Chain("sv_rcon_mod_password", ConchainRconModPasswordChange, this);
 	Console()->Chain("sv_rcon_helper_password", ConchainRconHelperPasswordChange, this);
+
+	Console()->Chain("sv_default_language", ConchainDefaultLanguage, this);
 
 	Console()->Chain("fake_map_crc", ConchainFakeMapCrc, this);
 
@@ -3969,15 +4053,12 @@ void CServer::GetClientAddr(int ClientID, NETADDR* pAddr)
 
 const char* CServer::GetAnnouncementLine(char const* pFileName)
 {
-	IOHANDLE File = m_pStorage->OpenFile(pFileName, IOFLAG_READ, IStorage::TYPE_ALL);
-	if (!File)
+	CLineReader LineReader;
+	if (!LineReader.OpenFile(m_pStorage->OpenFile(pFileName, IOFLAG_READ, IStorage::TYPE_ALL)))
 		return 0;
 
-	std::vector<char*> v;
-	char* pLine;
-	CLineReader* lr = new CLineReader();
-	lr->Init(File);
-	while ((pLine = lr->Get()))
+	std::vector<const char *> v;
+	while(const char *pLine = LineReader.Get())
 		if (str_length(pLine))
 			if (pLine[0] != '#')
 				v.push_back(pLine);
@@ -4004,8 +4085,6 @@ const char* CServer::GetAnnouncementLine(char const* pFileName)
 
 		m_AnnouncementLastLine = Rand;
 	}
-
-	io_close(File);
 
 	return v[m_AnnouncementLastLine];
 }
@@ -4262,6 +4341,35 @@ void CServer::PrintBotLookup()
 	m_BotLookupState = BOTLOOKUP_STATE_PENDING;
 }
 
+void CServer::CountryLookup(int ClientID)
+{
+	if (m_aClients[ClientID].m_CountryLookupState != CClient::COUNTRYLOOKUP_STATE_NONE)
+		return;
+
+	char aAddrStr[NETADDR_MAXSTRSIZE];
+	net_addr_str(m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), false);
+
+	IEngine *pEngine = Kernel()->RequestInterface<IEngine>();
+	pEngine->AddJob(m_aClients[ClientID].m_pCountryLookup = std::make_shared<CClient::CCountryLookup>(aAddrStr));
+	m_aClients[ClientID].m_CountryLookupState = CClient::COUNTRYLOOKUP_STATE_PENDING;
+}
+
+void CServer::CClient::CCountryLookup::Run()
+{
+	char aBuf[512];
+	str_format(aBuf, 512, "curl -s https://ipinfo.io/%s/country", m_aAddr);
+	FILE *pStream = pipe_open(aBuf, "r");
+	if (!pStream)
+		return;
+
+	char aResult[512] = "";
+	if (fgets(aResult, sizeof(aResult), pStream))
+	{
+		str_copy(m_aResult, aResult, sizeof(m_aResult));
+	}
+	pipe_close(pStream);
+}
+
 void CServer::CClient::CPgscLookup::Run()
 {
 	char aCmd[256];
@@ -4403,11 +4511,11 @@ void CServer::CTranslateChat::Run()
 #ifdef CONF_FAMILY_WINDOWS
 	if (m_pServer->Config()->m_SvLibreTranslateKey[0])
 		str_format(aKey, sizeof(aKey), ",\\\"api_key\\\":\\\"%s\\\"", m_pServer->Config()->m_SvLibreTranslateKey);
-	str_format(aCmd, sizeof(aCmd), "curl -s -H \"Content-Type:application/json\" -X POST --data \"{\\\"q\\\":\\\"%s\\\",\\\"source\\\":\\\"auto\\\",\\\"target\\\":\\\"%s\\\"%s}\" %s", m_aMessage, m_aLanguage, aKey, m_pServer->Config()->m_SvLibreTranslateURL);
+	str_format(aCmd, sizeof(aCmd), "curl -s -H \"Content-Type:application/json\" -X POST --data \"{\\\"q\\\":\\\"%s\\\",\\\"source\\\":\\\"auto\\\",\\\"target\\\":\\\"%s\\\"%s}\" %s", m_aMessage, m_aChatLanguage, aKey, m_pServer->Config()->m_SvLibreTranslateURL);
 #else
 	if (m_pServer->Config()->m_SvLibreTranslateKey[0])
 		str_format(aKey, sizeof(aKey), ",\"api_key\":\"%s\"", m_pServer->Config()->m_SvLibreTranslateKey);
-	str_format(aCmd, sizeof(aCmd), "curl -s -H \"Content-Type:application/json\" -X POST --data '{\"q\":\"%s\",\"source\":\"auto\",\"target\":\"%s\"%s}' %s", m_aMessage, m_aLanguage, aKey, m_pServer->Config()->m_SvLibreTranslateURL);
+	str_format(aCmd, sizeof(aCmd), "curl -s -H \"Content-Type:application/json\" -X POST --data '{\"q\":\"%s\",\"source\":\"auto\",\"target\":\"%s\"%s}' %s", m_aMessage, m_aChatLanguage, aKey, m_pServer->Config()->m_SvLibreTranslateURL);
 #endif
 
 	char aResult[512] = "";
@@ -4445,7 +4553,7 @@ void CServer::CTranslateChat::Run()
 	{
 		for (int i = 0; i < MAX_CLIENTS; i++)
 		{
-			if (m_pServer->m_aClients[i].m_State != CServer::CClient::STATE_INGAME || str_comp_nocase(m_pServer->GetLanguage(i), m_aLanguage) != 0)
+			if (m_pServer->m_aClients[i].m_State != CServer::CClient::STATE_INGAME || str_comp_nocase(m_pServer->GetLanguage(i), m_aChatLanguage) != 0)
 				continue;
 			int Mode = (m_Mode == CHAT_TEAM || m_Mode == CHAT_LOCAL) ? CHAT_SINGLE_TEAM : CHAT_SINGLE;
 			m_pServer->GameServer()->SendChatMessage(m_ClientID, Mode, i, aResult);

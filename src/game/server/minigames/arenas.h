@@ -4,7 +4,6 @@
 #define GAME_SERVER_MINIGAMES_ARENAS_H
 
 #include "minigame.h"
-#include <base/vmath.h>
 #include <vector>
 
 class CPlayer;

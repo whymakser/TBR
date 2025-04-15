@@ -67,6 +67,8 @@ inline float frandom() { return rand()/(float)(RAND_MAX); }
 inline int random(int max) { return rand() % max; }
 inline int random(int min, int max) { return min + rand() % (max+1 - min); }
 
+inline int mod(int a, int b) { return (a % b + b) % b; }
+
 // float to fixed
 inline int f2fx(float v) { return (int)(v*(float)(1<<10)); }
 inline float fx2f(int v) { return v*(1.0f/(1<<10)); }

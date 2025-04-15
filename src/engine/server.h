@@ -11,6 +11,7 @@
 #include <generated/protocol.h>
 #include <engine/shared/protocol.h>
 #include <base/math.h>
+#include <game/localization.h>
 
 struct CAntibotRoundData;
 
@@ -79,7 +80,9 @@ public:
 	virtual void LoadMapDesigns() = 0;
 
 	virtual void PrintBotLookup() = 0;
+	virtual void CountryLookup(int ClientID) = 0;
 	virtual void TranslateChat(int ClientID, const char *pMsg, int Mode) = 0;
+	virtual const char *GetCountryCode(int ClientID) = 0;
 
 	virtual void SaveWhitelist() = 0;
 	virtual void AddWhitelist(const NETADDR *pAddr, const char *pReason) = 0;
@@ -343,6 +346,7 @@ public:
 
 	virtual void FillAntibot(CAntibotRoundData *pData) = 0;
 	virtual void SetBotDetected(int ClientID) = 0;
+	virtual void OnCountryCodeLookup(int ClientID) = 0;
 
 	/**
 	 * Used to report custom player info to master servers.

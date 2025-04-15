@@ -467,11 +467,21 @@ void CGameContext::Mute(const NETADDR *pAddr, int Secs, const char *pDisplayName
 
 	char aBuf[128];
 	if (pReason[0])
-		str_format(aBuf, sizeof aBuf, "'%s' has been muted for %d seconds (%s)", pDisplayName, Secs, pReason);
+	{
+		str_copy(aBuf, Localizable("'%s' has been muted for %d seconds (%s)"), sizeof(aBuf));
+		SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, aBuf, pDisplayName, Secs, pReason);
+
+		str_format(aBuf, sizeof(aBuf), "'%s' has been muted for %d seconds (%s)", pDisplayName, Secs, pReason);
+		SendModLogMessage(ExecutorID, aBuf);
+	}
 	else
-		str_format(aBuf, sizeof aBuf, "'%s' has been muted for %d seconds", pDisplayName, Secs);
-	SendChat(-1, CHAT_ALL, -1, aBuf);
-	SendModLogMessage(ExecutorID, aBuf);
+	{
+		str_copy(aBuf, Localizable("'%s' has been muted for %d seconds"), sizeof(aBuf));
+		SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, aBuf, pDisplayName, Secs);
+
+		str_format(aBuf, sizeof(aBuf), "'%s' has been muted for %d seconds", pDisplayName, Secs);
+		SendModLogMessage(ExecutorID, aBuf);
+	}
 }
 
 void CGameContext::ConVoteMute(IConsole::IResult* pResult, void* pUserData)
@@ -1179,6 +1189,7 @@ void CGameContext::ConPlayerInfo(IConsole::IResult *pResult, void *pUserData)
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
 	}
 	str_format(aBuf, sizeof(aBuf), "Design: %s", pSelf->Server()->GetMapDesign(ID));
+	str_format(aBuf, sizeof(aBuf), "Language: %s", g_Localization.GetLanguageString(pPlayer->m_Language));
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
 	if (pChr)
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", "Status: Ingame");
@@ -1486,7 +1497,7 @@ void CGameContext::ConSetTaserShield(IConsole::IResult *pResult, void *pUserData
 		pPlayer->m_TaserShield = clamp(pResult->GetInteger(1), 0, 100);
 
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "Your taser shield has been set to %d%%. Use '/taser' to check later.", pPlayer->m_TaserShield);
+		str_format(aBuf, sizeof(aBuf), pPlayer->Localize("Your taser shield has been set to %d%%. Use '/taser' to check later."), pPlayer->m_TaserShield);
 		pSelf->SendChatTarget(Victim, aBuf);
 
 		str_format(aBuf, sizeof(aBuf), "Set taser shield percentage of '%s' to %d%%", pSelf->Server()->ClientName(Victim), pPlayer->m_TaserShield);
@@ -1653,7 +1664,7 @@ void CGameContext::ConSetPermille(IConsole::IResult *pResult, void *pUserData)
 	CCharacter *pChr = pSelf->GetPlayerChar(Victim);
 	if (pChr)
 	{
-		pChr->m_Permille = 0;
+		pChr->GetPlayer()->m_Permille = 0;
 		pChr->m_FirstPermilleTick = 0;
 		pChr->m_GrogBalancePosX = CCharacter::GROG_BALANCE_POS_UNSET;
 		pChr->m_GrogDirDelayEnd = 0;
@@ -1744,11 +1755,12 @@ void CGameContext::ConAccLogout(IConsole::IResult* pResult, void* pUserData)
 		return;
 	}
 
-	if (pSelf->m_Accounts[ID].m_ClientID >= 0)
-		pSelf->SendChatTarget(pSelf->m_Accounts[ID].m_ClientID, "You have been logged out by an admin");
+	int ClientID = pSelf->m_Accounts[ID].m_ClientID;
+	if (ClientID >= 0 && pSelf->m_apPlayers[ClientID])
+		pSelf->SendChatTarget(ClientID, pSelf->m_apPlayers[ClientID]->Localize("You have been logged out by an admin"));
 
 	char aBuf[64];
-	str_format(aBuf, sizeof(aBuf), "Logged out account '%s' (%s)", pSelf->m_Accounts[ID].m_Username, pSelf->m_Accounts[ID].m_ClientID >= 0 ? pSelf->Server()->ClientName(pSelf->m_Accounts[ID].m_ClientID) : "player not online");
+	str_format(aBuf, sizeof(aBuf), "Logged out account '%s' (%s)", pSelf->m_Accounts[ID].m_Username, ClientID >= 0 ? pSelf->Server()->ClientName(ClientID) : "player not online");
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
 
 	pSelf->Logout(ID);
@@ -1765,8 +1777,9 @@ void CGameContext::ConAccDisable(IConsole::IResult* pResult, void* pUserData)
 		return;
 	}
 
-	if (pSelf->m_Accounts[ID].m_ClientID >= 0)
-		pSelf->SendChatTarget(pSelf->m_Accounts[ID].m_ClientID, "You have been logged out due to account deactivation by an admin");
+	int ClientID = pSelf->m_Accounts[ID].m_ClientID;
+	if (ClientID >= 0 && pSelf->m_apPlayers[ClientID])
+		pSelf->SendChatTarget(pSelf->m_Accounts[ID].m_ClientID, pSelf->m_apPlayers[ClientID]->Localize("You have been logged out due to account deactivation by an admin"));
 
 	pSelf->m_Accounts[ID].m_Disabled = !pSelf->m_Accounts[ID].m_Disabled;
 
@@ -1828,11 +1841,11 @@ void CGameContext::ConAccAddEuros(IConsole::IResult* pResult, void* pUserData)
 
 	if (pSelf->m_Accounts[ID].m_ClientID >= 0)
 	{
-		str_format(aBuf, sizeof(aBuf), "You %s %.2f euros", Euros >= 0 ? "got" : "lost", Euros);
+		str_format(aBuf, sizeof(aBuf), "You %s %.2f EUR", Euros >= 0 ? "got" : "lost", Euros);
 		pSelf->SendChatTarget(pSelf->m_Accounts[ID].m_ClientID, aBuf);
 	}
 
-	str_format(aBuf, sizeof(aBuf), "%.2f euros given to account '%s'", Euros, pSelf->m_Accounts[ID].m_Username);
+	str_format(aBuf, sizeof(aBuf), "%.2f EUR given to account '%s'", Euros, pSelf->m_Accounts[ID].m_Username);
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
 
 	pSelf->WriteDonationFile(TYPE_DONATION, Euros, ID, "");
@@ -2039,7 +2052,7 @@ void CGameContext::ConSetNoBonusArea(IConsole::IResult* pResult, void* pUserData
 	int Victim = pResult->NumArguments() ? pResult->GetVictim() : pResult->m_ClientID;
 	CCharacter* pChr = pSelf->GetPlayerChar(Victim);
 	if (pChr && pChr->OnNoBonusArea(true))
-		pSelf->SendChatTarget(Victim, "You are now in no-bonus area mode");
+		pSelf->SendChatTarget(Victim, pChr->GetPlayer()->Localize("You are now in no-bonus area mode"));
 }
 
 void CGameContext::ConUnsetNoBonusArea(IConsole::IResult* pResult, void* pUserData)
@@ -2048,7 +2061,7 @@ void CGameContext::ConUnsetNoBonusArea(IConsole::IResult* pResult, void* pUserDa
 	int Victim = pResult->NumArguments() ? pResult->GetVictim() : pResult->m_ClientID;
 	CCharacter* pChr = pSelf->GetPlayerChar(Victim);
 	if (pChr && pChr->OnNoBonusArea(false))
-		pSelf->SendChatTarget(Victim, "You are no longer in no-bonus area mode");
+		pSelf->SendChatTarget(Victim, pChr->GetPlayer()->Localize("You are no longer in no-bonus area mode"));
 }
 
 void CGameContext::ConRedirectPort(IConsole::IResult* pResult, void* pUserData)
@@ -2126,7 +2139,7 @@ void CGameContext::ConJailArrest(IConsole::IResult* pResult, void* pUserData)
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "console", aBuf);
 		pSelf->SendModLogMessage(pResult->m_ClientID, aBuf);
 
-		str_format(aBuf, sizeof(aBuf), "You were arrested for %d seconds", Seconds);
+		str_format(aBuf, sizeof(aBuf), pSelf->m_apPlayers[Victim]->Localize("You were arrested for %d seconds"), Seconds);
 		pSelf->SendChatTarget(Victim, aBuf);
 	}
 }
@@ -2350,14 +2363,16 @@ void CGameContext::ConPlotOwner(IConsole::IResult* pResult, void* pUserData)
 	}
 
 	int OldID = pSelf->GetAccIDByUsername(pSelf->m_aPlots[PlotID].m_aOwner);
-	if (pSelf->m_Accounts[OldID].m_ClientID >= 0)
-		pSelf->SendChatTarget(pSelf->m_Accounts[OldID].m_ClientID, "You lost your plot");
+	int OldClientID = pSelf->m_Accounts[OldID].m_ClientID;
+	if (OldClientID >= 0 && pSelf->m_apPlayers[OldClientID])
+		pSelf->SendChatTarget(OldClientID, pSelf->m_apPlayers[OldClientID]->Localize("You lost your plot"));
 
 	char aBuf[128];
-	if (pSelf->m_Accounts[NewID].m_ClientID >= 0)
+	int NewClientID = pSelf->m_Accounts[NewID].m_ClientID;
+	if (NewClientID >= 0 && pSelf->m_apPlayers[NewClientID])
 	{
-		str_format(aBuf, sizeof(aBuf), "You are now owner of plot %d", PlotID);
-		pSelf->SendChatTarget(pSelf->m_Accounts[NewID].m_ClientID, aBuf);
+		str_format(aBuf, sizeof(aBuf), pSelf->m_apPlayers[NewClientID]->Localize("You are now owner of plot %d"), PlotID);
+		pSelf->SendChatTarget(NewClientID, aBuf);
 	}
 
 	if (pSelf->m_aPlots[PlotID].m_ExpireDate == 0)

@@ -11,6 +11,8 @@
 #include "detect.h"
 #include <time.h>
 #include <stdio.h>
+#include <optional>
+#include <string>
 
 #ifdef CONF_FAMILY_UNIX
 #include <sys/un.h>
@@ -1126,6 +1128,32 @@ GNUC_ATTRIBUTE((format(printf, 3, 4)));
 int str_format_v(char *buffer, int buffer_size, const char *format, va_list args)
 GNUC_ATTRIBUTE((format(printf, 3, 0)));
 
+class CFormatArg
+{
+public:
+	enum EFormatType
+	{
+		FORMAT_INT,
+		FORMAT_STRING,
+		FORMAT_INT64,
+		FORMAT_FLOAT,
+	};
+	union
+	{
+		int m_Int;
+		const char *m_pStr;
+		int64 m_Int64;
+		float m_Float;
+	};
+	EFormatType m_Type;
+	CFormatArg() = default;
+	CFormatArg(int Int) : m_Int(Int), m_Type(FORMAT_INT) {}
+	CFormatArg(const char *pStr) : m_pStr(pStr), m_Type(FORMAT_STRING) {}
+	CFormatArg(int64 Int64) : m_Int64(Int64), m_Type(FORMAT_INT64) {}
+	CFormatArg(float Float) : m_Float(Float), m_Type(FORMAT_FLOAT) {}
+};
+int str_format_args(char *pBuffer, int BufferSize, const char *pFormat, CFormatArg *pArgs, int NumArgs);
+
 FILE *pipe_open(const char *cmd, const char *mode);
 int pipe_close(FILE *stream);
 
@@ -1502,6 +1530,7 @@ void str_hex(char *dst, int dst_size, const void *data, int data_size);
 		- The strings are treated as zero-terminated strings.
 */
 int str_is_number(const char *pstr);
+bool str_isnum(char c);
 
 /*
 	Function: str_hex_decode
@@ -2118,6 +2147,22 @@ const char *str_skip_voting_menu_prefixes(const char *pStr);
 */
 void str_utf8_copy_num(char *dst, const char *src, int dst_size, int num);
 
+/**
+ * Returns a string of the preferred locale of the user / operating system.
+ * The string conforms to [RFC 3066](https://www.ietf.org/rfc/rfc3066.txt)
+ * and only contains the characters `a`-`z`, `A`-`Z`, `0`-`9` and `-`.
+ * If the preferred locale could not be determined this function
+ * falls back to the locale `"en-US"`.
+ *
+ * @ingroup Shell
+ *
+ * @param locale Buffer to use for the output.
+ * @param length Length of the output buffer.
+ *
+ * @remark The destination buffer will be zero-terminated.
+ */
+void os_locale_str(char* locale, size_t length);
+
 /*
 	Function: secure_random_init
 		Initializes the secure random module.
@@ -2213,6 +2258,23 @@ unsigned bytes_be_to_uint(const unsigned char *bytes);
 		- Assumes unsigned is 4 bytes
 */
 void uint_to_bytes_be(unsigned char *bytes, unsigned value);
+
+#if defined(CONF_FAMILY_WINDOWS)
+/**
+ * Converts a wide character string obtained from the Windows API
+ * to a UTF-8 encoded string.
+ *
+ * @ingroup Shell
+ *
+ * @param wide_str The wide character string to convert.
+ *
+ * @return The argument as a UTF-8 encoded string, wrapped in an optional.
+ * The optional is empty, if the wide string contains invalid codepoints.
+ *
+ * @remark The argument string must be zero-terminated.
+ */
+std::optional<std::string> windows_wide_to_utf8(const wchar_t *wide_str);
+#endif
 
 /**
  * Copies a string to a fixed-size array of chars.

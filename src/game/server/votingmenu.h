@@ -126,7 +126,7 @@ class CVotingMenu
 		char m_aaTempDesc[NUM_PAGE_MAX_VOTES][VOTE_DESC_LENGTH];
 	} m_aPages[NUM_PAGES];
 
-	int GetNumWantedPages() { float f = (float)m_vWantedPlayers.size() / (float)NUM_WANTEDS_PER_PAGE; return round_to_int(f + 0.5f); }
+	int GetNumWantedPages() { return (m_vWantedPlayers.size() + NUM_WANTEDS_PER_PAGE - 1) / NUM_WANTEDS_PER_PAGE; }
 	
 	bool SetPage(int ClientID, int Page);
 	const char *GetPageDescription(int ClientID, int Page);

@@ -245,7 +245,7 @@ void CShop::OnPageChange(int ClientID)
 			GetTimeMessage(m_aItems[Item].m_Time),
 			aAmount,
 			aDescription,
-			(m_aItems[Item].m_IsEuro && GameServer()->Config()->m_SvEuroMode) ? "\n\nHow to get euros ingame? Contact the admin and donate to the server, it will get added to your ingame euros.\n\nCheck '/account' for your details." : ""
+			(m_aItems[Item].m_IsEuro && GameServer()->Config()->m_SvEuroMode) ? "\n\nHow to get EUR ingame? Contact the admin and donate to the server, it will get added to your ingame euros.\n\nCheck '/account' for your details." : ""
 		);
 	}
 
@@ -258,14 +258,14 @@ void CShop::OnPageChange(int ClientID)
 
 void CShop::BuyItem(int ClientID, int Item)
 {
+	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 	if (Item <= PAGE_MAIN || Item >= m_NumItemsList)
 	{
-		GameServer()->SendChatTarget(ClientID, "Invalid item");
+		GameServer()->SendChatTarget(ClientID, pPlayer->Localize("Invalid item"));
 		return;
 	}
 
 	CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
-	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[pPlayer->GetAccID()];
 
 	char aMsg[128];
@@ -300,14 +300,17 @@ void CShop::BuyItem(int ClientID, int Item)
 
 			switch (Item)
 			{
-			case ITEM_POLICE:															GameServer()->SendChatTarget(ClientID, "You already have the highest police rank"); break;
-			case ITEM_SPAWN_SHOTGUN: case ITEM_SPAWN_GRENADE: case ITEM_SPAWN_RIFLE:	GameServer()->SendChatTarget(ClientID, "You already have the maximum amount of bullets"); break;
-			case ITEM_TASER:															GameServer()->SendChatTarget(ClientID, "You already have the maximum taser level"); break;
-			case ITEM_TASER_BATTERY:													GameServer()->SendChatTarget(ClientID, "You already have a fully filled taser battery"); break;
+			case ITEM_POLICE:															GameServer()->SendChatTarget(ClientID, pPlayer->Localize("You already have the highest police rank")); break;
+			case ITEM_SPAWN_SHOTGUN: case ITEM_SPAWN_GRENADE: case ITEM_SPAWN_RIFLE:	GameServer()->SendChatTarget(ClientID, pPlayer->Localize("You already have the maximum amount of bullets")); break;
+			case ITEM_TASER:															GameServer()->SendChatTarget(ClientID, pPlayer->Localize("You already have the maximum taser level")); break;
+			case ITEM_TASER_BATTERY:													GameServer()->SendChatTarget(ClientID, pPlayer->Localize("You already have a fully filled taser battery")); break;
 			case ITEM_SPOOKY_GHOST: case ITEM_ROOM_KEY:									UseThe = true;
 				// fallthrough
 			default:
-				str_format(aMsg, sizeof(aMsg), "You already have %s%s", UseThe ? "the " : "", m_aItems[ItemID].m_pName);
+				if (UseThe)
+					str_format(aMsg, sizeof(aMsg), pPlayer->Localize("You already have the %s"), m_aItems[ItemID].m_pName);
+				else
+					str_format(aMsg, sizeof(aMsg), pPlayer->Localize("You already have %s"), m_aItems[ItemID].m_pName);
 				GameServer()->SendChatTarget(ClientID, aMsg);
 			}
 			return;
@@ -316,19 +319,19 @@ void CShop::BuyItem(int ClientID, int Item)
 		// check police lvl 3 for taser
 		if ((Item == ITEM_TASER || Item == ITEM_TASER_BATTERY) && pAccount->m_PoliceLevel < 3)
 		{
-			GameServer()->SendChatTarget(ClientID, "You need to be police level 3 or higher to get a taser license");
+			GameServer()->SendChatTarget(ClientID, pPlayer->Localize("You need to be police level 3 or higher to get a taser license"));
 			return;
 		}
 
 		if (pAccount->m_VIP && ((Item == ITEM_VIP && pAccount->m_VIP != VIP_CLASSIC) || (Item == ITEM_VIP_PLUS && pAccount->m_VIP != VIP_PLUS)))
 		{
-			GameServer()->SendChatTarget(ClientID, "You can not buy this VIP level while owning another one");
+			GameServer()->SendChatTarget(ClientID, pPlayer->Localize("You can not buy this VIP level while owning another one"));
 			return;
 		}
 
 		if (Item == ITEM_BLOODY && (pChr->m_Atom || pChr->m_Trail || pChr->m_RotatingBall || pChr->m_EpicCircle))
 		{
-			GameServer()->SendChatTarget(ClientID, "You can not buy bloody while specific cosmetics are activated");
+			GameServer()->SendChatTarget(ClientID, pPlayer->Localize("You can not buy bloody while specific cosmetics are activated"));
 			return;
 		}
 
@@ -347,22 +350,22 @@ void CShop::BuyItem(int ClientID, int Item)
 		int OwnPlotID = GameServer()->GetPlotID(pPlayer->GetAccID());
 		if (GameServer()->m_aPlots[Item].m_aOwner[0] != 0)
 		{
-			GameServer()->SendChatTarget(ClientID, "This plot is already sold to someone else");
+			GameServer()->SendChatTarget(ClientID, pPlayer->Localize("This plot is already sold to someone else"));
 			return;
 		}
 		else if (OwnPlotID == Item)
 		{
-			GameServer()->SendChatTarget(ClientID, "You already own that plot");
+			GameServer()->SendChatTarget(ClientID, pPlayer->Localize("You already own that plot"));
 			return;
 		}
 		else if (OwnPlotID != 0)
 		{
-			GameServer()->SendChatTarget(ClientID, "You already own another plot");
+			GameServer()->SendChatTarget(ClientID, pPlayer->Localize("You already own another plot"));
 			return;
 		}
 		else if (GameServer()->HasPlotByIP(ClientID))
 		{
-			GameServer()->SendChatTarget(ClientID, "Your IP address already owns one plot");
+			GameServer()->SendChatTarget(ClientID, pPlayer->Localize("Your IP address already owns one plot"));
 			return;
 		}
 	}
@@ -376,35 +379,35 @@ void CShop::BuyItem(int ClientID, int Item)
 	if ((m_aItems[ItemID].m_IsEuro && pAccount->m_Euros < Price)
 		|| (!m_aItems[ItemID].m_IsEuro && pPlayer->GetUsableMoney() < Price))
 	{
-		GameServer()->SendChatTarget(ClientID, "You don't have enough money");
+		GameServer()->SendChatTarget(ClientID, pPlayer->Localize("You don't have enough money"));
 		return;
 	}
 
 	// check for the correct level
 	if (pAccount->m_Level < m_aItems[ItemID].m_Level)
 	{
-		str_format(aMsg, sizeof(aMsg), "Your level is too low, you need to be level %d to buy %s", m_aItems[ItemID].m_Level, m_aItems[ItemID].m_pName);
+		str_format(aMsg, sizeof(aMsg), pPlayer->Localize("Your level is too low, you need to be level %d to buy %s"), m_aItems[ItemID].m_Level, m_aItems[ItemID].m_pName);
 		GameServer()->SendChatTarget(ClientID, aMsg);
 		return;
 	}
 
 	if (IsType(HOUSE_SHOP) && Item == ITEM_TASER_BATTERY && !pPlayer->GiveTaserBattery(Amount))
 	{
-		GameServer()->SendChatTarget(ClientID, "Taser battery purchase failed");
+		GameServer()->SendChatTarget(ClientID, pPlayer->Localize("Taser battery purchase failed"));
 		return;
 	}
 
 	// send a message that we bought the item
-	str_format(aMsg, sizeof(aMsg), "You bought %s %s", aDescription, m_aItems[ItemID].m_Time == TIME_DEATH ? "until death" : m_aItems[ItemID].m_Time == TIME_DISCONNECT ? "until disconnect" : "");
+	str_format(aMsg, sizeof(aMsg), pPlayer->Localize("You bought %s %s"), aDescription, m_aItems[ItemID].m_Time == TIME_DEATH ? pPlayer->Localize("until death") : m_aItems[ItemID].m_Time == TIME_DISCONNECT ? pPlayer->Localize("until disconnect") : "");
 	GameServer()->SendChatTarget(ClientID, aMsg);
 	if (Item == ITEM_VIP || Item == ITEM_VIP_PLUS || Item == ITEM_PORTAL_RIFLE)
-		GameServer()->SendChatTarget(ClientID, "Check '/account' for more information about the expiration date");
+		GameServer()->SendChatTarget(ClientID, pPlayer->Localize("Check '/account' for more information about the expiration date"));
 
 	// apply a message to the history
 	char aDiscountMsg[64] = "\0";
 	if (m_CurrentDiscount && m_aItems[Item].m_IsEuro)
 		str_format(aDiscountMsg, sizeof(aDiscountMsg), " (-%d%% discount)", m_CurrentDiscount);
-	str_format(aMsg, sizeof(aMsg), "%s, bought '%s'%s", m_aItems[ItemID].m_IsEuro ? "euros" : "money", aDescription, aDiscountMsg);
+	str_format(aMsg, sizeof(aMsg), "%s, bought '%s'%s", m_aItems[ItemID].m_IsEuro ? "EUR" : "money", aDescription, aDiscountMsg);
 	if (m_aItems[ItemID].m_IsEuro)
 		pPlayer->BankCurrTransaction(-Price, aMsg);
 	else
@@ -446,7 +449,7 @@ void CShop::BuyItem(int ClientID, int Item)
 	{
 		GameServer()->SetPlotExpire(Item);
 		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "The plot will expire on %s", GameServer()->GetDate(GameServer()->m_aPlots[Item].m_ExpireDate));
+		str_format(aBuf, sizeof(aBuf), pPlayer->Localize("The plot will expire on %s"), GameServer()->GetDate(GameServer()->m_aPlots[Item].m_ExpireDate));
 		GameServer()->SendChatTarget(ClientID, aBuf);
 		GameServer()->SetPlotInfo(Item, pPlayer->GetAccID());
 	}

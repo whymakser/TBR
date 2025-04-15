@@ -144,7 +144,7 @@ public:
 	class CPlayer *GetPlayer() { return m_pPlayer; }
 
 	//drops
-	void DropMoney(int64 Amount, int Dir = -3, bool GlobalPickupDelay = false);
+	void DropMoney(int64 Amount, int Dir = -3, bool GlobalPickupDelay = false, bool OnDeath = false);
 	void DropFlag(int Dir = -3);
 	bool CanDropWeapon(int Type);
 	void DropWeapon(int WeaponID, bool OnDeath, float Dir = -3);
@@ -457,7 +457,7 @@ public:
 	bool m_FakeTuneCollision;
 	bool m_OldFakeTuneCollision;
 	bool m_Passive;
-	CPickup* m_pPassiveShield;
+	int m_PassiveSnapID;
 	int m_Item;
 	CPickup* m_pItem;
 	bool m_PoliceHelper;
@@ -471,6 +471,7 @@ public:
 	int m_MoneyTile;
 	bool m_LastPoliceFarmActive;
 	bool m_ProcessedMoneyTile;
+	bool m_ProcessedDurakSeatTile;
 	int64 m_RoomAntiSpamTick;
 	CSnake m_Snake;
 	bool m_InSnake;
@@ -568,6 +569,7 @@ public:
 	bool LoadRedirectTile(int Port);
 	int m_RedirectTilePort;
 	int64 m_PassiveEndTick;
+	bool UpdatePassiveEndTick(int64 NewEndTick);
 
 	std::vector< std::pair<int, int> > m_vCheckpoints;
 	void AddCheckpointList(int Port, int Checkpoint);
@@ -575,9 +577,10 @@ public:
 
 	// Grog
 	bool AddGrog();
+	int64 m_LastGrogHoldMsg;
 	int m_NumGrogsHolding;
 	CGrog *m_pGrog;
-	int m_Permille;
+	//int m_Permille; // Moved to player from character, because jail should keep permille xd
 	int64 m_FirstPermilleTick;
 	int m_GrogSpirit;
 	int DetermineGrogSpirit();

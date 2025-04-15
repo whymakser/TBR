@@ -157,8 +157,9 @@ MACRO_CONFIG_INT(SvVotesPerTick, sv_votes_per_tick, 5, 1, 15, CFGFLAG_SERVER, "N
 // account
 MACRO_CONFIG_INT(SvAccounts, sv_accounts, 1, 0, 1, CFGFLAG_SERVER, "Whether accounts are activated or deactivated", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvAccFilePath, sv_acc_file_path, 128, "data/accounts", CFGFLAG_SERVER, "The path where the server searches the account files (relative to binary)", AUTHED_ADMIN)
-MACRO_CONFIG_INT(SvDataSaveInterval, sv_data_save_interval, 30, 5, 60, CFGFLAG_SERVER, "Intervall in minutes between data saves", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvDataSaveInterval, sv_data_save_interval, 60, 5, 1440, CFGFLAG_SERVER, "Intervall in minutes between data saves", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvDonationFilePath, sv_donation_file_path, 128, "data", CFGFLAG_SERVER, "The path where the server searches the for the donation file (relative to binary)", AUTHED_ADMIN)
+MACRO_CONFIG_STR(SvTopAccountsFilePath, sv_top_accounts_file_path, 128, "data", CFGFLAG_SERVER, "The path where the server searches the for the top accounts file (relative to binary)", AUTHED_ADMIN)
 MACRO_CONFIG_STR(SvPlotFilePath, sv_plot_file_path, 128, "data/plots", CFGFLAG_SERVER, "The path where the server searches the plot files (relative to binary)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvKillLogout, sv_kill_logout, 3, 0, 60, CFGFLAG_SERVER, "Time in seconds a tee can kill after trying to logout (0 = disabled)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvEuroMode, sv_euro_mode, 0, 0, 1, CFGFLAG_SERVER, "Whether euro mode is enabled", AUTHED_ADMIN)
@@ -186,7 +187,7 @@ MACRO_CONFIG_INT(SvShutdownSaveTeeExpire, sv_shutdown_save_tee_expire, 1, 1, 24*
 MACRO_CONFIG_INT(SvJailSaveTeeExpire, sv_jail_save_tee_expire, 24, 1, 24*7, CFGFLAG_SERVER, "How many hours until a jail save expires", AUTHED_ADMIN)
 
 // shutdown auto reconnect
-MACRO_CONFIG_INT(SvShutdownAutoReconnect, sv_shutdown_auto_reconnect, 0, 0, 1, CFGFLAG_SERVER, "Whether shutdown will send a map change to time out client, so it'll reconnect (DDNet only)", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvShutdownAutoReconnect, sv_shutdown_auto_reconnect, 0, 0, 2, CFGFLAG_SERVER, "Whether shutdown will send a map change to time out client, so it'll reconnect (1=Map timeout, 2=Message)", AUTHED_ADMIN)
 
 // flags
 MACRO_CONFIG_INT(SvFlagSounds, sv_flag_sounds, 2, 0, 2, CFGFLAG_SERVER, "Flag sounds on drop/pickup/respawn (0=off, 1=public sounds, 2=respawn public rest local)", AUTHED_ADMIN)
@@ -374,7 +375,17 @@ MACRO_CONFIG_INT(SvGrogHoldLimit, sv_grog_hold_limit, 3, 1, 10, CFGFLAG_SERVER, 
 MACRO_CONFIG_INT(SvGrogMinPermilleLimit, sv_grog_min_permille_limit, 6, 0, 39, CFGFLAG_SERVER, "Divided by 10: Minimum legal permille limit, if exceeded=wanted", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvGrogForceHammer, sv_grog_force_hammer, 0, 0, 1, CFGFLAG_SERVER, "Whether holding grog forces to hold hammer, or can have no weapon (new DDNet can render tee without weapon)", AUTHED_ADMIN)
 
+// Durak
+MACRO_CONFIG_INT(SvDurakTeamColor, sv_durak_team_colors, 1, 0, 1, CFGFLAG_SERVER, "Whether Durak minigame uses team colors for own round", AUTHED_ADMIN)
+
+// Language
+MACRO_CONFIG_STR(SvDefaultLanguage, sv_default_language, 255, "", CFGFLAG_SERVER, "Default server language filename string without extension", AUTHED_ADMIN)
+MACRO_CONFIG_STR(SvLanguagesPath, sv_languages_path, 128, "data/languages", CFGFLAG_SERVER, "The path where the server searches the for the language index.txt (relative to binary)", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvLanguageSuggestion, sv_language_suggestion, 1, 0, 1, CFGFLAG_SERVER, "Whether player that entered the server will get a language suggestion vote", AUTHED_ADMIN)
+
 // other
+MACRO_CONFIG_INT(SvAllowXSkins, sv_allow_x_skins, 1, 0, 1, CFGFLAG_SERVER, "Whether special skins are allowed (x_ninja, x_spec, ...)", AUTHED_ADMIN)
+MACRO_CONFIG_INT(SvRainbowNameSpec, sv_rainbowname_spec, 0, 0, 1, CFGFLAG_SERVER, "Whether rainbowname is processed while paused or spectating (annoying in +spectate)", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvHideMinigamePlayers, sv_hide_minigame_players, 1, 0, 1, CFGFLAG_SERVER, "Whether players in different minigames are shown in the scoreboard", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvRainbowSpeedDefault, sv_rainbow_speed_default, 5, 1, 50, CFGFLAG_SERVER, "Default speed for rainbow", AUTHED_ADMIN)
 MACRO_CONFIG_INT(SvOldJetpackSound, sv_old_jetpack_sound, 0, 0, 1, CFGFLAG_SERVER, "Whether to use the default gun sound for jetpack or another sound", AUTHED_ADMIN)

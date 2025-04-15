@@ -238,6 +238,9 @@ public:
 	bool m_EyeEmote;
 	int m_DefEmote;
 	int m_DefEmoteReset;
+	int m_SavedDefEmote;
+	void SaveDefEmote() { m_SavedDefEmote = m_DefEmote; }
+	void LoadDefEmote() { if (m_SavedDefEmote != -1) { m_DefEmote = m_SavedDefEmote; m_SavedDefEmote = -1; } }
 	bool m_Halloween;
 	bool m_FirstPacket;
 #if defined(CONF_SQL)
@@ -325,8 +328,8 @@ public:
 	void ExpireItems();
 
 	void BankCurrTransaction(float Amount, const char* pDescription);
-	void BankTransaction(int Amount, const char *pDescription = "");
-	void WalletTransaction(int Amount, const char *pDescription = "");
+	bool BankTransaction(int Amount, const char *pDescription = "");
+	bool WalletTransaction(int Amount, const char *pDescription = "");
 	void ApplyMoneyHistoryMsg(int Type, float Amount, const char *pDescription);
 	int64 GetWalletMoney() { return m_WalletMoney; }
 	int64 GetUsableMoney();
@@ -397,6 +400,13 @@ public:
 	bool m_HideFromSpecCount;
 	char m_aDelayedJoinMsg[128];
 
+	// Language
+	const char *Localize(const char *pText, const char *pContext = ""); // Never change this function name
+	int m_Language;
+
+	// Moved to player from character, because jail should keep permille xd
+	int m_Permille;
+
 	// Voting Menu calls, used when executing the chat command aswell
 	void SetSilentFarm(bool Set);
 	void SetHideDrawings(bool Set);
@@ -421,6 +431,8 @@ public:
 	bool m_ViewCursorZoomed;
 	int m_ViewCursorID;
 
+	int64 m_LockSpecPosUntil;
+	void SetViewPos(vec2 Pos);
 	void SkipSetViewPos() { m_SkipSetViewPos = 2; }
 	int m_aStrongWeakID[MAX_CLIENTS];
 	bool m_aMuted[MAX_CLIENTS];
@@ -492,6 +504,7 @@ public:
 	{
 		VOTE_QUESTION_NONE = -1,
 		VOTE_QUESTION_DESIGN,
+		VOTE_QUESTION_LANGUAGE_SUGGESTION,
 	};
 
 	void StartVoteQuestion(VoteQuestionType Type);

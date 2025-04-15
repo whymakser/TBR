@@ -460,8 +460,12 @@ void CGameTeams::SendTeamsState(int ClientID)
 				Team = LegacyTeams ? 60 : 36; // blue colored team
 			// try to make hook visible in most cases, i dont want to use TEAM_SUPER cause that would make names red when NONAME e.g. spookyghost
 			// but this right now means, that if u r in a team and ur dummy isnt, and u swap, and both try to hook the flag, one will have invisible hook
-			else if (i == VANILLA_MAX_CLIENTS-1 && Server()->IsSevendown(ClientID))
+			else if (i == Server()->GetMaxClients(ClientID)-1 && Server()->IsSevendown(ClientID))
+			{
 				Team = m_Core.Team(ClientID);
+				if (Team == TEAM_SUPER) // Todo: Rainbowname.cpp, TEAM_SUPER but it's 128
+					Team = VANILLA_MAX_CLIENTS;
+			}
 			
 
 			if (Team != -1)
@@ -469,6 +473,14 @@ void CGameTeams::SendTeamsState(int ClientID)
 				Msg.AddInt(Team);
 				continue;
 			}
+		}
+
+		// durak handling
+		int DurakTeam = GameServer()->Durak()->GetTeam(ClientID, i);
+		if (DurakTeam != -1)
+		{
+			Msg.AddInt(DurakTeam);
+			continue;
 		}
 
 		// see others selector
@@ -623,7 +635,7 @@ void CGameTeams::OnFinish(CPlayer* Player, float Time, const char *pTimestamp)
 	char aBuf[128];
 	SetCpActive(Player, -2);
 	str_format(aBuf, sizeof(aBuf),
-			"%s finished in: %d minute(s) %5.2f second(s)",
+			Player->Localize("%s finished in: %d minute(s) %5.2f second(s)"),
 			Server()->ClientName(Player->GetCID()), (int)Time / 60,
 			Time - ((int)Time / 60 * 60));
 	if (GameServer()->Config()->m_SvHideScore || !GameServer()->Config()->m_SvSaveWorseScores)
@@ -638,10 +650,10 @@ void CGameTeams::OnFinish(CPlayer* Player, float Time, const char *pTimestamp)
 		// new record \o/
 
 		if (Diff >= 60)
-			str_format(aBuf, sizeof(aBuf), "New record: %d minute(s) %5.2f second(s) better.",
+			str_format(aBuf, sizeof(aBuf), Player->Localize("New record: %d minute(s) %5.2f second(s) better."),
 					(int)Diff / 60, Diff - ((int)Diff / 60 * 60));
 		else
-			str_format(aBuf, sizeof(aBuf), "New record: %5.2f second(s) better.",
+			str_format(aBuf, sizeof(aBuf), Player->Localize("New record: %5.2f second(s) better."),
 					Diff);
 		if (GameServer()->Config()->m_SvHideScore || !GameServer()->Config()->m_SvSaveWorseScores)
 			GameServer()->SendChatTarget(Player->GetCID(), aBuf);
@@ -652,17 +664,16 @@ void CGameTeams::OnFinish(CPlayer* Player, float Time, const char *pTimestamp)
 	{
 		if (Diff <= 0.005f)
 		{
-			GameServer()->SendChatTarget(Player->GetCID(),
-					"You finished with your best time.");
+			GameServer()->SendChatTarget(Player->GetCID(), Player->Localize("You finished with your best time."));
 		}
 		else
 		{
 			if (Diff >= 60)
-				str_format(aBuf, sizeof(aBuf), "%d minute(s) %5.2f second(s) worse, better luck next time.",
+				str_format(aBuf, sizeof(aBuf), Player->Localize("%d minute(s) %5.2f second(s) worse, better luck next time."),
 						(int)Diff / 60, Diff - ((int)Diff / 60 * 60));
 			else
 				str_format(aBuf, sizeof(aBuf),
-						"%5.2f second(s) worse, better luck next time.",
+						Player->Localize("%5.2f second(s) worse, better luck next time."),
 						Diff);
 			GameServer()->SendChatTarget(Player->GetCID(), aBuf); //this is private, sent only to the tee
 		}
@@ -720,7 +731,8 @@ void CGameTeams::OnCharacterSpawn(int ClientID)
 {
 	m_Core.SetSolo(ClientID, false);
 
-	if ((m_Core.Team(ClientID) >= TEAM_SUPER || !m_TeamLocked[m_Core.Team(ClientID)]) && !GameServer()->Arenas()->FightStarted(ClientID))
+	if ((m_Core.Team(ClientID) >= TEAM_SUPER || !m_TeamLocked[m_Core.Team(ClientID)])
+		&& !GameServer()->Arenas()->FightStarted(ClientID) && !GameServer()->Durak()->InDurakGame(ClientID))
 		// Important to only set a new team here, don't remove from an existing
 		// team since a newly joined player does by definition not have an old team
 		// to remove from. Doing so would destroy the count in m_MembersCount.
@@ -732,7 +744,7 @@ void CGameTeams::OnCharacterDeath(int ClientID, int Weapon)
 	m_Core.SetSolo(ClientID, false);
 
 	// we don't need team updating on every kill
-	if (GameServer()->Arenas()->FightStarted(ClientID))
+	if (GameServer()->Arenas()->FightStarted(ClientID) || GameServer()->Durak()->InDurakGame(ClientID))
 		return;
 
 	int Team = m_Core.Team(ClientID);

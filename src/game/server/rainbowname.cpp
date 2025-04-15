@@ -96,31 +96,43 @@ void CRainbowName::Update(int ClientID)
 
 		pInfo->m_aTeam[i] = -1;
 
-		if (pPlayer->m_PlayerFlags&PLAYERFLAG_SCOREBOARD)
+		bool IsPaused = pPlayer->GetTeam() == TEAM_SPECTATORS || pPlayer->IsPaused();
+		if (pPlayer->m_PlayerFlags&PLAYERFLAG_SCOREBOARD || (IsPaused && !GameServer()->Config()->m_SvRainbowNameSpec))
 			continue;
 
-		int ID = i;
-		if (!Server()->ReverseTranslate(ID, ClientID))
-			continue;
-
-		CPlayer *pOther = GameServer()->m_apPlayers[ID];
-		if (!pOther || !pOther->m_RainbowName)
-			continue;
-
-		bool InRange = pOther->GetCharacter() && pOther->GetCharacter()->CanSnapCharacter(ClientID) && !pOther->GetCharacter()->NetworkClipped(ClientID);
-		if (InRange || m_aInfo[ID].m_ResetChatColor)
+		if (GameServer()->Durak()->OnRainbowName(ClientID, i))
 		{
 			pInfo->m_aTeam[i] = m_Color;
 			pInfo->m_UpdateTeams = true;
 		}
+		else
+		{
+			int ID = i;
+			if (!Server()->ReverseTranslate(ID, ClientID))
+				continue;
 
-		if (!InRange || pCore->Team(ClientID) != pCore->Team(ID) || OwnMapID == -1)
+			CPlayer *pOther = GameServer()->m_apPlayers[ID];
+			if (!pOther || !pOther->m_RainbowName)
+				continue;
+
+			bool InRange = pOther->GetCharacter() && pOther->GetCharacter()->CanSnapCharacter(ClientID) && !pOther->GetCharacter()->NetworkClipped(ClientID);
+			if (InRange || m_aInfo[ID].m_ResetChatColor)
+			{
+				pInfo->m_aTeam[i] = m_Color;
+				pInfo->m_UpdateTeams = true;
+			}
+
+			if (!InRange || pCore->Team(ClientID) != pCore->Team(ID))
+				continue;
+		}
+
+		if (OwnMapID == -1)
 			continue;
 
 		int SpectatorID = pPlayer->GetSpectatorID();
-		bool NoSpecOrFollow = (pPlayer->GetTeam() != TEAM_SPECTATORS && !pPlayer->IsPaused()) || (SpectatorID != -1 && GameServer()->m_apPlayers[SpectatorID]);
+		bool NoSpecOrFollow = !IsPaused || (SpectatorID != -1 && GameServer()->m_apPlayers[SpectatorID]);
 		if (NoSpecOrFollow)
-			pInfo->m_aTeam[OwnMapID] = VANILLA_MAX_CLIENTS; // TEAM_SUPER, but it's 128 due to increased client capability // might have to adapt this in the future when teams are expanded to 128
+			pInfo->m_aTeam[OwnMapID] = VANILLA_MAX_CLIENTS; // TODO: TEAM_SUPER, but it's 128 due to increased client capability // might have to adapt this in the future when teams are expanded to 128
 	}
 
 	// if a player close to a rainbow name player sent a chat message, we send himself to t0 for one run, cuz that resets the chat color from TEAM_SUPER to grey

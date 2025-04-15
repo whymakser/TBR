@@ -234,7 +234,7 @@ void CNetConnection::Disconnect(const char *pReason, bool Shutdown)
 		{
 			// Don't send conn close on auto reconnect, let client time out and come back. we sent a map change ahead
 			// 0.7 is not supported, they would just time out, cl_reconnect_timeout is a ddnet feature.
-			if (!Shutdown || !Config()->m_SvShutdownAutoReconnect || !m_Sevendown)
+			if (!Shutdown || Config()->m_SvShutdownAutoReconnect != 1 || !m_Sevendown)
 			{
 				if (pReason)
 					SendControl(NET_CTRLMSG_CLOSE, pReason, str_length(pReason) + 1);

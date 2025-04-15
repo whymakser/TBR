@@ -100,6 +100,7 @@ void CPlayer::Reset()
 		}
 	}
 	m_DefEmoteReset = -1;
+	m_SavedDefEmote = -1;
 
 	GameServer()->Score()->PlayerData(m_ClientID)->Reset();
 
@@ -225,7 +226,7 @@ void CPlayer::Reset()
 	m_ViewCursorID = -2;
 	m_ViewCursorZoomed = false;
 
-	m_ZoomCursor = false;
+	m_ZoomCursor = true;
 	m_StandardShowDistance = m_ShowDistance;
 	m_SentShowDistance = false;
 	m_CameraInfo.Reset();
@@ -253,6 +254,9 @@ void CPlayer::Reset()
 
 	m_HideFromSpecCount = false;
 	m_aDelayedJoinMsg[0] = '\0';
+	m_LockSpecPosUntil = 0;
+	m_Permille = 0;
+	m_Language = g_Localization.GetLanguage(GameServer()->Config()->m_SvDefaultLanguage);
 }
 
 void CPlayer::Tick()
@@ -298,7 +302,7 @@ void CPlayer::Tick()
 	if(Server()->GetNetErrorString(m_ClientID)[0])
 	{
 		char aBuf[512];
-		str_format(aBuf, sizeof(aBuf), "'%s' would have timed out, but can use timeout protection now", Server()->ClientName(m_ClientID));
+		str_format(aBuf, sizeof(aBuf), Localizable("'%s' would have timed out, but can use timeout protection now"), Server()->ClientName(m_ClientID));
 		GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
 		Server()->ResetNetErrorString(m_ClientID);
 	}
@@ -417,13 +421,13 @@ void CPlayer::Tick()
 		m_JailTime--;
 		if (m_JailTime == 1)
 		{
-			GameServer()->SendChatTarget(m_ClientID, "You were released from jail");
+			GameServer()->SendChatTarget(m_ClientID, Localize("You were released from jail"));
 			KillCharacter(WEAPON_GAME);
 		}
 		else if (Server()->Tick() % 50 == 0 && (!m_pCharacter || !m_pCharacter->m_MoneyTile) && !m_HideBroadcasts)
 		{
 			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), "You are arrested for %lld seconds", m_JailTime / Server()->TickSpeed());
+			str_format(aBuf, sizeof(aBuf), Localize("You are arrested for %lld seconds"), m_JailTime / Server()->TickSpeed());
 			GameServer()->SendBroadcast(aBuf, m_ClientID, false);
 		}
 	}
@@ -434,12 +438,12 @@ void CPlayer::Tick()
 		m_EscapeTime--;
 		if (m_EscapeTime == 1)
 		{
-			GameServer()->SendChatTarget(m_ClientID, "Your life as a gangster is over, you are free now");
+			GameServer()->SendChatTarget(m_ClientID, Localize("Your life as a gangster is over, you are free now"));
 		}
 		else if (Server()->Tick() % Server()->TickSpeed() * 60 == 0 && (!m_pCharacter || !m_pCharacter->m_MoneyTile) && !m_HideBroadcasts)
 		{
 			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), "Avoid policehammers for the next %lld seconds", m_EscapeTime / Server()->TickSpeed());
+			str_format(aBuf, sizeof(aBuf), Localize("Avoid policehammers for the next %lld seconds"), m_EscapeTime / Server()->TickSpeed());
 			GameServer()->SendBroadcast(aBuf, m_ClientID, false);
 		}
 	}
@@ -466,7 +470,7 @@ void CPlayer::Tick()
 
 	if (m_aDelayedJoinMsg[0] != '\0' && m_JoinTick + Server()->TickSpeed() * GameServer()->Config()->m_SvJoinMsgDelay < Server()->Tick())
 	{
-		GameServer()->SendChat(-1, CHAT_ALL, -1, m_aDelayedJoinMsg);
+		GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, m_aDelayedJoinMsg, Server()->ClientName(m_ClientID));
 		m_aDelayedJoinMsg[0] = '\0';
 	}
 }
@@ -579,6 +583,8 @@ void CPlayer::Snap(int SnappingClient)
 			Score = GameServer()->m_Accounts[GetAccID()].m_Kills;
 		else if (pSnapping->m_Minigame == MINIGAME_SURVIVAL)
 			Score = GameServer()->m_Accounts[GetAccID()].m_SurvivalKills;
+		else if (pSnapping->m_Minigame == MINIGAME_DURAK || GameServer()->Durak()->IsPlayerOnSeat(SnappingClient))
+			Score = GameServer()->m_Accounts[GetAccID()].m_DurakWins;
 		else if (pSnapping->m_Minigame == MINIGAME_INSTAGIB_BOOMFNG || pSnapping->m_Minigame == MINIGAME_INSTAGIB_FNG)
 		{
 			Score = m_InstagibScore;
@@ -657,6 +663,15 @@ void CPlayer::Snap(int SnappingClient)
 		}
 		else
 		{
+			if (m_LockSpecPosUntil && m_LockSpecPosUntil > Server()->Tick())
+			{
+				SpecMode = SPEC_PLAYER;
+				SpectatorID = m_ClientID;
+			}
+			else
+			{
+				m_LockSpecPosUntil = 0;
+			}
 			// when we are spectating while being affected by rainbowname people we dont wanna focus on one player, so that no tee gets transparent due to IsOtherTeam
 			// its now actually only activated when we spec someone who has rainbowname, rest is handled in the update function
 			if (SpecMode == SPEC_PLAYER && GameServer()->m_RainbowName.IsAffected(m_ClientID))
@@ -832,22 +847,30 @@ void CPlayer::Snap(int SnappingClient)
 
 	bool ShowSpec = false;
 	vec2 SpecPos;
-	if (m_pCharacter)
-	{
-		ShowSpec = m_pCharacter->IsPaused() && m_pCharacter->CanSnapCharacter(SnappingClient);
-		SpecPos = m_pCharacter->Core()->m_Pos;
-	}
-
+	bool IsPaused = pSnapping->GetTeam() == TEAM_SPECTATORS || pSnapping->IsPaused();
+	bool ShowOthers = pSnapping->m_ShowOthers == 1 || IsPaused;
 	if (IsMinigame() && m_SavedMinigameTee)
 	{
 		ShowSpec = true;
 		SpecPos = m_MinigameTee.GetPos();
-	}
 
-	if(SnappingClient >= 0)
+		bool IsSpectating = IsPaused && pSnapping->GetSpectatorID() == m_ClientID;
+		int ClientID = IsSpectating ? m_ClientID : SnappingClient;
+		if (GameServer()->Arenas()->FightStarted(ClientID) || GameServer()->Durak()->InDurakGame(ClientID))
+		{
+			ShowSpec = pSnapping->m_ShowOthers == 1;
+		}
+	}
+	else if (m_pCharacter)
 	{
-		bool ShowTeam = !GameServer()->Arenas()->FightStarted(SnappingClient) && (GameServer()->GetDDRaceTeam(m_ClientID) == GameServer()->GetDDRaceTeam(SnappingClient) || GameServer()->Arenas()->FightStarted(m_ClientID));
-		ShowSpec = ShowSpec && (ShowTeam || pSnapping->m_ShowOthers == 1 || (pSnapping->GetTeam() == TEAM_SPECTATORS || pSnapping->IsPaused()));
+		ShowSpec = m_pCharacter->IsPaused() && m_pCharacter->CanSnapCharacter(SnappingClient);
+		SpecPos = m_pCharacter->Core()->m_Pos;
+
+		if (SnappingClient >= 0)
+		{
+			bool ShowTeam = GameServer()->GetDDRaceTeam(m_ClientID) == GameServer()->GetDDRaceTeam(SnappingClient);
+			ShowSpec = ShowSpec && (ShowTeam || ShowOthers);
+		}
 	}
 
 	if(ShowSpec)
@@ -986,7 +1009,7 @@ int CPlayer::GetHidePlayerTeam(int Asker)
 {
 	CPlayer *pAsker = GameServer()->m_apPlayers[Asker];
 	if (m_TeeControllerID != Asker && m_Team != TEAM_SPECTATORS && ((GameServer()->Config()->m_SvHideDummies && m_IsDummy)
-		|| (GameServer()->Config()->m_SvHideMinigamePlayers && (m_Minigame != MINIGAME_1VS1 || !GameServer()->Arenas()->FightStarted(m_ClientID)) && pAsker->m_Minigame != m_Minigame)))
+		|| (GameServer()->Config()->m_SvHideMinigamePlayers && !GameServer()->Durak()->InDurakGame(m_ClientID) && !GameServer()->Arenas()->FightStarted(m_ClientID) && pAsker->m_Minigame != m_Minigame)))
 		return TEAM_BLUE;
 	return m_Team;
 }
@@ -1006,12 +1029,19 @@ int CPlayer::GetAuthedHighlighted()
 bool CPlayer::RestrictZoom()
 {
 	// allow zoom in block and 1vs1
-	return IsMinigame() && m_Minigame != MINIGAME_BLOCK && m_Minigame != MINIGAME_1VS1;
+	return IsMinigame() && m_Minigame != MINIGAME_BLOCK && m_Minigame != MINIGAME_1VS1 && m_Minigame != MINIGAME_DURAK;
 }
 
 float CPlayer::GetZoomLevel()
 {
 	return m_ShowDistance.x / m_StandardShowDistance.x;
+}
+
+void CPlayer::SetViewPos(vec2 Pos)
+{
+	m_ViewPos = Pos;
+	SkipSetViewPos();
+	m_LockSpecPosUntil = Server()->Tick() + Server()->TickSpeed();
 }
 
 bool CPlayer::JoinChat(bool Local)
@@ -1021,9 +1051,9 @@ bool CPlayer::JoinChat(bool Local)
 
 	m_LocalChat = Local;
 	if (m_LocalChat)
-		GameServer()->SendChatTarget(m_ClientID, "Entered local chat");
+		GameServer()->SendChatTarget(m_ClientID, Localize("Entered local chat"));
 	else
-		GameServer()->SendChatTarget(m_ClientID, "Entered public chat");
+		GameServer()->SendChatTarget(m_ClientID, Localize("Entered public chat"));
 	return true;
 }
 
@@ -1039,12 +1069,14 @@ void CPlayer::OnDisconnect()
 	KillCharacter();
 
 	GameServer()->Arenas()->OnPlayerLeave(m_ClientID, true);
+	GameServer()->Durak()->OnPlayerLeave(m_ClientID, true);
 	GameServer()->Logout(GetAccID());
 
 	CGameControllerDDRace* Controller = (CGameControllerDDRace*)GameServer()->m_pController;
 	Controller->m_Teams.SetForceCharacterTeam(m_ClientID, 0);
 
 	GameServer()->m_VotingMenu.Reset(m_ClientID);
+	g_Localization.TryUnload(GameServer(), m_Language);
 
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
@@ -1366,6 +1398,7 @@ void CPlayer::SetTeam(int Team, bool DoChatMsg)
 	if (Team == TEAM_SPECTATORS)
 	{
 		GameServer()->Arenas()->OnPlayerLeave(m_ClientID);
+		GameServer()->Durak()->OnPlayerLeave(m_ClientID);
 
 		CGameControllerDDRace* Controller = (CGameControllerDDRace*)GameServer()->m_pController;
 		Controller->m_Teams.SetForceCharacterTeam(m_ClientID, 0);
@@ -1408,8 +1441,10 @@ void CPlayer::SetTeam(int Team, bool DoChatMsg)
 
 	if (DoChatMsg)
 	{
-		str_format(aBuf, sizeof(aBuf), "'%s' joined the %s", Server()->ClientName(m_ClientID), GameServer()->m_pController->GetTeamName(Team));
-		GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+		if (Team == TEAM_RED)
+			GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CFGFLAG_CHAT, Localizable("'%s' joined the game"), Server()->ClientName(m_ClientID));
+		else
+			GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CFGFLAG_CHAT, Localizable("'%s' joined the spectators"), Server()->ClientName(m_ClientID));
 	}
 }
 
@@ -1470,6 +1505,11 @@ void CPlayer::TryRespawn()
 			SpawnPos = GameServer()->Arenas()->GetSpawnPos(m_ClientID);
 		else
 			Index = TILE_1VS1_LOBBY;
+	}
+	else if (m_Minigame == MINIGAME_DURAK)
+	{
+		// overriden by m_ForceSpawnPos while in an active game
+		Index = TILE_DURAK_LOBBY;
 	}
 	else if (m_JailTime == 1)
 	{
@@ -1582,7 +1622,7 @@ bool CPlayer::AfkTimer(int NewTargetX, int NewTargetY)
 			if (m_Sent1stAfkWarning == 0 && m_LastPlaytime < time_get() - time_freq() * (int)(GameServer()->Config()->m_SvMaxAfkTime * 0.5))
 			{
 				str_format(m_pAfkMsg, sizeof(m_pAfkMsg),
-					"You have been afk for %d seconds now. Please note that you get kicked after not playing for %d seconds.",
+					Localize("You have been afk for %d seconds now. Please note that you get kicked after not playing for %d seconds."),
 					(int)(GameServer()->Config()->m_SvMaxAfkTime * 0.5),
 					GameServer()->Config()->m_SvMaxAfkTime
 				);
@@ -1592,7 +1632,7 @@ bool CPlayer::AfkTimer(int NewTargetX, int NewTargetY)
 			else if (m_Sent2ndAfkWarning == 0 && m_LastPlaytime < time_get() - time_freq() * (int)(GameServer()->Config()->m_SvMaxAfkTime * 0.9))
 			{
 				str_format(m_pAfkMsg, sizeof(m_pAfkMsg),
-					"You have been afk for %d seconds now. Please note that you get kicked after not playing for %d seconds.",
+					Localize("You have been afk for %d seconds now. Please note that you get kicked after not playing for %d seconds."),
 					(int)(GameServer()->Config()->m_SvMaxAfkTime * 0.9),
 					GameServer()->Config()->m_SvMaxAfkTime
 				);
@@ -1669,12 +1709,12 @@ int CPlayer::Pause(int State, bool Force)
 
 	if (m_TeeControllerID != -1)
 	{
-		GameServer()->SendChatTarget(m_ClientID, "You can't pause while you are controlled by someone else");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You can't pause while you are controlled by someone else"));
 		return 0;
 	}
 	if (m_TeeControlMode && !m_pControlledTee)
 	{
-		GameServer()->SendChatTarget(m_ClientID, "You can't pause while you are selecting a tee to control");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You can't pause while you are selecting a tee to control"));
 		return 0;
 	}
 	if (GameServer()->Arenas()->IsConfiguring(m_ClientID))
@@ -1850,14 +1890,15 @@ void CPlayer::BankCurrTransaction(float Amount, const char *pDescription)
 	ApplyMoneyHistoryMsg(TRANSACTION_BANK, Amount, pDescription);
 }
 
-void CPlayer::BankTransaction(int Amount, const char *pDescription)
+bool CPlayer::BankTransaction(int Amount, const char *pDescription)
 {
 	if (GetAccID() < ACC_START || Amount == 0)
-		return;
+		return false;
 
 	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[GetAccID()];
 	pAccount->m_Money += Amount;
 	ApplyMoneyHistoryMsg(TRANSACTION_BANK, Amount, pDescription);
+	return true;
 }
 
 int64 CPlayer::GetUsableMoney()
@@ -1873,17 +1914,18 @@ int64 CPlayer::GetWalletOrBankDisplay()
 	return GetWalletMoney();
 }
 
-void CPlayer::WalletTransaction(int Amount, const char *pDescription)
+bool CPlayer::WalletTransaction(int Amount, const char *pDescription)
 {
 	if (GameServer()->Config()->m_SvMoneyBankMode == 0 && GetAccID() >= ACC_START)
 	{
-		BankTransaction(Amount, pDescription);
-		return;
+		return BankTransaction(Amount, pDescription);
 	}
 	if (Amount == 0)
-		return;
+		return false;
+
 	m_WalletMoney += Amount;
 	ApplyMoneyHistoryMsg(TRANSACTION_WALLET, Amount, pDescription);
+	return true;
 }
 
 void CPlayer::ApplyMoneyHistoryMsg(int Type, float Amount, const char *pDescription)
@@ -1943,7 +1985,7 @@ void CPlayer::GiveXP(int64 Amount, const char *pMessage)
 
 	if (pMessage[0])
 	{
-		str_format(aBuf, sizeof(aBuf), "+%lld XP %s%s", Amount, pMessage, IsDoubleXp ? " (doubled xp)" : "");
+		str_format(aBuf, sizeof(aBuf), "+%lld XP %s %s", Amount, pMessage, IsDoubleXp ? Localize("(doubled xp)") : "");
 		GameServer()->SendChatTarget(m_ClientID, aBuf);
 	}
 
@@ -1951,7 +1993,7 @@ void CPlayer::GiveXP(int64 Amount, const char *pMessage)
 	{
 		pAccount->m_Level++;
 
-		str_format(aBuf, sizeof(aBuf), "You are now level %d!", pAccount->m_Level);
+		str_format(aBuf, sizeof(aBuf), Localize("You are now level %d!"), pAccount->m_Level);
 		GameServer()->SendChatTarget(m_ClientID, aBuf);
 
 		GameServer()->CreateFinishConfetti(m_pCharacter->GetPos(), m_pCharacter->TeamMask());
@@ -2048,12 +2090,22 @@ bool CPlayer::GivePortalBattery(int Amount)
 
 void CPlayer::OnLogin(bool ForceDesignLoad)
 {
-	GameServer()->SendChatTarget(m_ClientID, "Successfully logged in");
+	int AccID = GetAccID();
+	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[AccID];
+	// Load language at start, so that login messages get translated aswell
+	if (pAccount->m_aLanguage[0] != '\0')
+	{
+		m_Language = g_Localization.GetLanguage(pAccount->m_aLanguage);
+	}
+	GameServer()->SendChatTarget(m_ClientID, Localize("Successfully logged in"));
+
+	if (m_VoteQuestionType == CPlayer::VOTE_QUESTION_LANGUAGE_SUGGESTION)
+	{
+		OnEndVoteQuestion();
+	}
 
 	ExpireItems();
 
-	int AccID = GetAccID();
-	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[AccID];
 	if (m_pCharacter)
 	{
 		if (pAccount->m_VIP == VIP_PLUS)
@@ -2068,13 +2120,13 @@ void CPlayer::OnLogin(bool ForceDesignLoad)
 
 	if (pAccount->m_aContact[0] == '\0')
 	{
-		GameServer()->SendChatTarget(m_ClientID, "[WARNING] You did not set a contact, it can be used to recover your password or to get back the account after it got stolen.");
-		GameServer()->SendChatTarget(m_ClientID, "Set a contact with '/contact <option>' to hide this message and for a free XP reward.");
+		GameServer()->SendChatTarget(m_ClientID, Localize("[WARNING] You did not set a contact, it can be used to recover your password or to get back the account after it got stolen."));
+		GameServer()->SendChatTarget(m_ClientID, Localize("Set a contact with '/contact <option>' to hide this message and for a free XP reward."));
 	}
 
 	if (pAccount->m_aSecurityPin[0] == '\0')
 	{
-		GameServer()->SendChatTarget(m_ClientID, "[WARNING] You did not set security pin yet. Check '/pin' for more information.");
+		GameServer()->SendChatTarget(m_ClientID, Localize("[WARNING] You did not set security pin yet. Check '/pin' for more information."));
 	}
 
 	if (pAccount->m_Flags&CGameContext::ACCFLAG_ZOOMCURSOR)
@@ -2104,13 +2156,13 @@ void CPlayer::OnLogin(bool ForceDesignLoad)
 		BankTransaction(GetWalletMoney(), "automatic wallet to bank due to login and disabled bank");
 		// Manually set wallet money instead of using WalletTransaction, because SvMoneyBankMode 0 redirects walelttransactions to bank, which doesn't make any sense here
 		SetWalletMoney(0);
-		GameServer()->SendChatTarget(m_ClientID, "Your previously collected money got added to your account due to login");
+		GameServer()->SendChatTarget(m_ClientID, Localize("Your previously collected money got added to your account due to login"));
 	}
 }
 
 void CPlayer::OnLogout()
 {
-	GameServer()->SendChatTarget(m_ClientID, "Successfully logged out");
+	GameServer()->SendChatTarget(m_ClientID, Localize("Successfully logged out"));
 
 	int AccID = GetAccID();
 	CGameContext::AccountInfo *pAccount = &GameServer()->m_Accounts[AccID];
@@ -2132,7 +2184,6 @@ void CPlayer::OnLogout()
 
 	if (m_TimeoutCode[0] != '\0')
 		str_copy(pAccount->m_aTimeoutCode, m_TimeoutCode, sizeof(pAccount->m_aTimeoutCode));
-
 	m_aSecurityPin[0] = '\0';
 
 	pAccount->m_Flags = 0;
@@ -2148,14 +2199,15 @@ void CPlayer::OnLogout()
 		pAccount->m_Flags |= CGameContext::ACCFLAG_RESUMEMOVED;
 	if (m_HideBroadcasts)
 		pAccount->m_Flags |= CGameContext::ACCFLAG_HIDEBROADCASTS;
-
 	pAccount->m_VoteMenuFlags = GameServer()->m_VotingMenu.GetFlags(m_ClientID);
 
 	GameServer()->UpdateDesignList(AccID, Server()->GetMapDesign(m_ClientID));
+	str_copy(pAccount->m_aLanguage, g_Localization.GetLanguageFileName(m_Language), sizeof(pAccount->m_aLanguage));
 
 	if (m_VoteQuestionType == CPlayer::VOTE_QUESTION_DESIGN)
+	{
 		OnEndVoteQuestion();
-
+	}
 	GameServer()->StartResendingVotes(m_ClientID, false);
 }
 
@@ -2170,7 +2222,16 @@ void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 		if (!pDesign[0] || !str_comp(pDesign, Server()->GetMapDesign(m_ClientID)))
 			return;
 
-		str_format(aText, sizeof(aText), "Load recent design '%s'?", pDesign);
+		str_format(aText, sizeof(aText), Localize("Load recent design '%s'?"), pDesign);
+		break;
+	}
+	case CPlayer::VOTE_QUESTION_LANGUAGE_SUGGESTION:
+	{
+		int LanguageFromCode = g_Localization.GetLanguageByCode(Server()->GetCountryCode(m_ClientID));
+		if (str_comp(g_Localization.GetLanguageFileName(LanguageFromCode), GameServer()->Config()->m_SvDefaultLanguage) == 0)
+			return;
+
+		str_format(aText, sizeof(aText), ::Localize("Change language to %s?", LanguageFromCode), g_Localization.GetLanguageString(LanguageFromCode));
 		break;
 	}
 	}
@@ -2210,6 +2271,17 @@ void CPlayer::OnEndVoteQuestion(int Result)
 		if (Result == 1)
 		{
 			Server()->ChangeMapDesign(m_ClientID, GameServer()->GetCurrentDesignFromList(GetAccID()));
+		}
+		break;
+	}
+	case CPlayer::VOTE_QUESTION_LANGUAGE_SUGGESTION:
+	{
+		if (Result == 1)
+		{
+			m_Language = g_Localization.GetLanguageByCode(Server()->GetCountryCode(m_ClientID));
+			char aBuf[VOTE_DESC_LENGTH];
+			str_format(aBuf, sizeof(aBuf), Localize("Successfully changed language to %s"), g_Localization.GetLanguageString(m_Language));
+			GameServer()->SendChatTarget(m_ClientID, aBuf);
 		}
 		break;
 	}
@@ -2258,7 +2330,7 @@ void CPlayer::CancelPlotAuction()
 
 	m_PlotAuctionPrice = 0;
 	char aBuf[64];
-	str_format(aBuf, sizeof(aBuf), "The plot auction by '%s' is cancelled", Server()->ClientName(m_ClientID));
+	str_format(aBuf, sizeof(aBuf), Localize("The plot auction by '%s' is cancelled"), Server()->ClientName(m_ClientID));
 	GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
 }
 
@@ -2268,7 +2340,7 @@ void CPlayer::CancelPlotSwap()
 		return;
 
 	m_aPlotSwapUsername[0] = 0;
-	GameServer()->SendChatTarget(m_ClientID, "Your plot swap offer got cancelled");
+	GameServer()->SendChatTarget(m_ClientID, Localize("Your plot swap offer got cancelled"));
 }
 
 void CPlayer::ExpireItems()
@@ -2278,7 +2350,7 @@ void CPlayer::ExpireItems()
 		if (IsExpiredItem(i))
 		{
 			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), "[WARNING] Your %s expired", ((CShop *)GameServer()->m_pHouses[HOUSE_SHOP])->GetItemName(i));
+			str_format(aBuf, sizeof(aBuf), Localize("[WARNING] Your %s expired"), ((CShop *)GameServer()->m_pHouses[HOUSE_SHOP])->GetItemName(i));
 			GameServer()->SendChatTarget(m_ClientID, aBuf);
 		}
 	}
@@ -2492,15 +2564,17 @@ bool CPlayer::CheckClanProtection()
 	if (str_comp_nocase(Server()->ClientClan(m_ClientID), "Chilli.*") || !str_comp(m_TeeInfos.m_aaSkinPartNames[SKINPART_BODY], "greensward"))
 	{
 		if (m_ClanProtectionPunished)
-			GameServer()->SendChatTarget(m_ClientID, "You got unfrozen by the clan protection.");
+			GameServer()->SendChatTarget(m_ClientID, Localize("You got unfrozen by the clan protection."));
 
 		m_ClanProtectionPunished = false;
 		return false;
 	}
 
-	GameServer()->SendChatTarget(m_ClientID, "~~~ WARNING ~~~");
-	GameServer()->SendChatTarget(m_ClientID, "You got frozen by the clan protection.");
-	GameServer()->SendChatTarget(m_ClientID, "Remove your 'Chilli.*' clantag and reconnect, or set your skin body to 'greensward'.");
+	char aBuf[64];
+	str_format(aBuf, sizeof(aBuf), "~~~ %s ~~~", Localize("WARNING"));
+	GameServer()->SendChatTarget(m_ClientID, aBuf);
+	GameServer()->SendChatTarget(m_ClientID, Localize("You got frozen by the clan protection."));
+	GameServer()->SendChatTarget(m_ClientID, Localize("Remove your 'Chilli.*' clantag and reconnect, or set your skin body to 'greensward'."));
 
 	m_ClanProtectionPunished = true;
 	return true;
@@ -2519,14 +2593,14 @@ void CPlayer::OnSetAfk()
 	if (IsMinigame())
 	{
 		GameServer()->SetMinigame(m_ClientID, MINIGAME_NONE);
-		GameServer()->SendChatTarget(m_ClientID, "You automatically left the minigame because you were afk for too long");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You automatically left the minigame because you were afk for too long"));
 	}
 
 	// exit plot editor
 	if (m_pCharacter && m_pCharacter->m_DrawEditor.Active())
 	{
 		m_pCharacter->SetAvailableWeapon();
-		GameServer()->SendChatTarget(m_ClientID, "You automatically exited the plot editor because you were afk for too long");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You automatically exited the plot editor because you were afk for too long"));
 	}
 }
 
@@ -2574,13 +2648,13 @@ bool CPlayer::RequestMinigameChange(int RequestedMinigame)
 
 	if (m_EscapeTime)
 	{
-		GameServer()->SendChatTarget(m_ClientID, "You can't join a minigame while being searched by the police");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You can't join a minigame while being searched by the police"));
 		return true;
 	}
 
 	if (m_JailTime)
 	{
-		GameServer()->SendChatTarget(m_ClientID, "You can't join a minigame while being arrested");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You can't join a minigame while being arrested"));
 		return true;
 	}
 
@@ -2590,13 +2664,13 @@ bool CPlayer::RequestMinigameChange(int RequestedMinigame)
 
 	if (GetCharacter()->m_FreezeTime)
 	{
-		GameServer()->SendChatTarget(m_ClientID, "You can't join a minigame while being frozen");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You can't join a minigame while being frozen"));
 	}
 	else
 	{
 		m_RequestedMinigame = RequestedMinigame;
 		m_LastMinigameRequest = Server()->Tick();
-		GameServer()->SendChatTarget(m_ClientID, "Minigame request sent, please don't move for 5 seconds");
+		GameServer()->SendChatTarget(m_ClientID, Localize("Minigame request sent, please don't move for 5 seconds"));
 	}
 	return true;
 }
@@ -2616,9 +2690,9 @@ bool CPlayer::MinigameRequestTick()
 	else if (GetCharacter()->m_FreezeTime || GetCharacter()->GetPos() != GetCharacter()->m_PrevPos)
 	{
 		if (GetCharacter()->m_FreezeTime)
-			GameServer()->SendChatTarget(m_ClientID, "Your minigame request was cancelled because you are frozen");
+			GameServer()->SendChatTarget(m_ClientID, Localize("Your minigame request was cancelled because you are frozen"));
 		else
-			GameServer()->SendChatTarget(m_ClientID, "Your minigame request was cancelled because you moved");
+			GameServer()->SendChatTarget(m_ClientID, Localize("Your minigame request was cancelled because you moved"));
 		m_RequestedMinigame = MINIGAME_NONE;
 		m_LastMinigameRequest = 0;
 	}
@@ -2635,19 +2709,19 @@ bool CPlayer::MinigameRequestTick()
 
 void CPlayer::MinigameAfkCheck()
 {
-	if (!IsMinigame() || !GameServer()->Config()->m_SvMinigameAfkAutoLeave || m_IsDummy)
+	if (!IsMinigame() || !GameServer()->Config()->m_SvMinigameAfkAutoLeave || m_IsDummy || GameServer()->Durak()->InDurakGame(m_ClientID))
 		return;
 
 	int TimeLeft = ((m_LastMovementTick + Server()->TickSpeed() * GameServer()->Config()->m_SvMinigameAfkAutoLeave) - Server()->Tick()) / Server()->TickSpeed();
 	if (TimeLeft <= 0)
 	{
 		GameServer()->SetMinigame(m_ClientID, MINIGAME_NONE);
-		GameServer()->SendChatTarget(m_ClientID, "You automatically left the minigame because you were afk for too long");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You automatically left the minigame because you were afk for too long"));
 	}
 	else if (TimeLeft <= 10 && Server()->Tick() % Server()->TickSpeed() == 0)
 	{
 		char aBuf[64];
-		str_format(aBuf, sizeof(aBuf), "Please move within %d seconds or you will leave the minigame", TimeLeft);
+		str_format(aBuf, sizeof(aBuf), Localize("Please move within %d seconds or you will leave the minigame"), TimeLeft);
 		GameServer()->SendChatTarget(m_ClientID, aBuf);
 	}
 }
@@ -2661,7 +2735,13 @@ bool CPlayer::ShowDDraceHud()
 	CPlayer *pPlayer = this;
 	if ((m_Team == TEAM_SPECTATORS || m_Paused) && m_SpectatorID >= 0 && GameServer()->m_apPlayers[m_SpectatorID])
 		pPlayer = GameServer()->m_apPlayers[m_SpectatorID];
-	return !pPlayer->IsMinigame() || pPlayer->m_Minigame == MINIGAME_BLOCK || pPlayer->m_Minigame == MINIGAME_1VS1;
+	return !pPlayer->IsMinigame() || pPlayer->m_Minigame == MINIGAME_BLOCK || pPlayer->m_Minigame == MINIGAME_1VS1 || pPlayer->m_Minigame == MINIGAME_DURAK;
+}
+
+const char *CPlayer::Localize(const char *pText, const char *pContext)
+{
+	if (m_IsDummy) return pText;
+	return ::Localize(pText, m_Language);
 }
 
 void CPlayer::UpdateDoubleXpLifes()
@@ -2669,9 +2749,9 @@ void CPlayer::UpdateDoubleXpLifes()
 	m_DoubleXpLifesLeft--;
 	char aBuf[64];
 	if (m_DoubleXpLifesLeft > 0)
-		str_format(aBuf, sizeof(aBuf), "You have %dx double-xp life left", m_DoubleXpLifesLeft);
+		str_format(aBuf, sizeof(aBuf), Localize("You have %dx double-xp life left"), m_DoubleXpLifesLeft);
 	else
-		str_copy(aBuf, "You have no double-xp lifes anymore (last use)", sizeof(aBuf));
+		str_copy(aBuf, Localize("You have no double-xp lifes anymore (last use)"), sizeof(aBuf));
 	GameServer()->SendChatTarget(m_ClientID, aBuf);
 	m_pCharacter->m_IsDoubleXp = true;
 }
@@ -2682,9 +2762,9 @@ void CPlayer::SetSilentFarm(bool Set)
 		return;
 	m_SilentFarm = Set;
 	if (Set)
-		GameServer()->SendChatTarget(m_ClientID, "You will not receive sounds from the server while farming on a moneytile");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You will not receive sounds from the server while farming on a moneytile"));
 	else
-		GameServer()->SendChatTarget(m_ClientID, "You will receive all sounds again");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You will receive all sounds again"));
 }
 
 void CPlayer::SetHideDrawings(bool Set)
@@ -2693,9 +2773,9 @@ void CPlayer::SetHideDrawings(bool Set)
 		return;
 	m_HideDrawings = Set;
 	if (Set)
-		GameServer()->SendChatTarget(m_ClientID, "You will no longer see drawings");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You will no longer see drawings"));
 	else
-		GameServer()->SendChatTarget(m_ClientID, "You will now see drawings again");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You will now see drawings again"));
 }
 
 void CPlayer::SetHideBroadcasts(bool Set)
@@ -2705,11 +2785,11 @@ void CPlayer::SetHideBroadcasts(bool Set)
 	m_HideBroadcasts = Set;
 	if (Set)
 	{
-		GameServer()->SendChatTarget(m_ClientID, "You will no longer see money broadcasts, jail and escape timer will be shown in vote menu instead");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You will no longer see money broadcasts, jail and escape timer will be shown in vote menu instead"));
 		GameServer()->SendBroadcast("", m_ClientID);
 	}
 	else
-		GameServer()->SendChatTarget(m_ClientID, "You will now see all broadcasts again");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You will now see all broadcasts again"));
 }
 
 void CPlayer::SetWeaponIndicator(bool Set)
@@ -2718,9 +2798,9 @@ void CPlayer::SetWeaponIndicator(bool Set)
 		return;
 	m_WeaponIndicator = Set;
 	if (Set)
-		GameServer()->SendChatTarget(m_ClientID, "Weapon indicator enabled");
+		GameServer()->SendChatTarget(m_ClientID, Localize("Weapon indicator enabled"));
 	else
-		GameServer()->SendChatTarget(m_ClientID, "Weapon indicator disabled");
+		GameServer()->SendChatTarget(m_ClientID, Localize("Weapon indicator disabled"));
 }
 
 void CPlayer::SetZoomCursor(bool Set)
@@ -2729,23 +2809,23 @@ void CPlayer::SetZoomCursor(bool Set)
 		return;
 	m_ZoomCursor = Set;
 	if (Set)
-		GameServer()->SendChatTarget(m_ClientID, "Your cursor will now zoom. WARNING: Does not work with dynamic camera if deadzone or follow factor are non-default.");
+		GameServer()->SendChatTarget(m_ClientID, Localize("Your cursor will now zoom. WARNING: Does not work with dynamic camera if deadzone or follow factor are non-default."));
 	else
-		GameServer()->SendChatTarget(m_ClientID, "You cursor will no longer be zoomed");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You cursor will no longer be zoomed"));
 }
 
 void CPlayer::SetNinjaJetpack(bool Set)
 {
 	if (!GameServer()->m_Accounts[GetAccID()].m_Ninjajetpack)
 	{
-		GameServer()->SendChatTarget(m_ClientID, "You don't have ninjajetpack, buy it in the shop");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You don't have ninjajetpack, buy it in the shop"));
 		return;
 	}
 	m_NinjaJetpack = Set;
 	if (Set)
-		GameServer()->SendChatTarget(m_ClientID, "Ninjajetpack enabled");
+		GameServer()->SendChatTarget(m_ClientID, Localize("Ninjajetpack enabled"));
 	else
-		GameServer()->SendChatTarget(m_ClientID, "Ninjajetpack disabled");
+		GameServer()->SendChatTarget(m_ClientID, Localize("Ninjajetpack disabled"));
 }
 
 void CPlayer::SetPlotSpawn(bool Set)
@@ -2754,9 +2834,9 @@ void CPlayer::SetPlotSpawn(bool Set)
 		return;
 	m_PlotSpawn = Set;
 	if (Set)
-		GameServer()->SendChatTarget(m_ClientID, "You will now respawn at your plot (TAB+kill to join at normal spawn)");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You will now respawn at your plot (TAB+kill to join at normal spawn)"));
 	else
-		GameServer()->SendChatTarget(m_ClientID, "You will no longer respawn at your plot (TAB+kill to join at plot spawn)");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You will no longer respawn at your plot (TAB+kill to join at plot spawn)"));
 }
 
 void CPlayer::SetResumeMoved(bool Set)
@@ -2765,9 +2845,9 @@ void CPlayer::SetResumeMoved(bool Set)
 		return;
 	m_ResumeMoved = Set;
 	if (Set)
-		GameServer()->SendChatTarget(m_ClientID, "You will now resume from pause if your tee gets moved");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You will now resume from pause if your tee gets moved"));
 	else
-		GameServer()->SendChatTarget(m_ClientID, "You will no longer resume from pause if your tee gets moved");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You will no longer resume from pause if your tee gets moved"));
 }
 
 void CPlayer::ClearPlot()
@@ -2775,11 +2855,11 @@ void CPlayer::ClearPlot()
 	int PlotID = GameServer()->GetPlotID(GetAccID());
 	if (PlotID < PLOT_START)
 	{
-		GameServer()->SendChatTarget(m_ClientID, "You need a plot to use this command");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You need a plot to use this command"));
 		return;
 	}
 	GameServer()->ClearPlot(PlotID);
-	GameServer()->SendChatTarget(m_ClientID, "All objects of your plot have been removed");
+	GameServer()->SendChatTarget(m_ClientID, Localize("All objects of your plot have been removed"));
 }
 
 void CPlayer::StartPlotEdit()
@@ -2788,29 +2868,29 @@ void CPlayer::StartPlotEdit()
 	int PlotID = GameServer()->GetPlotID(GetAccID());
 	if (PlotID < PLOT_START)
 	{
-		GameServer()->SendChatTarget(m_ClientID, "You need a plot to use this command");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You need a plot to use this command"));
 		return;
 	}
 	if (!pChr)
 	{
-		GameServer()->SendChatTarget(m_ClientID, "You have to be alive to edit your plot");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You have to be alive to edit your plot"));
 		return;
 	}
 	else if (pChr->GetCurrentTilePlotID() != PlotID)
 	{
-		GameServer()->SendChatTarget(m_ClientID, "You have to be inside your plot to edit your plot");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You have to be inside your plot to edit your plot"));
 		return;
 	}
 	else if (GameServer()->PlotCanBeRaided(PlotID))
 	{
-		GameServer()->SendChatTarget(m_ClientID, "You can't edit your plot while living the life of a gangster.");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You can't edit your plot while living the life of a gangster."));
 		return;
 	}
 
 	if (GameServer()->Arenas()->FightStarted(m_ClientID))
 		return;
 
-	GameServer()->SendChatTarget(m_ClientID, "You are now editing your plot, switch to another weapon to exit the editor");
+	GameServer()->SendChatTarget(m_ClientID, Localize("You are now editing your plot, switch to another weapon to exit the editor"));
 	pChr->UnsetSpookyGhost();
 	pChr->GiveWeapon(WEAPON_DRAW_EDITOR);
 	pChr->SetActiveWeapon(WEAPON_DRAW_EDITOR);
@@ -2825,7 +2905,7 @@ void CPlayer::ChangeScoreMode(int ScoreMode)
 	m_ScoreMode = ScoreMode;
 
 	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "Changed displayed score to '%s'", GameServer()->GetScoreModeName(ScoreMode));
+	str_format(aBuf, sizeof(aBuf), Localize("Changed displayed score to '%s'"), GameServer()->GetScoreModeName(ScoreMode));
 	GameServer()->SendChatTarget(m_ClientID, aBuf);
 
 	// Update the gameinfo, add or remove GAMEFLAG_RACE as wanted (time score needs it, the others dont)
@@ -2836,7 +2916,7 @@ void CPlayer::SetRainbowSpeedVIP(int Value)
 {
 	if (GameServer()->m_Accounts[GetAccID()].m_VIP != VIP_PLUS)
 	{
-		GameServer()->SendChatTarget(m_ClientID, "You are not VIP+");
+		GameServer()->SendChatTarget(m_ClientID, Localize("You are not VIP+"));
 		return;
 	}
 
@@ -2848,7 +2928,7 @@ void CPlayer::SetRainbowSpeedVIP(int Value)
 	m_RainbowSpeed = Value;
 
 	char aBuf[64];
-	str_format(aBuf, sizeof(aBuf), "Rainbow speed has been updated to %d", Value);
+	str_format(aBuf, sizeof(aBuf), Localize("Rainbow speed has been updated to %d"), Value);
 	GameServer()->SendChatTarget(m_ClientID, aBuf);
 }
 

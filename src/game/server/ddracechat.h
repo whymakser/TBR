@@ -87,7 +87,8 @@ CHAT_COMMAND("zoomcursor", "?i['0'|'1']", CFGFLAG_CHAT, ConZoomCursor, this, "Wh
 CHAT_COMMAND("resumemoved", "?i['0'|'1']", CFGFLAG_CHAT, ConResumeMoved, this, "Whether to resume from pause when someone moved your tee (off by default), optional i = 0 for off else for on", AUTHED_NO)
 CHAT_COMMAND("mute", "r[playername]", CFGFLAG_CHAT, ConMutePlayer, this, "Mutes player r until disconnect", AUTHED_NO)
 CHAT_COMMAND("design", "?s[name]", CFGFLAG_CHAT, ConDesign, this, "Changes map design or shows a list of available designs", AUTHED_NO)
-CHAT_COMMAND("language", "?s[language]", CFGFLAG_CHAT, ConLanguage, this, "Changes language or shows a list of availables languages", AUTHED_NO)
+CHAT_COMMAND("chatlanguage", "?s[language]", CFGFLAG_CHAT, ConChatLanguage, this, "Changes language or shows a list of availables languages for chat translation", AUTHED_NO)
+CHAT_COMMAND("language", "?s[lang-code]", CFGFLAG_CHAT, ConLanguage, this, "Changes language or shows a list of available languages for server language", AUTHED_NO)
 CHAT_COMMAND("discord", "", CFGFLAG_CHAT, ConDiscord, this, "Sends Discord invite link", AUTHED_NO)
 CHAT_COMMAND("shrug", "", CFGFLAG_CHAT, ConShrug, this, "¯\\_(ツ)_/¯", AUTHED_NO)
 CHAT_COMMAND("hidebroadcasts", "?i['0'|'1']", CFGFLAG_CHAT, ConHideBroadcasts, this, "Whether to hide money, jail, escape broadcasts and show them in vote menu instead", AUTHED_NO)
@@ -100,13 +101,17 @@ CHAT_COMMAND("survival", "", CFGFLAG_CHAT, ConJoinSurvival, this, "Joins the sur
 CHAT_COMMAND("boomfng", "", CFGFLAG_CHAT, ConJoinBoomFNG, this, "Joins the boom fng minigame", AUTHED_NO)
 CHAT_COMMAND("fng", "", CFGFLAG_CHAT, ConJoinFNG, this, "Joins the fng minigame", AUTHED_NO)
 CHAT_COMMAND("1vs1", "?s[playername] ?i[scorelimit] ?i[killborder]", CFGFLAG_CHAT, Con1VS1, this, "Joins the 1vs1 minigame or accepts/creates a fight/new arena", AUTHED_NO)
+CHAT_COMMAND("durak", "", CFGFLAG_CHAT, ConJoinDurak, this, "Joins the durak minigame", AUTHED_NO)
 
 //account top5s
 CHAT_COMMAND("top5level", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5Level, this, "Shows top5 accounts sorted by level", AUTHED_NO)
 CHAT_COMMAND("top5points", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5Points, this, "Shows top5 accounts sorted by block points", AUTHED_NO)
 CHAT_COMMAND("top5money", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5Money, this, "Shows top5 accounts sorted by money", AUTHED_NO)
 CHAT_COMMAND("top5spree", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5Spree, this, "Shows top5 accounts sorted by killing spree", AUTHED_NO)
-CHAT_COMMAND("top5portal", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5Portal, this, "Shows top5 accounts sorted by portal batteries", AUTHED_NO)
+CHAT_COMMAND("top5battery", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5PortalBattery, this, "Shows top5 accounts sorted by portal batteries", AUTHED_NO)
+CHAT_COMMAND("top5portalblock", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5PortalBlocker, this, "Shows top5 accounts sorted by portal blockers", AUTHED_NO)
+CHAT_COMMAND("top5durakwins", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5DurakWins, this, "Shows top5 accounts sorted by Durák wins", AUTHED_NO)
+CHAT_COMMAND("top5durakprofit", "?i[rank to start with]", CFGFLAG_CHAT, ConTop5DurakProfit, this, "Shows top5 accounts sorted by Durák profit", AUTHED_NO)
 
 //police
 CHAT_COMMAND("policehelper", "s[add|remove] r[name]", CFGFLAG_CHAT, ConPoliceHelper, this, "Adds/removes player r to/from policehelpers", AUTHED_NO)

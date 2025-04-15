@@ -19,6 +19,7 @@
 #include "houses/house.h"
 #include "minigames/minigame.h"
 #include "minigames/arenas.h"
+#include "minigames/durak.h"
 
 #include "eventhandler.h"
 #include "gameworld.h"
@@ -81,7 +82,10 @@ enum Top5
 	TOP_POINTS,
 	TOP_MONEY,
 	TOP_SPREE,
-	TOP_PORTAL,
+	TOP_PORTAL_BATTERY,
+	TOP_PORTAL_BLOCKER,
+	TOP_DURAK_WINS,
+	TOP_DURAK_PROFIT,
 };
 
 enum
@@ -101,7 +105,7 @@ enum
 	MAX_PASSWORD_LENGTH = 128,
 
 	// update this one with every acc change you do
-	ACC_CURRENT_VERSION = 11,
+	ACC_CURRENT_VERSION = 15,
 
 	// vip
 	VIP_CLASSIC = 1,
@@ -212,6 +216,11 @@ public:
 	IAntibot *Antibot() { return m_pAntibot; }
 
 	LOCKED_TUNES *LockedTuning() { return &m_vLockedTuning[0]; }
+	bool IsTuneInList(LOCKED_TUNES *pLockedTunings, const char *pParam) { return std::any_of(pLockedTunings->begin(), pLockedTunings->end(),
+			[pParam](const CLockedTune &Tune) {
+				return str_comp(Tune.m_aParam, pParam) == 0;
+			}); }
+	bool ResetLockedTune(LOCKED_TUNES *pLockedTunings, const char *pParam);
 	bool SetLockedTune(LOCKED_TUNES *pLockedTunings, CLockedTune &Tune);
 	void ApplyTuneLock(LOCKED_TUNES *pLockedTunings, int TuneLock);
 	CTuningParams *ApplyLockedTunings(CTuningParams *pTuning, LOCKED_TUNES &LockedTunings);
@@ -295,15 +304,31 @@ public:
 		CHAT_SEVEN = 1<<0,
 		CHAT_SEVENDOWN = 1<<1,
 		CHAT_NO_WEBHOOK = 1<<2,
+
+		CHATFLAG_ALL = CHAT_SEVEN|CHAT_SEVENDOWN,
 	};
 
 	// network
 	void SendChatMsg(CNetMsg_Sv_Chat *pMsg, int Flags, int To);
-	void SendChatTarget(int To, const char* pText, int Flags = CHAT_SEVEN|CHAT_SEVENDOWN);
+	void SendChatTarget(int To, const char* pText, int Flags = CHATFLAG_ALL);
 	void SendChatTeam(int Team, const char* pText);
 	void SendChatMessage(int ChatterClientID, int Mode, int To, const char *pText) override { SendChat(ChatterClientID, Mode, To, pText); }
-	void SendChat(int ChatterClientID, int Mode, int To, const char *pText, int SpamProtectionClientID = -1, int Flags = CHAT_SEVEN|CHAT_SEVENDOWN);
-	void SendBroadcast(const char* pText, int ClientID, bool IsImportant = true);
+	void SendChat(int ChatterClientID, int Mode, int To, const char *pText, int SpamProtectionClientID = -1, int Flags = CHATFLAG_ALL, CFormatArg *pArgs = 0, int NumArgs = 0);
+
+	template<typename... Args>
+	void SendChatFormat(int ChatterClientID, int Mode, int To, int Flags, const char* pFormat, Args&&... args)
+	{
+		CFormatArg aArgs[] = { CFormatArg(std::forward<Args>(args))... };
+		SendChat(ChatterClientID, CHAT_ALL, To, pFormat, -1, Flags, aArgs, std::size(aArgs));
+	}
+
+	void SendBroadcast(const char* pText, int ClientID, bool IsImportant = true, CFormatArg *pArgs = 0, int NumArgs = 0);
+	template<typename... Args>
+	void SendBroadcastFormat(int ClientID, bool IsImportant, const char *pFormat, Args&&... args)
+	{
+		CFormatArg aArgs[] = { CFormatArg(std::forward<Args>(args))... };
+		SendBroadcast(pFormat, ClientID, IsImportant, aArgs, std::size(aArgs));
+	}
 	void SendEmoticon(int ClientID, int Emoticon);
 	void SendWeaponPickup(int ClientID, int Weapon);
 	void SendSettings(int ClientID);
@@ -375,6 +400,7 @@ public:
 	const char *NetVersion() const override;
 	const char *NetVersionSevendown() const override;
 
+	void OnCountryCodeLookup(int ClientID) override;
 	void SetBotDetected(int ClientID) override;
 	void FillAntibot(CAntibotRoundData *pData) override;
 	bool OnClientDDNetVersionKnown(int ClientID);
@@ -493,17 +519,22 @@ public:
 
 	struct TopAccounts
 	{
+		char m_aUsername[32];
+		char m_aAccountName[32];
 		int m_Level;
 		int m_Points;
 		int64 m_Money;
 		int m_KillStreak;
-		int m_Portal;
-		char m_aUsername[32];
-		char m_aAccountName[32];
+		int m_PortalBattery;
+		int m_PortalBlocker;
+		int m_DurakWins;
+		int m_DurakProfit;
 	};
 	std::vector<TopAccounts> m_TopAccounts;
-	void UpdateTopAccounts(int Type);
 	void SetTopAccStats(int FromID);
+	void LazySaveTopAccounts();
+	bool LazyLoadTopAccounts(int Type);
+	void SaveCurrentTopAccounts();
 
 	int m_LogoutAccountsPort;
 	static int InitAccounts(const char* pName, int IsDir, int StorageType, void* pUser);
@@ -574,6 +605,9 @@ public:
 		int m_PortalBattery;
 		int m_PortalBlocker;
 		int m_VoteMenuFlags;
+		int m_DurakWins;
+		int64 m_DurakProfit;
+		char m_aLanguage[32];
 	};
 	std::vector<AccountInfo> m_Accounts;
 
@@ -633,6 +667,9 @@ public:
 		ACC_PORTAL_BATTERY,
 		ACC_PORTAL_BLOCKER,
 		ACC_VOTE_MENU_FLAGS,
+		ACC_DURAK_WINS,
+		ACC_DURAK_PROFIT,
+		ACC_LANGUAGE,
 		NUM_ACCOUNT_VARIABLES
 	};
 
@@ -688,6 +725,7 @@ public:
 	class CHouse *m_pHouses[NUM_HOUSES];
 	class CMinigame *m_pMinigames[NUM_MINIGAMES];
 	CArenas *Arenas() { return ((CArenas *)m_pMinigames[MINIGAME_1VS1]); }
+	CDurak *Durak() { return ((CDurak *)m_pMinigames[MINIGAME_DURAK]); }
 	CWhoIs m_WhoIs;
 	CRainbowName m_RainbowName;
 	CVotingMenu m_VotingMenu;
@@ -732,12 +770,18 @@ public:
 	//minigames disabled
 	bool m_aMinigameDisabled[NUM_MINIGAMES];
 
-	void SetMinigame(int ClientID, int Minigame, bool Force = false);
+	void SetMinigame(int ClientID, int Minigame, bool Force = false, bool DoChatMsg = true);
 
 	//survival
 	void SurvivalTick();
 	void SetPlayerSurvivalState(int State);
-	void SendSurvivalBroadcast(const char* pMsg, bool Sound = false, bool IsImportant = true);
+	template<typename... Args>
+	void SendSurvivalBroadcastFormat(bool Sound, bool IsImportant, const char *pFormat, Args&&... args)
+	{
+		CFormatArg aArgs[] = { CFormatArg(std::forward<Args>(args))... };
+		SendSurvivalBroadcast(pFormat, Sound, IsImportant, aArgs, std::size(aArgs));
+	}
+	void SendSurvivalBroadcast(const char* pMsg, bool Sound = false, bool IsImportant = true, CFormatArg *pArgs = 0, int NumArgs = 0);
 	int CountSurvivalPlayers(int State);
 	int GetRandomSurvivalPlayer(int State, int NotThis = -1);
 	int m_SurvivalBackgroundState;
@@ -759,6 +803,12 @@ public:
 	void SetMapSpecificOptions();
 
 	// police
+	template<typename... Args>
+	void SendChatPoliceFormat(const char *pFormat, Args&&... args)
+	{
+		CFormatArg aArgs[] = { CFormatArg(std::forward<Args>(args))... };
+		SendChat(-1, CHAT_POLICE_CHANNEL, -1, pFormat, -1, CHATFLAG_ALL, aArgs, std::size(aArgs));
+	}
 	void SendChatPolice(const char *pMessage);
 	bool JailPlayer(int ClientID, int Seconds);
 	bool ForceJailRelease(int ClientID);
@@ -919,10 +969,12 @@ private:
 	static void ConJoinBoomFNG(IConsole::IResult* pResult, void* pUserData);
 	static void ConJoinFNG(IConsole::IResult* pResult, void* pUserData);
 	static void Con1VS1(IConsole::IResult* pResult, void* pUserData);
+	static void ConJoinDurak(IConsole::IResult* pResult, void* pUserData);
 
 	static void ConResumeMoved(IConsole::IResult* pResult, void* pUserData);
 	static void ConMutePlayer(IConsole::IResult* pResult, void* pUserData);
 	static void ConDesign(IConsole::IResult* pResult, void* pUserData);
+	static void ConChatLanguage(IConsole::IResult* pResult, void* pUserData);
 	static void ConLanguage(IConsole::IResult* pResult, void* pUserData);
 	static void ConDiscord(IConsole::IResult* pResult, void* pUserData);
 
@@ -934,7 +986,10 @@ private:
 	static void ConTop5Points(IConsole::IResult* pResult, void* pUserData);
 	static void ConTop5Money(IConsole::IResult* pResult, void* pUserData);
 	static void ConTop5Spree(IConsole::IResult* pResult, void* pUserData);
-	static void ConTop5Portal(IConsole::IResult* pResult, void* pUserData);
+	static void ConTop5PortalBattery(IConsole::IResult* pResult, void* pUserData);
+	static void ConTop5PortalBlocker(IConsole::IResult* pResult, void* pUserData);
+	static void ConTop5DurakWins(IConsole::IResult* pResult, void* pUserData);
+	static void ConTop5DurakProfit(IConsole::IResult* pResult, void* pUserData);
 
 	static void ConPoliceHelper(IConsole::IResult* pResult, void* pUserData);
 	static void ConWanted(IConsole::IResult* pResult, void* pUserData);

@@ -119,6 +119,7 @@ private:
 		// See others
 		int m_SeeOthersState;
 		int m_TotalOverhang;
+		int m_NumPages;
 		int m_NumSeeOthers;
 		bool m_aWasSeeOthers[MAX_CLIENTS];
 		void DoSeeOthers();
@@ -126,6 +127,7 @@ private:
 		void UpdateSeeOthers();
 		void ResetSeeOthers();
 		int GetSpecSelectFlag(int SpecFlag);
+		void AddToNumReserved(int Summand);
 	} m_aMap[MAX_CLIENTS];
 	void UpdatePlayerMap(int ClientID);
 
@@ -149,6 +151,7 @@ public:
 	void InitPlayerMap(int ClientID, bool Rejoin = false) { m_aMap[ClientID].InitPlayer(Rejoin); }
 	void UpdateTeamsState(int ClientID) { m_aMap[ClientID].m_UpdateTeamsState = true; }
 	void ForceInsertPlayer(int Insert, int ClientID) { m_aMap[ClientID].InsertNextEmpty(Insert); }
+	void AddToNumReserved(int ClientID, int Summand) { m_aMap[ClientID].AddToNumReserved(Summand); }
 
 	enum
 	{
@@ -157,6 +160,8 @@ public:
 		SEE_OTHERS_IND_BUTTON,
 	};
 
+	// We start after the seeother indicator/button, and can take all the ids up to m_NumReserved, we may not interfere with GetMapSize()
+	int GetFirstDurakID(int ClientID) { return GetSeeOthersID(ClientID) - 1; }
 	int GetSeeOthersID(int ClientID);
 	void DoSeeOthers(int ClientID);
 	void ResetSeeOthers(int ClientID);

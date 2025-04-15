@@ -217,7 +217,32 @@ public:
 
 		bool m_Rejoining;
 
-		char m_aLanguage[5]; // would be 2, but "none" is 4
+		char m_aChatLanguage[5]; // would be 2, but "none" is 4
+
+		enum
+		{
+			COUNTRYCODE_STRSIZE = 36,
+			COUNTRYLOOKUP_STATE_NONE,
+			COUNTRYLOOKUP_STATE_PENDING,
+			COUNTRYLOOKUP_STATE_DONE
+		};
+		char m_aCountryCode[COUNTRYCODE_STRSIZE];
+
+		class CCountryLookup : public IJob
+		{
+			void Run() override;
+		public:
+			CCountryLookup() {};
+			CCountryLookup(const char *pAddress)
+			{
+				str_copy(m_aAddr, pAddress, sizeof(m_aAddr));
+				m_aResult[0] = '\0';
+			}
+			char m_aResult[512];
+			char m_aAddr[NETADDR_MAXSTRSIZE];
+		};
+		int m_CountryLookupState;
+		std::shared_ptr<CCountryLookup> m_pCountryLookup;
 
 		class CDnsblLookup : public IJob
 		{
@@ -489,6 +514,7 @@ public:
 	static void ConchainRconModPasswordChange(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	static void ConchainRconHelperPasswordChange(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 	static void ConchainFakeMapCrc(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
+	static void ConchainDefaultLanguage(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
 
 #if defined(CONF_FAMILY_UNIX)
 	static void ConchainConnLoggingServerChange(IConsole::IResult *pResult, void *pUserData, IConsole::FCommandCallback pfnCallback, void *pCallbackUserData);
@@ -528,6 +554,9 @@ public:
 	unsigned m_AnnouncementLastLine;
 
 	bool IsBrowserScoreFix();
+
+	void CountryLookup(int ClientID) override;
+	const char *GetCountryCode(int ClientID) override { return m_aClients[ClientID].m_aCountryCode; }
 
 	class CBotLookup : public IJob
 	{
@@ -616,14 +645,14 @@ public:
 			m_ClientID = ClientID;
 			m_Mode = Mode;
 			str_copy(m_aMessage, pMessage, sizeof(m_aMessage));
-			str_copy(m_aLanguage, pLanguage, sizeof(m_aLanguage));
+			str_copy(m_aChatLanguage, pLanguage, sizeof(m_aChatLanguage));
 		}
 		
 		CServer *m_pServer;
 		int m_ClientID;
 		int m_Mode;
 		char m_aMessage[256];
-		char m_aLanguage[5];
+		char m_aChatLanguage[5];
 	};
 	enum
 	{
@@ -632,8 +661,8 @@ public:
 	};
 	void TranslateChat(int ClientID, const char *pMsg, int Mode) override;
 	int m_TranslateState;
-	const char *GetLanguage(int ClientID) override { return m_aClients[ClientID].m_aLanguage; }
-	void SetLanguage(int ClientID, const char *pLanguage) override { str_copy(m_aClients[ClientID].m_aLanguage, pLanguage, sizeof(m_aClients[ClientID].m_aLanguage)); }
+	const char *GetLanguage(int ClientID) override { return m_aClients[ClientID].m_aChatLanguage; }
+	void SetLanguage(int ClientID, const char *pLanguage) override { str_copy(m_aClients[ClientID].m_aChatLanguage, pLanguage, sizeof(m_aClients[ClientID].m_aChatLanguage)); }
 
 	const char *GetClientVersionStr(int ClientID) const;
 

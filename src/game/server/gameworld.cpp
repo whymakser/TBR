@@ -245,6 +245,7 @@ void CGameWorld::UpdatePlayerMap(int ClientID)
 			if (Overhang != m_aMap[i].m_TotalOverhang)
 			{
 				m_aMap[i].m_TotalOverhang = Overhang;
+				m_aMap[i].m_NumPages = std::max(1, (Overhang + PlayerMap::SSeeOthers::MAX_NUM_SEE_OTHERS - 1) / PlayerMap::SSeeOthers::MAX_NUM_SEE_OTHERS);
 				if (m_aMap[i].m_TotalOverhang <= 0 && m_aMap[i].m_SeeOthersState != PlayerMap::SSeeOthers::STATE_NONE)
 					m_aMap[i].ResetSeeOthers();
 
@@ -268,7 +269,7 @@ int CGameWorld::GetSeeOthersInd(int ClientID, int MapID)
 {
 	if (m_aMap[ClientID].m_TotalOverhang && MapID == GetSeeOthersID(ClientID))
 		return SEE_OTHERS_IND_BUTTON;
-	if (m_aMap[ClientID].m_NumSeeOthers && MapID >= m_aMap[ClientID].GetMapSize() - m_aMap[ClientID].m_NumSeeOthers)
+	if (m_aMap[ClientID].m_NumSeeOthers && MapID >= m_aMap[ClientID].GetMapSize() - m_aMap[ClientID].m_NumSeeOthers && MapID < m_aMap[ClientID].GetMapSize())
 		return SEE_OTHERS_IND_PLAYER;
 	return -1;
 }
@@ -279,16 +280,17 @@ const char *CGameWorld::GetSeeOthersName(int ClientID)
 	int State = m_aMap[ClientID].m_SeeOthersState;
 	const char *pDot = "\xe2\x8b\x85";
 
-	if (State == PlayerMap::SSeeOthers::STATE_PAGE_FIRST)
+	int Page = State + 1;
+	if (m_aMap[ClientID].m_NumPages > 1 && Page == m_aMap[ClientID].m_NumPages)
+	{
+		str_format(aName, sizeof(aName), "%s %d/%d | Close", pDot, Page, Page);
+	}
+	else if (State != PlayerMap::SSeeOthers::STATE_NONE)
 	{
 		if (m_aMap[ClientID].m_TotalOverhang > PlayerMap::SSeeOthers::MAX_NUM_SEE_OTHERS)
-			str_format(aName, sizeof(aName), "%s 1/2", pDot);
+			str_format(aName, sizeof(aName), "%s %d/%d", pDot, Page, m_aMap[ClientID].m_NumPages);
 		else
 			str_format(aName, sizeof(aName), "%s Close", pDot);
-	}
-	else if (State == PlayerMap::SSeeOthers::STATE_PAGE_SECOND)
-	{
-		str_format(aName, sizeof(aName), "%s 2/2 | Close", pDot);
 	}
 	else
 	{
@@ -366,6 +368,19 @@ int CGameWorld::PlayerMap::GetSpecSelectFlag(int SpecFlag)
 	if (SpecFlag != SPEC_FLAGRED && SpecFlag != SPEC_FLAGBLUE)
 		return -1;
 	return m_pGameWorld->Server()->GetMaxClients(m_ClientID) - SpecFlag;
+}
+
+void CGameWorld::PlayerMap::AddToNumReserved(int Summand)
+{
+	// Remove old players from map if we take more space at the end
+	if (m_NumReserved + Summand > m_NumReserved)
+	{
+		for (int i = GetMapSize()-1; i >= GetMapSize()-Summand; i--)
+		{
+			Remove(i);
+		}
+	}
+	m_NumReserved += Summand;
 }
 
 void CGameWorld::PlayerMap::UpdateSeeOthers()
@@ -731,7 +746,7 @@ void CGameWorld::Tick()
 				continue;
 
 			NumCharacters++;
-			if (pChr->m_MoneyTile == CCharacter::MONEYTILE_POLICE && !pChr->m_Passive)
+			if (pChr->m_MoneyTile == CCharacter::MONEYTILE_POLICE && !pChr->m_Passive && !pChr->GetPlayer()->IsMinigame())
 			{
 				m_PoliceFarm.m_NumPoliceTilePlayers++;
 			}

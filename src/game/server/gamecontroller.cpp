@@ -155,7 +155,14 @@ void IGameController::OnCharacterSpawn(CCharacter *pChr)
 	{
 		if (GameServer()->Arenas()->OnCharacterSpawn(pChr->GetPlayer()->GetCID()))
 			break;
-	} // fall-through
+		goto default_case;
+	}
+	case MINIGAME_DURAK:
+	{
+		GameServer()->Durak()->OnCharacterSpawn(pChr);
+		goto default_case;
+	}
+	default_case:
 	default:
 	{
 		pChr->GiveWeapon(WEAPON_HAMMER);
@@ -250,6 +257,19 @@ bool IGameController::OnEntity(int Index, vec2 Pos, int Layer, int Flags, int Nu
 			{
 				new CPlayerCounter(&GameServer()->m_World, Pos, Port);
 			}
+		}
+	}
+	else if (Layer == LAYER_SWITCH && Index == TILE_DURAK_TABLE)
+	{
+		GameServer()->Durak()->AddMapTableTile(Number, Pos);
+	}
+	else if (Layer == LAYER_SWITCH && Index == TILE_DURAK_SEAT)
+	{
+		int MapIndex = GameServer()->Collision()->GetMapIndex(Pos);
+		int Delay = GameServer()->Collision()->GetSwitchDelay(MapIndex);
+		if (Delay > 0)
+		{
+			GameServer()->Durak()->AddMapSeatTile(Number, MapIndex, Delay-1);
 		}
 	}
 	else if(Index == ENTITY_CRAZY_SHOTGUN_EX)
@@ -686,8 +706,10 @@ void IGameController::Snap(int SnappingClient)
 		| GAMEINFOFLAG_DONT_MASK_ENTITIES;
 	pGameInfoEx->m_Flags2 = 0
 		| GAMEINFOFLAG2_GAMETYPE_FDDRACE
-		| GAMEINFOFLAG2_ENTITIES_FDDRACE
-		| GAMEINFOFLAG2_ALLOW_X_SKINS;
+		| GAMEINFOFLAG2_ENTITIES_FDDRACE;
+
+	if (Config()->m_SvAllowXSkins)
+		pGameInfoEx->m_Flags2 |= GAMEINFOFLAG2_ALLOW_X_SKINS;
 
 	if (!Config()->m_SvWeakHook)
 		pGameInfoEx->m_Flags2 |= GAMEINFOFLAG2_NO_WEAK_HOOK_AND_BOUNCE;
@@ -801,7 +823,7 @@ void IGameController::UpdateGameInfo(int ClientID)
 				continue;
 
 			// F-DDrace
-			if (pPlayer->m_ScoreMode == SCORE_TIME && !pPlayer->IsMinigame())
+			if (pPlayer->m_ScoreMode == SCORE_TIME && !pPlayer->IsMinigame() && !GameServer()->Durak()->IsPlayerOnSeat(ClientID))
 				GameInfoMsg.m_GameFlags |= GAMEFLAG_RACE;
 
 			if (GameServer()->Arenas()->FightStarted(i))
@@ -820,7 +842,7 @@ void IGameController::UpdateGameInfo(int ClientID)
 	{
 		// F-DDrace
 		CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
-		if (pPlayer && pPlayer->m_ScoreMode == SCORE_TIME && !pPlayer->IsMinigame())
+		if (pPlayer && pPlayer->m_ScoreMode == SCORE_TIME && !pPlayer->IsMinigame() && !GameServer()->Durak()->IsPlayerOnSeat(ClientID))
 			GameInfoMsg.m_GameFlags |= GAMEFLAG_RACE;
 
 		if (GameServer()->Arenas()->FightStarted(ClientID))

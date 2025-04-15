@@ -97,7 +97,7 @@ void CPickup::Tick()
 	if (m_Owner >= 0)
 	{
 		CCharacter* pChr = GameServer()->GetPlayerChar(m_Owner);
-		if (pChr && (pChr->m_pPassiveShield == this || pChr->m_pItem == this))
+		if (pChr && pChr->m_pItem == this)
 		{
 			m_Pos.x = pChr->GetPos().x;
 			m_Pos.y = pChr->GetPos().y - 50;
@@ -312,33 +312,38 @@ void CPickup::Tick()
 				const char *pType = "";
 				if (m_Type == POWERUP_BATTERY)
 				{
-					pType = "battery";
+					pType = pChr->GetPlayer()->Localize("battery");
 					RespawnTimer = m_Subtype != WEAPON_PORTAL_RIFLE;
 				}
 				else if (m_Subtype == WEAPON_PORTAL_RIFLE && Config()->m_SvPortalRifleAmmo)
 				{
-					pType = "portal rifle";
+					pType = pChr->GetPlayer()->Localize("portal rifle");
 				}
 
 				if (!pType[0])
 					continue;
 
 				char aBuf[64] = "";
+				const char *pTime = pChr->GetPlayer()->Localize("seconds");
 				if (RespawnTimer)
 				{
 					int Seconds = (m_SpawnTick - Server()->Tick()) / Server()->TickSpeed();
-					if (Seconds <= 60)
-						str_format(aBuf, sizeof(aBuf), "This %s will respawn in %d seconds", pType, Seconds);
-					else
-						str_format(aBuf, sizeof(aBuf), "This %s will respawn in %d minutes", pType, Seconds / 60);
+					if (Seconds > 60)
+					{
+						Seconds /= 60;
+						pTime = pChr->GetPlayer()->Localize("minutes");
+					}
+					str_format(aBuf, sizeof(aBuf), pChr->GetPlayer()->Localize("This %s will respawn in %d %s"), pType, Seconds, pTime);
 				}
 				else
 				{
 					int Seconds = (Server()->Tick() - m_PickupTick) / Server()->TickSpeed();
-					if (Seconds <= 60)
-						str_format(aBuf, sizeof(aBuf), "This %s got picked up %d seconds ago", pType, Seconds);
-					else
-						str_format(aBuf, sizeof(aBuf), "This %s got picked up %d minutes ago", pType, Seconds / 60);
+					if (Seconds > 60)
+					{
+						Seconds /= 60;
+						pTime = pChr->GetPlayer()->Localize("minutes");
+					}
+					str_format(aBuf, sizeof(aBuf), pChr->GetPlayer()->Localize("This %s got picked up %d %s ago"), pType, Seconds, pTime);
 				}
 				GameServer()->SendChatTarget(ClientID, aBuf);
 				continue;

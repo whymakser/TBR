@@ -59,7 +59,7 @@ void CBank::OnSuccess(int ClientID)
 	int Amount = GetAmount(m_aClients[ClientID].m_Page, ClientID);
 	if (Amount <= 0)
 	{
-		GameServer()->SendChatTarget(ClientID, "You need to select an amount to deposit or withdraw.");
+		GameServer()->SendChatTarget(ClientID, pPlayer->Localize("You need to select an amount to deposit or withdraw."));
 		return;
 	}
 
@@ -68,14 +68,14 @@ void CBank::OnSuccess(int ClientID)
 	{
 		if (pPlayer->GetWalletMoney() < Amount)
 		{
-			GameServer()->SendChatTarget(ClientID, "You don't have enough money in your wallet to deposit this amount.");
+			GameServer()->SendChatTarget(ClientID, pPlayer->Localize("You don't have enough money in your wallet to deposit this amount."));
 			return;
 		}
 
 		pPlayer->BankTransaction(Amount, "deposit");
 		pPlayer->WalletTransaction(-Amount, "deposit");
 
-		str_format(aMsg, sizeof(aMsg), "You deposited %d money from your wallet to your bank account.", Amount);
+		str_format(aMsg, sizeof(aMsg), pPlayer->Localize("You deposited %d money from your wallet to your bank account."), Amount);
 		GameServer()->SendChatTarget(ClientID, aMsg);
 
 	}
@@ -83,14 +83,14 @@ void CBank::OnSuccess(int ClientID)
 	{
 		if (pAccount->m_Money < Amount)
 		{
-			GameServer()->SendChatTarget(ClientID, "You don't have enough money on your bank account to withdraw this amount.");
+			GameServer()->SendChatTarget(ClientID, pPlayer->Localize("You don't have enough money on your bank account to withdraw this amount."));
 			return;
 		}
 
 		pPlayer->BankTransaction(-Amount, "withdraw");
 		pPlayer->WalletTransaction(Amount, "withdraw");
 
-		str_format(aMsg, sizeof(aMsg), "You withdrew %d money from your bank account to your wallet.", Amount);
+		str_format(aMsg, sizeof(aMsg), pPlayer->Localize("You withdrew %d money from your bank account to your wallet."), Amount);
 		GameServer()->SendChatTarget(ClientID, aMsg);
 	}
 }
