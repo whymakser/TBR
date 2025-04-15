@@ -1329,6 +1329,18 @@ Everyone in your locked team was killed because '%s' killed.
 Everyone in your locked team was killed because '%s' died.
 == 
 
+Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs
+== 
+
+Aᴄᴄᴏᴜɴᴛ Iɴғᴏ
+== 
+
+Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs
+== 
+
+Pʟᴏᴛ
+== 
+
 Silent Farm
 == 
 
@@ -1398,6 +1410,15 @@ Hide Broadcasts
 Local Chat
 == 
 
+Vᴏᴛᴇs
+== 
+
+Aᴄᴄᴏᴜɴᴛ
+== 
+
+Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs
+== 
+
 Please specify the page using the reason field
 == 
 
@@ -1419,6 +1440,9 @@ You're not logged in.
 Use '/login' to see more information about your account.
 == 
 
+Cᴏʟʟᴇᴄᴛᴀʙʟᴇs
+== 
+
 Rented until
 == 
 
@@ -1429,6 +1453,15 @@ Destroy Seconds
 == 
 
 Oᴘᴛɪᴏɴs
+== 
+
+Dᴇsɪɢɴs
+== 
+
+Mɪɴɪɢᴀᴍᴇs
+== 
+
+Sᴄᴏʀᴇ Mᴏᴅᴇ
 == 
 
 You can't close your door because the police destroyed it
