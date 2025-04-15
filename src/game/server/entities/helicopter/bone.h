@@ -7,42 +7,60 @@
 
 #include "../../entity.h"
 
-struct SBone {
+struct SBone
+{
+	CEntity *m_pEntity;
 	vec2 m_From;
 	vec2 m_To;
 	int m_ID;
 	int m_Color;
 
-	SBone() : SBone(0, 0, 0, 0) {}
-	SBone(float FromX, float FromY, float ToX, float ToY) : SBone(vec2(FromX, FromY), vec2(ToX, ToY)) {}
-	SBone(vec2 From, vec2 To) : m_From(From), m_To(To), m_ID(-1), m_Color(LASERTYPE_RIFLE) {}
+	SBone() : SBone(nullptr, 0, 0, 0, 0) { }
+	SBone(CEntity *pEntity, float FromX, float FromY, float ToX, float ToY)
+		: SBone(pEntity, vec2(FromX, FromY), vec2(ToX, ToY)) { }
+	SBone(CEntity *pEntity, vec2 From, vec2 To)
+		: m_pEntity(pEntity), m_From(From), m_To(To), m_ID(-1), m_Color(LASERTYPE_RIFLE) { }
 
 	// Sense
-	[[nodiscard]] float GetLength() { return distance(m_To, m_From); }
+	IServer *Server() { return m_pEntity->Server(); }
+	CGameContext *GameServer() { return m_pEntity->GameServer(); }
+	float GetLength() { return distance(m_To, m_From); }
 
 	// Manipulating
-	void Flip() {
+	void Flip()
+	{
 		m_From.x *= -1;
 		m_To.x *= -1;
 	}
-	void Rotate(float Angle) {
+	void Rotate(float Angle)
+	{
 		m_From = rotate(m_From, Angle);
 		m_To = rotate(m_To, Angle);
 	}
-	void Scale(float factor) {
+	void Scale(float factor)
+	{
 		m_From *= factor;
 		m_To *= factor;
 	}
 
 	// Ticking
-	void Snap(int SnappingClient, CEntity* followParent) const;
+	void Snap(int SnappingClient);
 };
 
-struct STrail {
-	vec2* m_pPos;
+struct CTrail
+{
+	CEntity *m_pEntity;
+	vec2 *m_pPos;
 	int m_ID;
 
-	void Snap(CEntity* followParent) const;
+public:
+	CTrail(CEntity *pEntity, vec2 *pPos, int SnapID);
+
+	// Sense
+	IServer *Server() { return m_pEntity->Server(); }
+
+	// Ticking
+	void Snap(int SnappingClient);
 };
 
 #endif // GAME_SERVER_ENTITIES_HELICOPTER_BONE_H

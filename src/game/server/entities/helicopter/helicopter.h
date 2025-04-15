@@ -1,4 +1,5 @@
 // made by fokkonaut
+//  AND MATQ 2021
 
 #ifndef GAME_SERVER_ENTITIES_HELICOPTER_HELICOPTER_H
 #define GAME_SERVER_ENTITIES_HELICOPTER_HELICOPTER_H
@@ -47,13 +48,13 @@ private:
 	vec2 m_LastTopPropellerA, m_LastTopPropellerB;
 	void GetFullPropellerPositions(vec2& outPosA, vec2& outPosB);
 
-	STrail m_aTrails[NUM_TRAILS];
+	CTrail m_aTrails[NUM_TRAILS];
 	SBone m_aBones[NUM_BONES];
-	CHelicopterTurret* m_pTurretAttachment;
+	CHelicopterTurret *m_pTurretAttachment;
 
 	SBone *Body() { return &m_aBones[0]; } // size: NUM_BONES_BODY
 	SBone *TopPropeller() { return &m_aBones[NUM_BONES_BODY]; } // size: NUM_BONES_PROPELLERS_TOP
-	SBone *BackPropeller() { return &m_aBones[NUM_BONES_BODY+NUM_BONES_PROPELLERS_TOP]; } // size: NUM_BONES_PROPELLERS_BACK
+	SBone *BackPropeller() { return &m_aBones[NUM_BONES_BODY + NUM_BONES_PROPELLERS_TOP]; } // size: NUM_BONES_PROPELLERS_BACK
 	void PutTurretToForeground();
 
 public:
@@ -61,11 +62,11 @@ public:
 	~CHelicopter() override;
 
 	// Sense
-	[[nodiscard]] bool IsFlipped() { return m_Flipped; }
-	[[nodiscard]] float Angle() { return m_Angle; }
+	bool IsFlipped() { return m_Flipped; }
+	float Angle() { return m_Angle; }
 
 	// Manipulating
-	bool AttachTurret(CHelicopterTurret* helicopterTurret);
+	bool AttachTurret(CHelicopterTurret *helicopterTurret);
 	void DestroyTurret();
 	void FlingTee(CCharacter *pChar);
 

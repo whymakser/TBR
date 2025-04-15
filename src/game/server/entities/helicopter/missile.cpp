@@ -5,7 +5,8 @@
 #include "game/server/gamemodes/DDRace.h"
 #include "missile.h"
 
-CSpark::CSpark(CMissile* pMissile, int ResetLifespan, int Lifespan) {
+CSpark::CSpark(CMissile *pMissile, int ResetLifespan, int Lifespan)
+{
 	m_pMissile = pMissile;
 	m_ResetLifespan = ResetLifespan;
 	m_ID = Server()->SnapNewID();
@@ -15,26 +16,31 @@ CSpark::CSpark(CMissile* pMissile, int ResetLifespan, int Lifespan) {
 	m_Lifespan = Lifespan;
 }
 
-CSpark::~CSpark() {
+CSpark::~CSpark()
+{
 	Server()->SnapFreeID(m_ID);
 }
 
-IServer* CSpark::Server() {
+IServer *CSpark::Server()
+{
 	return m_pMissile->Server();
 }
 
-void CSpark::ResetFromMissile() {
+void CSpark::ResetFromMissile()
+{
 	vec2 Direction = m_pMissile->GetVel();
 	vec2 Perpendicular = normalize(vec2(-Direction.y, Direction.x));
 	m_Pos = m_pMissile->GetPos() + vec2((float)(rand() % 21 - 10), (float)(rand() % 21 - 10));
 	m_Vel = -Direction * ((float)(25 + rand() % 35) / 100.f) + Perpendicular * (float)(rand() % 101 - 50) / 15.f;
 }
 
-void CSpark::Tick() {
+void CSpark::Tick()
+{
 	if (!m_pMissile->IsIgnited())
 		return;
 
-	if (m_Lifespan <= 0) {
+	if (m_Lifespan <= 0)
+	{
 		ResetFromMissile();
 		m_Lifespan = m_ResetLifespan;
 	}
@@ -43,12 +49,13 @@ void CSpark::Tick() {
 	m_Lifespan--;
 }
 
-void CSpark::Snap(int SnappingClient) {
+void CSpark::Snap(int SnappingClient)
+{
 	if (!IsStillVisible())
 		return;
 
 	CNetObj_Projectile *pObj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, m_ID, sizeof(CNetObj_Projectile)));
-	if(!pObj)
+	if (!pObj)
 		return;
 
 	pObj->m_X = (int)m_Pos.x;
@@ -59,27 +66,33 @@ void CSpark::Snap(int SnappingClient) {
 	pObj->m_Type = WEAPON_HAMMER;
 }
 
-void CMissile::ApplyAcceleration() {
+void CMissile::ApplyAcceleration()
+{
 	if (m_ExplosionsLeft >= 0)
 		return;
 
 	m_IgnitionTime--;
-	if (m_IgnitionTime <= 0) {
+	if (m_IgnitionTime <= 0)
+	{
 		// Accelerates quickly, maximum speed 50.f
 		float Speed = length(m_Vel);
-		if (Speed <= 49.99f) {
+		if (Speed <= 49.99f)
+		{
 			m_Vel = normalize(m_Vel + m_Direction) * Speed * 1.03f;
 			if (length(m_Vel) > 50.f)
 				m_Vel = normalize(m_Vel) * 50.f;
 		}
-	} else {
+	}
+	else
+	{
 		m_Vel += vec2(0.f, 0.3f);
 	}
 
 	m_Pos += m_Vel;
 }
 
-void CMissile::HandleCollisions() {
+void CMissile::HandleCollisions()
+{
 	if (m_ExplosionsLeft >= 0)
 		return;
 
@@ -87,11 +100,11 @@ void CMissile::HandleCollisions() {
 	vec2 collisionPos, newPos;
 	int Collide = GameServer()->Collision()->IntersectLine(m_PrevPos, m_Pos, &collisionPos, &newPos);
 
-	CCharacter* pOwnerChar = nullptr;
+	CCharacter *pOwnerChar = nullptr;
 	if (m_Owner >= 0)
 		pOwnerChar = GameServer()->GetPlayerChar(m_Owner);
 
-	CCharacter* pTargetChr = nullptr;
+	CCharacter *pTargetChr = nullptr;
 	if (pOwnerChar ? !(pOwnerChar->m_Hit & CCharacter::DISABLE_HIT_GRENADE) : Config()->m_SvHit)
 		pTargetChr = GameWorld()->IntersectCharacter(m_PrevPos, collisionPos, 6.0f, collisionPos, pOwnerChar, m_Owner);
 
@@ -102,21 +115,20 @@ void CMissile::HandleCollisions() {
 	if (pOwnerChar && pTargetChr &&
 		pOwnerChar->IsAlive() &&
 		pTargetChr->IsAlive() &&
-		!pTargetChr->CanCollide(m_Owner)) {
+		!pTargetChr->CanCollide(m_Owner))
+	{
 		IsWeaponCollide = true;
 	}
-//	m_TeamMask = Mask128();
-//	if (pOwnerChar && pOwnerChar->IsAlive()) {
-//		m_TeamMask = pOwnerChar->TeamMask();
-//	}
 
-	if ((pTargetChr && (1 || m_Owner == -1 || pTargetChr == pOwnerChar) || Collide || GameLayerClipped(m_Pos)) && !IsWeaponCollide) {
+	if ((pTargetChr || Collide || GameLayerClipped(m_Pos)) && !IsWeaponCollide)
+	{
 		m_Pos = collisionPos;
 		TriggerExplosions();
 		return;
 	}
 
-	if (m_LifeSpan == -1) {
+	if (m_LifeSpan == -1)
+	{
 		GameServer()->CreateExplosion(collisionPos,
 									  m_Owner,
 									  WEAPON_GRENADE,
@@ -133,41 +145,46 @@ void CMissile::HandleCollisions() {
 		z = GameServer()->Collision()->IsTeleport(x);
 	else
 		z = GameServer()->Collision()->IsTeleportWeapon(x);
-	if (z && !((CGameControllerDDRace*)GameServer()->m_pController)->m_TeleOuts[z - 1].empty()) {
-		int Num = (int)((CGameControllerDDRace*)GameServer()->m_pController)->m_TeleOuts[z - 1].size();
+	if (z && !((CGameControllerDDRace *)GameServer()->m_pController)->m_TeleOuts[z - 1].empty())
+	{
+		int Num = (int)((CGameControllerDDRace *)GameServer()->m_pController)->m_TeleOuts[z - 1].size();
 		m_Pos =
-			((CGameControllerDDRace*)GameServer()->m_pController)->m_TeleOuts[z - 1][(!Num) ? Num : rand() % Num];
+			((CGameControllerDDRace *)GameServer()->m_pController)->m_TeleOuts[z - 1][(!Num) ? Num : rand() % Num];
 		m_StartTick = Server()->Tick();
 	}
 }
 
-void CMissile::UpdateStableProjectiles() {
+void CMissile::UpdateStableProjectiles()
+{
 	if (m_ExplosionsLeft >= 0)
 		return;
 
 	// When ignition started, teleport/reset smoke trail to the missile
 	if (m_IgnitionTime == 0)
-		for (int i = 0; i < 15; i++)
+		for (int i = 0; i < NUM_SPARKS; i++)
 			m_apSparks[i]->ResetFromMissile();
 
 	m_pStableRocket->SetPos(m_Pos);
-	for (int i = 1; i < 15; i++)
+	for (int i = 1; i < NUM_SPARKS; i++)
 		m_apSparks[i]->Tick();
 }
 
-void CMissile::TriggerExplosions() {
+void CMissile::TriggerExplosions()
+{
 	m_ExplosionsLeft = 5;
 
 	GameWorld()->DestroyEntity(m_pStableRocket);
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < NUM_SPARKS; i++)
 		delete m_apSparks[i];
 }
 
-void CMissile::HandleExplosions() {
+void CMissile::HandleExplosions()
+{
 	if (m_ExplosionsLeft < 0 || Server()->Tick() % 4 != 0)
 		return;
 
-	if (IsIgnited()) {
+	if (IsIgnited())
+	{
 		vec2 nearbyPos = m_Pos + vec2((float)(rand() % 151 - 75), (float)(rand() % 151 - 75));
 		GameServer()->CreateExplosion(nearbyPos,
 									  m_Owner,
@@ -175,7 +192,9 @@ void CMissile::HandleExplosions() {
 									  m_Owner == -1,
 									  -1);
 		GameServer()->CreateSound(nearbyPos, SOUND_GRENADE_EXPLODE);
-	} else { // Explode only once
+	}
+	else
+	{ // Explode only once
 		m_ExplosionsLeft = 0;
 		GameServer()->CreateExplosion(m_Pos,
 									  m_Owner,
@@ -196,30 +215,33 @@ void CMissile::HandleExplosions() {
 }
 
 CMissile::CMissile(CGameWorld *pGameWorld, int Owner, vec2 Pos, vec2 Vel, vec2 Direction, int Span, int Layer)
- : CEntity(pGameWorld, CGameWorld::ENTTYPE_MISSILE, Pos) {
+	: CEntity(pGameWorld, CGameWorld::ENTTYPE_MISSILE, Pos)
+{
 	m_Owner = Owner;
 	m_LifeSpan = Span;
 	m_StartTick = Server()->Tick();
 
-	m_IgnitionTime = 20; // 1s
+	m_IgnitionTime = 20;
 	m_PrevPos = Pos;
 	m_Vel = Vel;
 	m_Direction = Direction;
 
 	m_pStableRocket = new CStableProjectile(pGameWorld, WEAPON_GRENADE, Owner, Pos, false, false);
-	for (int i = 0; i < 15; i++)
-		m_apSparks[i] = new CSpark(this, 15, i);
+	for (int i = 0; i < NUM_SPARKS; i++) // Lifespan = sparks : one spark per tick
+		m_apSparks[i] = new CSpark(this, NUM_SPARKS, i);
 
 	m_ExplosionsLeft = -1;
 
 	GameWorld()->InsertEntity(this);
 }
 
-CMissile::~CMissile() {
+CMissile::~CMissile()
+{
 
 }
 
-void CMissile::Tick() {
+void CMissile::Tick()
+{
 	ApplyAcceleration();
 	HandleCollisions();
 
@@ -236,6 +258,6 @@ void CMissile::Snap(int SnappingClient)
 		return;
 
 	// Smoke trail
-	for (int i = 0; i < 15; i++)
+	for (int i = 0; i < NUM_SPARKS; i++)
 		m_apSparks[i]->Snap(SnappingClient);
 }

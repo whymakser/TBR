@@ -9,9 +9,9 @@
 #include "../stable_projectile.h"
 
 class CMissile;
-class CSpark {
-private:
-	CMissile* m_pMissile;
+class CSpark
+{
+	CMissile *m_pMissile;
 	vec2 m_Pos;
 	vec2 m_Vel;
 	int m_ResetLifespan;
@@ -20,12 +20,12 @@ private:
 	int m_ID;
 
 public:
-	CSpark(CMissile* pMissile, int ResetLifespan, int Lifespan);
+	CSpark(CMissile *pMissile, int ResetLifespan, int Lifespan);
 	~CSpark();
 
 	// Getting
-	[[nodiscard]] IServer* Server();
-	[[nodiscard]] bool IsStillVisible() { return m_Lifespan > 0; }
+	IServer *Server();
+	bool IsStillVisible() { return m_Lifespan > 0; }
 
 	// Manipulating
 	void ResetFromMissile();
@@ -36,8 +36,13 @@ public:
 
 };
 
-class CMissile : public CEntity {
-private:
+class CMissile : public CEntity
+{
+	enum
+	{
+		NUM_SPARKS = 15,
+	};
+
 	int m_Owner;
 	int m_LifeSpan;
 	int m_StartTick;
@@ -50,8 +55,8 @@ private:
 
 	int m_IgnitionTime;
 
-	CStableProjectile* m_pStableRocket;
-	CSpark* m_apSparks[15];
+	CStableProjectile *m_pStableRocket;
+	CSpark *m_apSparks[NUM_SPARKS];
 	void UpdateStableProjectiles();
 
 	int m_ExplosionsLeft;
@@ -63,10 +68,9 @@ public:
 	~CMissile();
 
 	// Getting
-	[[nodiscard]] vec2 GetVel() { return m_Vel; }
-	[[nodiscard]] int GetOwnerCID() { return m_Owner; }
-	[[nodiscard]] bool IsIgnited() { return m_IgnitionTime <= 0; }
-	[[nodiscard]] bool IsExploding() { return m_ExplosionsLeft >= 0; }
+	vec2 GetVel() { return m_Vel; }
+	bool IsIgnited() { return m_IgnitionTime <= 0; }
+	bool IsExploding() { return m_ExplosionsLeft >= 0; }
 
 	// Ticking
 	void Tick() override;

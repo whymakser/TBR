@@ -15,13 +15,14 @@ enum
 };
 
 class CHelicopter;
-class CHelicopterTurret {
+class CHelicopterTurret
+{
 protected:
 	friend class CHelicopter;
 
 	int m_TurretType;
-	CHelicopter* m_pHelicopter;
-	SBone* m_apBones;
+	CHelicopter *m_pHelicopter;
+	SBone *m_apBones;
 	size_t m_NumBones;
 
 	SBone m_TurretBone; // don't snap this one
@@ -46,24 +47,24 @@ protected:
 	virtual void FireTurret();
 
 	// Generating
-	[[nodiscard]] vec2 GetTurretDirection();
+	vec2 GetTurretDirection();
 
 public:
 	CHelicopterTurret(int TurretType, int NumBones,
-					  const SBone &TurretBone, const vec2& Pivot,
-					  float AimingRange, int ShootingCooldown);
+		const SBone& TurretBone, const vec2& Pivot,
+		float AimingRange, int ShootingCooldown);
 	~CHelicopterTurret();
 
 	// Sense
-	[[nodiscard]] IServer* Server();
-	[[nodiscard]] CGameWorld* GameWorld();
-	[[nodiscard]] CGameContext* GameServer();
-	[[nodiscard]] int GetType() { return m_TurretType; }
-	[[nodiscard]] size_t GetNumBones() { return m_NumBones; }
-	[[nodiscard]] SBone* Bones() { return m_apBones; } // size: m_NumBones || GetNumBones()
+	IServer *Server();
+	CGameWorld *GameWorld();
+	CGameContext *GameServer();
+	int GetType() { return m_TurretType; }
+	size_t GetNumBones() { return m_NumBones; }
+	SBone *Bones() { return m_apBones; } // size: m_NumBones || GetNumBones()
 
 	// Manipulating
-	bool TryBindHelicopter(CHelicopter* helicopter);
+	bool TryBindHelicopter(CHelicopter *helicopter);
 
 	// Ticking
 	virtual void Tick();
@@ -73,7 +74,8 @@ public:
 };
 
 class CHelicopter;
-class CMinigunTurret : public CHelicopterTurret {
+class CMinigunTurret : public CHelicopterTurret
+{
 private:
 	friend class CHelicopter;
 	enum
@@ -105,8 +107,8 @@ private:
 	void FireTurret() override;
 
 	static float AngleDiff() { return 2.f * pi / NUM_BONES_CLUSTER; } // 360deg / 3 = 120deg per bone
-	SBone* Cluster() { return &m_apBones[0]; } // size: NUM_BONES_CLUSTER
-	SBone* Retainer() { return &m_apBones[NUM_BONES_CLUSTER]; } // size: NUM_BONES_RETAINER
+	SBone *Cluster() { return &m_apBones[0]; } // size: NUM_BONES_CLUSTER
+	SBone *Retainer() { return &m_apBones[NUM_BONES_CLUSTER]; } // size: NUM_BONES_RETAINER
 
 public:
 	CMinigunTurret();
@@ -118,7 +120,8 @@ public:
 	void OnInput(CNetObj_PlayerInput *pNewInput) override;
 };
 
-class CLauncherTurret : public CHelicopterTurret {
+class CLauncherTurret : public CHelicopterTurret
+{
 private:
 	friend class CHelicopter;
 	enum
@@ -141,13 +144,13 @@ private:
 
 	float m_RecoilAmount;
 	float m_RecoilSpan;
-	float m_CurrentRetractionFactor;
-	void RetractShaft();
+	float m_CurrentRecoilFactor;
+	void HandleRecoil();
 	void FireTurret() override;
 
-	SBone* Ejector() { return &m_apBones[0]; } // size: NUM_BONES_EJECTOR
-	SBone* Shaft() { return &m_apBones[NUM_BONES_EJECTOR]; } // size: NUM_BONES_SHAFT
-	SBone* Retainer() { return &m_apBones[NUM_BONES_EJECTOR+NUM_BONES_SHAFT]; } // size: NUM_BONES_RETAINER
+	SBone *Ejector() { return &m_apBones[0]; } // size: NUM_BONES_EJECTOR
+	SBone *Shaft() { return &m_apBones[NUM_BONES_EJECTOR]; } // size: NUM_BONES_SHAFT
+	SBone *Retainer() { return &m_apBones[NUM_BONES_EJECTOR + NUM_BONES_SHAFT]; } // size: NUM_BONES_RETAINER
 
 public:
 	CLauncherTurret();
