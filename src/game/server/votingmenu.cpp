@@ -725,7 +725,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 	}
 
 	DoLineSeperator(Page, pNumOptions);
-	DoLineTextSubheader(Page, pNumOptions, pPlayer->Localize("Oᴘᴛɪᴏɴs"));
+	DoLineTextSubheader(Page, pNumOptions, pPlayer->Localize("Oᴘᴛɪᴏɴs", "vote-header"));
 	DoLineToggleOption(Page, pNumOptions, ACC_MISC_SILENTFARM, pPlayer->m_SilentFarm);
 	if (pAccount->m_Ninjajetpack)
 	{
