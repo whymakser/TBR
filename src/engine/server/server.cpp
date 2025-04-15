@@ -1475,7 +1475,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 						}
 
 						m_aClients[ClientID].m_CurrentMapDesign = m_aClients[Dummy].m_CurrentMapDesign;
-						SetLanguage(ClientID, GetLanguage(Dummy));
+						SetChatLanguage(ClientID, GetChatLanguage(Dummy));
 						m_aClients[ClientID].m_Main = false;
 					}
 				}
@@ -4554,7 +4554,7 @@ void CServer::CTranslateChat::Run()
 	{
 		for (int i = 0; i < MAX_CLIENTS; i++)
 		{
-			if (m_pServer->m_aClients[i].m_State != CServer::CClient::STATE_INGAME || str_comp_nocase(m_pServer->GetLanguage(i), m_aChatLanguage) != 0)
+			if (m_pServer->m_aClients[i].m_State != CServer::CClient::STATE_INGAME || str_comp_nocase(m_pServer->GetChatLanguage(i), m_aChatLanguage) != 0)
 				continue;
 			int Mode = (m_Mode == CHAT_TEAM || m_Mode == CHAT_LOCAL) ? CHAT_SINGLE_TEAM : CHAT_SINGLE;
 			m_pServer->GameServer()->SendChatMessage(m_ClientID, Mode, i, aResult);
@@ -4567,12 +4567,12 @@ void CServer::TranslateChat(int ClientID, const char *pMsg, int Mode)
 	std::vector<const char *> vLanguages;
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
-		if (m_aClients[i].m_State != CServer::CClient::STATE_INGAME || str_comp_nocase(GetLanguage(i), "none") == 0)
+		if (m_aClients[i].m_State != CServer::CClient::STATE_INGAME || str_comp_nocase(GetChatLanguage(i), "none") == 0)
 			continue;
 
 		bool Continue = false;
 		for (unsigned int j = 0; j < vLanguages.size(); j++)
-			if (!str_comp(GetLanguage(i), vLanguages[j]))
+			if (!str_comp(GetChatLanguage(i), vLanguages[j]))
 			{
 				Continue = true;
 				break;
@@ -4581,7 +4581,7 @@ void CServer::TranslateChat(int ClientID, const char *pMsg, int Mode)
 		if (Continue)
 			continue;
 
-		vLanguages.push_back(GetLanguage(i));
+		vLanguages.push_back(GetChatLanguage(i));
 	}
 
 	for (unsigned int i = 0; i < vLanguages.size(); i++)

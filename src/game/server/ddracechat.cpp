@@ -2715,7 +2715,7 @@ void CGameContext::ConChatLanguage(IConsole::IResult* pResult, void* pUserData)
 
 	if (pResult->NumArguments())
 	{
-		if (!str_comp(pSelf->Server()->GetLanguage(pResult->m_ClientID), pResult->GetString(0)))
+		if (!str_comp(pSelf->Server()->GetChatLanguage(pResult->m_ClientID), pResult->GetString(0)))
 		{
 			pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("This chat language is already selected"));
 			return;
@@ -2725,10 +2725,10 @@ void CGameContext::ConChatLanguage(IConsole::IResult* pResult, void* pUserData)
 		{
 			if (str_comp(pResult->GetString(0), apLanguages[i]) == 0)
 			{
-				pSelf->Server()->SetLanguage(pResult->m_ClientID, apLanguages[i]);
+				pSelf->Server()->SetChatLanguage(pResult->m_ClientID, apLanguages[i]);
 				int Dummy = pSelf->Server()->GetDummy(pResult->m_ClientID);
 				if (Dummy != -1)
-					pSelf->Server()->SetLanguage(Dummy, apLanguages[i]);
+					pSelf->Server()->SetChatLanguage(Dummy, apLanguages[i]);
 				pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("Successfully updated chat language"));
 				return;
 			}

@@ -686,7 +686,7 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 	if(Mode == CHAT_ALL)
 	{
 		for (int i = 0; i < MAX_CLIENTS; i++)
-			if (!IsMuted(MuteChecked, i) && CanReceiveMessage(ChatterClientID, i) && !str_comp(Server()->GetLanguage(i), "none"))
+			if (!IsMuted(MuteChecked, i) && CanReceiveMessage(ChatterClientID, i) && !str_comp(Server()->GetChatLanguage(i), "none"))
 			{
 				bool Send = (Server()->IsSevendown(i) && (Flags&CHAT_SEVENDOWN)) || (!Server()->IsSevendown(i) && (Flags&CHAT_SEVEN));
 				if (Send)
@@ -712,7 +712,7 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 		{
 			if(m_apPlayers[i] != 0)
 			{
-				if (IsMuted(MuteChecked, i) || !CanReceiveMessage(ChatterClientID, i) || str_comp(Server()->GetLanguage(i), "none"))
+				if (IsMuted(MuteChecked, i) || !CanReceiveMessage(ChatterClientID, i) || str_comp(Server()->GetChatLanguage(i), "none"))
 					continue;
 
 				if(m_apPlayers[ChatterClientID]->GetTeam() == TEAM_SPECTATORS)
@@ -761,7 +761,7 @@ void CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 		Msg.m_Mode = CHAT_TEAM;
 
 		for (int i = 0; i < MAX_CLIENTS; i++)
-			if (!IsMuted(MuteChecked, i) && IsLocal(ChatterClientID, i) && !str_comp(Server()->GetLanguage(i), "none"))
+			if (!IsMuted(MuteChecked, i) && IsLocal(ChatterClientID, i) && !str_comp(Server()->GetChatLanguage(i), "none"))
 				SendChatMsg(&Msg, MsgFlags|MSGFLAG_VITAL, i);
 	}
 	else if (Mode == CHAT_POLICE_CHANNEL)
