@@ -1013,9 +1013,6 @@ Your previously collected money got added to your account due to login
 Successfully logged out
 == Pomyślnie wylogowano
 
-Load recent design '%s'?
-== Czy załadować ostatni styl '%s'?
-
 The plot auction by '%s' is cancelled
 == Aukcja działki gracza '%s' została anulowana
 
@@ -1763,9 +1760,6 @@ Door Health
 Destroy Seconds
 == Sekundy do zniszczenia
 
-Oᴘᴛɪᴏɴs
-== Oᴘᴄᴊᴇ
-
 You have to be in a team with other tees to start
 == Musisz być w drużynie z innymi tee, aby rozpocząć
 
@@ -1867,3 +1861,62 @@ You can jump %d times
 
 ~ T A V E R N ~
 == ~ K A R C Z M A ~
+
+Load recent design?
+== 
+
+{vote-header}
+Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs
+== 
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ Iɴғᴏ
+== 
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs
+== 
+
+{vote-header}
+Pʟᴏᴛ
+== 
+
+{vote-header}
+Vᴏᴛᴇs
+== 
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ
+== 
+
+{vote-header}
+Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs
+== 
+
+{vote-header}
+Lᴀɴɢᴜᴀɢᴇs
+== 
+
+{vote-header}
+Cᴏʟʟᴇᴄᴛᴀʙʟᴇs
+== 
+
+{vote-header}
+Oᴘᴛɪᴏɴs
+== 
+
+{vote-header}
+Dᴇsɪɢɴs
+== 
+
+{vote-header}
+Mɪɴɪɢᴀᴍᴇs
+== 
+
+{vote-header}
+Sᴄᴏʀᴇ Mᴏᴅᴇ
+== 
+
+{vote-header}
+Aᴠᴀɪʟᴀʙʟᴇ Lᴀɴɢᴜᴀɢᴇs
+== 
