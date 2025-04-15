@@ -12,43 +12,47 @@ CGameContext *CVotingMenu::GameServer() const { return m_pGameServer; }
 IServer *CVotingMenu::Server() const { return GameServer()->Server(); }
 
 // Font: https://fsymbols.com/generators/smallcaps/
+#define VOTE_HEADER "vote-header"
+#define LocalizableHeader(str) Localizable((str), VOTE_HEADER)
+#define LocalizeHeader(header) Localize((header), VOTE_HEADER)
+
 // Not a normal space: https://www.cogsci.ed.ac.uk/~richard/utf-8.cgi?input=%E2%80%8A&mode=char
 static const char *PLACEHOLDER_DESC = " ";
 // Acc
-static const char *COLLAPSE_HEADER_WANTED_PLAYERS = "Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs";
-static const char *COLLAPSE_HEADER_ACC_INFO = "Aᴄᴄᴏᴜɴᴛ Iɴғᴏ";
-static const char *COLLAPSE_HEADER_ACC_STATS = "Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs";
-static const char *COLLAPSE_HEADER_PLOT_INFO = "Pʟᴏᴛ";
+static const char *COLLAPSE_HEADER_WANTED_PLAYERS = LocalizableHeader("Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs");
+static const char *COLLAPSE_HEADER_ACC_INFO = LocalizableHeader("Aᴄᴄᴏᴜɴᴛ Iɴғᴏ");
+static const char *COLLAPSE_HEADER_ACC_STATS = LocalizableHeader("Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs");
+static const char *COLLAPSE_HEADER_PLOT_INFO = LocalizableHeader("Pʟᴏᴛ");
 // Wanted // careful when adding another "Page", it has to differ somehow
-static const char *ACC_WANTED_PLAYERS_PAGE = "Page";
+static const char *ACC_WANTED_PLAYERS_PAGE = Localizable("Page");
 // Acc Misc
-static const char *ACC_MISC_SILENTFARM = "Silent Farm";
-static const char *ACC_MISC_NINJAJETPACK = "Ninjajetpack";
+static const char *ACC_MISC_SILENTFARM = Localizable("Silent Farm");
+static const char *ACC_MISC_NINJAJETPACK = Localizable("Ninjajetpack");
 // Acc Plot
-static const char *ACC_PLOT_SPAWN = "Plot Spawn";
-static const char *ACC_PLOT_EDIT = "Edit Plot";
-static const char *ACC_PLOT_CLEAR = "Clear Plot";
+static const char *ACC_PLOT_SPAWN = Localizable("Plot Spawn");
+static const char *ACC_PLOT_EDIT = Localizable("Edit Plot");
+static const char *ACC_PLOT_CLEAR = Localizable("Clear Plot");
 // VIP
-static const char *ACC_VIP_RAINBOW = "Rainbow";
-static const char *ACC_VIP_BLOODY = "Bloody";
-static const char *ACC_VIP_ATOM = "Atom";
-static const char *ACC_VIP_TRAIL = "Trail";
-static const char *ACC_VIP_SPREADGUN = "Spread Gun";
+static const char *ACC_VIP_RAINBOW = Localizable("Rainbow");
+static const char *ACC_VIP_BLOODY = Localizable("Bloody");
+static const char *ACC_VIP_ATOM = Localizable("Atom");
+static const char *ACC_VIP_TRAIL = Localizable("Trail");
+static const char *ACC_VIP_SPREADGUN = Localizable("Spread Gun");
 // VIP Plus
-static const char *ACC_VIP_PLUS_RAINBOWHOOK = "Rainbow Hook";
-static const char *ACC_VIP_PLUS_ROTATINGBALL = "Rotating Ball";
-static const char *ACC_VIP_PLUS_EPICCIRCLE = "Epic Circle";
-static const char *ACC_VIP_PLUS_LOVELY = "Lovely";
-static const char *ACC_VIP_PLUS_RAINBOWNAME = "Rainbow Name";
-static const char *ACC_VIP_PLUS_RAINBOWSPEED = "Rainbow Speed";
-static const char *ACC_VIP_PLUS_SPARKLE = "Sparkle";
+static const char *ACC_VIP_PLUS_RAINBOWHOOK = Localizable("Rainbow Hook");
+static const char *ACC_VIP_PLUS_ROTATINGBALL = Localizable("Rotating Ball");
+static const char *ACC_VIP_PLUS_EPICCIRCLE = Localizable("Epic Circle");
+static const char *ACC_VIP_PLUS_LOVELY = Localizable("Lovely");
+static const char *ACC_VIP_PLUS_RAINBOWNAME = Localizable("Rainbow Name");
+static const char *ACC_VIP_PLUS_RAINBOWSPEED = Localizable("Rainbow Speed");
+static const char *ACC_VIP_PLUS_SPARKLE = Localizable("Sparkle");
 // Misc
-static const char *MISC_HIDEDRAWINGS = "Hide Drawings";
-static const char *MISC_WEAPONINDICATOR = "Weapon Indicator";
-static const char *MISC_ZOOMCURSOR = "Zoom Cursor";
-static const char *MISC_RESUMEMOVED = "Resume Moved";
-static const char *MISC_HIDEBROADCASTS = "Hide Broadcasts";
-static const char *MISC_LOCALCHAT = "Local Chat";
+static const char *MISC_HIDEDRAWINGS = Localizable("Hide Drawings");
+static const char *MISC_WEAPONINDICATOR = Localizable("Weapon Indicator");
+static const char *MISC_ZOOMCURSOR = Localizable("Zoom Cursor");
+static const char *MISC_RESUMEMOVED = Localizable("Resume Moved");
+static const char *MISC_HIDEBROADCASTS = Localizable("Hide Broadcasts");
+static const char *MISC_LOCALCHAT = Localizable("Local Chat");
 
 void CVotingMenu::Init(CGameContext *pGameServer)
 {
@@ -62,13 +66,13 @@ void CVotingMenu::Init(CGameContext *pGameServer)
 		Reset(i);
 	}
 
-	str_copy(m_aPages[PAGE_VOTES].m_aName, "Vᴏᴛᴇs", sizeof(m_aPages[PAGE_VOTES].m_aName));
-	str_copy(m_aPages[PAGE_ACCOUNT].m_aName, "Aᴄᴄᴏᴜɴᴛ", sizeof(m_aPages[PAGE_ACCOUNT].m_aName));
-	str_copy(m_aPages[PAGE_MISCELLANEOUS].m_aName, "Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs", sizeof(m_aPages[PAGE_MISCELLANEOUS].m_aName));
+	str_copy(m_aPages[PAGE_VOTES].m_aName, LocalizableHeader("Vᴏᴛᴇs"), sizeof(m_aPages[PAGE_VOTES].m_aName));
+	str_copy(m_aPages[PAGE_ACCOUNT].m_aName, LocalizableHeader("Aᴄᴄᴏᴜɴᴛ"), sizeof(m_aPages[PAGE_ACCOUNT].m_aName));
+	str_copy(m_aPages[PAGE_MISCELLANEOUS].m_aName, LocalizableHeader("Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs"), sizeof(m_aPages[PAGE_MISCELLANEOUS].m_aName));
 
-	for (int i = 0; i < NUM_PAGES; i++)
-		for (int j = 0; j < NUM_PAGE_MAX_VOTES; j++)
-			m_aPages[i].m_aaTempDesc[j][0] = 0;
+	for (int i = 0; i < NUM_PAGE_MAX_VOTES; i++)
+		m_aaTempDesc[i][0] = 0;
+	m_TempLanguage = -1;
 
 	// Don't add the placeholders again when the map changes. The voteOptionHeap in CGameContext is not destroyed, so we do not have to add placeholders another time
 	if (!m_Initialized)
@@ -219,7 +223,7 @@ bool CVotingMenu::OnMessage(int ClientID, CNetMsg_Cl_CallVote *pMsg)
 	const char *pDesc = 0;
 	for (int i = 0; i < NUM_PAGE_MAX_VOTES; i++)
 	{
-		const char *pFullDesc = str_skip_voting_menu_prefixes(m_aPages[GetPage(ClientID)].m_aaTempDesc[i]);
+		const char *pFullDesc = str_skip_voting_menu_prefixes(m_aaTempDesc[i]);
 		if (!pFullDesc || !pFullDesc[0])
 			continue;
 
@@ -241,6 +245,16 @@ bool CVotingMenu::OnMessage(int ClientID, CNetMsg_Cl_CallVote *pMsg)
 		SendPageVotes(ClientID);
 	}
 	return true;
+}
+
+bool CVotingMenu::IsOptionWithSuffix(const char *pDesc, const char *pWantedOption)
+{
+	return str_startswith(pDesc, Localize(pWantedOption, m_TempLanguage)) != 0;
+}
+
+bool CVotingMenu::IsOption(const char *pDesc, const char *pWantedOption)
+{
+	return str_comp(pDesc, Localize(pWantedOption, m_TempLanguage)) == 0;
 }
 
 bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc, const char *pReason)
@@ -439,7 +453,7 @@ bool CVotingMenu::OnMessageSuccess(int ClientID, const char *pDesc, const char *
 
 		for (int i = -1; i < NUM_MINIGAMES; i++)
 		{
-			const char *pMinigame = i == -1 ? "No minigame" : GameServer()->GetMinigameName(i);
+			const char *pMinigame = i == -1 ? Localizable("No minigame") : GameServer()->GetMinigameName(i);
 			if (!IsOption(pDesc, pMinigame))
 				continue;
 			GameServer()->SetMinigame(ClientID, i);
@@ -466,6 +480,7 @@ int CVotingMenu::PrepareTempDescriptions(int ClientID)
 	if (!pPlayer)
 		return 0;
 
+	m_TempLanguage = pPlayer->m_Language;
 	m_NumCollapseEntries = 0;
 	int NumOptions = 0;
 
@@ -476,12 +491,12 @@ int CVotingMenu::PrepareTempDescriptions(int ClientID)
 		if (pPlayer->m_JailTime)
 		{
 			DoAnnouncement = true;
-			str_format(aBuf, sizeof(aBuf), "You are arrested for %lld seconds", pPlayer->m_JailTime / Server()->TickSpeed());
+			str_format(aBuf, sizeof(aBuf), pPlayer->Localize("You are arrested for %lld seconds"), pPlayer->m_JailTime / Server()->TickSpeed());
 		}
 		else if (pPlayer->m_EscapeTime)
 		{
 			DoAnnouncement = true;
-			str_format(aBuf, sizeof(aBuf), "You are wanted by the police for %lld seconds", pPlayer->m_EscapeTime / Server()->TickSpeed());
+			str_format(aBuf, sizeof(aBuf), pPlayer->Localize("You are wanted by the police for %lld seconds"), pPlayer->m_EscapeTime / Server()->TickSpeed());
 		}
 
 		if (DoAnnouncement)
@@ -493,7 +508,7 @@ int CVotingMenu::PrepareTempDescriptions(int ClientID)
 	if (pPlayer->GetCharacter() && pPlayer->m_Permille)
 	{
 		DoAnnouncement = true;
-		str_format(aBuf, sizeof(aBuf), "Grog permille: %.1f‰ / %.1f‰", pPlayer->m_Permille / 10.f, pPlayer->GetCharacter()->GetPermilleLimit() / 10.f);
+		str_format(aBuf, sizeof(aBuf), pPlayer->Localize("Grog permille: %.1f‰ / %.1f‰"), pPlayer->m_Permille / 10.f, pPlayer->GetCharacter()->GetPermilleLimit() / 10.f);
 		DoLineText(Page, &NumOptions, aBuf, BULLET_POINT);
 	}
 
@@ -527,8 +542,8 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 
 	if (AccID < ACC_START)
 	{
-		DoLineText(Page, pNumOptions, "You're not logged in.");
-		DoLineText(Page, pNumOptions, "Use '/login' to see more information about your account.");
+		DoLineText(Page, pNumOptions, pPlayer->Localize("You're not logged in."));
+		DoLineText(Page, pNumOptions, pPlayer->Localize("Use '/login' to see more information about your account."));
 		return;
 	}
 
@@ -573,17 +588,20 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 	bool ShowPortalDate = GameServer()->Config()->m_SvPortalRifleShop || pAccount->m_PortalRifle;
 	if (DoLineCollapse(Page, pNumOptions, COLLAPSE_HEADER_ACC_INFO, m_aClients[ClientID].m_ShowAccountInfo, 5 + (int)ShowEuros + (int)ShowPortalDate))
 	{
-		str_format(aBuf, sizeof(aBuf), "Account Name: %s", pAccount->m_Username);
+		str_format(aBuf, sizeof(aBuf), "%s: %s", pPlayer->Localize("Account Name"), pAccount->m_Username);
 		DoLineText(Page, pNumOptions, aBuf);
 
 		if (pAccount->m_RegisterDate != 0)
 		{
 			tmp = pAccount->m_RegisterDate;
-			str_format(aBuf, sizeof(aBuf), "Registered: %s", GameServer()->GetDate(tmp, false));
+			str_format(aBuf, sizeof(aBuf), "%s: %s", pPlayer->Localize("Registered"), GameServer()->GetDate(tmp, false));
 			DoLineText(Page, pNumOptions, aBuf);
 		}
 		else
-			DoLineText(Page, pNumOptions, "Registered: before April 9th 2021");
+		{
+			str_format(aBuf, sizeof(aBuf), "%s: before April 9th 2021", pPlayer->Localize("Registered"));
+			DoLineText(Page, pNumOptions, aBuf);
+		}
 
 		if (ShowEuros)
 		{
@@ -594,24 +612,30 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 		if (pAccount->m_VIP)
 		{
 			tmp = pAccount->m_ExpireDateVIP;
-			str_format(aBuf, sizeof(aBuf), "VIP%s: until %s", pAccount->m_VIP == VIP_PLUS ? "+" : "", GameServer()->GetDate(tmp));
+			str_format(aBuf, sizeof(aBuf), "VIP%s: %s %s", pAccount->m_VIP == VIP_PLUS ? "+" : "", pPlayer->Localize("until", "/account"), GameServer()->GetDate(tmp));
 			DoLineText(Page, pNumOptions, aBuf);
 		}
 		else
-			DoLineText(Page, pNumOptions, "VIP: not bought");
+		{
+			str_format(aBuf, sizeof(aBuf), "VIP: %s", pPlayer->Localize("not bought"));
+			DoLineText(Page, pNumOptions, aBuf);
+		}
 
 		if (pAccount->m_PortalRifle)
 		{
 			tmp = pAccount->m_ExpireDatePortalRifle;
-			str_format(aBuf, sizeof(aBuf), "Portal Rifle: until %s", GameServer()->GetDate(tmp));
+			str_format(aBuf, sizeof(aBuf), "%s: %s %s", pPlayer->Localize("Portal Rifle"), pPlayer->Localize("until", "/account"), GameServer()->GetDate(tmp));
 			DoLineText(Page, pNumOptions, aBuf);
 		}
 		else if (GameServer()->Config()->m_SvPortalRifleShop)
-			DoLineText(Page, pNumOptions, "Portal Rifle: not bought");
+		{
+			str_format(aBuf, sizeof(aBuf), "%s: %s", pPlayer->Localize("Portal Rifle"), pPlayer->Localize("not bought"));
+			DoLineText(Page, pNumOptions, aBuf);
+		}
 
-		str_format(aBuf, sizeof(aBuf), "Contact: %s", pAccount->m_aContact);
+		str_format(aBuf, sizeof(aBuf), "%s: %s", pPlayer->Localize("Contact"), pAccount->m_aContact);
 		DoLineText(Page, pNumOptions, aBuf);
-		str_format(aBuf, sizeof(aBuf), "E-Mail: %s", pAccount->m_aEmail);
+		str_format(aBuf, sizeof(aBuf), "%s: %s", pPlayer->Localize("E-Mail"), pAccount->m_aEmail);
 		DoLineText(Page, pNumOptions, aBuf);
 
 		// This does not count to NumEntries anymore, s_NumCollapseEntries is 0 by now again. We wanna add a seperator only if this thing is opened
@@ -622,7 +646,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 	bool BankEnabled = GameServer()->Config()->m_SvMoneyBankMode != 0;
 	if (DoLineCollapse(Page, pNumOptions, COLLAPSE_HEADER_ACC_STATS, m_aClients[ClientID].m_ShowAccountStats, 11 + (int)BankEnabled))
 	{
-		str_format(aBuf, sizeof(aBuf), "Level [%d]", pAccount->m_Level);
+		str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Level"), pAccount->m_Level);
 		DoLineText(Page, pNumOptions, aBuf);
 		if (pChr && pChr->m_aLineExp[0] != '\0')
 		{
@@ -641,7 +665,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 		}
 		else if (BankEnabled)
 		{
-			str_format(aBuf, sizeof(aBuf), "Bank [%lld]", pAccount->m_Money);
+			str_format(aBuf, sizeof(aBuf), "%s [%lld]", pPlayer->Localize("Bank"), pAccount->m_Money);
 			DoLineText(Page, pNumOptions, aBuf);
 		}
 
@@ -651,24 +675,24 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 		}
 		else
 		{
-			str_format(aBuf, sizeof(aBuf), "Wallet [%lld]", BankEnabled ? pPlayer->GetWalletMoney() : pAccount->m_Money);
+			str_format(aBuf, sizeof(aBuf), "%s [%lld]", pPlayer->Localize("Wallet"), BankEnabled ? pPlayer->GetWalletMoney() : pAccount->m_Money);
 			DoLineText(Page, pNumOptions, aBuf);
 		}
-		str_format(aBuf, sizeof(aBuf), "Police [%d]", pAccount->m_PoliceLevel);
+		str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Police"), pAccount->m_PoliceLevel);
 		DoLineText(Page, pNumOptions, aBuf);
 
-		DoLineTextSubheader(Page, pNumOptions, "Cᴏʟʟᴇᴄᴛᴀʙʟᴇs");
-		str_format(aBuf, sizeof(aBuf), "Taser Battery [%d]", pAccount->m_TaserBattery);
+		DoLineTextSubheader(Page, pNumOptions, pPlayer->LocalizeHeader("Cᴏʟʟᴇᴄᴛᴀʙʟᴇs"));
+		str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Taser battery"), pAccount->m_TaserBattery);
 		DoLineText(Page, pNumOptions, aBuf);
-		str_format(aBuf, sizeof(aBuf), "Portal Battery [%d]", pAccount->m_PortalBattery);
+		str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Portal Battery"), pAccount->m_PortalBattery);
 		DoLineText(Page, pNumOptions, aBuf);
 
 		DoLineTextSubheader(Page, pNumOptions, "Bʟᴏᴄᴋ");
-		str_format(aBuf, sizeof(aBuf), "Points: %d", pAccount->m_BlockPoints);
+		str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Points"), pAccount->m_BlockPoints);
 		DoLineText(Page, pNumOptions, aBuf);
-		str_format(aBuf, sizeof(aBuf), "Kills: %d", pAccount->m_Kills);
+		str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Kills"), pAccount->m_Kills);
 		DoLineText(Page, pNumOptions, aBuf);
-		str_format(aBuf, sizeof(aBuf), "Deaths: %d", pAccount->m_Deaths);
+		str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Deaths"), pAccount->m_Deaths);
 		DoLineText(Page, pNumOptions, aBuf);
 
 		// only when we have the next category below
@@ -686,14 +710,14 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 		bool IsPlotDestroy = GameServer()->m_aPlots[PlotID].m_DestroyEndTick;
 		if (DoLineCollapse(Page, pNumOptions, aPlotHeader, m_aClients[ClientID].m_ShowPlotInfo, 4 + (int)IsPlotDestroy*2))
 		{
-			str_format(aBuf, sizeof(aBuf), "Rented until: %s", GameServer()->GetDate(GameServer()->m_aPlots[PlotID].m_ExpireDate));
+			str_format(aBuf, sizeof(aBuf), "%s: %s", pPlayer->Localize("Rented until"), GameServer()->GetDate(GameServer()->m_aPlots[PlotID].m_ExpireDate));
 			DoLineText(Page, pNumOptions, aBuf, BULLET_POINT);
 
 			if (IsPlotDestroy)
 			{
-				str_format(aBuf, sizeof(aBuf), "Door Health: %d/%d", GameServer()->m_aPlots[PlotID].m_DoorHealth, GameServer()->Config()->m_SvPlotDoorHealth);
+				str_format(aBuf, sizeof(aBuf), "%s: %d/%d", pPlayer->Localize("Door Health"), GameServer()->m_aPlots[PlotID].m_DoorHealth, GameServer()->Config()->m_SvPlotDoorHealth);
 				DoLineText(Page, pNumOptions, aBuf, BULLET_POINT);
-				str_format(aBuf, sizeof(aBuf), "Destroy Seconds: %lld", (GameServer()->m_aPlots[PlotID].m_DestroyEndTick - Server()->Tick()) / Server()->TickSpeed());
+				str_format(aBuf, sizeof(aBuf), "%s: %lld", pPlayer->Localize("Destroy Seconds"), (GameServer()->m_aPlots[PlotID].m_DestroyEndTick - Server()->Tick()) / Server()->TickSpeed());
 				DoLineText(Page, pNumOptions, aBuf, BULLET_POINT);
 			}
 
@@ -704,7 +728,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 	}
 
 	DoLineSeperator(Page, pNumOptions);
-	DoLineTextSubheader(Page, pNumOptions, "Oᴘᴛɪᴏɴs");
+	DoLineTextSubheader(Page, pNumOptions, pPlayer->Localize("Oᴘᴛɪᴏɴs"));
 	DoLineToggleOption(Page, pNumOptions, ACC_MISC_SILENTFARM, pPlayer->m_SilentFarm);
 	if (pAccount->m_Ninjajetpack)
 	{
@@ -743,7 +767,7 @@ void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 	int Page = GetPage(ClientID);
 
-	DoLineTextSubheader(Page, pNumOptions, "Oᴘᴛɪᴏɴs");
+	DoLineTextSubheader(Page, pNumOptions, pPlayer->LocalizeHeader("Oᴘᴛɪᴏɴs"));
 	DoLineToggleOption(Page, pNumOptions, MISC_HIDEDRAWINGS, pPlayer->m_HideDrawings);
 	DoLineToggleOption(Page, pNumOptions, MISC_WEAPONINDICATOR, pPlayer->m_WeaponIndicator);
 	DoLineToggleOption(Page, pNumOptions, MISC_ZOOMCURSOR, pPlayer->m_ZoomCursor);
@@ -768,7 +792,7 @@ void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 	if (vpDesigns.size() > 1)
 	{
 		DoLineSeperator(Page, pNumOptions);
-		DoLineTextSubheader(Page, pNumOptions, "Dᴇsɪɢɴs");
+		DoLineTextSubheader(Page, pNumOptions, pPlayer->LocalizeHeader("Dᴇsɪɢɴs"));
 		// I have no idea what happens when a design has the same name as another vote, but it'll probably take the first and it'll be bugged out. try to avoid that xd
 		const char *pOwnDesign = Server()->GetMapDesign(ClientID);
 		for (unsigned int i = 0; i < vpDesigns.size(); i++)
@@ -779,18 +803,18 @@ void CVotingMenu::DoPageMiscellaneous(int ClientID, int *pNumOptions)
 	}
 
 	DoLineSeperator(Page, pNumOptions);
-	DoLineTextSubheader(Page, pNumOptions, "Mɪɴɪɢᴀᴍᴇs");
+	DoLineTextSubheader(Page, pNumOptions, pPlayer->LocalizeHeader("Mɪɴɪɢᴀᴍᴇs"));
 	for (int i = -1; i < NUM_MINIGAMES; i++)
 	{
 		if (i != -1 && GameServer()->m_aMinigameDisabled[i])
 			continue;
 		bool CurMinigame = i == pPlayer->m_Minigame;
-		const char *pMinigame = i == -1 ? "No minigame" : GameServer()->GetMinigameName(i);
+		const char *pMinigame = i == -1 ? Localizable("No minigame") : GameServer()->GetMinigameName(i);
 		DoLineToggleOption(Page, pNumOptions, pMinigame, CurMinigame);
 	}
 
 	DoLineSeperator(Page, pNumOptions);
-	DoLineTextSubheader(Page, pNumOptions, "Sᴄᴏʀᴇ Mᴏᴅᴇ");
+	DoLineTextSubheader(Page, pNumOptions, pPlayer->LocalizeHeader("Sᴄᴏʀᴇ Mᴏᴅᴇ"));
 	for (int i = 0; i < NUM_SCORE_MODES; i++)
 	{
 		if (i == SCORE_BONUS && !GameServer()->Config()->m_SvAllowBonusScoreMode)
@@ -937,6 +961,7 @@ bool CVotingMenu::FillStats(int ClientID, CVotingMenu::SClientVoteInfo::SPrevSta
 		pStats->m_JailTime = pPlayer->m_JailTime;
 		pStats->m_EscapeTime = pPlayer->m_EscapeTime;
 		pStats->m_Permille = pChr ? pPlayer->m_Permille : 0; // Got moved to player, but still check for character due to other dependencies
+		pStats->m_Language = pPlayer->m_Language;
 	}
 
 	pStats->m_Flags = Flags;
@@ -992,7 +1017,7 @@ void CVotingMenu::SendPageVotes(int ClientID, bool ResendVotesPage)
 
 		while(CurIndex < VotesLeft)
 		{
-			Msg.AddString(m_aPages[Page].m_aaTempDesc[TotalVotesSent], VOTE_DESC_LENGTH);
+			Msg.AddString(m_aaTempDesc[TotalVotesSent], VOTE_DESC_LENGTH);
 			TotalVotesSent++;
 			CurIndex++;
 		}
@@ -1072,12 +1097,12 @@ int CVotingMenu::GetFlags(int ClientID)
 		str_format(aTemp, sizeof(aTemp), "│ %s", aLine); \
 		str_copy(aLine, aTemp, sizeof(aLine)); \
 	} \
-	str_copy(m_aPages[Page].m_aaTempDesc[NUM_OPTION_START_OFFSET + *pNumOptions], aLine, VOTE_DESC_LENGTH); \
+	str_copy(m_aaTempDesc[NUM_OPTION_START_OFFSET + *pNumOptions], aLine, VOTE_DESC_LENGTH); \
 	(*pNumOptions)++; \
 	if (AddCollapseFooter) \
 	{ \
 		dbg_assert((NUM_OPTION_START_OFFSET + *pNumOptions < NUM_PAGE_MAX_VOTES), "added too many votes options per page"); \
-		str_copy(m_aPages[Page].m_aaTempDesc[NUM_OPTION_START_OFFSET + *pNumOptions], "╰───────────────────────", VOTE_DESC_LENGTH); \
+		str_copy(m_aaTempDesc[NUM_OPTION_START_OFFSET + *pNumOptions], "╰───────────────────────", VOTE_DESC_LENGTH); \
 		(*pNumOptions)++; \
 	} \
 } while(0)
@@ -1088,7 +1113,7 @@ int CVotingMenu::GetFlags(int ClientID)
 
 void CVotingMenu::DoLineToggleOption(int Page, int *pNumOptions, const char *pDescription, bool Value)
 {
-	ADDLINE_PREFIX(pDescription, Value ? "☒" : "☐");
+	ADDLINE_PREFIX(Localize(pDescription, m_TempLanguage), Value ? "☒" : "☐");
 }
 
 void CVotingMenu::DoLineSeperator(int Page, int *pNumOptions)
@@ -1108,11 +1133,11 @@ void CVotingMenu::DoLineValueOption(int Page, int *pNumOptions, const char *pDes
 	char aBuf[VOTE_DESC_LENGTH];
 	if (Max == -1)
 	{
-		str_format(aBuf, sizeof(aBuf), "%s: %d", pDescription, Value);
+		str_format(aBuf, sizeof(aBuf), "%s: %d", Localize(pDescription, m_TempLanguage), Value);
 	}
 	else
 	{
-		str_format(aBuf, sizeof(aBuf), "%s: %d/%d", pDescription, Value, Max);
+		str_format(aBuf, sizeof(aBuf), "%s: %d/%d", Localize(pDescription, m_TempLanguage), Value, Max);
 	}
 	DoLineText(Page, pNumOptions, aBuf, BulletPoint);
 }
@@ -1122,21 +1147,36 @@ void CVotingMenu::DoLineText(int Page, int *pNumOptions, const char *pDescriptio
 	const char *pPrefix = "";
 	if (BulletPoint == BULLET_POINT) pPrefix = "• ";
 	else if (BulletPoint == BULLET_ARROW) pPrefix = "⇨ ";
-	ADDLINE_PREFIX(pDescription, pPrefix);
+	ADDLINE_PREFIX(Localize(pDescription, m_TempLanguage), pPrefix);
 }
 
 bool CVotingMenu::DoLineCollapse(int Page, int *pNumOptions, const char *pDescription, bool ShowContent, int NumEntries)
 {
 	char aBuf[VOTE_DESC_LENGTH];
+	char aDescription[VOTE_DESC_LENGTH];
+	str_copy(aDescription, Localize(pDescription, m_TempLanguage), sizeof(aDescription));
+	const char *pPrefix = ShowContent ? "╭─" : ">";
+	const char *pSuffix = ShowContent ? "[‒]" : "[+]";
+	int PrefixLength = str_length(pPrefix);
+	int DescLength = str_length(aDescription);
+	int SuffixLength = str_length(pSuffix);
+	int TotalWidth = VOTE_DESC_LENGTH - 1; // -1 for null terminator ofc
+	int TotalSpaces = min(20, TotalWidth - PrefixLength - DescLength - SuffixLength);
+	int SpacesBefore = min(13, (int)(TotalSpaces * 0.7f));
+	int SpacesAfter = TotalSpaces - SpacesBefore;
+
+	char aSpacesBefore[VOTE_DESC_LENGTH];
+	memset(aSpacesBefore, ' ', SpacesBefore);
+	aSpacesBefore[SpacesBefore] = '\0';
+
+	char aSpacesAfter[VOTE_DESC_LENGTH];
+	memset(aSpacesAfter, ' ', SpacesAfter);
+	aSpacesAfter[SpacesAfter] = '\0';
+
 	if (ShowContent)
-	{
 		m_NumCollapseEntries = NumEntries;
-		str_format(aBuf, sizeof(aBuf), "╭─           %s     [‒]", pDescription);
-	}
-	else
-	{
-		str_format(aBuf, sizeof(aBuf), ">            %s     [+]", pDescription);
-	}
+
+	str_format(aBuf, sizeof(aBuf), "%s%s%s%s%s", pPrefix, aSpacesBefore, aDescription, aSpacesAfter, pSuffix);
 	ADDLINE_COLLAPSE(aBuf);
 	return ShowContent;
 }

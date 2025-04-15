@@ -100,6 +100,7 @@ class CVotingMenu
 			int m_NumWanted = 0;
 			int64 m_DestroyEndTick = 0;
 			int m_Permille = 0;
+			int m_Language = -1;
 			struct
 			{
 				int64 m_XP = 0;
@@ -123,16 +124,17 @@ class CVotingMenu
 	struct SPageInfo
 	{
 		char m_aName[64];
-		char m_aaTempDesc[NUM_PAGE_MAX_VOTES][VOTE_DESC_LENGTH];
 	} m_aPages[NUM_PAGES];
+	char m_aaTempDesc[NUM_PAGE_MAX_VOTES][VOTE_DESC_LENGTH];
+	int m_TempLanguage;
 
 	int GetNumWantedPages() { return (m_vWantedPlayers.size() + NUM_WANTEDS_PER_PAGE - 1) / NUM_WANTEDS_PER_PAGE; }
 	
 	bool SetPage(int ClientID, int Page);
 	const char *GetPageDescription(int ClientID, int Page);
 
-	bool IsOptionWithSuffix(const char *pDesc, const char *pWantedOption) { return str_startswith(pDesc, pWantedOption) != 0; }
-	bool IsOption(const char *pDesc, const char *pWantedOption) { return str_comp(pDesc, pWantedOption) == 0; }
+	bool IsOptionWithSuffix(const char *pDesc, const char *pWantedOption);
+	bool IsOption(const char *pDesc, const char *pWantedOption);
 	bool OnMessageSuccess(int ClientID, const char *pDesc, const char *pReason);
 
 	int PrepareTempDescriptions(int ClientID);

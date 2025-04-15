@@ -1332,7 +1332,7 @@ void CGameContext::ConAccount(IConsole::IResult* pResult, void* pUserData)
 
 	str_format(aBuf, sizeof(aBuf), "%s: %s", pPlayer->Localize("Contact"), pAccount->m_aContact);
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-	str_format(aBuf, sizeof(aBuf), "E-Mail: %s", pAccount->m_aEmail);
+	str_format(aBuf, sizeof(aBuf), "%s: %s", pPlayer->Localize("E-Mail"), pAccount->m_aEmail);
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 }
 
