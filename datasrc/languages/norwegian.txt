@@ -1017,6 +1017,9 @@ Successfully logged out
 Load recent design '%s'?
 == 
 
+Change language to %s?
+== 
+
 The plot auction by '%s' is cancelled
 == 
 

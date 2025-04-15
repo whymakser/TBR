@@ -1505,3 +1505,6 @@ Your stake got returned: +%lld money.
 
 You got +%lld money from others leaving the game.
 == Вы получили +%lld денег от других покинувших игру.
+
+Change language to %s?
+== 
