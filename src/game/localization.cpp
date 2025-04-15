@@ -316,6 +316,9 @@ bool CLocalizationDatabase::TryUnload(CGameContext *pGameServer, int Language)
 	if (!pGameServer || Language == -1 || !m_vLanguages[Language].m_Loaded)
 		return false;
 
+	if (str_comp(m_vLanguages[Language].m_Name.c_str(), "English") == 0)
+		return false;
+
 	bool CanUnloadLanguage = true;
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
