@@ -1425,6 +1425,9 @@ You have accepted the invite by '%s'
 '%s' won a 1vs1 round against '%s'! Final scores: %d - %d
 == '%s', '%s' karşısında 1vs1 raundunu kazandı! Son skor: %d - %d
 
+'%s' left a 1vs1 round against '%s'! Current scores: %d - %d
+ == '%s', '%s' ile olan 1vs1 raundundan ayrıldı! Mevcut skor: %d - %d
+
 Select your favourite part of the map\nZoom in or out to change the size\nPlace arena by pressing SPACE
 == Haritada favori bölgeni seç\nBoyutu değiştirmek için yakınlaştır veya uzaklaştır\nSPACE ile arenayı yerleştir
 

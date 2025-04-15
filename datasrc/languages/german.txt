@@ -1425,6 +1425,9 @@ You have accepted the invite by '%s'
 '%s' won a 1vs1 round against '%s'! Final scores: %d - %d
 == '%s' hat eine 1vs1-Runde gegen '%s' gewonnen! Endstand: %d - %d
 
+'%s' left a 1vs1 round against '%s'! Current scores: %d - %d
+ == '%s' hat eine 1vs1-Runde gegen '%s' verlassen! Aktueller Stand: %d - %d
+
 Select your favourite part of the map\nZoom in or out to change the size\nPlace arena by pressing SPACE
 == Wähle deinen Lieblingsteil der Karte\nZoome rein oder raus, um die Größe zu ändern\nPlatziere die Arena, indem du SPACE drückst
 
