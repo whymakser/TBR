@@ -1185,9 +1185,6 @@ You can't close your door because the police destroyed it
 You lost, you can wait for another round or leave the lobby using '/leave'
 == Kaybettiniz, başka bir raundu bekleyebilir veya '/leave' yazarak lobiden çıkabilirsiniz
 
-Too many players on police tiles
-== Polis alanlarında çok fazla oyuncu var
-
 You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'
 == Para alanlarını kullanmak için giriş yapmalısınız.\n'/register <ad> <şifre> <şifre>' ile hesap oluşturun
 
@@ -1425,9 +1422,6 @@ You have accepted the invite by '%s'
 '%s' won a 1vs1 round against '%s'! Final scores: %d - %d
 == '%s', '%s' karşısında 1vs1 raundunu kazandı! Son skor: %d - %d
 
-'%s' left a 1vs1 round against '%s'! Current scores: %d - %d
-== '%s', '%s' ile olan 1vs1 raundundan ayrıldı! Mevcut skor: %d - %d
-
 Select your favourite part of the map\nZoom in or out to change the size\nPlace arena by pressing SPACE
 == Haritada favori bölgeni seç\nBoyutu değiştirmek için yakınlaştır veya uzaklaştır\nSPACE ile arenayı yerleştir
 
@@ -1508,3 +1502,366 @@ Change language to %s?
 
 Load recent design?
 == Önceki tasarım yüklensin mi?
+
+F-DDrace is a mod by fokkonaut
+== 
+
+This mod is based on Teeworlds 0.7 and also incorporates features, ideas, and partial implementations
+== 
+
+from DDNet++ by ChillerDragon, DDNet, and other community projects, aswell as many custom features!
+== 
+
+If you want to check out the code or contribute, feel free to check out F-DDrace on GitHub:
+== 
+
+For more info, say '/cmdlist' or '/credits'
+== 
+
+to check a server setting say /settings and setting's name, setting names are:
+== 
+
+Teams are disabled
+== 
+
+This team can't be locked
+== 
+
+'%s' unlocked your team.
+== 
+
+Team locking is disabled on this server
+== 
+
+'%s' locked your team. After the race started killing will kill everyone in your team.
+== 
+
+Invites are disabled
+== 
+
+Player already invited
+== 
+
+Can't invite this quickly
+== 
+
+'%s' invited you to team %d.
+== 
+
+'%s' invited '%s' to your team.
+== 
+
+You are running a vote please try again after the vote is done!
+== 
+
+You must join a team and play with somebody or else you can't play
+== 
+
+You can't change teams while you are dead/a spectator.
+== 
+
+You can't change teams that fast!
+== 
+
+You can't join teams in this minigame
+== 
+
+This team is locked using /lock. Only members of the team can unlock it using /lock.
+== 
+
+This team is locked using /lock. Only members of the team can invite you or unlock it using /lock.
+== 
+
+This team already has the maximum allowed size of %d players
+== 
+
+%s joined team %d
+== 
+
+You cannot join this team at this time
+== 
+
+You can't check your team while you are dead/a spectator.
+== 
+
+/me is disabled on this server
+== 
+
+E-Mail
+== 
+
+Discord server
+== 
+
+%s was killed by %s
+== 
+
+'%s' banned '%s' for %d seconds from voting.
+== 
+
+'%s' unbanned '%s' from voting.
+== 
+
+Use /pause first then you can kill
+== 
+
+Only %d active players are allowed
+== 
+
+All players were moved to the game
+== 
+
+All players were moved to the spectators
+== 
+
+Authorized player forced server option '%s' (%s)
+== 
+
+'%s' was moved to spectator (%s)
+== 
+
+Listing players with "%s" in name:
+== 
+
+Listing all players:
+== 
+
+You can only vote after logging in.
+== 
+
+Wait for current vote to end before calling a new one.
+== 
+
+You must wait %d seconds before making your first vote.
+== 
+
+You must wait %d seconds before making another vote.
+== 
+
+You are not permitted to vote for the next %d seconds.
+== 
+
+There's a %d second delay between map-votes, please wait %d seconds.
+== 
+
+%s has finished and didn't go through start yet, wait for him or join another team.
+== 
+
+%s wants to start a new round, kill or walk to start.
+== 
+
+Team %d started with these %d players:
+== 
+
+Your team would've finished in: %d minute(s) %5.2f second(s). Since you had practice mode enabled your rank doesn't count.
+== 
+
+%s joined team 0
+== 
+
+Everyone in your locked team was killed because '%s' killed.
+== 
+
+Everyone in your locked team was killed because '%s' died.
+== 
+
+Silent Farm
+== 
+
+Ninjajetpack
+== 
+
+Plot Spawn
+== 
+
+Edit Plot
+== 
+
+Clear Plot
+== 
+
+Rainbow
+== 
+
+Bloody
+== 
+
+Atom
+== 
+
+Trail
+== 
+
+Spread Gun
+== 
+
+Rainbow Hook
+== 
+
+Rotating Ball
+== 
+
+Epic Circle
+== 
+
+Lovely
+== 
+
+Rainbow Name
+== 
+
+Rainbow Speed
+== 
+
+Sparkle
+== 
+
+Hide Drawings
+== 
+
+Weapon Indicator
+== 
+
+Zoom Cursor
+== 
+
+Resume Moved
+== 
+
+Hide Broadcasts
+== 
+
+Local Chat
+== 
+
+No minigame
+== 
+
+You are wanted by the police for %lld seconds
+== 
+
+Grog permille: %.1f‰ / %.1f‰
+== 
+
+You're not logged in.
+== 
+
+Use '/login' to see more information about your account.
+== 
+
+Rented until
+== 
+
+Door Health
+== 
+
+Destroy Seconds
+== 
+
+Oᴘᴛɪᴏɴs
+== 
+
+You have to be in a team with other tees to start
+== 
+
+Too many players on police tiles [%d/%d]
+== 
+
+You can't hit others
+== 
+
+You can hit others
+== 
+
+You can't collide with others
+== 
+
+You can collide with others
+== 
+
+You can't hook others
+== 
+
+You can hook others
+== 
+
+You got +1 jump and can jump %d times now
+== 
+
+Your team was unlocked by an unlock team tile
+== 
+
+You are now in a solo part
+== 
+
+You are now out of the solo part
+== 
+
+Teleport gun enabled
+== 
+
+Teleport gun disabled
+== 
+
+Teleport grenade enabled
+== 
+
+Teleport grenade disabled
+== 
+
+Teleport laser enabled
+== 
+
+Teleport laser disabled
+== 
+
+You can hammer hit others
+== 
+
+You can't hammer hit others
+== 
+
+You can shoot others with shotgun
+== 
+
+You can't shoot others with shotgun
+== 
+
+You can shoot others with grenade
+== 
+
+You can't shoot others with grenade
+== 
+
+You can shoot others with rifle
+== 
+
+You can't shoot others with rifle
+== 
+
+Please join a team before you start
+== 
+
+For more info, say '/helptoggle'
+== 
+
+You only have your ground jump now
+== 
+
+You can jump 1 time
+== 
+
+You can jump %d times
+== 
+
+~ S H O P ~
+== 
+
+~ P L O T - S H O P ~
+== 
+
+~ B A N K ~
+== 
+
+~ T A V E R N ~
+== 

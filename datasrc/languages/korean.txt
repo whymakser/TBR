@@ -2,6 +2,21 @@
 # Author:
 #
 
+F-DDrace is a mod by fokkonaut
+== 
+
+This mod is based on Teeworlds 0.7 and also incorporates features, ideas, and partial implementations
+== 
+
+from DDNet++ by ChillerDragon, DDNet, and other community projects, aswell as many custom features!
+== 
+
+If you want to check out the code or contribute, feel free to check out F-DDrace on GitHub:
+== 
+
+For more info, say '/cmdlist' or '/credits'
+== 
+
 /cmdlist will show a list of all chat commands
 == 
 
@@ -17,10 +32,82 @@ Usage
 Command is either unknown or you have given a blank command without any parameters.
 == 
 
+to check a server setting say /settings and setting's name, setting names are:
+== 
+
 You can't join the spectators while you are in survival
 == 
 
 Timeout code has to be at least 8 characters long, make sure to use a safe code.
+== 
+
+Teams are disabled
+== 
+
+This team can't be locked
+== 
+
+'%s' unlocked your team.
+== 
+
+Team locking is disabled on this server
+== 
+
+'%s' locked your team. After the race started killing will kill everyone in your team.
+== 
+
+Invites are disabled
+== 
+
+Player not found
+== 
+
+Player already invited
+== 
+
+Can't invite this quickly
+== 
+
+'%s' invited you to team %d.
+== 
+
+'%s' invited '%s' to your team.
+== 
+
+You are running a vote please try again after the vote is done!
+== 
+
+You must join a team and play with somebody or else you can't play
+== 
+
+You can't change teams while you are dead/a spectator.
+== 
+
+You can't change teams that fast!
+== 
+
+You can't join teams in this minigame
+== 
+
+This team is locked using /lock. Only members of the team can unlock it using /lock.
+== 
+
+This team is locked using /lock. Only members of the team can invite you or unlock it using /lock.
+== 
+
+This team already has the maximum allowed size of %d players
+== 
+
+%s joined team %d
+== 
+
+You cannot join this team at this time
+== 
+
+You can't check your team while you are dead/a spectator.
+== 
+
+/me is disabled on this server
 == 
 
 You will now see all tees on this server, no matter the distance
@@ -75,7 +162,7 @@ Portal Rifle
 Contact
 == 
 
-Player not found
+E-Mail
 == 
 
 Stats
@@ -579,6 +666,9 @@ Chat Language
 You can set one of the following languages by using '/chatlanguage <option>':
 == 
 
+Discord server
+== 
+
 This server does not have a linked Discord server
 == 
 
@@ -678,10 +768,19 @@ Taser shield
 Drop taser battery: '/taser drop <amount>'
 == 
 
+%s was killed by %s
+== 
+
 '%s' has been muted for %d seconds (%s)
 == 
 
 '%s' has been muted for %d seconds
+== 
+
+'%s' banned '%s' for %d seconds from voting.
+== 
+
+'%s' unbanned '%s' from voting.
 == 
 
 Your taser shield has been set to %d%%. Use '/taser' to check later.
@@ -744,6 +843,9 @@ Vote passed
 Vote failed
 == 
 
+'%s' called vote to change server option '%s' (%s)
+== 
+
 Your plot is no longer subject to a search warrant and can no longer be destroyed
 == 
 
@@ -778,9 +880,6 @@ Following players can't receive your message because either you or they are in l
 == 
 
 No reason given
-== 
-
-'%s' called vote to change server option '%s' (%s)
 == 
 
 '%s' isn't an option on this server
@@ -852,6 +951,12 @@ Wallet kill Protection enabled. If you really want to join the spectators, first
 You can't join the spectators while being searched by the police
 == 
 
+Use /pause first then you can kill
+== 
+
+Only %d active players are allowed
+== 
+
 You need to wait %d seconds before killing again due to escaping
 == 
 
@@ -861,6 +966,18 @@ Kill Protection enabled. If you really want to kill, type /kill
 Wallet kill Protection enabled. If you really want to kill, type /kill
 == 
 
+All players were moved to the game
+== 
+
+All players were moved to the spectators
+== 
+
+Authorized player forced server option '%s' (%s)
+== 
+
+'%s' was moved to spectator (%s)
+== 
+
 Local chat mode has been disabled, automatically entered public chat
 == 
 
@@ -868,6 +985,30 @@ Automatic wallet to bank due to bank disabling
 == 
 
 You are not permitted to talk for the next %d seconds.
+== 
+
+Listing players with "%s" in name:
+== 
+
+Listing all players:
+== 
+
+You can only vote after logging in.
+== 
+
+Wait for current vote to end before calling a new one.
+== 
+
+You must wait %d seconds before making your first vote.
+== 
+
+You must wait %d seconds before making another vote.
+== 
+
+You are not permitted to vote for the next %d seconds.
+== 
+
+There's a %d second delay between map-votes, please wait %d seconds.
 == 
 
 Your plot expired
@@ -1149,6 +1290,21 @@ You are not VIP+
 Rainbow speed has been updated to %d
 == 
 
+%s has finished and didn't go through start yet, wait for him or join another team.
+== 
+
+%s wants to start a new round, kill or walk to start.
+== 
+
+Team %d started with these %d players:
+== 
+
+Your team would've finished in: %d minute(s) %5.2f second(s). Since you had practice mode enabled your rank doesn't count.
+== 
+
+%s joined team 0
+== 
+
 %s finished in: %d minute(s) %5.2f second(s)
 == 
 
@@ -1167,10 +1323,112 @@ You finished with your best time.
 %5.2f second(s) worse, better luck next time.
 == 
 
+Everyone in your locked team was killed because '%s' killed.
+== 
+
+Everyone in your locked team was killed because '%s' died.
+== 
+
+Silent Farm
+== 
+
+Ninjajetpack
+== 
+
+Plot Spawn
+== 
+
+Edit Plot
+== 
+
+Clear Plot
+== 
+
+Rainbow
+== 
+
+Bloody
+== 
+
+Atom
+== 
+
+Trail
+== 
+
+Spread Gun
+== 
+
+Rainbow Hook
+== 
+
+Rotating Ball
+== 
+
+Epic Circle
+== 
+
+Lovely
+== 
+
+Rainbow Name
+== 
+
+Rainbow Speed
+== 
+
+Sparkle
+== 
+
+Hide Drawings
+== 
+
+Weapon Indicator
+== 
+
+Zoom Cursor
+== 
+
+Resume Moved
+== 
+
+Hide Broadcasts
+== 
+
+Local Chat
+== 
+
 Please specify the page using the reason field
 == 
 
 Please specify the rainbow speed using the reason field
+== 
+
+No minigame
+== 
+
+You are wanted by the police for %lld seconds
+== 
+
+Grog permille: %.1f‰ / %.1f‰
+== 
+
+You're not logged in.
+== 
+
+Use '/login' to see more information about your account.
+== 
+
+Rented until
+== 
+
+Door Health
+== 
+
+Destroy Seconds
+== 
+
+Oᴘᴛɪᴏɴs
 == 
 
 You can't close your door because the police destroyed it
@@ -1191,7 +1449,10 @@ You can't close your door because the police destroyed it
 You lost, you can wait for another round or leave the lobby using '/leave'
 == 
 
-Too many players on police tiles
+You have to be in a team with other tees to start
+== 
+
+Too many players on police tiles [%d/%d]
 == 
 
 You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'
@@ -1204,6 +1465,27 @@ Congratulations, double-xp has been activated for %d lifes
 == 
 
 '%s' finished the special race!
+== 
+
+You can't hit others
+== 
+
+You can hit others
+== 
+
+You can't collide with others
+== 
+
+You can collide with others
+== 
+
+You can't hook others
+== 
+
+You can hook others
+== 
+
+You got +1 jump and can jump %d times now
 == 
 
 This area is for helpers only
@@ -1230,10 +1512,64 @@ Happy birthday! :) You have jetpack for 45 seconds
 Sorry, someting is missing to get the gift.
 == 
 
+Your team was unlocked by an unlock team tile
+== 
+
+You are now in a solo part
+== 
+
+You are now out of the solo part
+== 
+
+Teleport gun enabled
+== 
+
+Teleport gun disabled
+== 
+
+Teleport grenade enabled
+== 
+
+Teleport grenade disabled
+== 
+
+Teleport laser enabled
+== 
+
+Teleport laser disabled
+== 
+
 You need a key to enter this room, buy one in the shop
 == 
 
 This area is for VIP+ only, buy it in the shop
+== 
+
+You can hammer hit others
+== 
+
+You can't hammer hit others
+== 
+
+You can shoot others with shotgun
+== 
+
+You can't shoot others with shotgun
+== 
+
+You can shoot others with grenade
+== 
+
+You can't shoot others with grenade
+== 
+
+You can shoot others with rifle
+== 
+
+You can't shoot others with rifle
+== 
+
+Please join a team before you start
 == 
 
 Your jetpack is now disabled
@@ -1287,7 +1623,19 @@ Grog testing results: %.1f‰ / %.1f‰
 You were arrested for %d minutes by '%s'
 == 
 
+For more info, say '/helptoggle'
+== 
+
 You already have the maximum of 50 meteors
+== 
+
+You only have your ground jump now
+== 
+
+You can jump 1 time
+== 
+
+You can jump %d times
 == 
 
 Taser shield has been used, -5%%, new current: %d%%
@@ -1327,6 +1675,18 @@ You don't have enough money on your bank account to withdraw this amount.
 == 
 
 You withdrew %d money from your bank account to your wallet.
+== 
+
+~ S H O P ~
+== 
+
+~ P L O T - S H O P ~
+== 
+
+~ B A N K ~
+== 
+
+~ T A V E R N ~
 == 
 
 Bye! Come back if you need something.
@@ -1429,9 +1789,6 @@ You have accepted the invite by '%s'
 == 
 
 '%s' won a 1vs1 round against '%s'! Final scores: %d - %d
-== 
-
-'%s' left a 1vs1 round against '%s'! Current scores: %d - %d
 == 
 
 Select your favourite part of the map\nZoom in or out to change the size\nPlace arena by pressing SPACE
