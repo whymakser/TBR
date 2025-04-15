@@ -1671,15 +1671,19 @@ Everyone in your locked team was killed because '%s' killed.
 Everyone in your locked team was killed because '%s' died.
 == 
 
+{vote-header}
 Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs
 == 
 
+{vote-header}
 Aᴄᴄᴏᴜɴᴛ Iɴғᴏ
 == 
 
+{vote-header}
 Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs
 == 
 
+{vote-header}
 Pʟᴏᴛ
 == 
 
@@ -1752,12 +1756,15 @@ Hide Broadcasts
 Local Chat
 == 
 
+{vote-header}
 Vᴏᴛᴇs
 == 
 
+{vote-header}
 Aᴄᴄᴏᴜɴᴛ
 == 
 
+{vote-header}
 Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs
 == 
 
@@ -1776,6 +1783,7 @@ You're not logged in.
 Use '/login' to see more information about your account.
 == 
 
+{vote-header}
 Cᴏʟʟᴇᴄᴛᴀʙʟᴇs
 == 
 
@@ -1791,12 +1799,19 @@ Destroy Seconds
 Oᴘᴛɪᴏɴs
 == 
 
+{vote-header}
+Oᴘᴛɪᴏɴs
+== 
+
+{vote-header}
 Dᴇsɪɢɴs
 == 
 
+{vote-header}
 Mɪɴɪɢᴀᴍᴇs
 == 
 
+{vote-header}
 Sᴄᴏʀᴇ Mᴏᴅᴇ
 == 
 
