@@ -639,7 +639,6 @@ void CArenas::OnPlayerLeave(int ClientID, bool Disconnect)
 			int Other = m_aFights[Fight].m_aParticipants[0].m_ClientID == ClientID ? 1 : 0;
 			int OtherID = m_aFights[Fight].m_aParticipants[Other].m_ClientID;
 
-			char aBuf[128];
 			int FightScore = m_aFights[Fight].m_aParticipants[Index].m_Score;
 			int OtherScore = m_aFights[Fight].m_aParticipants[Other].m_Score;
 
