@@ -20,7 +20,7 @@
 
 #include "entities/character.h"
 #include "entities/money.h"
-#include "entities/helicopter.h"
+#include "game/server/entities/helicopter/helicopter.h"
 #include "entities/speedup.h"
 #include "entities/button.h"
 #include "entities/teleporter.h"
@@ -357,7 +357,7 @@ void CGameContext::CreateExplosion(vec2 Pos, int Owner, int Weapon, bool NoDamag
 
 	int Types = (1<<CGameWorld::ENTTYPE_CHARACTER);
 	if (Config()->m_SvInteractiveDrops)
-		Types |= (1<<CGameWorld::ENTTYPE_FLAG) | (1<<CGameWorld::ENTTYPE_PICKUP_DROP) | (1<<CGameWorld::ENTTYPE_MONEY) | (1<<CGameWorld::ENTTYPE_GROG);
+		Types |= (1<<CGameWorld::ENTTYPE_FLAG) | (1<<CGameWorld::ENTTYPE_PICKUP_DROP) | (1<<CGameWorld::ENTTYPE_MONEY) | (1<<CGameWorld::ENTTYPE_GROG) | (1<<CGameWorld::ENTTYPE_HELICOPTER);
 	int Num = m_World.FindEntitiesTypes(Pos, Radius, (CEntity * *)apEnts, MAX_CLIENTS, Types);
 	Mask128 TeamMask = Mask128();
 	for (int i = 0; i < Num; i++)
@@ -7714,10 +7714,16 @@ CLaserText *CGameContext::CreateLaserText(vec2 Pos, int Owner, const char *pText
 	return new CLaserText(&m_World, Pos, Owner, Seconds > 0 ? Server()->TickSpeed() * Seconds : -1, pText, (int)(strlen(pText)));
 }
 
-void CGameContext::SpawnHelicopter(vec2 Pos)
+void CGameContext::SpawnHelicopter(vec2 Pos, int TurretType)
 {
 	Pos.y -= 64.f;
-	new CHelicopter(&m_World, Pos);
+	auto Helicopter = new CHelicopter(&m_World, Pos);
+
+    if (TurretType == TURRETTYPE_MINIGUN)
+        Helicopter->AttachTurret(new CMinigunTurret());
+    else if (TurretType == TURRETTYPE_LAUNCHER)
+        Helicopter->AttachTurret(new CLauncherTurret());
+
 }
 
 void CGameContext::UpdateHidePlayers(int UpdateID)
