@@ -1863,60 +1863,100 @@ You can jump %d times
 == ~ K A R C Z M A ~
 
 Load recent design?
-== 
+== Załadować poprzedni styl?
 
 {vote-header}
 Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs
-== 
+== Pᴏszᴜᴋɪᴡᴀɴɪ Gʀᴀᴄᴢᴇ
 
 {vote-header}
 Aᴄᴄᴏᴜɴᴛ Iɴғᴏ
-== 
+== Iɴғᴏʀᴍᴀᴄᴊᴇ ᴏ Kᴏɴᴄɪᴇ
 
 {vote-header}
 Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs
-== 
+== Sᴛᴀᴛʏsᴛʏᴋɪ Kᴏɴᴛᴀ
 
 {vote-header}
 Pʟᴏᴛ
-== 
+== Dzɪᴀłᴋᴀ
 
 {vote-header}
 Vᴏᴛᴇs
-== 
+== Gʟᴏsʏ
 
 {vote-header}
 Aᴄᴄᴏᴜɴᴛ
-== 
+== Kᴏɴᴛᴏ
 
 {vote-header}
 Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs
-== 
-
-{vote-header}
-Lᴀɴɢᴜᴀɢᴇs
-== 
+== Iɴɴᴇ
 
 {vote-header}
 Cᴏʟʟᴇᴄᴛᴀʙʟᴇs
-== 
+== Pʀᴢᴇᴅᴍɪᴏᴛʏ Kᴏʟᴇᴋᴄᴊᴏɴᴇʀsᴋɪᴇ
 
 {vote-header}
 Oᴘᴛɪᴏɴs
-== 
+== Oᴘᴄᴊᴇ
 
 {vote-header}
 Dᴇsɪɢɴs
-== 
+== Pʀᴏᴊᴇᴋᴛʏ
 
 {vote-header}
 Mɪɴɪɢᴀᴍᴇs
-== 
+== Mɪɴɪɢʀʏ
 
 {vote-header}
 Sᴄᴏʀᴇ Mᴏᴅᴇ
-== 
+== Tʀʏʙ Pᴜɴᴋᴛᴏᴡʏ
 
 {vote-header}
-Aᴠᴀɪʟᴀʙʟᴇ Lᴀɴɢᴜᴀɢᴇs
-== 
+Oᴘᴛɪᴏɴs
+== Oᴘᴄᴊᴇ
+
+{vote-header}
+Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs
+== Pᴏszᴜкɪᴡᴀɴɪ Gʀᴀᴄzᴇ
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ Iɴғᴏ
+== Iɴғᴏʀᴍᴀᴄᴊᴇ ᴏ Kᴏɴᴄɪᴇ
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs
+== Sᴛᴀᴛʏsᴛʏᴋɪ Kᴏɴᴛᴀ
+
+{vote-header}
+Pʟᴏᴛ
+== Dzɪᴀłᴋᴀ
+
+{vote-header}
+Vᴏᴛᴇs
+== Gʟᴏsʏ
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ
+== Kᴏɴᴛᴏ
+
+{vote-header}
+Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs
+== Iɴɴᴇ
+
+{vote-header}
+Cᴏʟʟᴇᴄᴛᴀʙʟᴇs
+== Pʀᴢᴇᴅᴍɪᴏᴛʏ Kᴏʟᴇᴋᴄᴊᴏɴᴇʀsᴋɪᴇ
+
+{vote-header}
+Dᴇsɪɢɴs
+== Pʀᴏᴊᴇᴋᴛʏ
+
+{vote-header}
+Mɪɴɪɢᴀᴍᴇs
+== Mɪɴɪɢʀʏ
+
+{vote-header}
+Sᴄᴏʀᴇ Mᴏᴅᴇ
+== Tʀʏʙ Pᴜɴᴋᴛᴏᴡʏ
