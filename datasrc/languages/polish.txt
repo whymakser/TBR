@@ -1188,6 +1188,9 @@ You can't close your door because the police destroyed it
 You lost, you can wait for another round or leave the lobby using '/leave'
 == Przegrałeś, możesz zaczekać na następną rundę lub wyjść z poczekalni używająć '/leave'
 
+Too many players on police tiles [%d/%d]
+ == Zbyt dużo graczy na siedzeniu policyjnym [%d/%d]
+
 You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'
 == Musisz być zalogowany aby używać siedzeń.\nZałóz konto używając '/register <nazwa> <hasło> <hasło>'
 
@@ -1424,6 +1427,9 @@ You have accepted the invite by '%s'
 
 '%s' won a 1vs1 round against '%s'! Final scores: %d - %d
 == '%s' wygrał rundę 1vs1 przeciwko '%s'! Finalne wyniki: %d - %d
+
+'%s' left a 1vs1 round against '%s'! Current scores: %d - %d
+ == '%s' wyszedł z rundy 1vs1 przeciwko '%s'! Obecne wyniki: %d - %d
 
 Select your favourite part of the map\nZoom in or out to change the size\nPlace arena by pressing SPACE
 == Wybierz twoją ulubioną część mapy\nPrzybliż lub oddal kamerę aby zmienić rozmiar\nPostaw arenę naciskając SPACJĘ
@@ -1762,9 +1768,6 @@ Oᴘᴛɪᴏɴs
 == 
 
 You have to be in a team with other tees to start
-== 
-
-Too many players on police tiles [%d/%d]
 == 
 
 You can't hit others

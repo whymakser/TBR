@@ -1185,6 +1185,9 @@ You can't close your door because the police destroyed it
 You lost, you can wait for another round or leave the lobby using '/leave'
 == Kaybettiniz, başka bir raundu bekleyebilir veya '/leave' yazarak lobiden çıkabilirsiniz
 
+Too many players on police tiles [%d/%d]
+ == Polis alanlarında çok fazla oyuncu var [%d/%d]
+
 You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'
 == Para alanlarını kullanmak için giriş yapmalısınız.\n'/register <ad> <şifre> <şifre>' ile hesap oluşturun
 
@@ -1762,9 +1765,6 @@ Oᴘᴛɪᴏɴs
 == 
 
 You have to be in a team with other tees to start
-== 
-
-Too many players on police tiles [%d/%d]
 == 
 
 You can't hit others

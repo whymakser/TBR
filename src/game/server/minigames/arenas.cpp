@@ -645,7 +645,7 @@ void CArenas::OnPlayerLeave(int ClientID, bool Disconnect)
 
 			// First, send to clients
 			char aFormat[128];
-			str_copy(aFormat, Localizable("'%s' won a 1vs1 round against '%s'! Final scores: %d - %d"), sizeof(aFormat));
+			str_copy(aFormat, Localizable("'%s' left a 1vs1 round against '%s'! Current scores: %d - %d"), sizeof(aFormat));
 			GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, aFormat, Server()->ClientName(ClientID), Server()->ClientName(OtherID),
 				m_aFights[Fight].m_aParticipants[Index].m_Score, m_aFights[Fight].m_aParticipants[Other].m_Score);
 
