@@ -80,175 +80,175 @@ vec2 CProjectile::GetPos(float Time)
 
 void CProjectile::Tick()
 {
-    float Pt = (Server()->Tick() - m_StartTick - 1) / (float)Server()->TickSpeed();
-    float Ct = (Server()->Tick() - m_StartTick) / (float)Server()->TickSpeed();
-    vec2 PrevPos = GetPos(Pt);
-    m_CurPos = GetPos(Ct);
-    vec2 ColPos;
-    vec2 NewPos;
-    int Collide = GameServer()->Collision()->IntersectLine(PrevPos, m_CurPos, &ColPos, &NewPos);
-    CCharacter* pOwnerChar = 0;
+	float Pt = (Server()->Tick() - m_StartTick - 1) / (float)Server()->TickSpeed();
+	float Ct = (Server()->Tick() - m_StartTick) / (float)Server()->TickSpeed();
+	vec2 PrevPos = GetPos(Pt);
+	m_CurPos = GetPos(Ct);
+	vec2 ColPos;
+	vec2 NewPos;
+	int Collide = GameServer()->Collision()->IntersectLine(PrevPos, m_CurPos, &ColPos, &NewPos);
+	CCharacter* pOwnerChar = 0;
 
-    if (m_Owner >= 0)
-        pOwnerChar = GameServer()->GetPlayerChar(m_Owner);
+	if (m_Owner >= 0)
+		pOwnerChar = GameServer()->GetPlayerChar(m_Owner);
 
-    CCharacter* pTargetChr = 0;
+	CCharacter* pTargetChr = 0;
 
-    if (pOwnerChar ? !(pOwnerChar->m_Hit & CCharacter::DISABLE_HIT_GRENADE) : Config()->m_SvHit)
-        pTargetChr = GameWorld()->IntersectCharacter(PrevPos, ColPos, m_Freeze ? 1.0f : 6.0f, ColPos, pOwnerChar, m_Owner);
+	if (pOwnerChar ? !(pOwnerChar->m_Hit & CCharacter::DISABLE_HIT_GRENADE) : Config()->m_SvHit)
+		pTargetChr = GameWorld()->IntersectCharacter(PrevPos, ColPos, m_Freeze ? 1.0f : 6.0f, ColPos, pOwnerChar, m_Owner);
 
-    if (m_LifeSpan > -1)
-        m_LifeSpan--;
+	if (m_LifeSpan > -1)
+		m_LifeSpan--;
 
-    bool IsWeaponCollide = false;
-    if
-        (
-        pOwnerChar &&
-            pTargetChr &&
-            pOwnerChar->IsAlive() &&
-            pTargetChr->IsAlive() &&
-            !pTargetChr->CanCollide(m_Owner)
-        )
-    {
-        IsWeaponCollide = true;
-    }
-    m_TeamMask = Mask128();
-    if (pOwnerChar && pOwnerChar->IsAlive())
-    {
-        m_TeamMask = pOwnerChar->TeamMask();
-    }
-    else if (m_Owner >= 0 && (GameServer()->GetProjectileType(m_Type) != WEAPON_GRENADE || Config()->m_SvDestroyBulletsOnDeath || GameServer()->Arenas()->FightStarted(m_Owner)))
-    {
-        GameWorld()->DestroyEntity(this);
-        return;
-    }
+	bool IsWeaponCollide = false;
+	if
+		(
+			pOwnerChar &&
+			pTargetChr &&
+			pOwnerChar->IsAlive() &&
+			pTargetChr->IsAlive() &&
+			!pTargetChr->CanCollide(m_Owner)
+			)
+	{
+		IsWeaponCollide = true;
+	}
+	m_TeamMask = Mask128();
+	if (pOwnerChar && pOwnerChar->IsAlive())
+	{
+		m_TeamMask = pOwnerChar->TeamMask();
+	}
+	else if (m_Owner >= 0 && (GameServer()->GetProjectileType(m_Type) != WEAPON_GRENADE || Config()->m_SvDestroyBulletsOnDeath || GameServer()->Arenas()->FightStarted(m_Owner)))
+	{
+		GameWorld()->DestroyEntity(this);
+		return;
+	}
 
-    if (((pTargetChr && (pOwnerChar ? !(pOwnerChar->m_Hit & CCharacter::DISABLE_HIT_GRENADE) : Config()->m_SvHit || m_Owner == -1 || pTargetChr == pOwnerChar)) || Collide || GameLayerClipped(m_CurPos)) && !IsWeaponCollide)
-    {
-        if (m_Explosive/*??*/ && (!pTargetChr || (pTargetChr && (!m_Freeze || (m_Type == WEAPON_SHOTGUN && Collide)))))
-        {
-            GameServer()->CreateExplosion(ColPos, m_Owner, m_Type, m_Owner == -1, (!pTargetChr ? -1 : pTargetChr->Team()), m_TeamMask);
-            GameServer()->CreateSound(ColPos, m_SoundImpact, m_TeamMask);
-        }
-        else if (m_Freeze)
-        {
-            CCharacter* apEnts[MAX_CLIENTS];
-            int Num = GameWorld()->FindEntities(m_CurPos, 1.0f, (CEntity * *)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
-            for (int i = 0; i < Num; ++i)
-                if (apEnts[i] && (m_Layer != LAYER_SWITCH || (m_Layer == LAYER_SWITCH && GameServer()->Collision()->m_pSwitchers[m_Number].m_Status[apEnts[i]->Team()])))
-                    apEnts[i]->Freeze();
-        }
-        // F-DDrace
-        if (pTargetChr)
-        {
-            if (!m_Explosive)
-            {
-                pTargetChr->TakeDamage(m_Direction * max(0.001f, m_Force), m_Direction*-1, g_pData->m_Weapons.m_aId[GameServer()->GetProjectileType(m_Type)].m_Damage, m_Owner, m_Type);
-            }
-            if (m_Spooky)
-            {
-                pTargetChr->SetEmote(EMOTE_SURPRISE, Server()->Tick() + 2 * Server()->TickSpeed());
-                GameServer()->SendEmoticon(pTargetChr->GetPlayer()->GetCID(), EMOTICON_GHOST);
-            }
-        }
+	if (((pTargetChr && (pOwnerChar ? !(pOwnerChar->m_Hit & CCharacter::DISABLE_HIT_GRENADE) : Config()->m_SvHit || m_Owner == -1 || pTargetChr == pOwnerChar)) || Collide || GameLayerClipped(m_CurPos)) && !IsWeaponCollide)
+	{
+		if (m_Explosive/*??*/ && (!pTargetChr || (pTargetChr && (!m_Freeze || (m_Type == WEAPON_SHOTGUN && Collide)))))
+		{
+			GameServer()->CreateExplosion(ColPos, m_Owner, m_Type, m_Owner == -1, (!pTargetChr ? -1 : pTargetChr->Team()), m_TeamMask);
+			GameServer()->CreateSound(ColPos, m_SoundImpact, m_TeamMask);
+		}
+		else if (m_Freeze)
+		{
+			CCharacter* apEnts[MAX_CLIENTS];
+			int Num = GameWorld()->FindEntities(m_CurPos, 1.0f, (CEntity * *)apEnts, MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
+			for (int i = 0; i < Num; ++i)
+				if (apEnts[i] && (m_Layer != LAYER_SWITCH || (m_Layer == LAYER_SWITCH && GameServer()->Collision()->m_pSwitchers[m_Number].m_Status[apEnts[i]->Team()])))
+					apEnts[i]->Freeze();
+		}
+		// F-DDrace
+		if (pTargetChr)
+		{
+			if (!m_Explosive)
+			{
+				pTargetChr->TakeDamage(m_Direction * max(0.001f, m_Force), m_Direction*-1, g_pData->m_Weapons.m_aId[GameServer()->GetProjectileType(m_Type)].m_Damage, m_Owner, m_Type);
+			}
+			if (m_Spooky)
+			{
+				pTargetChr->SetEmote(EMOTE_SURPRISE, Server()->Tick() + 2 * Server()->TickSpeed());
+				GameServer()->SendEmoticon(pTargetChr->GetPlayer()->GetCID(), EMOTICON_GHOST);
+			}
+		}
 
-        if (pOwnerChar && ColPos && !GameLayerClipped(ColPos) &&
-            ((m_Type == WEAPON_GRENADE && pOwnerChar->m_HasTeleGrenade) || (m_Type == WEAPON_GUN && pOwnerChar->m_HasTeleGun)))
-        {
-            int MapIndex = GameServer()->Collision()->GetPureMapIndex(pTargetChr ? pTargetChr->GetPos() : ColPos);
-            int TileFIndex = GameServer()->Collision()->GetFTileIndex(MapIndex);
-            bool IsSwitchTeleGun = GameServer()->Collision()->IsSwitch(MapIndex) == TILE_ALLOW_TELE_GUN || pOwnerChar->m_AlwaysTeleWeapon;
-            bool IsBlueSwitchTeleGun = GameServer()->Collision()->IsSwitch(MapIndex) == TILE_ALLOW_BLUE_TELE_GUN;
+		if (pOwnerChar && ColPos && !GameLayerClipped(ColPos) &&
+			((m_Type == WEAPON_GRENADE && pOwnerChar->m_HasTeleGrenade) || (m_Type == WEAPON_GUN && pOwnerChar->m_HasTeleGun)))
+		{
+			int MapIndex = GameServer()->Collision()->GetPureMapIndex(pTargetChr ? pTargetChr->GetPos() : ColPos);
+			int TileFIndex = GameServer()->Collision()->GetFTileIndex(MapIndex);
+			bool IsSwitchTeleGun = GameServer()->Collision()->IsSwitch(MapIndex) == TILE_ALLOW_TELE_GUN || pOwnerChar->m_AlwaysTeleWeapon;
+			bool IsBlueSwitchTeleGun = GameServer()->Collision()->IsSwitch(MapIndex) == TILE_ALLOW_BLUE_TELE_GUN;
 
-            if (IsSwitchTeleGun || IsBlueSwitchTeleGun) {
-                // Delay specifies which weapon the tile should work for.
-                // Delay = 0 means all.
-                int delay = GameServer()->Collision()->GetSwitchDelay(MapIndex);
+			if (IsSwitchTeleGun || IsBlueSwitchTeleGun) {
+				// Delay specifies which weapon the tile should work for.
+				// Delay = 0 means all.
+				int delay = GameServer()->Collision()->GetSwitchDelay(MapIndex);
 
-                if (delay == 1 && m_Type != WEAPON_GUN)
-                    IsSwitchTeleGun = IsBlueSwitchTeleGun = false;
-                if (delay == 2 && m_Type != WEAPON_GRENADE)
-                    IsSwitchTeleGun = IsBlueSwitchTeleGun = false;
-                if (delay == 3 && m_Type != WEAPON_LASER)
-                    IsSwitchTeleGun = IsBlueSwitchTeleGun = false;
-            }
+				if (delay == 1 && m_Type != WEAPON_GUN)
+					IsSwitchTeleGun = IsBlueSwitchTeleGun = false;
+				if (delay == 2 && m_Type != WEAPON_GRENADE)
+					IsSwitchTeleGun = IsBlueSwitchTeleGun = false;
+				if (delay == 3 && m_Type != WEAPON_LASER)
+					IsSwitchTeleGun = IsBlueSwitchTeleGun = false;
+			}
 
-            if (TileFIndex == TILE_ALLOW_TELE_GUN
-                || TileFIndex == TILE_ALLOW_BLUE_TELE_GUN
-                || IsSwitchTeleGun
-                || IsBlueSwitchTeleGun
-                || pTargetChr)
-            {
-                bool Found;
-                vec2 PossiblePos;
+			if (TileFIndex == TILE_ALLOW_TELE_GUN
+				|| TileFIndex == TILE_ALLOW_BLUE_TELE_GUN
+				|| IsSwitchTeleGun
+				|| IsBlueSwitchTeleGun
+				|| pTargetChr)
+			{
+				bool Found;
+				vec2 PossiblePos;
 
-                if (!Collide)
-                    Found = GetNearestAirPosPlayer(pTargetChr->GetPos(), &PossiblePos);
-                else
-                    Found = GetNearestAirPos(NewPos, m_CurPos, &PossiblePos);
+				if (!Collide)
+					Found = GetNearestAirPosPlayer(pTargetChr->GetPos(), &PossiblePos);
+				else
+					Found = GetNearestAirPos(NewPos, m_CurPos, &PossiblePos);
 
-                if (Found && PossiblePos)
-                {
-                    pOwnerChar->m_TeleGunPos = PossiblePos;
-                    pOwnerChar->m_TeleGunTeleport = true;
-                    pOwnerChar->m_IsBlueTeleGunTeleport = TileFIndex == TILE_ALLOW_BLUE_TELE_GUN || IsBlueSwitchTeleGun;
-                }
-            }
-        }
+				if (Found && PossiblePos)
+				{
+					pOwnerChar->m_TeleGunPos = PossiblePos;
+					pOwnerChar->m_TeleGunTeleport = true;
+					pOwnerChar->m_IsBlueTeleGunTeleport = TileFIndex == TILE_ALLOW_BLUE_TELE_GUN || IsBlueSwitchTeleGun;
+				}
+			}
+		}
 
-        if (Collide && m_Bouncing != 0)
-        {
-            m_StartTick = Server()->Tick();
-            m_Pos = NewPos + (-(m_Direction * 4));
-            if (m_Bouncing == 1)
-                m_Direction.x = -m_Direction.x;
-            else if (m_Bouncing == 2)
-                m_Direction.y = -m_Direction.y;
-            if (fabs(m_Direction.x) < 1e-6)
-                m_Direction.x = 0;
-            if (fabs(m_Direction.y) < 1e-6)
-                m_Direction.y = 0;
-            m_Pos += m_Direction;
-        }
-        else if (GameServer()->GetProjectileType(m_Type) == WEAPON_GUN)
-        {
-            if (pOwnerChar && (pOwnerChar->GetPlayer()->m_Gamemode == GAMEMODE_DDRACE || m_Type != WEAPON_GUN))
-                GameServer()->CreateDamage(m_CurPos, m_Owner, m_Direction, 1, 0, (pTargetChr && m_Owner == pTargetChr->GetPlayer()->GetCID()), m_TeamMask, 1);
-            GameWorld()->DestroyEntity(this);
-            return;
-        }
-        else
-        {
-            if (!m_Freeze)
-            {
-                GameWorld()->DestroyEntity(this);
-                return;
-            }
-        }
-    }
-    if (m_LifeSpan == -1)
-    {
-        if (m_Explosive)
-        {
-            GameServer()->CreateExplosion(ColPos, m_Owner, m_Type, m_Owner == -1, (!pOwnerChar ? -1 : pOwnerChar->Team()), m_TeamMask);
-            GameServer()->CreateSound(ColPos, m_SoundImpact, m_TeamMask);
-        }
-        GameWorld()->DestroyEntity(this);
-        return;
-    }
+		if (Collide && m_Bouncing != 0)
+		{
+			m_StartTick = Server()->Tick();
+			m_Pos = NewPos + (-(m_Direction * 4));
+			if (m_Bouncing == 1)
+				m_Direction.x = -m_Direction.x;
+			else if (m_Bouncing == 2)
+				m_Direction.y = -m_Direction.y;
+			if (fabs(m_Direction.x) < 1e-6)
+				m_Direction.x = 0;
+			if (fabs(m_Direction.y) < 1e-6)
+				m_Direction.y = 0;
+			m_Pos += m_Direction;
+		}
+		else if (GameServer()->GetProjectileType(m_Type) == WEAPON_GUN)
+		{
+			if (pOwnerChar && (pOwnerChar->GetPlayer()->m_Gamemode == GAMEMODE_DDRACE || m_Type != WEAPON_GUN))
+				GameServer()->CreateDamage(m_CurPos, m_Owner, m_Direction, 1, 0, (pTargetChr && m_Owner == pTargetChr->GetPlayer()->GetCID()), m_TeamMask, 10);
+			GameWorld()->DestroyEntity(this);
+			return;
+		}
+		else
+		{
+			if (!m_Freeze)
+			{
+				GameWorld()->DestroyEntity(this);
+				return;
+			}
+		}
+	}
+	if (m_LifeSpan == -1)
+	{
+		if (m_Explosive)
+		{
+			GameServer()->CreateExplosion(ColPos, m_Owner, m_Type, m_Owner == -1, (!pOwnerChar ? -1 : pOwnerChar->Team()), m_TeamMask);
+			GameServer()->CreateSound(ColPos, m_SoundImpact, m_TeamMask);
+		}
+		GameWorld()->DestroyEntity(this);
+		return;
+	}
 
-    int x = GameServer()->Collision()->GetIndex(PrevPos, m_CurPos);
-    int z;
-    if (Config()->m_SvOldTeleportWeapons)
-        z = GameServer()->Collision()->IsTeleport(x);
-    else
-        z = GameServer()->Collision()->IsTeleportWeapon(x);
-    if (z && ((CGameControllerDDRace*)GameServer()->m_pController)->m_TeleOuts[z - 1].size())
-    {
-        int Num = ((CGameControllerDDRace*)GameServer()->m_pController)->m_TeleOuts[z - 1].size();
-        m_Pos = ((CGameControllerDDRace*)GameServer()->m_pController)->m_TeleOuts[z - 1][(!Num) ? Num : rand() % Num];
-        m_StartTick = Server()->Tick();
-    }
+	int x = GameServer()->Collision()->GetIndex(PrevPos, m_CurPos);
+	int z;
+	if (Config()->m_SvOldTeleportWeapons)
+		z = GameServer()->Collision()->IsTeleport(x);
+	else
+		z = GameServer()->Collision()->IsTeleportWeapon(x);
+	if (z && ((CGameControllerDDRace*)GameServer()->m_pController)->m_TeleOuts[z - 1].size())
+	{
+		int Num = ((CGameControllerDDRace*)GameServer()->m_pController)->m_TeleOuts[z - 1].size();
+		m_Pos = ((CGameControllerDDRace*)GameServer()->m_pController)->m_TeleOuts[z - 1][(!Num) ? Num : rand() % Num];
+		m_StartTick = Server()->Tick();
+	}
 }
 
 void CProjectile::TickPaused()
@@ -284,8 +284,8 @@ void CProjectile::FillInfo(CNetObj_Projectile* pProj)
 
 void CProjectile::Snap(int SnappingClient)
 {
-    if (NetworkClipped(SnappingClient, m_CurPos))
-        return;
+	if (NetworkClipped(SnappingClient, m_CurPos))
+		return;
 
 	if(m_LifeSpan == -2)
 	{
