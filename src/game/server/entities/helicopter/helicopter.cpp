@@ -5,60 +5,60 @@
 #include "helicopter.h"
 
 bool MovingCircleHitsMovingSegment_Analytical(
-    vec2 circleLast, vec2 circleNow, float radius,
-    vec2 lineLastA, vec2 lineNowA,
-    vec2 lineLastB, vec2 lineNowB)
+	vec2 circleLast, vec2 circleNow, float radius,
+	vec2 lineLastA, vec2 lineNowA,
+	vec2 lineLastB, vec2 lineNowB)
 {
-    // Step 1: Relative motion
-    vec2 circleVel = circleNow - circleLast;
-    vec2 lineVelA = lineNowA - lineLastA;
-    vec2 lineVelB = lineNowB - lineLastB;
-    vec2 lineVel = (lineVelA + lineVelB) * 0.5f;
-    vec2 relVel = circleVel - lineVel;
+	// Step 1: Relative motion
+	vec2 circleVel = circleNow - circleLast;
+	vec2 lineVelA = lineNowA - lineLastA;
+	vec2 lineVelB = lineNowB - lineLastB;
+	vec2 lineVel = (lineVelA + lineVelB) * 0.5f;
+	vec2 relVel = circleVel - lineVel;
 
-    vec2 C0 = circleLast;
-    vec2 C1 = C0 + relVel;
+	vec2 C0 = circleLast;
+	vec2 C1 = C0 + relVel;
 
-    vec2 L0 = lineLastA;
-    vec2 L1 = lineLastB;
-    vec2 d = L1 - L0;
-    vec2 m = C0 - L0;
+	vec2 L0 = lineLastA;
+	vec2 L1 = lineLastB;
+	vec2 d = L1 - L0;
+	vec2 m = C0 - L0;
 
-    float a = dot(relVel, relVel);
-    float b = dot(relVel, d);
-    float c = dot(d, d);
-    float d1 = dot(relVel, m);
-    float e = dot(d, m);
+	float a = dot(relVel, relVel);
+	float b = dot(relVel, d);
+	float c = dot(d, d);
+	float d1 = dot(relVel, m);
+	float e = dot(d, m);
 
-    float denom = a * c - b * b;
+	float denom = a * c - b * b;
 
-    float t, s;
+	float t, s;
 
-    if (denom != 0.0f) {
-        t = (b * e - c * d1) / denom;
-    } else {
-        t = 0.0f; // Parallel
-    }
+	if (denom != 0.0f) {
+		t = (b * e - c * d1) / denom;
+	} else {
+		t = 0.0f; // Parallel
+	}
 
-    t = clamp(t, 0.0f, 1.0f);
+	t = clamp(t, 0.0f, 1.0f);
 
-    // Get point on circle path at time t
-    vec2 circlePosAtT = C0 + relVel * t;
+	// Get point on circle path at time t
+	vec2 circlePosAtT = C0 + relVel * t;
 
-    // Find closest point on segment
-    float segmentLenSq = dot(d, d);
-    if (segmentLenSq != 0.0f) {
-        s = clamp(dot(circlePosAtT - L0, d) / segmentLenSq, 0.0f, 1.0f);
-    } else {
-        s = 0.0f;
-    }
+	// Find closest point on segment
+	float segmentLenSq = dot(d, d);
+	if (segmentLenSq != 0.0f) {
+		s = clamp(dot(circlePosAtT - L0, d) / segmentLenSq, 0.0f, 1.0f);
+	} else {
+		s = 0.0f;
+	}
 
-    vec2 closestOnSegment = L0 + d * s;
+	vec2 closestOnSegment = L0 + d * s;
 
-    vec2 diff = circlePosAtT - closestOnSegment;
-    float distSq = dot(diff, diff);
+	vec2 diff = circlePosAtT - closestOnSegment;
+	float distSq = dot(diff, diff);
 
-    return distSq <= radius * radius;
+	return distSq <= radius * radius;
 }
 
 CHelicopter::CHelicopter(CGameWorld *pGameWorld, vec2 Pos)
@@ -67,31 +67,31 @@ CHelicopter::CHelicopter(CGameWorld *pGameWorld, vec2 Pos)
 	m_AllowVipPlus = false;
 	m_Elasticity = 0.f;
 
-    m_InputDirection = 0;
-    m_Health = 100.f;
+	m_InputDirection = 0;
+	m_Health = 100.f;
 	m_Flipped = false;
 	m_Angle = 0.f;
 	m_Accel = vec2(0.f, 0.f);
 
-    m_pTurretAttachment = nullptr;
+	m_pTurretAttachment = nullptr;
 
-    memset(m_aBonedCharacters, 0, sizeof(m_aBonedCharacters));
-    m_BackPropellerRadius = 25.f;
-    m_TopPropellerRadius = 100.f;
-    m_TopPropellersReset = false;
+	memset(m_aBonedCharacters, 0, sizeof(m_aBonedCharacters));
+	m_BackPropellerRadius = 25.f;
+	m_TopPropellerRadius = 100.f;
+	m_TopPropellersReset = false;
 
 	InitBody();
 	InitPropellers();
-    GetFullPropellerPositions(m_LastTopPropellerA, m_LastTopPropellerB);
+	GetFullPropellerPositions(m_LastTopPropellerA, m_LastTopPropellerB);
 
-    // Experimental: Downscale helicopter
-    float scaleFactor = 0.9f;
-    m_Size *= scaleFactor;
-    m_BackPropellerRadius *= scaleFactor;
-    m_TopPropellerRadius *= scaleFactor;
-    for (SBone &Bone : m_aBones)
-        Bone.Scale(scaleFactor);
-    //
+	// Experimental: Downscale helicopter
+	float scaleFactor = 0.9f;
+	m_Size *= scaleFactor;
+	m_BackPropellerRadius *= scaleFactor;
+	m_TopPropellerRadius *= scaleFactor;
+	for (SBone &Bone : m_aBones)
+		Bone.Scale(scaleFactor);
+	//
 
 	for (int i = 0; i < NUM_BONES; i++)
 		m_aBones[i].m_ID = Server()->SnapNewID();
@@ -107,7 +107,7 @@ CHelicopter::~CHelicopter()
 		Server()->SnapFreeID(m_aBones[i].m_ID);
 	for (int i = 0; i < NUM_TRAILS; i++)
 		Server()->SnapFreeID(m_aTrails[i].m_ID);
-    DestroyTurret();
+	DestroyTurret();
 }
 
 void CHelicopter::Reset()
@@ -117,94 +117,94 @@ void CHelicopter::Reset()
 }
 
 bool CHelicopter::AttachTurret(CHelicopterTurret* helicopterTurret) {
-    if (helicopterTurret == nullptr)
-    {
-        DestroyTurret();
-        return true;
-    }
+	if (helicopterTurret == nullptr)
+	{
+		DestroyTurret();
+		return true;
+	}
 
-    if (helicopterTurret->TryBindHelicopter(this))
-    {
-        if (m_pTurretAttachment)
-            DestroyTurret();
+	if (helicopterTurret->TryBindHelicopter(this))
+	{
+		if (m_pTurretAttachment)
+			DestroyTurret();
 
-        m_pTurretAttachment = helicopterTurret;
-        PutTurretToForeground();
-        return true;
-    }
-    return false;
+		m_pTurretAttachment = helicopterTurret;
+		PutTurretToForeground();
+		return true;
+	}
+	return false;
 }
 
 void CHelicopter::DestroyTurret() {
-    delete m_pTurretAttachment;
-    m_pTurretAttachment = nullptr;
+	delete m_pTurretAttachment;
+	m_pTurretAttachment = nullptr;
 }
 
 void CHelicopter::FlingTee(CCharacter *pChar) {
-    if (!pChar->IsAlive())
-        return;
+	if (!pChar->IsAlive())
+		return;
 
-    GameServer()->CreateSound(pChar->GetPos(), SOUND_PLAYER_PAIN_SHORT, pChar->TeamMask());
-    GameServer()->CreateDeath(pChar->GetPos(), pChar->GetPlayer()->GetCID(), pChar->TeamMask());
-    pChar->SetEmote(EMOTE_PAIN, Server()->Tick() + 500 * Server()->TickSpeed() / 1000);
+	GameServer()->CreateSound(pChar->GetPos(), SOUND_PLAYER_PAIN_SHORT, pChar->TeamMask());
+	GameServer()->CreateDeath(pChar->GetPos(), pChar->GetPlayer()->GetCID(), pChar->TeamMask());
+	pChar->SetEmote(EMOTE_PAIN, Server()->Tick() + 500 * Server()->TickSpeed() / 1000);
 
-    float helicopterVelocity = length(m_Vel);
-    float teeVelocity = length(pChar->GetCore().m_Vel);
+	float helicopterVelocity = length(m_Vel);
+	float teeVelocity = length(pChar->GetCore().m_Vel);
 
-    vec2 directionAwayFromBlades = normalize(pChar->GetCore().m_Pos - m_Pos - TopPropeller()[0].m_To);
-    // Known at compile time
-    constexpr float teeMass = 10.f;
-    constexpr float helicopterMass = 18.f;
-    constexpr float transferForceTee = helicopterMass / teeMass; // POOR THING :SKULL: 💀
-    constexpr float transferForceHelicopter = teeMass / helicopterMass;
-    //
-    float totalVelocity = helicopterVelocity + teeVelocity;
-    vec2 teeAcceleration = directionAwayFromBlades * transferForceTee * totalVelocity;
-    vec2 helicopterAcceleration = -directionAwayFromBlades * transferForceHelicopter * totalVelocity;
+	vec2 directionAwayFromBlades = normalize(pChar->GetCore().m_Pos - m_Pos - TopPropeller()[0].m_To);
+	// Known at compile time
+	constexpr float teeMass = 10.f;
+	constexpr float helicopterMass = 18.f;
+	constexpr float transferForceTee = helicopterMass / teeMass; // POOR THING :SKULL: 💀
+	constexpr float transferForceHelicopter = teeMass / helicopterMass;
+	//
+	float totalVelocity = helicopterVelocity + teeVelocity;
+	vec2 teeAcceleration = directionAwayFromBlades * transferForceTee * totalVelocity;
+	vec2 helicopterAcceleration = -directionAwayFromBlades * transferForceHelicopter * totalVelocity;
 
-    pChar->SetCoreVel(pChar->GetCore().m_Vel + teeAcceleration);
-    m_Vel += helicopterAcceleration;
+	pChar->SetCoreVel(pChar->GetCore().m_Vel + teeAcceleration);
+	m_Vel += helicopterAcceleration;
 }
 
 void CHelicopter::Tick()
 {
-    CAdvancedEntity::Tick();
-    HandleDropped();
+	CAdvancedEntity::Tick();
+	HandleDropped();
 
-    if (GetOwner())
-    {
-        GetOwner()->ForceSetPos(m_Pos);
-        GetOwner()->Core()->m_Vel = vec2(0, 0);
+	if (GetOwner())
+	{
+		GetOwner()->ForceSetPos(m_Pos);
+		GetOwner()->Core()->m_Vel = vec2(0, 0);
 
-        m_Gravity = GetOwner()->m_FreezeTime;
-        m_GroundVel = GetOwner()->m_FreezeTime || m_Accel.x == 0.f; // when on floor and not moving
-    }
+		m_Gravity = GetOwner()->m_FreezeTime;
+		m_GroundVel = GetOwner()->m_FreezeTime || m_Accel.x == 0.f; // when on floor and not moving
+	}
 
-    DestroyThingsInItsPath();
+	DestroyThingsInItsPath();
 
-    ApplyAcceleration();
-    SpinPropellers();
+	ApplyAcceleration();
+	SpinPropellers();
 
-    if (m_pTurretAttachment)
-        m_pTurretAttachment->Tick();
+	if (m_pTurretAttachment)
+		m_pTurretAttachment->Tick();
 
-    if (m_Health <= 0.f)
-        GameWorld()->DestroyEntity(this);
+	if (m_Health <= 0.f)
+		GameWorld()->DestroyEntity(this);
 
-    m_PrevPos = m_Pos;
-    GetFullPropellerPositions(m_LastTopPropellerA, m_LastTopPropellerB);
+	m_PrevPos = m_Pos;
+	GetFullPropellerPositions(m_LastTopPropellerA, m_LastTopPropellerB);
 }
 
 void CHelicopter::OnInput(CNetObj_PlayerInput *pNewInput)
 {
-    // Movement controls
+	// Movement controls
 	if (!GetOwner() || GetOwner()->m_FreezeTime)
 	{
 		m_Accel = vec2(0.f, 0.f);
 		return;
 	}
 
-    m_InputDirection = pNewInput->m_Direction;
+	m_InputDirection = pNewInput->m_Direction;
 	m_Accel.x = (float)pNewInput->m_Direction;
 
 	bool Rise = pNewInput->m_Jump;
@@ -214,64 +214,64 @@ void CHelicopter::OnInput(CNetObj_PlayerInput *pNewInput)
 	else
 		m_Accel.y = Rise ? -1 : 1;
 
-    // Weapon controls
-    if (m_pTurretAttachment)
-        m_pTurretAttachment->OnInput(pNewInput);
+	// Weapon controls
+	if (m_pTurretAttachment)
+		m_pTurretAttachment->OnInput(pNewInput);
 }
 
 void CHelicopter::ApplyAcceleration()
 {
-    float strafeFactor = (m_Flipped == (m_Vel.x > 0.f)) ? 0.4f : 1.f; // Accelerate slower when moving backwards
+	float strafeFactor = (m_Flipped == (m_Vel.x > 0.f)) ? 0.4f : 1.f; // Accelerate slower when moving backwards
 	m_Vel.x += m_Accel.x * 0.4f * strafeFactor;
 	m_Vel.y += m_Accel.y * 0.5f;
 	m_Vel.y *= 0.95f;
 
-    // Prevent flipping when not going the opposite direction OR when shooting the opposite direction
-    if (((m_InputDirection == -1 && !m_Flipped && m_Vel.x < 0.f) ||
-        (m_InputDirection == 1 && m_Flipped && m_Vel.x > 0.f)) &&
-        (!m_pTurretAttachment || !m_pTurretAttachment->m_Shooting ||
-        (m_Flipped != m_pTurretAttachment->m_AimPosition.x < 0.f)))
-        Flip();
+	// Prevent flipping when not going the opposite direction OR when shooting the opposite direction
+	if (((m_InputDirection == -1 && !m_Flipped && m_Vel.x < 0.f) ||
+		(m_InputDirection == 1 && m_Flipped && m_Vel.x > 0.f)) &&
+		(!m_pTurretAttachment || !m_pTurretAttachment->m_Shooting ||
+		(m_Flipped != m_pTurretAttachment->m_AimPosition.x < 0.f)))
+		Flip();
 
 	SetAngle(m_Vel.x);
 }
 
 void CHelicopter::DestroyThingsInItsPath() {
-    if (!GetOwner() && IsGrounded())
-        return;
+	if (!GetOwner() && IsGrounded())
+		return;
 
-    CCharacter* aPossibleCollisions[5];
-    int numFound = GameWorld()->FindEntities(m_Pos, m_TopPropellerRadius + 200.f, (CEntity**)aPossibleCollisions, 5, CGameWorld::ENTTYPE_CHARACTER);
-    if (!numFound)
-        return;
+	CCharacter* aPossibleCollisions[5];
+	int numFound = GameWorld()->FindEntities(m_Pos, m_TopPropellerRadius + 200.f, (CEntity**)aPossibleCollisions, 5, CGameWorld::ENTTYPE_CHARACTER);
+	if (!numFound)
+		return;
 
-    for (int i = 0; i < numFound; i++)
-    {
-        CCharacter* pChar = aPossibleCollisions[i];
-        int cID = pChar->GetPlayer()->GetCID();
-        if (Server()->Tick() - m_aBonedCharacters[cID] <= 10)
-            return;
+	for (int i = 0; i < numFound; i++)
+	{
+		CCharacter* pChar = aPossibleCollisions[i];
+		int cID = pChar->GetPlayer()->GetCID();
+		if (Server()->Tick() - m_aBonedCharacters[cID] <= 10)
+			return;
 
-        vec2 propellerPosA, propellerPosB;
-        GetFullPropellerPositions(propellerPosA, propellerPosB);
-        bool collisionDetected = MovingCircleHitsMovingSegment_Analytical(pChar->m_PrevPos - m_Pos, pChar->GetPos() - m_Pos,
-                                                                          pChar->GetProximityRadius(),
-                                                                          m_LastTopPropellerA, propellerPosA,
-                                                                          m_LastTopPropellerB, propellerPosB);
-        if (collisionDetected)
-        {
-            m_aBonedCharacters[cID] = Server()->Tick();
-            FlingTee(pChar);
-        }
-    }
+		vec2 propellerPosA, propellerPosB;
+		GetFullPropellerPositions(propellerPosA, propellerPosB);
+		bool collisionDetected = MovingCircleHitsMovingSegment_Analytical(pChar->m_PrevPos - m_Pos, pChar->GetPos() - m_Pos,
+																		  pChar->GetProximityRadius(),
+																		  m_LastTopPropellerA, propellerPosA,
+																		  m_LastTopPropellerB, propellerPosB);
+		if (collisionDetected)
+		{
+			m_aBonedCharacters[cID] = Server()->Tick();
+			FlingTee(pChar);
+		}
+	}
 
 }
 
 void CHelicopter::GetFullPropellerPositions(vec2& outPosA, vec2& outPosB)
 {
-    vec2 bladeSpan = normalize(TopPropeller()[0].m_To - TopPropeller()[0].m_From) * m_TopPropellerRadius;
-    outPosA = TopPropeller()[0].m_To + bladeSpan;
-    outPosB = TopPropeller()[1].m_To - bladeSpan;
+	vec2 bladeSpan = normalize(TopPropeller()[0].m_To - TopPropeller()[0].m_From) * m_TopPropellerRadius;
+	outPosA = TopPropeller()[0].m_To + bladeSpan;
+	outPosB = TopPropeller()[1].m_To - bladeSpan;
 }
 
 void CHelicopter::SpinPropellers()
@@ -279,12 +279,12 @@ void CHelicopter::SpinPropellers()
 	if (Server()->Tick() % 2 != 0)
 		return;
 
-    if (!GetOwner() && IsGrounded()) // Reset top propellers when grounded without driver
-    {
-        if (!m_TopPropellersReset)
-            ResetTopPropellers();
-        return;
-    }
+	if (!GetOwner() && IsGrounded()) // Reset top propellers when grounded without driver
+	{
+		if (!m_TopPropellersReset)
+			ResetTopPropellers();
+		return;
+	}
 
 	for (int i = 0; i < NUM_BONES_PROPELLERS_BACK; i++)
 		BackPropeller()[i].m_From = rotate_around_point(BackPropeller()[i].m_From, BackPropeller()[i].m_To, 50.f / pi);
@@ -299,7 +299,7 @@ void CHelicopter::SpinPropellers()
 		Diff *= -1;
 	}
 
-    m_TopPropellersReset = false;
+	m_TopPropellersReset = false;
 }
 
 bool CHelicopter::Mount(int ClientID)
@@ -342,8 +342,8 @@ void CHelicopter::Flip()
 	for (int i = 0; i < NUM_BONES; i++)
 		m_aBones[i].Flip();
 
-    if (m_pTurretAttachment)
-        m_pTurretAttachment->SetFlipped(m_Flipped);
+	if (m_pTurretAttachment)
+		m_pTurretAttachment->SetFlipped(m_Flipped);
 }
 
 void CHelicopter::Rotate(float Angle)
@@ -352,8 +352,8 @@ void CHelicopter::Rotate(float Angle)
 	for (int i = 0; i < NUM_BONES; i++)
 		m_aBones[i].Rotate(Angle);
 
-    if (m_pTurretAttachment)
-        m_pTurretAttachment->Rotate(Angle);
+	if (m_pTurretAttachment)
+		m_pTurretAttachment->Rotate(Angle);
 }
 
 void CHelicopter::SetAngle(float Angle)
@@ -371,36 +371,36 @@ void CHelicopter::Snap(int SnappingClient)
 		return;
 
 	for (const SBone &Bone : m_aBones)
-        Bone.Snap(SnappingClient, this);
+		Bone.Snap(SnappingClient, this);
 
 	if (GetOwner() || !IsGrounded())
 		for (const auto &m_aTrail : m_aTrails)
-            m_aTrail.Snap(this);
+			m_aTrail.Snap(this);
 
-    if (m_pTurretAttachment)
-        m_pTurretAttachment->Snap(SnappingClient);
+	if (m_pTurretAttachment)
+		m_pTurretAttachment->Snap(SnappingClient);
 }
 
 void CHelicopter::PutTurretToForeground() { // meant for adding turret later, not specifically at initialization
-    if (!m_pTurretAttachment)
-        return; // what turret?
+	if (!m_pTurretAttachment)
+		return; // what turret?
 
-    size_t numBonesTurret = m_pTurretAttachment->GetNumBones();
+	size_t numBonesTurret = m_pTurretAttachment->GetNumBones();
 
-    // Get current IDs
-    int* apIDs = new int[NUM_BONES + numBonesTurret];
-    for (int i = 0; i < NUM_BONES; i++)
-        apIDs[i] = m_aBones[i].m_ID;
-    for (int i = 0; i < numBonesTurret; i++)
-        apIDs[NUM_BONES+i] = m_pTurretAttachment->Bones()[i].m_ID;
-    std::sort(apIDs, apIDs + (NUM_BONES + numBonesTurret));
+	// Get current IDs
+	int* apIDs = new int[NUM_BONES + numBonesTurret];
+	for (int i = 0; i < NUM_BONES; i++)
+		apIDs[i] = m_aBones[i].m_ID;
+	for (int i = 0; i < numBonesTurret; i++)
+		apIDs[NUM_BONES+i] = m_pTurretAttachment->Bones()[i].m_ID;
+	std::sort(apIDs, apIDs + (NUM_BONES + numBonesTurret));
 
-    // Update sorted IDs (low -> high | ascending)
-    for (int i = 0; i < NUM_BONES; i++)
-        m_aBones[i].m_ID = apIDs[i];
-    for (int i = 0; i < CMinigunTurret::NUM_BONES; i++)
-        m_pTurretAttachment->Bones()[i].m_ID = apIDs[NUM_BONES+i];
-    delete[] apIDs;
+	// Update sorted IDs (low -> high | ascending)
+	for (int i = 0; i < NUM_BONES; i++)
+		m_aBones[i].m_ID = apIDs[i];
+	for (int i = 0; i < CMinigunTurret::NUM_BONES; i++)
+		m_pTurretAttachment->Bones()[i].m_ID = apIDs[NUM_BONES+i];
+	delete[] apIDs;
 }
 
 void CHelicopter::InitBody()
@@ -430,7 +430,7 @@ void CHelicopter::InitPropellers()
 	for (int i = 0; i < NUM_BONES_PROPELLERS_TOP; i++)
 	{
 		TopPropeller()[i] = SBone(vec2(Radius, -60.f), vec2(0, -60.f));
-        TopPropeller()[i].m_Color = LASERTYPE_DOOR;
+		TopPropeller()[i].m_Color = LASERTYPE_DOOR;
 		Radius *= -1;
 	}
 
@@ -444,13 +444,13 @@ void CHelicopter::InitPropellers()
 }
 
 void CHelicopter::ResetTopPropellers() {
-    m_TopPropellersReset = true;
+	m_TopPropellersReset = true;
 
-    float Radius = m_TopPropellerRadius;
-    vec2 Direction = normalize(TopPropeller()[0].m_From - TopPropeller()[0].m_To);
-    for (int i = 0; i < NUM_BONES_PROPELLERS_TOP; i++)
-    {
-        TopPropeller()[i].m_From = TopPropeller()[i].m_To + Direction * Radius;
-        Radius *= -1;
-    }
+	float Radius = m_TopPropellerRadius;
+	vec2 Direction = normalize(TopPropeller()[0].m_From - TopPropeller()[0].m_To);
+	for (int i = 0; i < NUM_BONES_PROPELLERS_TOP; i++)
+	{
+		TopPropeller()[i].m_From = TopPropeller()[i].m_To + Direction * Radius;
+		Radius *= -1;
+	}
 }

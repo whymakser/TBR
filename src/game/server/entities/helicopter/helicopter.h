@@ -20,8 +20,8 @@ private:
 		NUM_HELICOPTER_IDS = NUM_BONES + NUM_TRAILS,
 	};
 
-    int m_InputDirection;
-    float m_Health;
+	int m_InputDirection;
+	float m_Health;
 
 	void InitBody();
 	void InitPropellers();
@@ -38,38 +38,38 @@ private:
 	void ApplyAcceleration();
 	vec2 m_Accel;
 
-    int m_aBonedCharacters[MAX_CLIENTS];
-    void DestroyThingsInItsPath();
+	int m_aBonedCharacters[MAX_CLIENTS];
+	void DestroyThingsInItsPath();
 
-    float m_BackPropellerRadius;
-    float m_TopPropellerRadius;
-    bool m_TopPropellersReset;
-    vec2 m_LastTopPropellerA, m_LastTopPropellerB;
-    void GetFullPropellerPositions(vec2& outPosA, vec2& outPosB);
+	float m_BackPropellerRadius;
+	float m_TopPropellerRadius;
+	bool m_TopPropellersReset;
+	vec2 m_LastTopPropellerA, m_LastTopPropellerB;
+	void GetFullPropellerPositions(vec2& outPosA, vec2& outPosB);
 
 	STrail m_aTrails[NUM_TRAILS];
 	SBone m_aBones[NUM_BONES];
-    CHelicopterTurret* m_pTurretAttachment;
+	CHelicopterTurret* m_pTurretAttachment;
 
 	SBone *Body() { return &m_aBones[0]; } // size: NUM_BONES_BODY
 	SBone *TopPropeller() { return &m_aBones[NUM_BONES_BODY]; } // size: NUM_BONES_PROPELLERS_TOP
 	SBone *BackPropeller() { return &m_aBones[NUM_BONES_BODY+NUM_BONES_PROPELLERS_TOP]; } // size: NUM_BONES_PROPELLERS_BACK
-    void PutTurretToForeground();
+	void PutTurretToForeground();
 
 public:
 	CHelicopter(CGameWorld *pGameWorld, vec2 Pos);
 	~CHelicopter() override;
 
-    // Sense
-    [[nodiscard]] bool IsFlipped() const { return m_Flipped; }
-    [[nodiscard]] float Angle() const { return m_Angle; }
+	// Sense
+	[[nodiscard]] bool IsFlipped() { return m_Flipped; }
+	[[nodiscard]] float Angle() { return m_Angle; }
 
-    // Manipulating
-    bool AttachTurret(CHelicopterTurret* helicopterTurret);
-    void DestroyTurret();
-    void FlingTee(CCharacter *pChar);
+	// Manipulating
+	bool AttachTurret(CHelicopterTurret* helicopterTurret);
+	void DestroyTurret();
+	void FlingTee(CCharacter *pChar);
 
-    // Ticking
+	// Ticking
 	void Tick() override;
 	void Snap(int SnappingClient) override;
 	void Reset() override;

@@ -11,68 +11,66 @@
 class CMissile;
 class CSpark {
 private:
-    CMissile* m_pMissile;
-    vec2 m_Pos;
-    vec2 m_Vel;
-    int m_ResetLifespan;
-    int m_Lifespan;
+	CMissile* m_pMissile;
+	vec2 m_Pos;
+	vec2 m_Vel;
+	int m_ResetLifespan;
+	int m_Lifespan;
 
-    int m_ID;
+	int m_ID;
 
 public:
-    CSpark(CMissile* pMissile, int ResetLifespan, int Lifespan);
-    ~CSpark();
+	CSpark(CMissile* pMissile, int ResetLifespan, int Lifespan);
+	~CSpark();
 
-    // Getting
-    [[nodiscard]] IServer* Server() const;
-    [[nodiscard]] bool IsStillVisible() const { return m_Lifespan > 0; }
+	// Getting
+	[[nodiscard]] IServer* Server();
+	[[nodiscard]] bool IsStillVisible() { return m_Lifespan > 0; }
 
-    // Manipulating
-    void ResetFromMissile();
+	// Manipulating
+	void ResetFromMissile();
 
-    // Ticking
-    void Tick();
-    void Snap(int SnappingClient) const;
+	// Ticking
+	void Tick();
+	void Snap(int SnappingClient);
 
 };
 
 class CMissile : public CEntity {
 private:
-    int m_Owner;
-    int m_LifeSpan;
-    Mask128 m_TeamMask;
-    int m_Layer;
-    int m_StartTick;
+	int m_Owner;
+	int m_LifeSpan;
+	int m_StartTick;
 
-    vec2 m_Vel;
-    vec2 m_PrevPos;
-    vec2 m_Direction;
-    void ApplyAcceleration();
-    void HandleCollisions();
+	vec2 m_Vel;
+	vec2 m_PrevPos;
+	vec2 m_Direction;
+	void ApplyAcceleration();
+	void HandleCollisions();
 
-    int m_IgnitionTime;
+	int m_IgnitionTime;
 
-    CStableProjectile* m_pStableRocket;
-    CSpark* m_apSparks[15];
-    void UpdateStableProjectiles();
+	CStableProjectile* m_pStableRocket;
+	CSpark* m_apSparks[15];
+	void UpdateStableProjectiles();
 
-    int m_ExplosionsLeft;
-    void TriggerExplosions();
-    void HandleExplosions();
+	int m_ExplosionsLeft;
+	void TriggerExplosions();
+	void HandleExplosions();
 
 public:
-    CMissile(CGameWorld *pGameWorld, int Owner, vec2 Pos, vec2 Vel, vec2 Direction, int Span, int Layer);
-    ~CMissile();
+	CMissile(CGameWorld *pGameWorld, int Owner, vec2 Pos, vec2 Vel, vec2 Direction, int Span, int Layer);
+	~CMissile();
 
-    // Getting
-    [[nodiscard]] vec2 GetVel() const { return m_Vel; }
-    [[nodiscard]] int GetOwnerCID() const { return m_Owner; }
-    [[nodiscard]] bool IsIgnited() const { return m_IgnitionTime <= 0; }
-    [[nodiscard]] bool IsExploding() const { return m_ExplosionsLeft >= 0; }
+	// Getting
+	[[nodiscard]] vec2 GetVel() { return m_Vel; }
+	[[nodiscard]] int GetOwnerCID() { return m_Owner; }
+	[[nodiscard]] bool IsIgnited() { return m_IgnitionTime <= 0; }
+	[[nodiscard]] bool IsExploding() { return m_ExplosionsLeft >= 0; }
 
-    // Ticking
-    void Tick() override;
-    void Snap(int SnappingClient) override;
+	// Ticking
+	void Tick() override;
+	void Snap(int SnappingClient) override;
 
 };
 
