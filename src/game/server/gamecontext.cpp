@@ -2951,9 +2951,7 @@ void CGameContext::OnMessage(int MsgID, CUnpacker *pUnpacker, int ClientID)
 			}
 			else
 			{
-				char aBuf[128];
-				str_format(aBuf, sizeof(aBuf), "Only %d active players are allowed", Config()->m_SvPlayerSlots);
-				SendBroadcast(aBuf, ClientID);
+				SendBroadcastFormat(ClientID, true, Localizable("Only %d active players are allowed"), Config()->m_SvPlayerSlots);
 			}
 		}
 		else if (MsgID == NETMSGTYPE_CL_SETSPECTATORMODE && !m_World.m_Paused)
@@ -3602,7 +3600,7 @@ void CGameContext::ConForceVote(IConsole::IResult *pResult, void *pUserData)
 
 		if(!pOption)
 		{
-			str_format(aBuf, sizeof(aBuf),  "'%s' isn't an option on this server", pValue);
+			str_format(aBuf, sizeof(aBuf), "'%s' isn't an option on this server", pValue);
 			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "server", aBuf);
 			return;
 		}
@@ -5746,9 +5744,7 @@ bool CGameContext::OnPlotDoorTaser(int PlotID, int TaserStrength, int ClientID, 
 		return true;
 	}
 
-	char aBuf[64];
-	str_format(aBuf, sizeof(aBuf), m_apPlayers[ClientID]->Localize("Plot %d Door Health [%d/%d]"), PlotID, m_aPlots[PlotID].m_DoorHealth, Config()->m_SvPlotDoorHealth);
-	SendBroadcast(aBuf, ClientID);
+	SendBroadcastFormat(ClientID, true, Localizable("Plot %d Door Health [%d/%d]"), PlotID, m_aPlots[PlotID].m_DoorHealth, Config()->m_SvPlotDoorHealth);
 	return false;
 }
 

@@ -425,9 +425,7 @@ void CPlayer::Tick()
 		}
 		else if (Server()->Tick() % 50 == 0 && (!m_pCharacter || !m_pCharacter->m_MoneyTile) && !m_HideBroadcasts)
 		{
-			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), Localize("You are arrested for %lld seconds"), m_JailTime / Server()->TickSpeed());
-			GameServer()->SendBroadcast(aBuf, m_ClientID, false);
+			GameServer()->SendBroadcastFormat(m_ClientID, false, Localizable("You are arrested for %lld seconds"), m_JailTime / Server()->TickSpeed());
 		}
 	}
 
@@ -441,9 +439,7 @@ void CPlayer::Tick()
 		}
 		else if (Server()->Tick() % Server()->TickSpeed() * 60 == 0 && (!m_pCharacter || !m_pCharacter->m_MoneyTile) && !m_HideBroadcasts)
 		{
-			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), Localize("Avoid policehammers for the next %lld seconds"), m_EscapeTime / Server()->TickSpeed());
-			GameServer()->SendBroadcast(aBuf, m_ClientID, false);
+			GameServer()->SendBroadcastFormat(m_ClientID, false, Localize("Avoid policehammers for the next %lld seconds"), m_EscapeTime / Server()->TickSpeed());
 		}
 	}
 	// Update plot destroy end tick, in case we leave

@@ -2829,9 +2829,8 @@ void CCharacter::HandleTiles(int Index)
 				
 				if (!IsPoliceFarmActive && (m_LastPoliceFarmActive || Server()->Tick() % Server()->TickSpeed() == 0))
 				{
-					char aBuf[64];
-					str_format(aBuf, sizeof(aBuf), "%s [%d/%d]", m_pPlayer->Localize("Too many players on police tiles"), GameWorld()->m_PoliceFarm.m_NumPoliceTilePlayers, GameWorld()->m_PoliceFarm.m_MaxPoliceTilePlayers);
-					GameServer()->SendBroadcast(aBuf, m_pPlayer->GetCID(), false);
+					GameServer()->SendBroadcastFormat(m_pPlayer->GetCID(), false, Localizable("Too many players on police tiles [%d/%d]"),
+						GameWorld()->m_PoliceFarm.m_NumPoliceTilePlayers, GameWorld()->m_PoliceFarm.m_MaxPoliceTilePlayers);
 					m_LastPoliceFarmActive = IsPoliceFarmActive;
 					return;
 				}
@@ -2860,7 +2859,7 @@ void CCharacter::HandleTiles(int Index)
 				if (m_pPlayer->GetAccID() < ACC_START)
 				{
 					if (!IsWeaponIndicator())
-						GameServer()->SendBroadcast(m_pPlayer->Localize("You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'"), m_pPlayer->GetCID(), false);
+						GameServer()->SendBroadcast(Localizable("You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'"), m_pPlayer->GetCID(), false);
 					return;
 				}
 
@@ -2986,7 +2985,7 @@ void CCharacter::HandleTiles(int Index)
 			if (m_pPlayer->GetAccID() < ACC_START)
 			{
 				if (Server()->Tick() % 50 == 0)
-					GameServer()->SendBroadcast(m_pPlayer->Localize("You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'"), m_pPlayer->GetCID(), false);
+					GameServer()->SendBroadcast(Localizable("You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'"), m_pPlayer->GetCID(), false);
 			}
 			else if (m_pPlayer->m_LastMoneyXPBomb < Server()->Tick() - Server()->TickSpeed() * 5)
 			{

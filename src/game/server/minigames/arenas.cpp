@@ -735,7 +735,7 @@ void CArenas::Tick()
 				case STATE_1VS1_PLACE_SECOND_SPAWN: pMsg = Localizable("Set second spawn positions by pressing SPACE"); break;
 				case STATE_1VS1_SELECT_WEAPONS: pMsg = Localizable("Choose a weapon with A/D\nToggle weapon usage by pressing SPACE\nPress SPACE on the heart to confirm"); break;
 				}
-				GameServer()->SendBroadcast(pChr->GetPlayer()->Localize(pMsg), ClientID, false);
+				GameServer()->SendBroadcast(pMsg, ClientID, false);
 			}
 		}
 	}

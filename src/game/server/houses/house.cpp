@@ -13,10 +13,10 @@ CHouse::CHouse(CGameContext *pGameServer, int Type)
 
 	switch (m_Type)
 	{
-	case HOUSE_SHOP: m_pHeadline = "~ S H O P ~"; break;
-	case HOUSE_PLOT_SHOP: m_pHeadline = "~ P L O T - S H O P ~"; break;
-	case HOUSE_BANK: m_pHeadline = "~ B A N K ~"; break;
-	case HOUSE_TAVERN: m_pHeadline = "~ T A V E R N ~"; break;
+	case HOUSE_SHOP: m_pHeadline = Localizable("~ S H O P ~"); break;
+	case HOUSE_PLOT_SHOP: m_pHeadline = Localizable("~ P L O T - S H O P ~"); break;
+	case HOUSE_BANK: m_pHeadline = Localizable("~ B A N K ~"); break;
+	case HOUSE_TAVERN: m_pHeadline = Localizable("~ T A V E R N ~"); break;
 	default: m_pHeadline = "~ I N V A L I D ~";
 	}
 
@@ -53,7 +53,7 @@ void CHouse::SendWindow(int ClientID, const char *pMsg, const char *pFooterMsg, 
 		"%s"
 		"                  %s\n"
 		"%s\n"
-		"%s", pCut, m_pHeadline, pCut, pMsg);
+		"%s", pCut, GameServer()->m_apPlayers[ClientID]->Localize(m_pHeadline), pCut, pMsg);
 
 	GameServer()->SendMotd(GameServer()->AppendMotdFooter(aMsg, aFooter), ClientID);
 }
