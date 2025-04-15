@@ -15,7 +15,7 @@
 #include "pickup.h"
 #include "lightsaber.h"
 #include "stable_projectile.h"
-#include "helicopter.h"
+#include "game/server/entities/helicopter/helicopter.h"
 #include "portalblocker.h"
 #include "grog.h"
 

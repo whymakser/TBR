@@ -1518,8 +1518,14 @@ set_src(GAME_SERVER GLOB_RECURSE src/game/server
   entities/grog.h
   entities/gun.cpp
   entities/gun.h
-  entities/helicopter.cpp
-  entities/helicopter.h
+  entities/helicopter/bone.cpp
+  entities/helicopter/bone.h
+  entities/helicopter/helicopter.cpp
+  entities/helicopter/helicopter.h
+  entities/helicopter/helicopter_turret.cpp
+  entities/helicopter/helicopter_turret.h
+  entities/helicopter/missile.cpp
+  entities/helicopter/missile.h
   entities/laser.cpp
   entities/laser.h
   entities/lasertext.cpp
