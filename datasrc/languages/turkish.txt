@@ -2019,4 +2019,4 @@ Welcome to the tavern!\n\nIf you would like to buy a grog for %d money, please p
 == Meyhaneye hoş geldiniz!\n\nEğer %d para karşılığında bir grog satın almak isterseniz, lütfen F3'e basın.
 
 If you want to buy an item, press F3
-== 
+== Bir eşya satın almak istiyorsanız, F3'e basın
