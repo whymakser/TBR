@@ -76,6 +76,8 @@ CHelicopter::CHelicopter(CGameWorld *pGameWorld, vec2 Pos, int Team)
 
 	m_InputDirection = 0;
 	m_Health = 100.f;
+	m_EngineOn = false;
+
 	m_Flipped = false;
 	m_Angle = 0.f;
 	m_Accel = vec2(0.f, 0.f);
@@ -90,6 +92,8 @@ CHelicopter::CHelicopter(CGameWorld *pGameWorld, vec2 Pos, int Team)
 	InitBody();
 	InitPropellers();
 	GetFullPropellerPositions(m_LastTopPropellerA, m_LastTopPropellerB);
+
+	SortBones();
 
 	// Experimental: Downscale helicopter
 	float scaleFactor = 0.9f;
@@ -128,7 +132,7 @@ bool CHelicopter::AttachTurret(CHelicopterTurret *helicopterTurret)
 	if (helicopterTurret->TryBindHelicopter(this)) // Attempt to pass ownership
 	{
 		m_pTurretAttachment = helicopterTurret;
-		PutTurretToForeground();
+		SortBones();
 		return true;
 	}
 	return false;
@@ -231,7 +235,7 @@ void CHelicopter::ApplyAcceleration()
 	if (((m_InputDirection == -1 && !m_Flipped && m_Vel.x < 0.f) ||
 		(m_InputDirection == 1 && m_Flipped && m_Vel.x > 0.f)) &&
 		(!m_pTurretAttachment || !m_pTurretAttachment->m_Shooting ||
-			(m_Flipped != (m_pTurretAttachment->m_AimPosition.x < 0.f))))
+		(m_Flipped != (m_pTurretAttachment->m_AimPosition.x < 0.f))))
 		Flip();
 
 	SetAngle(m_Vel.x);
@@ -256,11 +260,11 @@ void CHelicopter::DestroyThingsInItsPath()
 
 		vec2 propellerPosA, propellerPosB;
 		GetFullPropellerPositions(propellerPosA, propellerPosB);
-		bool collisionDetected =
-			MovingCircleHitsMovingSegment_Analytical(pChar->m_PrevPos - m_Pos, pChar->GetPos() - m_Pos,
-													 pChar->GetProximityRadius(),
-													 m_LastTopPropellerA, propellerPosA,
-													 m_LastTopPropellerB, propellerPosB);
+		bool collisionDetected = MovingCircleHitsMovingSegment_Analytical(
+			pChar->m_PrevPos - m_Pos,pChar->GetPos() - m_Pos,
+			pChar->GetProximityRadius(),
+			m_LastTopPropellerA, propellerPosA,
+			m_LastTopPropellerB, propellerPosB);
 		if (collisionDetected)
 		{
 			m_aBonedCharacters[cID] = Server()->Tick();
@@ -279,7 +283,7 @@ void CHelicopter::GetFullPropellerPositions(vec2& outPosA, vec2& outPosB)
 
 void CHelicopter::SpinPropellers()
 {
-	if (Server()->Tick() % 2 != 0)
+	if (!m_EngineOn || Server()->Tick() % 2 != 0)
 		return;
 
 	if (!GetOwner() && IsGrounded()) // Reset top propellers when grounded without driver
@@ -310,6 +314,7 @@ bool CHelicopter::Mount(int ClientID)
 	if (m_Owner != -1)
 		return false;
 
+	m_EngineOn = true;
 	m_Gravity = false;
 	m_GroundVel = false;
 	m_Owner = ClientID;
@@ -329,6 +334,7 @@ void CHelicopter::Dismount()
 
 	m_Gravity = true;
 	m_GroundVel = true;
+	m_Accel.y = 0;
 	if (GetOwner())
 	{
 		GetOwner()->m_pHelicopter = nullptr;
@@ -384,26 +390,27 @@ void CHelicopter::Snap(int SnappingClient)
 		m_pTurretAttachment->Snap(SnappingClient);
 }
 
-void CHelicopter::PutTurretToForeground()
+void CHelicopter::SortBones()
 { // meant for adding turret later, not specifically at initialization
-	if (!m_pTurretAttachment)
-		return; // what turret?
-
-	int numBonesTurret = m_pTurretAttachment->GetNumBones();
+	int numBones = NUM_BONES;
+	if (m_pTurretAttachment)
+		numBones += m_pTurretAttachment->GetNumBones();
 
 	// Get current IDs
-	int *apIDs = new int[NUM_BONES + numBonesTurret];
+	int *apIDs = new int[numBones];
 	for (int i = 0; i < NUM_BONES; i++)
 		apIDs[i] = m_aBones[i].m_ID;
-	for (int i = 0; i < numBonesTurret; i++)
-		apIDs[NUM_BONES + i] = m_pTurretAttachment->Bones()[i].m_ID;
-	std::sort(apIDs, apIDs + (NUM_BONES + numBonesTurret));
+	if (m_pTurretAttachment)
+		for (int i = 0; i < m_pTurretAttachment->GetNumBones(); i++)
+			apIDs[NUM_BONES + i] = m_pTurretAttachment->Bones()[i].m_ID;
+	std::sort(apIDs, apIDs + numBones);
 
 	// Update sorted IDs (low -> high | ascending)
 	for (int i = 0; i < NUM_BONES; i++)
 		m_aBones[i].m_ID = apIDs[i];
-	for (int i = 0; i < numBonesTurret; i++)
-		m_pTurretAttachment->Bones()[i].m_ID = apIDs[NUM_BONES + i];
+	if (m_pTurretAttachment)
+		for (int i = 0; i < m_pTurretAttachment->GetNumBones(); i++)
+			m_pTurretAttachment->Bones()[i].m_ID = apIDs[NUM_BONES + i];
 	delete[] apIDs;
 }
 
