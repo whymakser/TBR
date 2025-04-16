@@ -613,60 +613,73 @@ void CCharacter::FireWeapon()
 					break;
 
 				CCharacter* apEnts[MAX_CLIENTS];
-				int Hits = 0;
-				int Num = GameWorld()->FindEntities(ProjStartPos, GetProximityRadius() * 0.5f, (CEntity * *)apEnts,
-					MAX_CLIENTS, CGameWorld::ENTTYPE_CHARACTER);
+				int Types = (1<<CGameWorld::ENTTYPE_CHARACTER) | (1<<CGameWorld::ENTTYPE_HELICOPTER);
+				int Num = GameWorld()->FindEntitiesTypes(ProjStartPos, GetProximityRadius() * 0.5f, (CEntity * *)apEnts, MAX_CLIENTS, Types, Team());
 
+				int Hits = 0;
 				for (int i = 0; i < Num; ++i)
 				{
-					CCharacter* pTarget = apEnts[i];
-
-					if ((pTarget == this || (pTarget->IsAlive() && !CanCollide(pTarget->GetPlayer()->GetCID()))))
-						continue;
-
-					// set his velocity to fast upward (for now)
-					vec2 EffectPos = ProjStartPos;
-					if (length(pTarget->m_Pos - ProjStartPos) > 0.0f)
-						EffectPos = pTarget->m_Pos - normalize(pTarget->m_Pos - ProjStartPos) * GetProximityRadius() * 0.5f;
-					GameServer()->CreateHammerHit(EffectPos, TeamMask());
-
-					int TargetCID = pTarget->GetPlayer()->GetCID();
-					// transformation
-					bool TransformSuccess = false;
-					// Important feature from blockZ where you can hit a tee without transforming by looking a little down, aaand.. of course for not hitting through walls
-					if (!GameServer()->Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, NULL, NULL))
+					Hits++;
+					CEntity *pEnt = apEnts[i];
+					CCharacter *pTarget = 0;
+					CHelicopter *pHelicopter = 0;
+					switch (pEnt->GetObjType())
 					{
-						TransformSuccess = TryHumanTransformation(pTarget);
+					case CGameWorld::ENTTYPE_CHARACTER: pTarget = (CCharacter *)pEnt; break;
+					case CGameWorld::ENTTYPE_HELICOPTER: pHelicopter = (CHelicopter *)pEnt; break;
 					}
 
-					if (!TryCatchingWanted(TargetCID, EffectPos))
+					if (pTarget)
 					{
-						vec2 Dir;
-						if (length(pTarget->m_Pos - m_Pos) > 0.0f)
-							Dir = normalize(pTarget->m_Pos - m_Pos);
-						else
-							Dir = vec2(0.f, -1.f);
+						if ((pTarget == this || (pTarget->IsAlive() && !CanCollide(pTarget->GetPlayer()->GetCID()))))
+							continue;
 
-						vec2 Temp = pTarget->m_Core.m_Vel + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f;
-						Temp = ClampVel(pTarget->m_MoveRestrictions, Temp);
-						Temp -= pTarget->m_Core.m_Vel;
+						// set his velocity to fast upward (for now)
+						vec2 EffectPos = ProjStartPos;
+						if (length(pTarget->m_Pos - ProjStartPos) > 0.0f)
+							EffectPos = pTarget->m_Pos - normalize(pTarget->m_Pos - ProjStartPos) * GetProximityRadius() * 0.5f;
+						GameServer()->CreateHammerHit(EffectPos, TeamMask());
 
-						// dont unfreeze when we just got frozen from transformation
-						if (!TransformSuccess)
+						int TargetCID = pTarget->GetPlayer()->GetCID();
+						// transformation
+						bool TransformSuccess = false;
+						// Important feature from blockZ where you can hit a tee without transforming by looking a little down, aaand.. of course for not hitting through walls
+						if (!GameServer()->Collision()->IntersectLine(ProjStartPos, pTarget->m_Pos, NULL, NULL))
 						{
-							// do unfreeze before takedamage, so that we update the weapon and killer to hammer when we are still in freeze, so we dont reset it
-							pTarget->UnFreeze();
+							TransformSuccess = TryHumanTransformation(pTarget);
 						}
 
-						pTarget->TakeDamage((vec2(0.f, -1.0f) + Temp) * Tuning()->m_HammerStrength, Dir * -1, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage, m_pPlayer->GetCID(), GetActiveWeapon());
+						if (!TryCatchingWanted(TargetCID, EffectPos))
+						{
+							vec2 Dir;
+							if (length(pTarget->m_Pos - m_Pos) > 0.0f)
+								Dir = normalize(pTarget->m_Pos - m_Pos);
+							else
+								Dir = vec2(0.f, -1.f);
 
-						if (m_FreezeHammer)
-							pTarget->Freeze();
+							vec2 Temp = pTarget->m_Core.m_Vel + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f;
+							Temp = ClampVel(pTarget->m_MoveRestrictions, Temp);
+							Temp -= pTarget->m_Core.m_Vel;
+
+							// dont unfreeze when we just got frozen from transformation
+							if (!TransformSuccess)
+							{
+								// do unfreeze before takedamage, so that we update the weapon and killer to hammer when we are still in freeze, so we dont reset it
+								pTarget->UnFreeze();
+							}
+
+							pTarget->TakeDamage((vec2(0.f, -1.0f) + Temp) * Tuning()->m_HammerStrength, Dir * -1, g_pData->m_Weapons.m_Hammer.m_pBase->m_Damage, m_pPlayer->GetCID(), GetActiveWeapon());
+
+							if (m_FreezeHammer)
+								pTarget->Freeze();
+						}
+
+						Antibot()->OnHammerHit(m_pPlayer->GetCID(), TargetCID);
 					}
+					else if (pHelicopter)
+					{
 
-					Antibot()->OnHammerHit(m_pPlayer->GetCID(), TargetCID);
-
-					Hits++;
+					}
 				}
 
 				// if we Hit anything, we have to wait for the reload

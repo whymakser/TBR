@@ -50,7 +50,7 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 	int Types = (1<<CGameWorld::ENTTYPE_CHARACTER);
 	if (Config()->m_SvInteractiveDrops && m_Type == WEAPON_SHOTGUN)
 	{
-		Types |= (1<<CGameWorld::ENTTYPE_FLAG) | (1<<CGameWorld::ENTTYPE_PICKUP_DROP) | (1<<CGameWorld::ENTTYPE_MONEY) | (1<<CGameWorld::ENTTYPE_GROG);
+		Types |= (1<<CGameWorld::ENTTYPE_FLAG) | (1<<CGameWorld::ENTTYPE_PICKUP_DROP) | (1<<CGameWorld::ENTTYPE_MONEY) | (1<<CGameWorld::ENTTYPE_GROG) | (1<<CGameWorld::ENTTYPE_HELICOPTER);
 	}
 	else if (m_Type == WEAPON_TASER)
 	{

@@ -76,6 +76,7 @@ public:
 	void Snap(int SnappingClient) override;
 	void Reset() override;
 
+	bool OnTakeDamage() { return true; }
 	bool Mount(int ClientID);
 	void Dismount();
 	void OnInput(CNetObj_PlayerInput *pNewInput);
