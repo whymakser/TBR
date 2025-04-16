@@ -245,8 +245,7 @@ CMissile::~CMissile()
 
 void CMissile::Tick()
 {
-	CCharacter *pOwnerChar = GameServer()->GetPlayerChar(m_Owner);
-	m_TeamMask = pOwnerChar ? pOwnerChar->TeamMask() : Mask128();
+	m_TeamMask = ((CGameControllerDDRace*)GameServer()->m_pController)->m_Teams.TeamMask(m_DDTeam);
 
 	ApplyAcceleration();
 	HandleCollisions();
