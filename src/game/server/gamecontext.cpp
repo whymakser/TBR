@@ -7719,10 +7719,14 @@ void CGameContext::SpawnHelicopter(vec2 Pos, int TurretType)
 	Pos.y -= 64.f;
 	auto Helicopter = new CHelicopter(&m_World, Pos);
 
+	CHelicopterTurret* pTurret = nullptr;
     if (TurretType == TURRETTYPE_MINIGUN)
-        Helicopter->AttachTurret(new CMinigunTurret());
+		pTurret = new CMinigunTurret();
     else if (TurretType == TURRETTYPE_LAUNCHER)
-        Helicopter->AttachTurret(new CLauncherTurret());
+		pTurret = new CLauncherTurret();
+
+	if (!Helicopter->AttachTurret(pTurret))
+		delete pTurret; // Failed to assign ownership
 
 }
 

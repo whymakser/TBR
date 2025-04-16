@@ -60,7 +60,7 @@ public:
 	CGameWorld *GameWorld();
 	CGameContext *GameServer();
 	int GetType() { return m_TurretType; }
-	size_t GetNumBones() { return m_NumBones; }
+	int GetNumBones() { return m_NumBones; }
 	SBone *Bones() { return m_apBones; } // size: m_NumBones || GetNumBones()
 
 	// Manipulating
