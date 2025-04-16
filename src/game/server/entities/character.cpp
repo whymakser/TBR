@@ -676,7 +676,7 @@ void CCharacter::FireWeapon()
 
 						Antibot()->OnHammerHit(m_pPlayer->GetCID(), TargetCID);
 					}
-					else if (pHelicopter)
+					else if (pHelicopter && pHelicopter->OnTakeDamage())
 					{
 
 					}
