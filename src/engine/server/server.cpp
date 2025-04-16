@@ -2977,12 +2977,9 @@ int CServer::Run()
 						}
 						else
 						{
-							int Language = g_Localization.GetLanguageByCode(pResult);
-							const char *pLanguage = g_Localization.GetLanguageFileName(Language);
-							if (str_comp(pLanguage, Config()->m_SvDefaultLanguage) != 0)
-							{
-								str_copy(m_aClients[i].m_aCountryCode, pResult, sizeof(m_aClients[i].m_aCountryCode));
-							}
+							// Set
+							SetCountryCode(i, pResult);
+
 							char aBuf[256];
 							str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> fetched country code=%s, suggesting '%s'", i, aAddrStr, pResult, pLanguage);
 							Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
@@ -4367,6 +4364,16 @@ void CServer::PrintBotLookup()
 	m_BotLookupState = BOTLOOKUP_STATE_PENDING;
 }
 
+void CServer::SetCountryCode(int ClientID, const char *pLanguageCode)
+{
+	int Language = g_Localization.GetLanguageByCode(pLanguageCode);
+	const char *pLanguage = g_Localization.GetLanguageFileName(Language);
+	if (str_comp(pLanguage, Config()->m_SvDefaultLanguage) != 0)
+	{
+		str_copy(m_aClients[ClientID].m_aCountryCode, pLanguageCode, sizeof(m_aClients[ClientID].m_aCountryCode));
+	}
+}
+
 void CServer::CountryLookup(int ClientID)
 {
 	if (m_aClients[ClientID].m_CountryLookupState != CClient::COUNTRYLOOKUP_STATE_NONE)
@@ -4396,12 +4403,13 @@ void CServer::CountryLookup(int ClientID)
 		auto it = CountryHashMap.find(str_quickhash(aAddrStr));
 		if (it != CountryHashMap.end())
 		{
+			// Set
 			m_aClients[ClientID].m_CountryLookupState = CClient::COUNTRYLOOKUP_STATE_DONE;
-			str_copy(m_aClients[ClientID].m_aCountryCode, aCode, sizeof(m_aClients[ClientID].m_aCountryCode));
+			SetCountryCode(ClientID, aCode);
 
 			// Console output
 			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> found cached country=%s, suggesting '%s'", ClientID, aAddrStr, m_aClients[ClientID].m_aCountryCode,
+			str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> found cached country=%s, suggesting '%s'", ClientID, aAddrStr, aCode,
 				g_Localization.GetLanguageFileName(g_Localization.GetLanguageByCode(m_aClients[ClientID].m_aCountryCode)));
 			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 
