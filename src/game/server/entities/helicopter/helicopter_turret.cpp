@@ -36,7 +36,7 @@ void CHelicopterTurret::AimTurret()
 	if (!m_pHelicopter->GetOwner())
 		return;
 
-	vec2 aimFromTurret = (m_AimPosition - m_TurretBone.m_To) * (m_Flipped ? -1.f : 1.f);
+	vec2 aimFromTurret = (m_pHelicopter->GetOwner()->GetCursorPos() - m_pHelicopter->GetPos() - m_TurretBone.m_To) * (m_Flipped ? -1.f : 1.f);
 	float targetAngle = (atan2f(aimFromTurret.y, aimFromTurret.x) / pi * 180.f);
 
 	float targetAngleClamped = clamp(targetAngle, m_TurretAngle - m_AimingRange, m_TurretAngle + m_AimingRange);
@@ -79,13 +79,13 @@ void CHelicopterTurret::FireTurret()
 
 	vec2 projectileDirection = normalize(Direction + vec2(-Direction.y, Direction.x));
 	new CProjectile(GameWorld(),
-					WEAPON_GUN,
-					m_pHelicopter->GetOwner()->GetPlayer()->GetCID(),
-					startingPos,
-					projectileDirection,
-					Server()->TickSpeed() * 2,
-					false, false,
-					0.f, -1);
+		WEAPON_GUN,
+		m_pHelicopter->GetOwner()->GetPlayer()->GetCID(),
+		startingPos,
+		projectileDirection,
+		Server()->TickSpeed() * 2,
+		false, false,
+		0.f, -1);
 }
 
 vec2 CHelicopterTurret::GetTurretDirection()
@@ -226,10 +226,10 @@ void CMinigunTurret::UpdateClusterBones()
 
 void CMinigunTurret::SpinCluster()
 {
-	if (m_Shooting)
+	if (m_pHelicopter->GetOwner() && !m_pHelicopter->GetOwner()->m_FreezeTime && m_Shooting)
 		m_ClusterSpeed += (float)Server()->TickSpeed() / 5000.f;
 	m_ClusterSpeed *= 0.98f;
-	m_ClusterRotation = fmodf(m_ClusterRotation + m_ClusterSpeed, 2.f * pi);
+//	m_ClusterRotation = fmodf(m_ClusterRotation + m_ClusterSpeed, 2.f * pi);
 
 	UpdateClusterBones();
 }
@@ -312,15 +312,15 @@ void CMinigunTurret::FireTurret()
 	float spreadRandomness = (float)(random_int() % 21 - 10) / 400.f;
 	vec2 projectileDirection = normalize(Direction + vec2(-Direction.y, Direction.x) * spreadRandomness);
 	new CProjectile(GameWorld(),
-					WEAPON_GUN,
-					m_pHelicopter->GetOwner()->GetPlayer()->GetCID(),
-					startingPos,
-					projectileDirection,
-					Server()->TickSpeed() * 2,
-					false, true,
-					0.f, SOUND_GRENADE_EXPLODE);
+		WEAPON_GUN,
+		m_pHelicopter->GetOwner()->GetPlayer()->GetCID(),
+		startingPos,
+		projectileDirection,
+		Server()->TickSpeed() * 2,
+		false, true,
+		0.f, SOUND_GRENADE_EXPLODE);
 	GameServer()->CreateSound(startingPos, SOUND_GRENADE_FIRE, m_pHelicopter->GetOwner()->TeamMask());
-	GameServer()->CreateSound(startingPos, SOUND_GUN_FIRE, m_pHelicopter->GetOwner()->TeamMask());
+//	GameServer()->CreateSound(startingPos, SOUND_GUN_FIRE, m_pHelicopter->GetOwner()->TeamMask());
 
 	m_ShootingBarrelIndex = (m_ShootingBarrelIndex + 1) % NUM_BONES_CLUSTER;
 	m_pHelicopter->SetVel(m_pHelicopter->GetVel() + -Direction * 0.5f);
@@ -328,8 +328,8 @@ void CMinigunTurret::FireTurret()
 
 CMinigunTurret::CMinigunTurret()
 	: CHelicopterTurret(TURRETTYPE_MINIGUN, NUM_BONES,
-						SBone(nullptr, -1, vec2(70.f, 50.f), vec2(-34.f, 50.f)),
-						vec2(4.f, 50.f), 15.f, 5)
+	SBone(nullptr, -1, vec2(70.f, 50.f), vec2(-34.f, 50.f)),
+	vec2(4.f, 50.f), 15.f, 7)
 {
 	m_pHelicopter = nullptr;
 
@@ -458,11 +458,11 @@ void CLauncherTurret::FireTurret()
 	vec2 Direction = GetTurretDirection();
 	float missileStartingSpeed = 8.f;
 	new CMissile(GameWorld(),
-				 m_pHelicopter->GetOwner()->GetPlayer()->GetCID(),
-				 startingPos,
-				 m_pHelicopter->GetVel() * 0.5f + Direction * missileStartingSpeed,
-				 Direction,
-				 Server()->TickSpeed() * 3, 0);
+		m_pHelicopter->GetOwner()->GetPlayer()->GetCID(),
+		startingPos,
+		m_pHelicopter->GetVel() * 0.5f + Direction * missileStartingSpeed,
+		Direction,
+		Server()->TickSpeed() * 3, 0);
 	GameServer()->CreateSound(startingPos, SOUND_GRENADE_FIRE, m_pHelicopter->GetOwner()->TeamMask());
 	GameServer()->CreateSound(startingPos, SOUND_GRENADE_EXPLODE, m_pHelicopter->GetOwner()->TeamMask());
 
@@ -471,8 +471,8 @@ void CLauncherTurret::FireTurret()
 
 CLauncherTurret::CLauncherTurret()
 	: CHelicopterTurret(TURRETTYPE_LAUNCHER, NUM_BONES,
-						SBone(nullptr, -1, vec2(70.f, 50.f), vec2(-44.f, 50.f)),
-						vec2(-10.f, 50.f), 15.f, 50)
+		SBone(nullptr, -1, vec2(70.f, 50.f), vec2(-44.f, 50.f)),
+		vec2(-10.f, 50.f), 15.f, 50)
 {
 	m_pHelicopter = nullptr;
 
