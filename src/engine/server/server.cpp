@@ -37,6 +37,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <unordered_map>
 #include <engine/shared/linereader.h>
 #include <engine/external/json-parser/json.h>
 
@@ -1475,7 +1476,7 @@ void CServer::ProcessClientPacket(CNetChunk *pPacket)
 						}
 
 						m_aClients[ClientID].m_CurrentMapDesign = m_aClients[Dummy].m_CurrentMapDesign;
-						SetLanguage(ClientID, GetLanguage(Dummy));
+						SetChatLanguage(ClientID, GetChatLanguage(Dummy));
 						m_aClients[ClientID].m_Main = false;
 					}
 				}
@@ -2875,8 +2876,8 @@ int CServer::Run()
 			}
 
 			// remove after 24 hours because iphub.info has 1000 free requests within 24 hours
-			// actually lets use 48 hours just to be safe
-			if (Tick() % (TickSpeed() * 60 * 60 * 48))
+			// actually lets use 36 hours just to be safe
+			if (Tick() % (TickSpeed() * 60 * 60 * 36) == 0)
 			{
 				m_DnsblCache.m_vBlacklist.clear();
 				m_DnsblCache.m_vWhitelist.clear();
@@ -2963,7 +2964,7 @@ int CServer::Run()
 
 						// Console outut
 						char aAddrStr[NETADDR_MAXSTRSIZE];
-						net_addr_str(m_NetServer.ClientAddr(i), aAddrStr, sizeof(aAddrStr), true);
+						net_addr_str(m_NetServer.ClientAddr(i), aAddrStr, sizeof(aAddrStr), false);
 
 						// Process result
 						const char *pResult = m_aClients[i].m_pCountryLookup->m_aResult;
@@ -2976,15 +2977,33 @@ int CServer::Run()
 						}
 						else
 						{
-							int Language = g_Localization.GetLanguageByCode(pResult);
-							char aBuf[256];
-							const char *pLanguage = g_Localization.GetLanguageFileName(Language);
-							if (str_comp(pLanguage, Config()->m_SvDefaultLanguage) != 0)
+							// Set
+							SetCountryCode(i, pResult, true, aAddrStr);
+
+							// Insert and sort for faster lookup
 							{
-								str_copy(m_aClients[i].m_aCountryCode, pResult, sizeof(m_aClients[i].m_aCountryCode));
+								std::map<uint32_t, std::string> HashMap;
+								char aFile[256];
+								str_format(aFile, sizeof(aFile), "%s/countries.txt", Config()->m_SvCountriesFilePath);
+								std::ifstream InFile(aFile);
+								std::string Line;
+								while (std::getline(InFile, Line))
+								{
+									if (Line.empty() || Line[0] == '#') continue;
+									unsigned int Hash;
+									char aCode[CClient::COUNTRYCODE_STRSIZE];
+									if (sscanf(Line.c_str(), "%u %s", &Hash, aCode) == 2)
+										HashMap[Hash] = aCode;
+								}
+								InFile.close();
+
+								uint32_t NewHash = fnv1a(aAddrStr);
+								HashMap[NewHash] = pResult;
+
+								std::ofstream OutFile(aFile, std::ios::trunc); // overwrite file
+								for (const auto &[Hash, Code] : HashMap)
+									OutFile << Hash << " " << Code << "\n";
 							}
-							str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> fetched country code=%s, suggesting '%s'", i, aAddrStr, pResult, pLanguage);
-							Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 						}
 
 						// Notify game and process language suggestion
@@ -4341,6 +4360,29 @@ void CServer::PrintBotLookup()
 	m_BotLookupState = BOTLOOKUP_STATE_PENDING;
 }
 
+void CServer::SetCountryCode(int ClientID, const char *pLanguageCode, bool Lookup, const char *pAddr)
+{
+	int Language = g_Localization.GetLanguageByCode(pLanguageCode);
+	const char *pLanguage = g_Localization.GetLanguageFileName(Language);
+	if (str_comp(pLanguage, Config()->m_SvDefaultLanguage) != 0)
+	{
+		str_copy(m_aClients[ClientID].m_aCountryCode, pLanguageCode, sizeof(m_aClients[ClientID].m_aCountryCode));
+	}
+
+	// Console output
+	char aBuf[256];
+	if (Lookup)
+	{
+		str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> fetched country code=%s, suggesting '%s'", ClientID, pAddr, pLanguageCode, pLanguage);
+	}
+	else
+	{
+		str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> found cached country=%s, suggesting '%s'", ClientID, pAddr, pLanguageCode,
+			g_Localization.GetLanguageFileName(g_Localization.GetLanguageByCode(m_aClients[ClientID].m_aCountryCode)));
+	}
+	Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
+}
+
 void CServer::CountryLookup(int ClientID)
 {
 	if (m_aClients[ClientID].m_CountryLookupState != CClient::COUNTRYLOOKUP_STATE_NONE)
@@ -4348,6 +4390,34 @@ void CServer::CountryLookup(int ClientID)
 
 	char aAddrStr[NETADDR_MAXSTRSIZE];
 	net_addr_str(m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), false);
+
+	char aFile[256];
+	str_format(aFile, sizeof(aFile), "%s/countries.txt", Config()->m_SvCountriesFilePath);
+	std::fstream CountriesFile(aFile);
+	if (CountriesFile.is_open())
+	{
+		std::unordered_map<uint32_t, std::string> CountryHashMap;
+		char aCode[CClient::COUNTRYCODE_STRSIZE];
+		unsigned int Hash;
+		std::string data;
+		while (getline(CountriesFile, data))
+		{
+			const char *pLine = data.c_str();
+			if (!str_length(pLine) || pLine[0] == '#') // skip empty lines and comments
+				continue;
+			if (sscanf(pLine, "%u %s", &Hash, aCode) == 2)
+				CountryHashMap[Hash] = aCode;
+		}
+
+		auto it = CountryHashMap.find(fnv1a(aAddrStr));
+		if (it != CountryHashMap.end())
+		{
+			m_aClients[ClientID].m_CountryLookupState = CClient::COUNTRYLOOKUP_STATE_DONE;
+			SetCountryCode(ClientID, it->second.c_str(), false, aAddrStr);
+			GameServer()->OnCountryCodeLookup(ClientID);
+			return;
+		}
+	}
 
 	IEngine *pEngine = Kernel()->RequestInterface<IEngine>();
 	pEngine->AddJob(m_aClients[ClientID].m_pCountryLookup = std::make_shared<CClient::CCountryLookup>(aAddrStr));
@@ -4366,6 +4436,7 @@ void CServer::CClient::CCountryLookup::Run()
 	if (fgets(aResult, sizeof(aResult), pStream))
 	{
 		str_copy(m_aResult, aResult, sizeof(m_aResult));
+		m_aResult[str_length(m_aResult) - 1] = 0;
 	}
 	pipe_close(pStream);
 }
@@ -4553,7 +4624,7 @@ void CServer::CTranslateChat::Run()
 	{
 		for (int i = 0; i < MAX_CLIENTS; i++)
 		{
-			if (m_pServer->m_aClients[i].m_State != CServer::CClient::STATE_INGAME || str_comp_nocase(m_pServer->GetLanguage(i), m_aChatLanguage) != 0)
+			if (m_pServer->m_aClients[i].m_State != CServer::CClient::STATE_INGAME || str_comp_nocase(m_pServer->GetChatLanguage(i), m_aChatLanguage) != 0)
 				continue;
 			int Mode = (m_Mode == CHAT_TEAM || m_Mode == CHAT_LOCAL) ? CHAT_SINGLE_TEAM : CHAT_SINGLE;
 			m_pServer->GameServer()->SendChatMessage(m_ClientID, Mode, i, aResult);
@@ -4566,12 +4637,12 @@ void CServer::TranslateChat(int ClientID, const char *pMsg, int Mode)
 	std::vector<const char *> vLanguages;
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
-		if (m_aClients[i].m_State != CServer::CClient::STATE_INGAME || str_comp_nocase(GetLanguage(i), "none") == 0)
+		if (m_aClients[i].m_State != CServer::CClient::STATE_INGAME || str_comp_nocase(GetChatLanguage(i), "none") == 0)
 			continue;
 
 		bool Continue = false;
 		for (unsigned int j = 0; j < vLanguages.size(); j++)
-			if (!str_comp(GetLanguage(i), vLanguages[j]))
+			if (!str_comp(GetChatLanguage(i), vLanguages[j]))
 			{
 				Continue = true;
 				break;
@@ -4580,7 +4651,7 @@ void CServer::TranslateChat(int ClientID, const char *pMsg, int Mode)
 		if (Continue)
 			continue;
 
-		vLanguages.push_back(GetLanguage(i));
+		vLanguages.push_back(GetChatLanguage(i));
 	}
 
 	for (unsigned int i = 0; i < vLanguages.size(); i++)

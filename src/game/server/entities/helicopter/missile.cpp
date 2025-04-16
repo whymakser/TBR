@@ -181,8 +181,8 @@ void CMissile::HandleExplosions()
 									  m_Owner,
 									  WEAPON_GRENADE,
 									  m_Owner == -1,
-									  -1);
-		GameServer()->CreateSound(nearbyPos, SOUND_GRENADE_EXPLODE);
+									  m_DDTeam, m_TeamMask);
+		GameServer()->CreateSound(nearbyPos, SOUND_GRENADE_EXPLODE, m_TeamMask);
 	}
 	else
 	{ // Explode only once
@@ -191,8 +191,8 @@ void CMissile::HandleExplosions()
 									  m_Owner,
 									  WEAPON_GRENADE,
 									  m_Owner == -1,
-									  -1);
-		GameServer()->CreateSound(m_Pos, SOUND_GRENADE_EXPLODE);
+									  m_DDTeam, m_TeamMask);
+		GameServer()->CreateSound(m_Pos, SOUND_GRENADE_EXPLODE, m_TeamMask);
 	}
 
 	// F-DDrace
@@ -205,10 +205,13 @@ void CMissile::HandleExplosions()
 	m_ExplosionsLeft--;
 }
 
-CMissile::CMissile(CGameWorld *pGameWorld, int Owner, vec2 Pos, vec2 Vel, vec2 Direction, int Span, int Layer)
+CMissile::CMissile(CGameWorld *pGameWorld, int Owner, vec2 Pos, vec2 Vel, vec2 Direction, int Span)
 	: CEntity(pGameWorld, CGameWorld::ENTTYPE_MISSILE, Pos)
 {
 	m_Owner = Owner;
+	CCharacter *pOwnerChar = GameServer()->GetPlayerChar(m_Owner);
+	m_DDTeam = pOwnerChar ? pOwnerChar->Team() : 0;
+	m_TeamMask = ((CGameControllerDDRace*)GameServer()->m_pController)->m_Teams.TeamMask(m_DDTeam);
 	m_LifeSpan = Span;
 	m_StartTick = Server()->Tick();
 
@@ -233,6 +236,8 @@ CMissile::~CMissile()
 
 void CMissile::Tick()
 {
+	m_TeamMask = ((CGameControllerDDRace*)GameServer()->m_pController)->m_Teams.TeamMask(m_DDTeam);
+
 	ApplyAcceleration();
 	HandleCollisions();
 
@@ -246,6 +251,9 @@ void CMissile::Tick()
 void CMissile::Snap(int SnappingClient)
 {
 	if (NetworkClipped(SnappingClient, m_Pos) || !IsIgnited() || IsExploding())
+		return;
+
+	if (!CmaskIsSet(m_TeamMask, SnappingClient))
 		return;
 
 	// Smoke trail

@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, ubuntu-20.04]
+        os: [ubuntu-latest, windows-latest]
         include:
         - os: ubuntu-latest
           cmake-args: -G Ninja
@@ -15,19 +15,6 @@ jobs:
           env:
             CFLAGS: -Wdeclaration-after-statement -Werror
             CXXFLAGS: -Werror
-        - os: ubuntu-20.04
-          cmake-path: /usr/bin/
-          cmake-args: -G Ninja
-          package-file: teeworlds-*-linux_x86_64.tar.xz
-          env:
-            CFLAGS: -Wdeclaration-after-statement -Werror
-            CXXFLAGS: -Werror
-        #- os: macOS-latest
-        #  cmake-args: -G Ninja
-        #  package-file: teeworlds-*-macos.dmg
-        #  env:
-        #    CFLAGS: -Wdeclaration-after-statement -Werror
-        #    CXXFLAGS: -Werror
         - os: windows-latest
           cmake-args: -A x64
           package-file: teeworlds-*-win64.zip

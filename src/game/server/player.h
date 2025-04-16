@@ -402,6 +402,7 @@ public:
 
 	// Language
 	const char *Localize(const char *pText, const char *pContext = ""); // Never change this function name
+	void SetLanguage(int Language, bool Silent = false);
 	int m_Language;
 
 	// Moved to player from character, because jail should keep permille xd
@@ -512,6 +513,7 @@ public:
 	bool m_VoteQuestionRunning;
 	VoteQuestionType m_VoteQuestionType;
 	int64 m_VoteQuestionEndTick;
+	int64 m_LastVoteStatusUpdateTick;
 
 private:
 	int64 m_WalletMoney;

@@ -76,7 +76,7 @@ int CGameWorld::FindEntities(vec2 Pos, float Radius, CEntity **ppEnts, int Max, 
 		{
 			if (Type == ENTTYPE_CHARACTER && Team != ((CCharacter*)pEnt)->Team())
 				continue;
-			if ((Type == ENTTYPE_MONEY || Type == ENTTYPE_PICKUP_DROP || Type == ENTTYPE_GROG) && Team != ((CAdvancedEntity*)pEnt)->GetDDTeam())
+			if ((Type == ENTTYPE_MONEY || Type == ENTTYPE_PICKUP_DROP || Type == ENTTYPE_GROG || Type == ENTTYPE_HELICOPTER) && Team != ((CAdvancedEntity*)pEnt)->GetDDTeam())
 				continue;
 		}
 
@@ -849,7 +849,7 @@ CEntity *CGameWorld::ClosestEntity(vec2 Pos, float Radius, int Type, CEntity *pN
 		{
 			if (Type == ENTTYPE_CHARACTER && Team != ((CCharacter*)p)->Team())
 				continue;
-			if ((Type == ENTTYPE_MONEY || Type == ENTTYPE_PICKUP_DROP || Type == ENTTYPE_GROG) && Team != ((CAdvancedEntity*)p)->GetDDTeam())
+			if ((Type == ENTTYPE_MONEY || Type == ENTTYPE_PICKUP_DROP || Type == ENTTYPE_GROG || Type == ENTTYPE_HELICOPTER) && Team != ((CAdvancedEntity*)p)->GetDDTeam())
 				continue;
 		}
 
@@ -1142,7 +1142,7 @@ CEntity *CGameWorld::IntersectEntityTypes(vec2 Pos0, vec2 Pos1, float Radius, ve
 					CCharacter *pChr = 0;
 					if (i == ENTTYPE_CHARACTER)
 						pChr = (CCharacter *)p;
-					else if (i == ENTTYPE_FLAG || i == ENTTYPE_PICKUP_DROP || i == ENTTYPE_MONEY)
+					else if (i == ENTTYPE_FLAG || i == ENTTYPE_PICKUP_DROP || i == ENTTYPE_MONEY || i == ENTTYPE_HELICOPTER)
 						pChr = ((CAdvancedEntity *)p)->GetOwner();
 
 					if (pChr && !pChr->CanCollide(CollideWith))

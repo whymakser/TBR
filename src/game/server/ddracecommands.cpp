@@ -81,11 +81,8 @@ void CGameContext::ConKillPlayer(IConsole::IResult *pResult, void *pUserData)
 	if (pSelf->m_apPlayers[Victim])
 	{
 		pSelf->m_apPlayers[Victim]->KillCharacter(WEAPON_GAME);
-		char aBuf[512];
-		str_format(aBuf, sizeof(aBuf), "%s was killed by %s",
-				pSelf->Server()->ClientName(Victim),
-				pSelf->Server()->ClientName(pResult->m_ClientID));
-		pSelf->SendChat(-1, CHAT_ALL, -1, aBuf);
+		pSelf->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("%s was killed by %s"),
+			pSelf->Server()->ClientName(Victim), pSelf->Server()->ClientName(pResult->m_ClientID));
 	}
 }
 
@@ -466,20 +463,21 @@ void CGameContext::Mute(const NETADDR *pAddr, int Secs, const char *pDisplayName
 		return;
 
 	char aBuf[128];
+	char aFormat[128];
 	if (pReason[0])
 	{
-		str_copy(aBuf, Localizable("'%s' has been muted for %d seconds (%s)"), sizeof(aBuf));
-		SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, aBuf, pDisplayName, Secs, pReason);
+		str_copy(aFormat, Localizable("'%s' has been muted for %d seconds (%s)"), sizeof(aFormat));
+		SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, aFormat, pDisplayName, Secs, pReason);
 
-		str_format(aBuf, sizeof(aBuf), "'%s' has been muted for %d seconds (%s)", pDisplayName, Secs, pReason);
+		str_format(aBuf, sizeof(aBuf), aFormat, pDisplayName, Secs, pReason);
 		SendModLogMessage(ExecutorID, aBuf);
 	}
 	else
 	{
-		str_copy(aBuf, Localizable("'%s' has been muted for %d seconds"), sizeof(aBuf));
-		SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, aBuf, pDisplayName, Secs);
+		str_copy(aFormat, Localizable("'%s' has been muted for %d seconds"), sizeof(aFormat));
+		SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, aFormat, pDisplayName, Secs);
 
-		str_format(aBuf, sizeof(aBuf), "'%s' has been muted for %d seconds", pDisplayName, Secs);
+		str_format(aBuf, sizeof(aBuf), aFormat, pDisplayName, Secs);
 		SendModLogMessage(ExecutorID, aBuf);
 	}
 }
@@ -503,10 +501,8 @@ void CGameContext::ConVoteMute(IConsole::IResult* pResult, void* pUserData)
 
 	if (Found)
 	{
-		char aBuf[128];
-		str_format(aBuf, sizeof aBuf, "'%s' banned '%s' for %d seconds from voting.",
+		pSelf->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("'%s' banned '%s' for %d seconds from voting."),
 			pSelf->Server()->ClientName(pResult->m_ClientID), pSelf->Server()->ClientName(Victim), Seconds);
-		pSelf->SendChat(-1, CHAT_ALL, -1, aBuf);
 	}
 }
 
@@ -527,10 +523,8 @@ void CGameContext::ConVoteUnmute(IConsole::IResult* pResult, void* pUserData)
 	bool Found = pSelf->VoteUnmute(&Addr, pSelf->Server()->ClientName(Victim), pResult->m_ClientID);
 	if (Found)
 	{
-		char aBuf[128];
-		str_format(aBuf, sizeof aBuf, "'%s' unbanned '%s' from voting.",
+		pSelf->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("'%s' unbanned '%s' from voting."),
 			pSelf->Server()->ClientName(pResult->m_ClientID), pSelf->Server()->ClientName(Victim));
-		pSelf->SendChat(-1, CHAT_ALL, -1, aBuf);
 	}
 }
 
@@ -1345,7 +1339,7 @@ void CGameContext::ConHelicopter(IConsole::IResult *pResult, void *pUserData)
 	if (pChr)
 	{
 		int TurretType = pResult->NumArguments() > 1 ? pResult->GetInteger(1) : 0;
-		pSelf->SpawnHelicopter(pChr->GetPos(), TurretType);
+		pSelf->SpawnHelicopter(pChr->GetPos(), TurretType, pChr->Team());
 	}
 }
 
@@ -2442,4 +2436,32 @@ void CGameContext::ConReloadDesigns(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	pSelf->Server()->LoadMapDesigns();
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "designs", "Reloaded map designs");
+}
+
+void CGameContext::ConReloadLanguages(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	// If unloaded, load again
+	for (unsigned int i = 0; i < g_Localization.Languages().size(); i++)
+		if (g_Localization.TryUnload(pSelf, i))
+			g_Localization.Load(i);
+	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", "Reloaded languages");
+}
+
+void CGameContext::ConListLoadedLanguages(IConsole::IResult *pResult, void *pUserData)
+{
+	CGameContext *pSelf = (CGameContext *)pUserData;
+	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", "Currently loaded languages:");
+	char aBuf[128];
+	for (int i = 0; i < (int)g_Localization.Languages().size(); i++)
+	{
+		if (!g_Localization.Languages()[i].m_Loaded)
+			continue;
+		int NumUsed = 0;
+		for (int c = 0; c < MAX_CLIENTS; c++)
+			if (pSelf->m_apPlayers[c] && pSelf->m_apPlayers[c]->m_Language == i)
+				NumUsed++;
+		str_format(aBuf, sizeof(aBuf), "%s (%d players)", g_Localization.GetLanguageFileName(i), NumUsed);
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", aBuf);
+	}
 }

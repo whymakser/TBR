@@ -13,10 +13,10 @@ CHouse::CHouse(CGameContext *pGameServer, int Type)
 
 	switch (m_Type)
 	{
-	case HOUSE_SHOP: m_pHeadline = "~ S H O P ~"; break;
-	case HOUSE_PLOT_SHOP: m_pHeadline = "~ P L O T - S H O P ~"; break;
-	case HOUSE_BANK: m_pHeadline = "~ B A N K ~"; break;
-	case HOUSE_TAVERN: m_pHeadline = "~ T A V E R N ~"; break;
+	case HOUSE_SHOP: m_pHeadline = Localizable("~ S H O P ~"); break;
+	case HOUSE_PLOT_SHOP: m_pHeadline = Localizable("~ P L O T - S H O P ~"); break;
+	case HOUSE_BANK: m_pHeadline = Localizable("~ B A N K ~"); break;
+	case HOUSE_TAVERN: m_pHeadline = Localizable("~ T A V E R N ~"); break;
 	default: m_pHeadline = "~ I N V A L I D ~";
 	}
 
@@ -53,7 +53,7 @@ void CHouse::SendWindow(int ClientID, const char *pMsg, const char *pFooterMsg, 
 		"%s"
 		"                  %s\n"
 		"%s\n"
-		"%s", pCut, m_pHeadline, pCut, pMsg);
+		"%s", pCut, GameServer()->m_apPlayers[ClientID]->Localize(m_pHeadline), pCut, pMsg);
 
 	GameServer()->SendMotd(GameServer()->AppendMotdFooter(aMsg, aFooter), ClientID);
 }
@@ -87,7 +87,7 @@ void CHouse::OnEnter(int ClientID)
 	{
 		CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
 		int From = GameServer()->m_World.GetClosestHouseDummy(pChr->GetPos(), pChr, m_Type, ClientID);
-		GameServer()->SendChat(From, CHAT_SINGLE, ClientID, GetWelcomeMessage(ClientID));
+		GameServer()->SendChat(From, CHAT_SINGLE, ClientID, pChr->GetPlayer()->Localize(GetWelcomeMessage(ClientID)));
 	}
 }
 
@@ -105,7 +105,7 @@ void CHouse::OnLeave(int ClientID)
 	{
 		CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
 		int From = GameServer()->m_World.GetClosestHouseDummy(pChr->GetPos(), pChr, m_Type, ClientID);
-		GameServer()->SendChat(From, CHAT_SINGLE, ClientID, Localizable("Bye! Come back if you need something."));
+		GameServer()->SendChat(From, CHAT_SINGLE, ClientID, pChr->GetPlayer()->Localize("Bye! Come back if you need something."));
 		m_aClients[ClientID].m_NextMsg = Server()->Tick() + Server()->TickSpeed() * 5;
 	}
 
@@ -160,7 +160,7 @@ void CHouse::OnKeyPress(int ClientID, int Dir)
 void CHouse::ConfirmAssignment(int ClientID)
 {
 	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "%s\n\nF3: yes\nF4: no", GetConfirmMessage(ClientID));
+	str_format(aBuf, sizeof(aBuf), "%s\n\nF3: yes\nF4: no", GameServer()->m_apPlayers[ClientID]->Localize(GetConfirmMessage(ClientID)));
 	SendWindow(ClientID, aBuf);
 	m_aClients[ClientID].m_State = STATE_CONFIRM;
 }
@@ -169,7 +169,7 @@ void CHouse::EndSession(int ClientID, bool Cancelled)
 {
 	if (Cancelled)
 	{
-		SendWindow(ClientID, GetEndMessage(ClientID));
+		SendWindow(ClientID, GameServer()->m_apPlayers[ClientID]->Localize(GetEndMessage(ClientID)));
 	}
 	else
 	{

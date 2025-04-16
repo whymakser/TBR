@@ -16,15 +16,17 @@ bool CheckClientID(int ClientID);
 void CGameContext::ConCredits(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *) pUserData;
-
+	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
+	if (!pPlayer)
+		return;
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credits",
-		"F-DDrace is a mod by fokkonaut");
+		pPlayer->Localize("F-DDrace is a mod by fokkonaut"));
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credits",
-		"This mod is based on Teeworlds 0.7 by it's developers and also incorporates features, ideas, and partial implementations");
+		pPlayer->Localize("This mod is based on Teeworlds 0.7 and also incorporates features, ideas, and partial implementations"));
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credits",
-		"from DDNet++ by ChillerDragon, DDNet by the DDNet developers, and other community projects, aswell as many custom features!");
+		pPlayer->Localize("from DDNet++ by ChillerDragon, DDNet, and other community projects, aswell as many custom features!"));
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credits",
-		"If you want to check out the code or contribute, feel free to check out F-DDrace on GitHub:");
+		pPlayer->Localize("If you want to check out the code or contribute, feel free to check out F-DDrace on GitHub:"));
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "credits",
 		"https://github.com/fokkonaut/F-DDrace");
 }
@@ -32,6 +34,9 @@ void CGameContext::ConCredits(IConsole::IResult *pResult, void *pUserData)
 void CGameContext::ConInfo(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *) pUserData;
+	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
+	if (!pPlayer)
+		return;
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info", "F-DDrace Mod. Version: " GAME_VERSION ", by fokkonaut");
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info", "Source: https://github.com/fokkonaut/F-DDrace");
 	if(GIT_SHORTREV_HASH)
@@ -40,7 +45,7 @@ void CGameContext::ConInfo(IConsole::IResult *pResult, void *pUserData)
 		str_format(aBuf, sizeof(aBuf), "Git revision hash: %s", GIT_SHORTREV_HASH);
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info", aBuf);
 	}
-	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info", "For more info, say '/cmdlist' or '/credits'");
+	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "info", pPlayer->Localize("For more info, say '/cmdlist' or '/credits'"));
 }
 
 void CGameContext::ConList(IConsole::IResult *pResult, void *pUserData)
@@ -99,11 +104,14 @@ void CGameContext::ConHelp(IConsole::IResult *pResult, void *pUserData)
 void CGameContext::ConSettings(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *) pUserData;
+	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
+	if (!pPlayer)
+		return;
 
 	if (pResult->NumArguments() == 0)
 	{
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "settings",
-				"to check a server setting say /settings and setting's name, setting names are:");
+				pPlayer->Localize("to check a server setting say /settings and setting's name, setting names are:"));
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "settings",
 				"teams, collision, hooking, endlesshooking, me, ");
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "settings",
@@ -492,18 +500,12 @@ void CGameContext::ConPractice(IConsole::IResult *pResult, void *pUserData)
 
 	char aBuf[512];
 	str_format(aBuf, sizeof(aBuf), "'%s' voted to %s /practice mode for your team, which means you can use /r, but you can't earn a rank. Type /practice to vote (%d/%d required votes)", pSelf->Server()->ClientName(pResult->m_ClientID), VotedForPractice ? "enable" : "disable", NumCurrentVotes, NumRequiredVotes);
-
-	for(int i = 0; i < MAX_CLIENTS; i++)
-		if(Teams.m_Core.Team(i) == Team)
-			pSelf->SendChatTarget(i, aBuf);
+	pSelf->SendChatTeam(Team, aBuf);
 
 	if(NumCurrentVotes >= NumRequiredVotes)
 	{
 		Teams.EnablePractice(Team);
-
-		for(int i = 0; i < MAX_CLIENTS; i++)
-			if(Teams.m_Core.Team(i) == Team)
-				pSelf->SendChatTarget(i, "Practice mode enabled for your team, happy practicing!");
+		pSelf->SendChatTeam(Team, "Practice mode enabled for your team, happy practicing!");
 	}
 }
 
@@ -681,7 +683,6 @@ void CGameContext::ConRank(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *) pUserData;
 	if (!CheckClientID(pResult->m_ClientID))
 		return;
-
 	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
 	if (!pPlayer)
 		return;
@@ -705,11 +706,14 @@ void CGameContext::ConLockTeam(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *) pUserData;
 	if (!CheckClientID(pResult->m_ClientID))
 		return;
+	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
+	if (!pPlayer)
+		return;
 
 	if(pSelf->Config()->m_SvTeam == 0 || pSelf->Config()->m_SvTeam == 3)
 	{
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "lock",
-				"Teams are disabled");
+				pPlayer->Localize("Teams are disabled"));
 		return;
 	}
 
@@ -725,37 +729,27 @@ void CGameContext::ConLockTeam(IConsole::IResult *pResult, void *pUserData)
 		pSelf->Console()->Print(
 				IConsole::OUTPUT_LEVEL_STANDARD,
 				"print",
-				"This team can't be locked");
+				pPlayer->Localize("This team can't be locked"));
 		return;
 	}
 
-	char aBuf[512];
 	if(Lock)
 	{
 		((CGameControllerDDRace*) pSelf->m_pController)->m_Teams.SetTeamLock(Team, false);
-
-		str_format(aBuf, sizeof(aBuf), "'%s' unlocked your team.", pSelf->Server()->ClientName(pResult->m_ClientID));
-
-		for (int i = 0; i < MAX_CLIENTS; i++)
-			if (((CGameControllerDDRace*) pSelf->m_pController)->m_Teams.m_Core.Team(i) == Team)
-				pSelf->SendChatTarget(i, aBuf);
+		pSelf->SendChatTeamFormat(Team, Localizable("'%s' unlocked your team."), pSelf->Server()->ClientName(pResult->m_ClientID));
 	}
 	else if(!pSelf->Config()->m_SvTeamLock)
 	{
 		pSelf->Console()->Print(
 				IConsole::OUTPUT_LEVEL_STANDARD,
 				"print",
-				"Team locking is disabled on this server");
+				pPlayer->Localize("Team locking is disabled on this server"));
 	}
 	else
 	{
 		((CGameControllerDDRace*) pSelf->m_pController)->m_Teams.SetTeamLock(Team, true);
 
-		str_format(aBuf, sizeof(aBuf), "'%s' locked your team. After the race started killing will kill everyone in your team.", pSelf->Server()->ClientName(pResult->m_ClientID));
-
-		for (int i = 0; i < MAX_CLIENTS; i++)
-			if (((CGameControllerDDRace*) pSelf->m_pController)->m_Teams.m_Core.Team(i) == Team)
-				pSelf->SendChatTarget(i, aBuf);
+		pSelf->SendChatTeamFormat(Team, Localizable("'%s' locked your team. After the race started killing will kill everyone in your team."), pSelf->Server()->ClientName(pResult->m_ClientID));
 	}
 }
 
@@ -764,17 +758,20 @@ void CGameContext::ConInviteTeam(IConsole::IResult *pResult, void *pUserData)
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	CGameControllerDDRace*pController = (CGameControllerDDRace*)pSelf->m_pController;
 	const char *pName = pResult->GetString(0);
+	CPlayer *pPlayer = pSelf->m_apPlayers[pResult->m_ClientID];
+	if (!pPlayer)
+		return;
 
 	if(pSelf->Config()->m_SvTeam == 0 || pSelf->Config()->m_SvTeam == 3)
 	{
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join",
-				"Teams are disabled");
+				pPlayer->Localize("Teams are disabled"));
 		return;
 	}
 
 	if(!pSelf->Config()->m_SvInvite)
 	{
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "invite", "Invites are disabled");
+		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "invite", pPlayer->Localize("Invites are disabled"));
 		return;
 	}
 
@@ -793,33 +790,30 @@ void CGameContext::ConInviteTeam(IConsole::IResult *pResult, void *pUserData)
 
 		if(Target < 0)
 		{
-			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "invite", "Player not found");
+			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "invite", pPlayer->Localize("Player not found"));
 			return;
 		}
 
 		if(pController->m_Teams.IsInvited(Team, Target))
 		{
-			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "invite", "Player already invited");
+			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "invite", pPlayer->Localize("Player already invited"));
 			return;
 		}
 
-		if(pSelf->m_apPlayers[pResult->m_ClientID] && pSelf->m_apPlayers[pResult->m_ClientID]->m_LastInvited + pSelf->Config()->m_SvInviteFrequency * pSelf->Server()->TickSpeed() > pSelf->Server()->Tick())
+		if(pPlayer->m_LastInvited + pSelf->Config()->m_SvInviteFrequency * pSelf->Server()->TickSpeed() > pSelf->Server()->Tick())
 		{
-			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "invite", "Can't invite this quickly");
+			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "invite", pPlayer->Localize("Can't invite this quickly"));
 			return;
 		}
 
 		pController->m_Teams.SetClientInvited(Team, Target, true);
-		pSelf->m_apPlayers[pResult->m_ClientID]->m_LastInvited = pSelf->Server()->Tick();
+		pPlayer->m_LastInvited = pSelf->Server()->Tick();
 
 		char aBuf[512];
-		str_format(aBuf, sizeof aBuf, "'%s' invited you to team %d.", pSelf->Server()->ClientName(pResult->m_ClientID), Team);
+		str_format(aBuf, sizeof aBuf, pSelf->m_apPlayers[Target]->Localize("'%s' invited you to team %d."), pSelf->Server()->ClientName(pResult->m_ClientID), Team);
 		pSelf->SendChatTarget(Target, aBuf);
 
-		str_format(aBuf, sizeof aBuf, "'%s' invited '%s' to your team.", pSelf->Server()->ClientName(pResult->m_ClientID), pSelf->Server()->ClientName(Target));;
-		for (int i = 0; i < MAX_CLIENTS; i++)
-			if (((CGameControllerDDRace*) pSelf->m_pController)->m_Teams.m_Core.Team(i) == Team)
-				pSelf->SendChatTarget(i, aBuf);
+		pSelf->SendChatTeamFormat(Team, Localizable("'%s' invited '%s' to your team."), pSelf->Server()->ClientName(pResult->m_ClientID), pSelf->Server()->ClientName(Target));
 	}
 	else
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "invite", "Can't invite players to this team");
@@ -841,13 +835,7 @@ void CGameContext::ConJoinTeam(IConsole::IResult *pResult, void *pUserData)
 		pSelf->Console()->Print(
 				IConsole::OUTPUT_LEVEL_STANDARD,
 				"join",
-				"You are running a vote please try again after the vote is done!");
-		return;
-	}
-	else if (pSelf->Config()->m_SvTeam == 0 || pSelf->Config()->m_SvTeam == 3)
-	{
-		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join",
-				"Teams are disabled");
+				pPlayer->Localize("You are running a vote please try again after the vote is done!"));
 		return;
 	}
 	else if (pSelf->Config()->m_SvTeam == 2 && pResult->GetInteger(0) == 0 && pPlayer->GetCharacter() && pPlayer->GetCharacter()->m_LastStartWarning < pSelf->Server()->Tick() - 3 * pSelf->Server()->TickSpeed())
@@ -855,7 +843,7 @@ void CGameContext::ConJoinTeam(IConsole::IResult *pResult, void *pUserData)
 		pSelf->Console()->Print(
 				IConsole::OUTPUT_LEVEL_STANDARD,
 				"join",
-				"You must join a team and play with somebody or else you can\'t play");
+				pPlayer->Localize("You must join a team and play with somebody or else you can't play"));
 		pPlayer->GetCharacter()->m_LastStartWarning = pSelf->Server()->Tick();
 	}
 
@@ -864,7 +852,7 @@ void CGameContext::ConJoinTeam(IConsole::IResult *pResult, void *pUserData)
 		if (pPlayer->GetCharacter() == 0)
 		{
 			pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join",
-					"You can't change teams while you are dead/a spectator.");
+					pPlayer->Localize("You can't change teams while you are dead/a spectator."));
 		}
 		else
 		{
@@ -876,33 +864,33 @@ void CGameContext::ConJoinTeam(IConsole::IResult *pResult, void *pUserData)
 					> pSelf->Server()->Tick())
 			{
 				pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join",
-						"You can\'t change teams that fast!");
+						pPlayer->Localize("You can't change teams that fast!"));
 			}
-			else if (pPlayer->m_Minigame == MINIGAME_SURVIVAL && pResult->NumArguments() > 0)
+			else if (pPlayer->IsMinigame() && pPlayer->m_Minigame != MINIGAME_BLOCK && pResult->NumArguments() > 0)
 			{
 				pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join",
-					"You can\'t join teams in survival");
+					pPlayer->Localize("You can't join teams in this minigame"));
 			}
 			else if(Team > 0 && Team < MAX_CLIENTS && pController->m_Teams.TeamLocked(Team) && !pController->m_Teams.IsInvited(Team, pResult->m_ClientID))
 			{
 				pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join",
 					pSelf->Config()->m_SvInvite ?
-						"This team is locked using /lock. Only members of the team can unlock it using /lock." :
-						"This team is locked using /lock. Only members of the team can invite you or unlock it using /lock.");
+						pPlayer->Localize("This team is locked using /lock. Only members of the team can unlock it using /lock."):
+						pPlayer->Localize("This team is locked using /lock. Only members of the team can invite you or unlock it using /lock."));
 			}
 			else if(Team > 0 && Team < MAX_CLIENTS && pController->m_Teams.Count(Team) >= pSelf->Config()->m_SvTeamMaxSize)
 			{
 				char aBuf[512];
-				str_format(aBuf, sizeof(aBuf), "This team already has the maximum allowed size of %d players", pSelf->Config()->m_SvTeamMaxSize);
+				str_format(aBuf, sizeof(aBuf), pPlayer->Localize("This team already has the maximum allowed size of %d players"), pSelf->Config()->m_SvTeamMaxSize);
 				pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join", aBuf);
+			}
+			else if (pSelf->Config()->m_SvTeam == 0 || pSelf->Config()->m_SvTeam == 3)
+			{
+				pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join", pPlayer->Localize("Teams are disabled"));
 			}
 			else if(pController->m_Teams.SetCharacterTeam(pPlayer->GetCID(), Team))
 			{
-				char aBuf[512];
-				str_format(aBuf, sizeof(aBuf), "%s joined team %d",
-						pSelf->Server()->ClientName(pPlayer->GetCID()),
-						Team);
-				pSelf->SendChat(-1, CHAT_ALL, -1, aBuf);
+				pSelf->SendChatFormat(-1, CHAT_ALL, -1, CHATFLAG_ALL, Localizable("%s joined team %d"), pSelf->Server()->ClientName(pPlayer->GetCID()), Team);
 				pPlayer->m_Last_Team = pSelf->Server()->Tick();
 
 				if(pController->m_Teams.IsPractice(Team))
@@ -911,7 +899,7 @@ void CGameContext::ConJoinTeam(IConsole::IResult *pResult, void *pUserData)
 			else
 			{
 				pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "join",
-						"You cannot join this team at this time");
+						pPlayer->Localize("You cannot join this team at this time"));
 			}
 		}
 	}
@@ -923,7 +911,7 @@ void CGameContext::ConJoinTeam(IConsole::IResult *pResult, void *pUserData)
 			pSelf->Console()->Print(
 					IConsole::OUTPUT_LEVEL_STANDARD,
 					"join",
-					"You can't check your team while you are dead/a spectator.");
+					pPlayer->Localize("You can't check your team while you are dead/a spectator."));
 		}
 		else
 		{
@@ -956,7 +944,7 @@ void CGameContext::ConMe(IConsole::IResult *pResult, void *pUserData)
 		pSelf->Console()->Print(
 				IConsole::OUTPUT_LEVEL_STANDARD,
 				"me",
-				"/me is disabled on this server");
+				pSelf->m_apPlayers[pResult->m_ClientID]->Localize("/me is disabled on this server"));
 }
 
 void CGameContext::ConEyeEmote(IConsole::IResult *pResult, void *pUserData)
@@ -1344,7 +1332,7 @@ void CGameContext::ConAccount(IConsole::IResult* pResult, void* pUserData)
 
 	str_format(aBuf, sizeof(aBuf), "%s: %s", pPlayer->Localize("Contact"), pAccount->m_aContact);
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-	str_format(aBuf, sizeof(aBuf), "E-Mail: %s", pAccount->m_aEmail);
+	str_format(aBuf, sizeof(aBuf), "%s: %s", pPlayer->Localize("E-Mail"), pAccount->m_aEmail);
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 }
 
@@ -1352,10 +1340,12 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 {
 	CGameContext* pSelf = (CGameContext*)pUserData;
 	int ID = pResult->NumArguments() ? pSelf->GetCIDByName(pResult->GetString(0)) : pResult->m_ClientID;
-	CPlayer* pPlayer = pSelf->m_apPlayers[ID];
-	if (ID == -1 || !pPlayer)
+	int AskerID = pResult->m_ClientID;
+	CPlayer *pPlayer = pSelf->m_apPlayers[ID];
+	CPlayer *pAsker = pSelf->m_apPlayers[AskerID];
+	if (ID == -1 || !pPlayer || !pAsker)
 	{
-		pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("Player not found"));
+		pSelf->SendChatTarget(pResult->m_ClientID, pAsker->Localize("Player not found"));
 		return;
 	}
 
@@ -1375,13 +1365,13 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 		case MINIGAME_1VS1:
 		case MINIGAME_NONE:
 		{
-			str_format(aBuf, sizeof(aBuf), "--- %s's %s ---", pSelf->Server()->ClientName(ID), pPlayer->Localize("Stats"));
+			str_format(aBuf, sizeof(aBuf), "--- %s's %s ---", pSelf->Server()->ClientName(ID), pAsker->Localize("Stats"));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s [%d] %s", pPlayer->Localize("Level"), pAccount->m_Level, pPlayer->GetAccID() < ACC_START ? pPlayer->Localize("(not logged in)") : "");
+			str_format(aBuf, sizeof(aBuf), "%s [%d] %s", pAsker->Localize("Level"), pAccount->m_Level, pPlayer->GetAccID() < ACC_START ? pAsker->Localize("(not logged in)") : "");
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			str_format(aBuf, sizeof(aBuf), "XP [%lld/%lld]", pAccount->m_XP, pSelf->GetNeededXP(pAccount->m_Level));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s [%lld]", BankEnabled ? pPlayer->Localize("Bank") : pPlayer->Localize("Wallet"), pPlayer->GetWalletOrBankDisplay());
+			str_format(aBuf, sizeof(aBuf), "%s [%lld]", BankEnabled ? pAsker->Localize("Bank") : pAsker->Localize("Wallet"), pPlayer->GetWalletOrBankDisplay());
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 
 			// dont expose some info to other players than you
@@ -1389,7 +1379,7 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 			{
 				if (BankEnabled)
 				{
-					str_format(aBuf, sizeof(aBuf), "%s [%lld]", pPlayer->Localize("Wallet"), pPlayer->GetWalletMoney());
+					str_format(aBuf, sizeof(aBuf), "%s [%lld]", pAsker->Localize("Wallet"), pPlayer->GetWalletMoney());
 					pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 				}
 				if (pSelf->Config()->m_SvEuroMode || pAccount->m_Euros > 0)
@@ -1399,14 +1389,14 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 				}
 			}
 
-			str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Police"), pAccount->m_PoliceLevel);
+			str_format(aBuf, sizeof(aBuf), "%s [%d]", pAsker->Localize("Police"), pAccount->m_PoliceLevel);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 
-			str_format(aBuf, sizeof(aBuf), "--- %s ---", pPlayer->Localize("Collectables"));
+			str_format(aBuf, sizeof(aBuf), "--- %s ---", pAsker->Localize("Collectables"));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Taser battery"), pAccount->m_TaserBattery);
+			str_format(aBuf, sizeof(aBuf), "%s [%d]", pAsker->Localize("Taser battery"), pAccount->m_TaserBattery);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Portal Battery"), pAccount->m_PortalBattery);
+			str_format(aBuf, sizeof(aBuf), "%s [%d]", pAsker->Localize("Portal Battery"), pAccount->m_PortalBattery);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 		} //fallthrough
 
@@ -1418,14 +1408,14 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 			}
 			else
 			{
-				str_format(aBuf, sizeof(aBuf), "--- %s's Block %s ---", pSelf->Server()->ClientName(ID), pPlayer->Localize("Stats"));
+				str_format(aBuf, sizeof(aBuf), "--- %s's Block %s ---", pSelf->Server()->ClientName(ID), pAsker->Localize("Stats"));
 				pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			}
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Points"), pAccount->m_BlockPoints);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Points"), pAccount->m_BlockPoints);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Kills"), pAccount->m_Kills);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Kills"), pAccount->m_Kills);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Deaths"), pAccount->m_Deaths);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Deaths"), pAccount->m_Deaths);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 		} break;
 
@@ -1433,46 +1423,46 @@ void CGameContext::ConStats(IConsole::IResult* pResult, void* pUserData)
 		{
 			if (ID == pResult->m_ClientID)
 			{
-				str_format(aBuf, sizeof(aBuf), "--- %s's %s ---", pSelf->Server()->ClientName(ID), pPlayer->Localize("Stats"));
+				str_format(aBuf, sizeof(aBuf), "--- %s's %s ---", pSelf->Server()->ClientName(ID), pAsker->Localize("Stats"));
 				pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-				str_format(aBuf, sizeof(aBuf), "%s [%lld]", pPlayer->Localize("Wallet"), pPlayer->GetUsableMoney());
+				str_format(aBuf, sizeof(aBuf), "%s [%lld]", pAsker->Localize("Wallet"), pPlayer->GetUsableMoney());
 				pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 				pSelf->SendChatTarget(pResult->m_ClientID, "--- Durák ---");
 			}
 			else
 			{
-				str_format(aBuf, sizeof(aBuf), "--- %s's Durák %s ---", pSelf->Server()->ClientName(ID), pPlayer->Localize("Stats"));
+				str_format(aBuf, sizeof(aBuf), "--- %s's Durák %s ---", pSelf->Server()->ClientName(ID), pAsker->Localize("Stats"));
 				pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			}
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Games won"), pAccount->m_DurakWins);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Games won"), pAccount->m_DurakWins);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %s%lld$", pPlayer->Localize("Profit"), pAccount->m_DurakProfit > 0 ? "+" : "", pAccount->m_DurakProfit);
+			str_format(aBuf, sizeof(aBuf), "%s: %s%lld$", pAsker->Localize("Profit"), pAccount->m_DurakProfit > 0 ? "+" : "", pAccount->m_DurakProfit);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 		} break;
 
 		case MINIGAME_SURVIVAL:
 		{
-			str_format(aBuf, sizeof(aBuf), "--- %s's Survival %s ---", pSelf->Server()->ClientName(ID), pPlayer->Localize("Stats"));
+			str_format(aBuf, sizeof(aBuf), "--- %s's Survival %s ---", pSelf->Server()->ClientName(ID), pAsker->Localize("Stats"));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Wins"), pAccount->m_SurvivalWins);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Wins"), pAccount->m_SurvivalWins);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Kills"), pAccount->m_SurvivalKills);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Kills"), pAccount->m_SurvivalKills);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Deaths"), pAccount->m_SurvivalDeaths);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Deaths"), pAccount->m_SurvivalDeaths);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 		} break;
 
 		case MINIGAME_INSTAGIB_BOOMFNG: // fallthrough
 		case MINIGAME_INSTAGIB_FNG:
 		{
-			str_format(aBuf, sizeof(aBuf), "--- %s's Instagib %s ---", pSelf->Server()->ClientName(ID), pPlayer->Localize("Stats"));
+			str_format(aBuf, sizeof(aBuf), "--- %s's Instagib %s ---", pSelf->Server()->ClientName(ID), pAsker->Localize("Stats"));
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Wins"), pAccount->m_InstagibWins);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Wins"), pAccount->m_InstagibWins);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Kills"), pAccount->m_InstagibKills);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Kills"), pAccount->m_InstagibKills);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
-			str_format(aBuf, sizeof(aBuf), "%s: %d", pPlayer->Localize("Deaths"), pAccount->m_InstagibDeaths);
+			str_format(aBuf, sizeof(aBuf), "%s: %d", pAsker->Localize("Deaths"), pAccount->m_InstagibDeaths);
 			pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 		} break;
 	}
@@ -2555,7 +2545,7 @@ void CGameContext::ConPoliceInfo(IConsole::IResult *pResult, void *pUserData)
 	{
 		int Level = 0;
 		int Policelevel = Page - 1;
-		char aPolice[32];
+		char aPolice[64];
 
 		if (Policelevel == 1)
 			Level = 18;
@@ -2687,16 +2677,13 @@ void CGameContext::ConLanguage(IConsole::IResult* pResult, void* pUserData)
 		}
 
 		// Update language
-		g_Localization.TryUnload(pSelf, pPlayer->m_Language);
-		pPlayer->m_Language = Language;
-		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), pPlayer->Localize("Successfully changed language to %s"), g_Localization.GetLanguageString(Language));
-		pSelf->SendChatTarget(ClientID, aBuf);
+		pPlayer->SetLanguage(Language);
 		return;
 	}
 
 	char aBuf[256];
 	str_format(aBuf, sizeof(aBuf), "~~~ %s ~~~", pPlayer->Localize("Server Language"));
+	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	str_format(aBuf, sizeof(aBuf), "%s: %s", pPlayer->Localize("Current language"), g_Localization.GetLanguageString(pPlayer->m_Language));
 	pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("You can set one of the following languages for server-side translation by using '/language <option>':"));
@@ -2715,7 +2702,7 @@ void CGameContext::ConChatLanguage(IConsole::IResult* pResult, void* pUserData)
 
 	if (pResult->NumArguments())
 	{
-		if (!str_comp(pSelf->Server()->GetLanguage(pResult->m_ClientID), pResult->GetString(0)))
+		if (!str_comp(pSelf->Server()->GetChatLanguage(pResult->m_ClientID), pResult->GetString(0)))
 		{
 			pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("This chat language is already selected"));
 			return;
@@ -2725,10 +2712,10 @@ void CGameContext::ConChatLanguage(IConsole::IResult* pResult, void* pUserData)
 		{
 			if (str_comp(pResult->GetString(0), apLanguages[i]) == 0)
 			{
-				pSelf->Server()->SetLanguage(pResult->m_ClientID, apLanguages[i]);
+				pSelf->Server()->SetChatLanguage(pResult->m_ClientID, apLanguages[i]);
 				int Dummy = pSelf->Server()->GetDummy(pResult->m_ClientID);
 				if (Dummy != -1)
-					pSelf->Server()->SetLanguage(Dummy, apLanguages[i]);
+					pSelf->Server()->SetChatLanguage(Dummy, apLanguages[i]);
 				pSelf->SendChatTarget(pResult->m_ClientID, pPlayer->Localize("Successfully updated chat language"));
 				return;
 			}
@@ -2764,7 +2751,7 @@ void CGameContext::ConDiscord(IConsole::IResult *pResult, void *pUserData)
 	if (pSelf->Config()->m_SvDiscordURL[0])
 	{
 		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "Discord server: %s", pSelf->Config()->m_SvDiscordURL);
+		str_format(aBuf, sizeof(aBuf), "%s: %s", pPlayer->Localize("Discord server"), pSelf->Config()->m_SvDiscordURL);
 		pSelf->SendChatTarget(pResult->m_ClientID, aBuf);
 	}
 	else

@@ -1,4 +1,4 @@
-// made by timakro (initially) and fokkonaut
+// made by fokkonaut
 
 #ifndef GAME_LOCALIZATION_H
 #define GAME_LOCALIZATION_H
@@ -66,6 +66,8 @@ class CLocalizationDatabase
 	class IStorage *m_pStorage;
 	class CConfig *m_pConfig;
 
+	void Unload(int Language);
+
 public:
 	void LoadIndexfile(class IStorage *pStorage, class CConfig *pConfig);
 	std::vector<CLanguage> &Languages() { return m_vLanguages; }
@@ -76,7 +78,6 @@ public:
 
 	bool Load(const char *pFilename, bool Force = false);
 	bool Load(int Language);
-	void Unload(int Language);
 	bool TryUnload(class CGameContext *pGameServer, int Language);
 	int GetLanguage(const char *pFileName);
 	int GetLanguageByCode(const char *pLanguageCode);

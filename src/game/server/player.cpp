@@ -240,6 +240,7 @@ void CPlayer::Reset()
 	m_VoteQuestionRunning = false;
 	m_VoteQuestionType = CPlayer::VOTE_QUESTION_NONE;
 	m_VoteQuestionEndTick = 0;
+	m_LastVoteStatusUpdateTick = 0;
 	m_LastRedirectTryTick = 0;
 	m_LastMoneyPay = 0;
 	m_DoSeeOthersByVote = false;
@@ -301,9 +302,7 @@ void CPlayer::Tick()
 
 	if(Server()->GetNetErrorString(m_ClientID)[0])
 	{
-		char aBuf[512];
-		str_format(aBuf, sizeof(aBuf), Localizable("'%s' would have timed out, but can use timeout protection now"), Server()->ClientName(m_ClientID));
-		GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+		GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("'%s' would have timed out, but can use timeout protection now"), Server()->ClientName(m_ClientID));
 		Server()->ResetNetErrorString(m_ClientID);
 	}
 
@@ -426,9 +425,7 @@ void CPlayer::Tick()
 		}
 		else if (Server()->Tick() % 50 == 0 && (!m_pCharacter || !m_pCharacter->m_MoneyTile) && !m_HideBroadcasts)
 		{
-			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), Localize("You are arrested for %lld seconds"), m_JailTime / Server()->TickSpeed());
-			GameServer()->SendBroadcast(aBuf, m_ClientID, false);
+			GameServer()->SendBroadcastFormat(m_ClientID, false, Localizable("You are arrested for %lld seconds"), m_JailTime / Server()->TickSpeed());
 		}
 	}
 
@@ -442,9 +439,7 @@ void CPlayer::Tick()
 		}
 		else if (Server()->Tick() % Server()->TickSpeed() * 60 == 0 && (!m_pCharacter || !m_pCharacter->m_MoneyTile) && !m_HideBroadcasts)
 		{
-			char aBuf[128];
-			str_format(aBuf, sizeof(aBuf), Localize("Avoid policehammers for the next %lld seconds"), m_EscapeTime / Server()->TickSpeed());
-			GameServer()->SendBroadcast(aBuf, m_ClientID, false);
+			GameServer()->SendBroadcastFormat(m_ClientID, false, Localize("Avoid policehammers for the next %lld seconds"), m_EscapeTime / Server()->TickSpeed());
 		}
 	}
 	// Update plot destroy end tick, in case we leave
@@ -465,8 +460,31 @@ void CPlayer::Tick()
 	MinigameAfkCheck();
 
 	// Automatic close/stop after 30 seconds
-	if (m_VoteQuestionEndTick && Server()->Tick() > m_VoteQuestionEndTick)
-		OnEndVoteQuestion();
+	if (m_VoteQuestionEndTick)
+	{
+		if (Server()->Tick() >= m_VoteQuestionEndTick)
+		{
+			OnEndVoteQuestion();
+		}
+		else
+		{
+			const int TimeoutSec = 15;
+			const int Freq = Server()->GetMaxClients(m_ClientID) / TimeoutSec;
+			int Max = TimeoutSec * Freq;
+			const int IntervalTicks = Server()->TickSpeed() / Freq;
+			int RemainingTicks = m_VoteQuestionEndTick - Server()->Tick();
+			if (Server()->Tick() - m_LastVoteStatusUpdateTick >= IntervalTicks)
+			{
+				m_LastVoteStatusUpdateTick = Server()->Tick();
+				int Yes = RemainingTicks * Freq / Server()->TickSpeed() + 1;
+				if (Yes <= 1)
+				{
+					Max = Yes = 0;
+				}
+				GameServer()->SendVoteStatus(m_ClientID, Max, Yes, 0/*Max-Yes*/);
+			}
+		}
+	}
 
 	if (m_aDelayedJoinMsg[0] != '\0' && m_JoinTick + Server()->TickSpeed() * GameServer()->Config()->m_SvJoinMsgDelay < Server()->Tick())
 	{
@@ -1777,9 +1795,7 @@ int CPlayer::ForcePause(int Time)
 
 	if (GameServer()->Config()->m_SvPauseMessages)
 	{
-		char aBuf[128];
-		str_format(aBuf, sizeof(aBuf), "'%s' was force-paused for %ds", Server()->ClientName(m_ClientID), Time);
-		GameServer()->SendChat(-1, CHAT_ALL, -1, aBuf);
+		GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, "'%s' was force-paused for %ds", Server()->ClientName(m_ClientID), Time);
 	}
 
 	return Pause(PAUSE_SPEC, true);
@@ -2095,7 +2111,12 @@ void CPlayer::OnLogin(bool ForceDesignLoad)
 	// Load language at start, so that login messages get translated aswell
 	if (pAccount->m_aLanguage[0] != '\0')
 	{
-		m_Language = g_Localization.GetLanguage(pAccount->m_aLanguage);
+		int DummyID = Server()->GetDummy(m_ClientID);
+		if (DummyID == -1 || GameServer()->m_apPlayers[DummyID]->GetAccID() < ACC_START)
+		{
+			// Only set language when other dummy is not logged in
+			SetLanguage(g_Localization.GetLanguage(pAccount->m_aLanguage));
+		}
 	}
 	GameServer()->SendChatTarget(m_ClientID, Localize("Successfully logged in"));
 
@@ -2213,7 +2234,8 @@ void CPlayer::OnLogout()
 
 void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 {
-	char aText[128] = { 0 };
+	char aText[VOTE_DESC_LENGTH] = { 0 };
+	char aReason[VOTE_REASON_LENGTH] = { 0 };
 	switch ((int)Type)
 	{
 	case CPlayer::VOTE_QUESTION_DESIGN:
@@ -2222,7 +2244,8 @@ void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 		if (!pDesign[0] || !str_comp(pDesign, Server()->GetMapDesign(m_ClientID)))
 			return;
 
-		str_format(aText, sizeof(aText), Localize("Load recent design '%s'?"), pDesign);
+		str_copy(aText, Localize("Load recent design?"), sizeof(aText));
+		str_copy(aReason, pDesign, sizeof(aReason));
 		break;
 	}
 	case CPlayer::VOTE_QUESTION_LANGUAGE_SUGGESTION:
@@ -2236,7 +2259,7 @@ void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 	}
 	}
 
-	const int TimeoutSec = 30;
+	const int TimeoutSec = 15;
 
 	m_VoteQuestionRunning = true;
 	m_VoteQuestionType = Type;
@@ -2249,7 +2272,7 @@ void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 		Msg.m_Timeout = TimeoutSec;
 		Msg.m_ClientID = Server()->GetMaxClients(m_ClientID)-1;
 		Msg.m_pDescription = aText;
-		Msg.m_pReason = "";
+		Msg.m_pReason = aReason;
 		Server()->SendPackMsg(&Msg, MSGFLAG_VITAL|MSGFLAG_NOTRANSLATE, m_ClientID);
 	}
 	else
@@ -2257,9 +2280,10 @@ void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 		CMsgPacker Msg(NETMSGTYPE_SV_VOTESET);
 		Msg.AddInt(TimeoutSec);
 		Msg.AddString(aText, -1);
-		Msg.AddString("", -1);
+		Msg.AddString(aReason, -1);
 		Server()->SendMsg(&Msg, MSGFLAG_VITAL, m_ClientID);
 	}
+	GameServer()->SendVoteStatus(m_ClientID, 2, 2, 0);
 }
 
 void CPlayer::OnEndVoteQuestion(int Result)
@@ -2276,12 +2300,14 @@ void CPlayer::OnEndVoteQuestion(int Result)
 	}
 	case CPlayer::VOTE_QUESTION_LANGUAGE_SUGGESTION:
 	{
+		int Language = g_Localization.GetLanguageByCode(Server()->GetCountryCode(m_ClientID));
 		if (Result == 1)
 		{
-			m_Language = g_Localization.GetLanguageByCode(Server()->GetCountryCode(m_ClientID));
-			char aBuf[VOTE_DESC_LENGTH];
-			str_format(aBuf, sizeof(aBuf), Localize("Successfully changed language to %s"), g_Localization.GetLanguageString(m_Language));
-			GameServer()->SendChatTarget(m_ClientID, aBuf);
+			SetLanguage(Language);
+		}
+		else if (Result == -1)
+		{
+			g_Localization.TryUnload(GameServer(), Language);
 		}
 		break;
 	}
@@ -2741,7 +2767,31 @@ bool CPlayer::ShowDDraceHud()
 const char *CPlayer::Localize(const char *pText, const char *pContext)
 {
 	if (m_IsDummy) return pText;
-	return ::Localize(pText, m_Language);
+	return ::Localize(pText, m_Language, pContext);
+}
+
+void CPlayer::SetLanguage(int Language, bool Silent)
+{
+	if (Language == m_Language)
+		return;
+
+	int DummyID = Server()->GetDummy(m_ClientID);
+	if (DummyID != -1)
+	{
+		// Always keep track of dummy language
+		GameServer()->m_apPlayers[DummyID]->m_Language = Language;
+	}
+
+	int PrevLanguage = m_Language;
+	m_Language = Language;
+	g_Localization.TryUnload(GameServer(), PrevLanguage);
+
+	if (!Silent)
+	{
+		char aBuf[VOTE_DESC_LENGTH];
+		str_format(aBuf, sizeof(aBuf), Localize("Successfully changed language to %s"), g_Localization.GetLanguageString(m_Language));
+		GameServer()->SendChatTarget(m_ClientID, aBuf);
+	}
 }
 
 void CPlayer::UpdateDoubleXpLifes()

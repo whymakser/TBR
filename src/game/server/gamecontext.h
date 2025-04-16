@@ -310,10 +310,17 @@ public:
 
 	// network
 	void SendChatMsg(CNetMsg_Sv_Chat *pMsg, int Flags, int To);
-	void SendChatTarget(int To, const char* pText, int Flags = CHATFLAG_ALL);
-	void SendChatTeam(int Team, const char* pText);
+	void SendChatTarget(int To, const char *pText, int Flags = CHATFLAG_ALL);
+	void SendChatTeam(int Team, const char *pText, CFormatArg *pArgs = 0, int NumArgs = 0);
 	void SendChatMessage(int ChatterClientID, int Mode, int To, const char *pText) override { SendChat(ChatterClientID, Mode, To, pText); }
 	void SendChat(int ChatterClientID, int Mode, int To, const char *pText, int SpamProtectionClientID = -1, int Flags = CHATFLAG_ALL, CFormatArg *pArgs = 0, int NumArgs = 0);
+
+	template<typename... Args>
+	void SendChatTeamFormat(int Team, const char *pFormat, Args&&... args)
+	{
+		CFormatArg aArgs[] = { CFormatArg(std::forward<Args>(args))... };
+		SendChatTeam(Team, pFormat, aArgs, std::size(aArgs));
+	}
 
 	template<typename... Args>
 	void SendChatFormat(int ChatterClientID, int Mode, int To, int Flags, const char* pFormat, Args&&... args)
@@ -337,7 +344,7 @@ public:
 	// DDRace
 	void SendTeamChange(int ClientID, int Team, bool Silent, int CooldownTick, int ToClientID);
 
-	void CallVote(int ClientID, const char *aDesc, const char *aCmd, const char *pReason, const char *aChatmsg, const char *pSevendownDesc);
+	void CallVote(int ClientID, const char *aDesc, const char *aCmd, const char *pReason, const char *aChatmsg, const char *pSevendownDesc, CFormatArg *pArgs = 0, int NumArgs = 0);
 
 	void List(int ClientID, const char* filter); // ClientID -1 prints to console, otherwise to chat
 
@@ -765,7 +772,7 @@ public:
 	std::vector<CPickupDrop*> m_vPickupDropLimit;
 
 	// helicopter
-	void SpawnHelicopter(vec2 Pos, int TurretType);
+	void SpawnHelicopter(vec2 Pos, int TurretType, int Team);
 
 	//minigames disabled
 	bool m_aMinigameDisabled[NUM_MINIGAMES];
@@ -1168,6 +1175,8 @@ private:
 	static void ConPlotInfo(IConsole::IResult* pResult, void* pUserData);
 	static void ConPresetList(IConsole::IResult* pResult, void* pUserData);
 
+	static void ConListLoadedLanguages(IConsole::IResult* pResult, void* pUserData);
+	static void ConReloadLanguages(IConsole::IResult* pResult, void* pUserData);
 	static void ConReloadDesigns(IConsole::IResult* pResult, void* pUserData);
 	static void ConAddGrog(IConsole::IResult* pResult, void* pUserData);
 	static void ConSetPermille(IConsole::IResult* pResult, void* pUserData);

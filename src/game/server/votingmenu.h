@@ -23,6 +23,7 @@ class CVotingMenu
 		VOTEFLAG_SHOW_ACC_STATS = 1 << 4,
 		VOTEFLAG_SHOW_PLOT_INFO = 1 << 5,
 		VOTEFLAG_SHOW_WANTED_PLAYERS = 1 << 6,
+		VOTEFLAG_PAGE_LANGUAGES = 1 << 7,
 	};
 
 	enum EVotingPage
@@ -30,6 +31,7 @@ class CVotingMenu
 		PAGE_VOTES = 0,
 		PAGE_ACCOUNT,
 		PAGE_MISCELLANEOUS,
+		PAGE_LANGUAGES,
 		NUM_PAGES,
 
 		NUM_PAGE_SEPERATORS = 2,
@@ -100,6 +102,7 @@ class CVotingMenu
 			int m_NumWanted = 0;
 			int64 m_DestroyEndTick = 0;
 			int m_Permille = 0;
+			int m_Language = -1;
 			struct
 			{
 				int64 m_XP = 0;
@@ -123,21 +126,23 @@ class CVotingMenu
 	struct SPageInfo
 	{
 		char m_aName[64];
-		char m_aaTempDesc[NUM_PAGE_MAX_VOTES][VOTE_DESC_LENGTH];
 	} m_aPages[NUM_PAGES];
+	char m_aaTempDesc[NUM_PAGE_MAX_VOTES][VOTE_DESC_LENGTH];
+	int m_TempLanguage;
 
 	int GetNumWantedPages() { return (m_vWantedPlayers.size() + NUM_WANTEDS_PER_PAGE - 1) / NUM_WANTEDS_PER_PAGE; }
 	
 	bool SetPage(int ClientID, int Page);
 	const char *GetPageDescription(int ClientID, int Page);
 
-	bool IsOptionWithSuffix(const char *pDesc, const char *pWantedOption) { return str_startswith(pDesc, pWantedOption) != 0; }
-	bool IsOption(const char *pDesc, const char *pWantedOption) { return str_comp(pDesc, pWantedOption) == 0; }
+	bool IsOptionWithSuffix(const char *pDesc, const char *pWantedOption);
+	bool IsOption(const char *pDesc, const char *pWantedOption);
 	bool OnMessageSuccess(int ClientID, const char *pDesc, const char *pReason);
 
 	int PrepareTempDescriptions(int ClientID);
 	void DoPageAccount(int ClientID, int *pNumOptions);
 	void DoPageMiscellaneous(int ClientID, int *pNumOptions);
+	void DoPageLanguages(int ClientID, int *pNumOptions);
 	void DoLineToggleOption(int Page, int *pNumOptions, const char *pDescription, bool Value);
 	void DoLineValueOption(int Page, int *pNumOptions, const char *pDescription, int Value, int Max = -1, int BulletPoint = BULLET_NONE);
 	void DoLineSeperator(int Page, int* pNumOptions);

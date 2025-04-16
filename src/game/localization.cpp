@@ -1,4 +1,4 @@
-// made by timakro (initially) and fokkonaut
+// made by fokkonaut
 
 #include "localization.h"
 
@@ -314,6 +314,9 @@ const char *CLocalizationDatabase::FindString(unsigned Hash, unsigned ContextHas
 bool CLocalizationDatabase::TryUnload(CGameContext *pGameServer, int Language)
 {
 	if (!pGameServer || Language == -1 || !m_vLanguages[Language].m_Loaded)
+		return false;
+
+	if (str_comp(m_vLanguages[Language].m_Name.c_str(), "English") == 0)
 		return false;
 
 	bool CanUnloadLanguage = true;
