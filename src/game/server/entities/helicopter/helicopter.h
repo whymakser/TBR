@@ -23,6 +23,7 @@ private:
 
 	int m_InputDirection;
 	float m_Health;
+	bool m_EngineOn;
 
 	void InitBody();
 	void InitPropellers();
@@ -55,7 +56,7 @@ private:
 	SBone *Body() { return &m_aBones[0]; } // size: NUM_BONES_BODY
 	SBone *TopPropeller() { return &m_aBones[NUM_BONES_BODY]; } // size: NUM_BONES_PROPELLERS_TOP
 	SBone *BackPropeller() { return &m_aBones[NUM_BONES_BODY + NUM_BONES_PROPELLERS_TOP]; } // size: NUM_BONES_PROPELLERS_BACK
-	void PutTurretToForeground();
+	void SortBones();
 
 public:
 	CHelicopter(CGameWorld *pGameWorld, vec2 Pos, int Team);

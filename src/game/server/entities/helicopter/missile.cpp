@@ -116,9 +116,7 @@ void CMissile::HandleCollisions()
 		pOwnerChar->IsAlive() &&
 		pTargetChr->IsAlive() &&
 		!pTargetChr->CanCollide(m_Owner))
-	{
 		IsWeaponCollide = true;
-	}
 
 	if ((pTargetChr || Collide || GameLayerClipped(m_Pos)) && !IsWeaponCollide)
 	{
@@ -129,13 +127,7 @@ void CMissile::HandleCollisions()
 
 	if (m_LifeSpan == -1)
 	{
-		GameServer()->CreateExplosion(collisionPos,
-									  m_Owner,
-									  WEAPON_GRENADE,
-									  m_Owner == -1,
-									  m_DDTeam, m_TeamMask);
-		GameServer()->CreateSound(collisionPos, SOUND_GRENADE_EXPLODE, m_TeamMask);
-		GameWorld()->DestroyEntity(this);
+		TriggerExplosions();
 		return;
 	}
 
@@ -148,8 +140,7 @@ void CMissile::HandleCollisions()
 	if (z && !((CGameControllerDDRace *)GameServer()->m_pController)->m_TeleOuts[z - 1].empty())
 	{
 		int Num = (int)((CGameControllerDDRace *)GameServer()->m_pController)->m_TeleOuts[z - 1].size();
-		m_Pos =
-			((CGameControllerDDRace *)GameServer()->m_pController)->m_TeleOuts[z - 1][(!Num) ? Num : rand() % Num];
+		m_Pos = ((CGameControllerDDRace *)GameServer()->m_pController)->m_TeleOuts[z - 1][(!Num) ? Num : rand() % Num];
 		m_StartTick = Server()->Tick();
 	}
 }
