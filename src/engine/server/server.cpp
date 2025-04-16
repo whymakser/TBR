@@ -2880,6 +2880,13 @@ int CServer::Run()
 			{
 				m_DnsblCache.m_vBlacklist.clear();
 				m_DnsblCache.m_vWhitelist.clear();
+				char aBuf[256];
+				str_format(aBuf, sizeof(aBuf), "%s/countries.txt", Config()->m_SvCountriesFilePath);
+				std::ofstream CountriesFile(aBuf, std::ios::trunc);
+				if (CountriesFile.is_open())
+					Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", "Cleared countries.txt due to long server runtime");
+				else
+					Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", "Failed to clear countries.txt, could not open file");
 			}
 
 			for (int i = 0; i < MAX_CLIENTS; i++)
