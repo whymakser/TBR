@@ -261,9 +261,9 @@ void CHelicopter::DestroyThingsInItsPath()
 		GetFullPropellerPositions(propellerPosA, propellerPosB);
 		bool collisionDetected =
 			MovingCircleHitsMovingSegment_Analytical(pChar->m_PrevPos - m_Pos, pChar->GetPos() - m_Pos,
-													 pChar->GetProximityRadius(),
-													 m_LastTopPropellerA, propellerPosA,
-													 m_LastTopPropellerB, propellerPosB);
+			pChar->GetProximityRadius(),
+			m_LastTopPropellerA, propellerPosA,
+			m_LastTopPropellerB, propellerPosB);
 		if (collisionDetected)
 		{
 			m_aBonedCharacters[cID] = Server()->Tick();
