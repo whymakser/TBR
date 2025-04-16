@@ -2984,33 +2984,33 @@ int CServer::Run()
 								str_copy(m_aClients[i].m_aCountryCode, pResult, sizeof(m_aClients[i].m_aCountryCode));
 							}
 							char aBuf[256];
-							str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> fetched country code=%s, suggesting '%s'", i, aAddrStr, m_aClients[i].m_aCountryCode, pLanguage);
+							str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> fetched country code=%s, suggesting '%s'", i, aAddrStr, pResult, pLanguage);
 							Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
-						}
 
-						// Insert and sort for faster lookup
-						{
-							std::map<unsigned int, std::string> HashMap;
-							char aFile[256];
-							str_format(aFile, sizeof(aFile), "%s/countries.txt", Config()->m_SvCountriesFilePath);
-							std::ifstream InFile(aFile);
-							std::string Line;
-							while (std::getline(InFile, Line))
+							// Insert and sort for faster lookup
 							{
-								if (Line.empty() || Line[0] == '#') continue;
-								unsigned int Hash;
-								char aCode[CClient::COUNTRYCODE_STRSIZE];
-								if (sscanf(Line.c_str(), "%u %s", &Hash, aCode) == 2)
-									HashMap[Hash] = aCode;
+								std::map<unsigned int, std::string> HashMap;
+								char aFile[256];
+								str_format(aFile, sizeof(aFile), "%s/countries.txt", Config()->m_SvCountriesFilePath);
+								std::ifstream InFile(aFile);
+								std::string Line;
+								while (std::getline(InFile, Line))
+								{
+									if (Line.empty() || Line[0] == '#') continue;
+									unsigned int Hash;
+									char aCode[CClient::COUNTRYCODE_STRSIZE];
+									if (sscanf(Line.c_str(), "%u %s", &Hash, aCode) == 2)
+										HashMap[Hash] = aCode;
+								}
+								InFile.close();
+
+								unsigned int NewHash = str_quickhash(aAddrStr);
+								HashMap[NewHash] = pResult;
+
+								std::ofstream OutFile(aFile, std::ios::trunc); // overwrite file
+								for (const auto &[Hash, Code] : HashMap)
+									OutFile << Hash << " " << Code << "\n";
 							}
-							InFile.close();
-
-							unsigned int NewHash = str_quickhash(aAddrStr);
-							HashMap[NewHash] = m_aClients[i].m_aCountryCode;
-
-							std::ofstream OutFile(aFile, std::ios::trunc); // overwrite file
-							for (const auto &[Hash, Code] : HashMap)
-								OutFile << Hash << " " << Code << "\n";
 						}
 
 						// Notify game and process language suggestion
