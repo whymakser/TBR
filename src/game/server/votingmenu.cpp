@@ -114,8 +114,8 @@ void CVotingMenu::AddPlaceholderVotes()
 
 const char *CVotingMenu::GetPageDescription(int ClientID, int Page)
 {
-	static char aBuf[64];
-	str_format(aBuf, sizeof(aBuf), "%s %s", Page == GetPage(ClientID) ? "☒" : "☐", m_aPages[Page].m_aName);
+	static char aBuf[VOTE_DESC_LENGTH];
+	str_format(aBuf, sizeof(aBuf), "%s %s", Page == GetPage(ClientID) ? "☒" : "☐", GameServer()->m_apPlayers[ClientID]->Localize(m_aPages[Page].m_aName, "vote-header"));
 	return aBuf;
 }
 
