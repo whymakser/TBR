@@ -220,7 +220,7 @@ CMissile::CMissile(CGameWorld *pGameWorld, int Owner, vec2 Pos, vec2 Vel, vec2 D
 	m_Owner = Owner;
 	CCharacter *pOwnerChar = GameServer()->GetPlayerChar(m_Owner);
 	m_DDTeam = pOwnerChar ? pOwnerChar->Team() : 0;
-	m_TeamMask = Mask128();
+	m_TeamMask = ((CGameControllerDDRace*)GameServer()->m_pController)->m_Teams.TeamMask(m_DDTeam);
 	m_LifeSpan = Span;
 	m_StartTick = Server()->Tick();
 
