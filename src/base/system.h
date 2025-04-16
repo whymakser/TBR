@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <optional>
 #include <string>
+#include <cstdint>
 
 #ifdef CONF_FAMILY_UNIX
 #include <sys/un.h>
