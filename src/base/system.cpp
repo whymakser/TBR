@@ -3380,9 +3380,9 @@ unsigned str_quickhash(const char *str)
 	return hash;
 }
 
-unsigned fnv1a(const char *str)
+uint32_t fnv1a(const char *str)
 {
-    unsigned hash = 2166136261u;
+	uint32_t hash = 2166136261u;
     while (*str)
     {
         hash ^= (uint8_t)(*str++);

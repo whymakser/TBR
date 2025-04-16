@@ -2982,7 +2982,7 @@ int CServer::Run()
 
 							// Insert and sort for faster lookup
 							{
-								std::map<unsigned int, std::string> HashMap;
+								std::map<uint32_t, std::string> HashMap;
 								char aFile[256];
 								str_format(aFile, sizeof(aFile), "%s/countries.txt", Config()->m_SvCountriesFilePath);
 								std::ifstream InFile(aFile);
@@ -2997,7 +2997,7 @@ int CServer::Run()
 								}
 								InFile.close();
 
-								unsigned int NewHash = fnv1a(aAddrStr);
+								uint32_t NewHash = fnv1a(aAddrStr);
 								HashMap[NewHash] = pResult;
 
 								std::ofstream OutFile(aFile, std::ios::trunc); // overwrite file
@@ -4396,7 +4396,7 @@ void CServer::CountryLookup(int ClientID)
 	std::fstream CountriesFile(aFile);
 	if (CountriesFile.is_open())
 	{
-		std::unordered_map<unsigned int, std::string> CountryHashMap;
+		std::unordered_map<uint32_t, std::string> CountryHashMap;
 		char aCode[CClient::COUNTRYCODE_STRSIZE];
 		unsigned int Hash;
 		std::string data;
