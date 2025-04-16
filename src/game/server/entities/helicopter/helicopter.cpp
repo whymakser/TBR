@@ -119,17 +119,13 @@ void CHelicopter::Reset()
 
 bool CHelicopter::AttachTurret(CHelicopterTurret *helicopterTurret)
 {
-	if (helicopterTurret == nullptr)
-	{
-		DestroyTurret();
+	DestroyTurret();
+
+	if (helicopterTurret == nullptr) // Just remove the current turret
 		return true;
-	}
 
-	if (helicopterTurret->TryBindHelicopter(this))
+	if (helicopterTurret->TryBindHelicopter(this)) // Attempt to pass ownership
 	{
-		if (m_pTurretAttachment)
-			DestroyTurret();
-
 		m_pTurretAttachment = helicopterTurret;
 		PutTurretToForeground();
 		return true;
@@ -155,14 +151,14 @@ void CHelicopter::FlingTee(CCharacter *pChar)
 	float helicopterVelocity = length(m_Vel);
 	float teeVelocity = length(pChar->GetCore().m_Vel);
 
-	vec2 directionAwayFromBlades = normalize(pChar->GetCore().m_Pos - m_Pos - TopPropeller()[0].m_To);
+	vec2 directionAwayFromBlades = normalize(pChar->m_PrevPos - m_Pos);
 	// Known at compile time
 	constexpr float teeMass = 10.f;
 	constexpr float helicopterMass = 18.f;
 	constexpr float transferForceTee = helicopterMass / teeMass; // POOR THING :SKULL: 💀
 	constexpr float transferForceHelicopter = teeMass / helicopterMass;
 	//
-	float totalVelocity = helicopterVelocity + teeVelocity;
+	float totalVelocity = clamp((helicopterVelocity + teeVelocity) * 0.75f, 5.f, 25.f);
 	vec2 teeAcceleration = directionAwayFromBlades * transferForceTee * totalVelocity;
 	vec2 helicopterAcceleration = -directionAwayFromBlades * transferForceHelicopter * totalVelocity;
 
@@ -193,7 +189,7 @@ void CHelicopter::Tick()
 		m_pTurretAttachment->Tick();
 
 	if (m_Health <= 0.f)
-		GameWorld()->DestroyEntity(this);
+		Reset();
 
 	m_PrevPos = m_Pos;
 	GetFullPropellerPositions(m_LastTopPropellerA, m_LastTopPropellerB);
@@ -234,7 +230,7 @@ void CHelicopter::ApplyAcceleration()
 	if (((m_InputDirection == -1 && !m_Flipped && m_Vel.x < 0.f) ||
 		(m_InputDirection == 1 && m_Flipped && m_Vel.x > 0.f)) &&
 		(!m_pTurretAttachment || !m_pTurretAttachment->m_Shooting ||
-		(m_Flipped != (m_pTurretAttachment->m_AimPosition.x < 0.f))))
+			(m_Flipped != (m_pTurretAttachment->m_AimPosition.x < 0.f))))
 		Flip();
 
 	SetAngle(m_Vel.x);
@@ -265,9 +261,9 @@ void CHelicopter::DestroyThingsInItsPath()
 		GetFullPropellerPositions(propellerPosA, propellerPosB);
 		bool collisionDetected =
 			MovingCircleHitsMovingSegment_Analytical(pChar->m_PrevPos - m_Pos, pChar->GetPos() - m_Pos,
-			pChar->GetProximityRadius(),
-			m_LastTopPropellerA, propellerPosA,
-			m_LastTopPropellerB, propellerPosB);
+													 pChar->GetProximityRadius(),
+													 m_LastTopPropellerA, propellerPosA,
+													 m_LastTopPropellerB, propellerPosB);
 		if (collisionDetected)
 		{
 			m_aBonedCharacters[cID] = Server()->Tick();
@@ -409,7 +405,7 @@ void CHelicopter::PutTurretToForeground()
 	// Update sorted IDs (low -> high | ascending)
 	for (int i = 0; i < NUM_BONES; i++)
 		m_aBones[i].m_ID = apIDs[i];
-	for (int i = 0; i < CMinigunTurret::NUM_BONES; i++)
+	for (int i = 0; i < numBonesTurret; i++)
 		m_pTurretAttachment->Bones()[i].m_ID = apIDs[NUM_BONES + i];
 	delete[] apIDs;
 }
