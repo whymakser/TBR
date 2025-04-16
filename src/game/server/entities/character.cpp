@@ -636,7 +636,7 @@ void CCharacter::FireWeapon()
 						Dir = vec2(0.f, -1.f);
 
 					vec2 EffectPos = ProjStartPos;
-					if (length(pTarget->m_Pos - ProjStartPos) > 0.0f)
+					if (length(pEnt->GetPos() - ProjStartPos) > 0.0f)
 						EffectPos = pEnt->GetPos() - normalize(pEnt->GetPos() - ProjStartPos) * GetProximityRadius() * 0.5f;
 					GameServer()->CreateHammerHit(EffectPos, TeamMask());
 
