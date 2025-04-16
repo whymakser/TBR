@@ -385,7 +385,7 @@ public:
 	void SortHand(SSeat *pSeat, int TrumpSuit)
 	{
 		std::vector<CCard> &vHandCards = pSeat->m_Player.m_vHandCards;
-		for (unsigned int i = 0; i < vHandCards.size(); i++)
+		for (int i = 0; i < (int)vHandCards.size(); i++)
 		{
 			if (pSeat->m_Player.m_HoveredCard == i)
 			{
