@@ -2880,7 +2880,6 @@ int CServer::Run()
 			{
 				m_DnsblCache.m_vBlacklist.clear();
 				m_DnsblCache.m_vWhitelist.clear();
-				m_CountryCache.clear();
 			}
 
 			for (int i = 0; i < MAX_CLIENTS; i++)
@@ -2988,7 +2987,15 @@ int CServer::Run()
 							Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 						}
 
-						m_CountryCache[aAddrStr] = m_aClients[i].m_aCountryCode;
+						char aFile[256];
+						str_format(aFile, sizeof(aFile), "%s/countries.txt", Config()->m_SvCountriesFilePath);
+						std::ofstream CountriesFile(aFile, std::ios_base::app | std::ios_base::out);
+						if (CountriesFile.is_open())
+						{
+							str_format(aBuf, sizeof(aBuf), "%u %s", str_quickhash(aAddrStr), m_aClients[i].m_aCountryCode);
+							CountriesFile << aBuf << "\n";
+						}
+
 						// Notify game and process language suggestion
 						GameServer()->OnCountryCodeLookup(i);
 					}
@@ -4351,20 +4358,35 @@ void CServer::CountryLookup(int ClientID)
 	char aAddrStr[NETADDR_MAXSTRSIZE];
 	net_addr_str(m_NetServer.ClientAddr(ClientID), aAddrStr, sizeof(aAddrStr), false);
 
-	auto it = m_CountryCache.find(aAddrStr);
-	if (it != m_CountryCache.end())
+	char aFile[256];
+	str_format(aFile, sizeof(aFile), "%s/countries.txt", Config()->m_SvCountriesFilePath);
+	std::fstream CountriesFile(aFile);
+	if (CountriesFile.is_open())
 	{
-		m_aClients[ClientID].m_CountryLookupState = CClient::COUNTRYLOOKUP_STATE_DONE;
-		str_copy(m_aClients[ClientID].m_aCountryCode, it->second.c_str(), sizeof(m_aClients[ClientID].m_aCountryCode));
+		unsigned int IPHash = str_quickhash(aAddrStr);
+		std::string data;
+		char aCode[CClient::COUNTRYCODE_STRSIZE];
+		unsigned int Hash;
+		while (getline(CountriesFile, data))
+		{
+			const char *pLine = data.c_str();
+			if (!str_length(pLine) || pLine[0] == '#') // skip empty lines and comments
+				continue;
+			if (sscanf(pLine, "%u %s", &Hash, aCode) == 2 && Hash == IPHash)
+			{
+				m_aClients[ClientID].m_CountryLookupState = CClient::COUNTRYLOOKUP_STATE_DONE;
+				str_copy(m_aClients[ClientID].m_aCountryCode, aCode, sizeof(m_aClients[ClientID].m_aCountryCode));
 
-		// Console output
-		char aBuf[256];
-		str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> found cached country=%s, suggesting '%s'", ClientID, aAddrStr, m_aClients[ClientID].m_aCountryCode,
-			g_Localization.GetLanguageFileName(g_Localization.GetLanguageByCode(m_aClients[ClientID].m_aCountryCode)));
-		Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
+				// Console output
+				char aBuf[256];
+				str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> found cached country=%s, suggesting '%s'", ClientID, aAddrStr, m_aClients[ClientID].m_aCountryCode,
+					g_Localization.GetLanguageFileName(g_Localization.GetLanguageByCode(m_aClients[ClientID].m_aCountryCode)));
+				Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 
-		GameServer()->OnCountryCodeLookup(ClientID);
-		return;
+				GameServer()->OnCountryCodeLookup(ClientID);
+				return;
+			}
+		}
 	}
 
 	IEngine *pEngine = Kernel()->RequestInterface<IEngine>();

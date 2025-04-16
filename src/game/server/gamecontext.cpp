@@ -5859,7 +5859,7 @@ bool CGameContext::LazyLoadTopAccounts(int Type)
 {
 	char aFile[256];
 	str_format(aFile, sizeof(aFile), "%s/topaccounts.txt", Config()->m_SvTopAccountsFilePath);
-	std::fstream TopAccsFile(aFile, std::ios::in);
+	std::fstream TopAccsFile(aFile);
 	if (!TopAccsFile.is_open())
 		return false;
 
@@ -7008,6 +7008,8 @@ void CGameContext::CreateFolders()
 	fs_makedir(Storage()->GetBinaryPath(Config()->m_SvAccFilePath, aBuf, sizeof(aBuf)));
 	fs_makedir(Storage()->GetBinaryPath(Config()->m_SvDonationFilePath, aBuf, sizeof(aBuf)));
 	fs_makedir(Storage()->GetBinaryPath(Config()->m_SvTopAccountsFilePath, aBuf, sizeof(aBuf)));
+	fs_makedir(Storage()->GetBinaryPath(Config()->m_SvLanguagesPath, aBuf, sizeof(aBuf)));
+	fs_makedir(Storage()->GetBinaryPath(Config()->m_SvCountriesFilePath, aBuf, sizeof(aBuf)));
 
 	char aPath[IO_MAX_PATH_LENGTH];
 
