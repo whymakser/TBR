@@ -1761,7 +1761,7 @@ void CDurak::PrepareStaticCards(CDurakGame *pGame, CDurakGame::SSeat *pSeat)
 						}
 					}
 
-					if (pSeat->m_Player.m_KeyboardControl || pSeat->m_Player.m_LastCursorMove < Server()->Tick() - Server()->TickSpeed() / 10)
+					if (pSeat->m_Player.m_KeyboardControl || pSeat->m_Player.m_LastCursorMove < Server()->Tick() - Server()->TickSpeed() * 0.15f)
 					{
 						pCard->SetTooltip(pSeat->m_Player.m_Tooltip);
 					}
