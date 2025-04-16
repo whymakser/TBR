@@ -23,7 +23,7 @@ protected:
 	int m_TurretType;
 	CHelicopter *m_pHelicopter;
 	SBone *m_apBones;
-	size_t m_NumBones;
+	int m_NumBones;
 
 	SBone m_TurretBone; // don't snap this one
 	vec2 m_Pivot;
@@ -53,7 +53,7 @@ public:
 	CHelicopterTurret(int TurretType, int NumBones,
 		const SBone& TurretBone, const vec2& Pivot,
 		float AimingRange, int ShootingCooldown);
-	~CHelicopterTurret();
+	virtual ~CHelicopterTurret();
 
 	// Sense
 	IServer *Server();
@@ -154,7 +154,7 @@ private:
 
 public:
 	CLauncherTurret();
-	~CLauncherTurret();
+	virtual ~CLauncherTurret();
 
 	// Ticking
 	void Tick() override;

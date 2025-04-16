@@ -59,7 +59,7 @@ private:
 
 public:
 	CHelicopter(CGameWorld *pGameWorld, vec2 Pos);
-	~CHelicopter() override;
+	virtual ~CHelicopter();
 
 	// Sense
 	bool IsFlipped() { return m_Flipped; }

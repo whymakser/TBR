@@ -17,7 +17,7 @@ bool MovingCircleHitsMovingSegment_Analytical(
 	vec2 relVel = circleVel - lineVel;
 
 	vec2 C0 = circleLast;
-	vec2 C1 = C0 + relVel;
+//	vec2 C1 = C0 + relVel;
 
 	vec2 L0 = lineLastA;
 	vec2 L1 = lineLastB;
@@ -234,7 +234,7 @@ void CHelicopter::ApplyAcceleration()
 	if (((m_InputDirection == -1 && !m_Flipped && m_Vel.x < 0.f) ||
 		(m_InputDirection == 1 && m_Flipped && m_Vel.x > 0.f)) &&
 		(!m_pTurretAttachment || !m_pTurretAttachment->m_Shooting ||
-		(m_Flipped != m_pTurretAttachment->m_AimPosition.x < 0.f)))
+		(m_Flipped != (m_pTurretAttachment->m_AimPosition.x < 0.f))))
 		Flip();
 
 	SetAngle(m_Vel.x);
@@ -396,7 +396,7 @@ void CHelicopter::PutTurretToForeground()
 	if (!m_pTurretAttachment)
 		return; // what turret?
 
-	size_t numBonesTurret = m_pTurretAttachment->GetNumBones();
+	int numBonesTurret = m_pTurretAttachment->GetNumBones();
 
 	// Get current IDs
 	int *apIDs = new int[NUM_BONES + numBonesTurret];
