@@ -133,7 +133,6 @@ void CProjectile::Tick()
 		return;
 	}
 
-	Config()->m_SvTestingCommands = 1;
 	if (pTargetHelicopter && pTargetHelicopter->OnTakeDamage())
 	{
 		GameServer()->CreateExplosion(ColPos, m_Owner, m_Type, m_Owner == -1, pTargetHelicopter->GetDDTeam(), m_TeamMask);
