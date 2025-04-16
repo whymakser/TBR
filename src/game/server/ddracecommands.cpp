@@ -2453,7 +2453,7 @@ void CGameContext::ConListLoadedLanguages(IConsole::IResult *pResult, void *pUse
 	CGameContext *pSelf = (CGameContext *)pUserData;
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", "Currently loaded languages:");
 	char aBuf[128];
-	for (unsigned int i = 0; i < g_Localization.Languages().size(); i++)
+	for (int i = 0; i < (int)g_Localization.Languages().size(); i++)
 	{
 		if (!g_Localization.Languages()[i].m_Loaded)
 			continue;
