@@ -772,7 +772,7 @@ public:
 	std::vector<CPickupDrop*> m_vPickupDropLimit;
 
 	// helicopter
-	void SpawnHelicopter(vec2 Pos, int TurretType);
+	void SpawnHelicopter(vec2 Pos, int TurretType, int Team);
 
 	//minigames disabled
 	bool m_aMinigameDisabled[NUM_MINIGAMES];

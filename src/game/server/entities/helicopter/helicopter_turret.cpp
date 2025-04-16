@@ -319,8 +319,8 @@ void CMinigunTurret::FireTurret()
 					Server()->TickSpeed() * 2,
 					false, true,
 					0.f, SOUND_GRENADE_EXPLODE);
-	GameServer()->CreateSound(startingPos, SOUND_GRENADE_FIRE, m_pHelicopter->GetOwner()->TeamMask());
-	GameServer()->CreateSound(startingPos, SOUND_GUN_FIRE, m_pHelicopter->GetOwner()->TeamMask());
+	GameServer()->CreateSound(startingPos, SOUND_GRENADE_FIRE, m_pHelicopter->TeamMask());
+	GameServer()->CreateSound(startingPos, SOUND_GUN_FIRE, m_pHelicopter->TeamMask());
 
 	m_ShootingBarrelIndex = (m_ShootingBarrelIndex + 1) % NUM_BONES_CLUSTER;
 	m_pHelicopter->SetVel(m_pHelicopter->GetVel() + -Direction * 0.5f);
@@ -462,9 +462,9 @@ void CLauncherTurret::FireTurret()
 				 startingPos,
 				 m_pHelicopter->GetVel() * 0.5f + Direction * missileStartingSpeed,
 				 Direction,
-				 Server()->TickSpeed() * 3, 0);
-	GameServer()->CreateSound(startingPos, SOUND_GRENADE_FIRE, m_pHelicopter->GetOwner()->TeamMask());
-	GameServer()->CreateSound(startingPos, SOUND_GRENADE_EXPLODE, m_pHelicopter->GetOwner()->TeamMask());
+				 Server()->TickSpeed() * 3);
+	GameServer()->CreateSound(startingPos, SOUND_GRENADE_FIRE, m_pHelicopter->TeamMask());
+	GameServer()->CreateSound(startingPos, SOUND_GRENADE_EXPLODE, m_pHelicopter->TeamMask());
 
 	m_pHelicopter->SetVel(m_pHelicopter->GetVel() + -Direction * 3.f);
 }

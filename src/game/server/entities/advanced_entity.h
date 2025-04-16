@@ -25,6 +25,7 @@ public:
 	virtual void ReleaseHooked() {}
 
 	int GetDDTeam() { return m_DDTeam; }
+	Mask128 TeamMask() { return m_TeamMask; }
 
 protected:
 	bool IsGrounded(bool GroundVel = false, bool AirVel = false);

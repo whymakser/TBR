@@ -58,7 +58,7 @@ private:
 	void PutTurretToForeground();
 
 public:
-	CHelicopter(CGameWorld *pGameWorld, vec2 Pos);
+	CHelicopter(CGameWorld *pGameWorld, vec2 Pos, int Team);
 	virtual ~CHelicopter();
 
 	// Sense

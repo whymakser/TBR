@@ -7721,10 +7721,10 @@ CLaserText *CGameContext::CreateLaserText(vec2 Pos, int Owner, const char *pText
 	return new CLaserText(&m_World, Pos, Owner, Seconds > 0 ? Server()->TickSpeed() * Seconds : -1, pText, (int)(strlen(pText)));
 }
 
-void CGameContext::SpawnHelicopter(vec2 Pos, int TurretType)
+void CGameContext::SpawnHelicopter(vec2 Pos, int TurretType, int Team)
 {
 	Pos.y -= 64.f;
-	auto Helicopter = new CHelicopter(&m_World, Pos);
+	CHelicopter *pHelicopter = new CHelicopter(&m_World, Pos, Team);
 
 	CHelicopterTurret* pTurret = nullptr;
     if (TurretType == TURRETTYPE_MINIGUN)
@@ -7732,9 +7732,8 @@ void CGameContext::SpawnHelicopter(vec2 Pos, int TurretType)
     else if (TurretType == TURRETTYPE_LAUNCHER)
 		pTurret = new CLauncherTurret();
 
-	if (!Helicopter->AttachTurret(pTurret))
+	if (!pHelicopter->AttachTurret(pTurret))
 		delete pTurret; // Failed to assign ownership
-
 }
 
 void CGameContext::UpdateHidePlayers(int UpdateID)

@@ -1339,7 +1339,7 @@ void CGameContext::ConHelicopter(IConsole::IResult *pResult, void *pUserData)
 	if (pChr)
 	{
 		int TurretType = pResult->NumArguments() > 1 ? pResult->GetInteger(1) : 0;
-		pSelf->SpawnHelicopter(pChr->GetPos(), TurretType);
+		pSelf->SpawnHelicopter(pChr->GetPos(), TurretType, pChr->Team());
 	}
 }
 
