@@ -774,65 +774,69 @@ bool CDurak::HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg)
 	return false;
 }
 
-const char *CDurak::GetCardSymbol(int Suit, int Rank, CDurakGame *pGame)
+const char *CDurak::GetCardSymbol(int Suit, int Rank, CDurakGame *pGame, int SnappingClient)
 {
-	if (Suit == -1 && Rank == -1) {
+	if (Suit == -1 && Rank == -1)
+	{
 		static const char *pBackCard = "🂠";
 		return pBackCard;
 	}
+	if (!(Suit < 0 || Suit > 3 || Rank < 6 || Rank > 14))
+	{
+		static const char *aapCards[4][9] = {
+			{"🂦", "🂧", "🂨", "🂩", "🂪", "🂫", "🂭", "🂮", "🂡"}, // Spades
+			{"🂶", "🂷", "🂸", "🂹", "🂺", "🂻", "🂽", "🂾", "🂱"}, // Hearts
+			{"🃆", "🃇", "🃈", "🃉", "🃊", "🃋", "🃍", "🃎", "🃁"}, // Diamonds
+			{"🃖", "🃗", "🃘", "🃙", "🃚", "🃛", "🃝", "🃞", "🃑"}  // Clubs
+		};
+		return aapCards[Suit][Rank - 6];
+	}
 	static char aBuf[MAX_NAME_LENGTH];
+	#define Localize(str, context) SnappingClient == -1 ? Localizable((str), (context)) : GameServer()->m_apPlayers[SnappingClient]->Localize((str), (context))
 	switch (Suit)
 	{
-	case CCard::IND_EMPTY: return " ";
-	case CCard::IND_DURAK_TABLE_LABEL: return "🂭   Durák";
-	case CCard::IND_KEYBOARD_ON: return "⌨☒";
-	case CCard::IND_KEYBOARD_OFF: return "⌨☐";
-	case CCard::IND_END_MOVE_BUTTON: return "[✓]";
-	case CCard::IND_START_TIMER:
-	{
-		if (pGame->NumParticipants() < MIN_DURAK_PLAYERS) return Localizable("Waiting…", "durak-name");
-		str_format(aBuf, sizeof(aBuf), "Start in %ds…", (int)(pGame->m_GameStartTick - Server()->Tick()) / Server()->TickSpeed() + 1);
-		return aBuf;
+		case CCard::IND_EMPTY: return " ";
+		case CCard::IND_DURAK_TABLE_LABEL: return "🂭   Durák";
+		case CCard::IND_KEYBOARD_ON: return "⌨☒";
+		case CCard::IND_KEYBOARD_OFF: return "⌨☐";
+		case CCard::IND_END_MOVE_BUTTON: return "[✓]";
+		case CCard::IND_START_TIMER:
+		{
+			if (pGame->NumParticipants() < MIN_DURAK_PLAYERS) return Localize("Waiting…", "durak-name");
+			str_format(aBuf, sizeof(aBuf), "Start in %ds…", (int)(pGame->m_GameStartTick - Server()->Tick()) / Server()->TickSpeed() + 1);
+			return aBuf;
+		}
+		case CCard::IND_PLAYERCOUNTER:
+		{
+			str_format(aBuf, sizeof(aBuf), Localize("Players - %d/%d", "durak-name"), pGame->NumParticipants(), (int)MAX_DURAK_PLAYERS);
+			return aBuf;
+		}
+		case CCard::IND_STAKE:
+		{
+			if (pGame->m_Stake == -1) return "> ??? <";
+			str_format(aBuf, sizeof(aBuf), "> %lld$ <", pGame->m_Stake);
+			return aBuf;
+		}
+		case CCard::IND_TOOLTIP_SELECT_ATTACK: return Localize("Select attack", "durak-name");
+		case CCard::IND_TOOLTIP_ATTACK: return Localize("Attack!", "durak-name");
+		case CCard::IND_TOOLTIP_DEFEND: return Localize("Defend", "durak-name");
+		case CCard::IND_TOOLTIP_PASS: return Localize("Pass!", "durak-name");
+		case CCard::IND_TOOLTIP_END_MOVE: return Localize("End move", "durak-name");
+		case CCard::IND_TOOLTIP_TAKE_CARDS: return Localize("Take cards", "durak-name");
+		case CCard::IND_TOOLTIP_ATTACKERS_TURN:
+		{
+			str_format(aBuf, sizeof(aBuf), "%s", Server()->ClientName(pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_ClientID));
+			return aBuf;
+		}
+		case CCard::IND_TOOLTIP_DEFENDER_PASSED: return Localize("Passed…", "durak-name");
+		case CCard::IND_TOOLTIP_NEXT_MOVE:
+		{
+			str_format(aBuf, sizeof(aBuf), Localize("Next move: %ds", "durak-name"), (int)(pGame->m_NextMove - Server()->Tick()) / Server()->TickSpeed() + 1);
+			return aBuf;
+		}
+		default: return "??";
 	}
-	case CCard::IND_PLAYERCOUNTER:
-	{
-		str_format(aBuf, sizeof(aBuf), Localizable("Players - %d/%d", "durak-name"), pGame->NumParticipants(), (int)MAX_DURAK_PLAYERS);
-		return aBuf;
-	}
-	case CCard::IND_STAKE:
-	{
-		if (pGame->m_Stake == -1) return "> ??? <";
-		str_format(aBuf, sizeof(aBuf), "> %lld$ <", pGame->m_Stake);
-		return aBuf;
-	}
-	case CCard::IND_TOOLTIP_SELECT_ATTACK: return Localizable("Select attack", "durak-name");
-	case CCard::IND_TOOLTIP_ATTACK: return Localizable("Attack!", "durak-name");
-	case CCard::IND_TOOLTIP_DEFEND: return Localizable("Defend", "durak-name");
-	case CCard::IND_TOOLTIP_PASS: return Localizable("Pass!", "durak-name");
-	case CCard::IND_TOOLTIP_END_MOVE: return Localizable("End move", "durak-name");
-	case CCard::IND_TOOLTIP_TAKE_CARDS: return Localizable("Take cards", "durak-name");
-	case CCard::IND_TOOLTIP_ATTACKERS_TURN:
-	{
-		str_format(aBuf, sizeof(aBuf), "%s", Server()->ClientName(pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_ClientID));
-		return aBuf;
-	}
-	case CCard::IND_TOOLTIP_DEFENDER_PASSED: return Localizable("Passed…", "durak-name");
-	case CCard::IND_TOOLTIP_NEXT_MOVE:
-	{
-		str_format(aBuf, sizeof(aBuf), Localizable("Next move: %ds", "durak-name"), (int)(pGame->m_NextMove - Server()->Tick()) / Server()->TickSpeed() + 1);
-		return aBuf;
-	}
-	}
-	if (Suit < 0 || Suit > 3 || Rank < 6 || Rank > 14) {
-		return "??";
-	}
-	static const char *aapCards[4][9] = {
-		{"🂦", "🂧", "🂨", "🂩", "🂪", "🂫", "🂭", "🂮", "🂡"}, // Spades
-		{"🂶", "🂷", "🂸", "🂹", "🂺", "🂻", "🂽", "🂾", "🂱"}, // Hearts
-		{"🃆", "🃇", "🃈", "🃉", "🃊", "🃋", "🃍", "🃎", "🃁"}, // Diamonds
-		{"🃖", "🃗", "🃘", "🃙", "🃚", "🃛", "🃝", "🃞", "🃑"}  // Clubs
-	};
-	return aapCards[Suit][Rank - 6];
+	#undef Localize
 }
 
 int CDurak::GetPlayerState(int ClientID)

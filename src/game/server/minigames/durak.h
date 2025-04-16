@@ -793,7 +793,7 @@ class CDurak : public CMinigame
 	void SendChatToParticipants(int Game, const char *pFormat, Args&&... args);
 
 	int GetPlayerState(int ClientID);
-	const char *GetCardSymbol(int Suit, int Rank, CDurakGame *pGame = 0);
+	const char *GetCardSymbol(int Suit, int Rank, CDurakGame *pGame = 0, int SnappingClient = -1);
 	void UpdatePassive(int ClientID, int Seconds);
 	void CreateFlyingPoint(int FromClientID, int Game, CCard *pToCard);
 
