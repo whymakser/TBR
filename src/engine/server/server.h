@@ -556,7 +556,7 @@ public:
 
 	bool IsBrowserScoreFix();
 
-	void SetCountryCode(int ClientID, const char *pLanguageCode);
+	void SetCountryCode(int ClientID, const char *pLanguageCode, bool Lookup, const char *pAddr);
 	void CountryLookup(int ClientID) override;
 	const char *GetCountryCode(int ClientID) override { return m_aClients[ClientID].m_aCountryCode; }
 

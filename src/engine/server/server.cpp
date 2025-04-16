@@ -2978,11 +2978,7 @@ int CServer::Run()
 						else
 						{
 							// Set
-							SetCountryCode(i, pResult);
-
-							char aBuf[256];
-							str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> fetched country code=%s, suggesting '%s'", i, aAddrStr, pResult, pLanguage);
-							Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
+							SetCountryCode(i, pResult, true, aAddrStr);
 
 							// Insert and sort for faster lookup
 							{
@@ -4364,7 +4360,7 @@ void CServer::PrintBotLookup()
 	m_BotLookupState = BOTLOOKUP_STATE_PENDING;
 }
 
-void CServer::SetCountryCode(int ClientID, const char *pLanguageCode)
+void CServer::SetCountryCode(int ClientID, const char *pLanguageCode, bool Lookup, const char *pAddr)
 {
 	int Language = g_Localization.GetLanguageByCode(pLanguageCode);
 	const char *pLanguage = g_Localization.GetLanguageFileName(Language);
@@ -4372,6 +4368,19 @@ void CServer::SetCountryCode(int ClientID, const char *pLanguageCode)
 	{
 		str_copy(m_aClients[ClientID].m_aCountryCode, pLanguageCode, sizeof(m_aClients[ClientID].m_aCountryCode));
 	}
+
+	// Console output
+	char aBuf[256];
+	if (Lookup)
+	{
+		str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> fetched country code=%s, suggesting '%s'", ClientID, pAddr, pLanguageCode, pLanguage);
+	}
+	else
+	{
+		str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> found cached country=%s, suggesting '%s'", ClientID, pAddr, pLanguageCode,
+			g_Localization.GetLanguageFileName(g_Localization.GetLanguageByCode(m_aClients[ClientID].m_aCountryCode)));
+	}
+	Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 }
 
 void CServer::CountryLookup(int ClientID)
@@ -4403,16 +4412,8 @@ void CServer::CountryLookup(int ClientID)
 		auto it = CountryHashMap.find(str_quickhash(aAddrStr));
 		if (it != CountryHashMap.end())
 		{
-			// Set
 			m_aClients[ClientID].m_CountryLookupState = CClient::COUNTRYLOOKUP_STATE_DONE;
-			SetCountryCode(ClientID, aCode);
-
-			// Console output
-			char aBuf[256];
-			str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> found cached country=%s, suggesting '%s'", ClientID, aAddrStr, aCode,
-				g_Localization.GetLanguageFileName(g_Localization.GetLanguageByCode(m_aClients[ClientID].m_aCountryCode)));
-			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
-
+			SetCountryCode(ClientID, aCode, false, aAddrStr);
 			GameServer()->OnCountryCodeLookup(ClientID);
 			return;
 		}
