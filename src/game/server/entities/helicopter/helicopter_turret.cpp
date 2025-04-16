@@ -123,7 +123,8 @@ CHelicopterTurret::~CHelicopterTurret()
 {
 	if (m_pHelicopter) // if helicopter was never set, ids were never set either
 		for (int i = 0; i < m_NumBones; i++)
-			Server()->SnapFreeID(m_apBones[i].m_ID);
+			if (m_apBones[i].m_ID != -1)
+				Server()->SnapFreeID(m_apBones[i].m_ID);
 	delete[] m_apBones;
 }
 
@@ -361,9 +362,9 @@ CMinigunTurret::CMinigunTurret()
 
 CMinigunTurret::~CMinigunTurret()
 {
-	if (m_pHelicopter) // if helicopter was never set, ids were never set either
-		for (int i = 0; i < m_NumBones; i++)
-			Server()->SnapFreeID(m_apBones[i].m_ID);
+//	if (m_pHelicopter) // if helicopter was never set, ids were never set either
+//		for (int i = 0; i < m_NumBones; i++)
+//			Server()->SnapFreeID(m_apBones[i].m_ID);
 }
 
 void CMinigunTurret::Tick()
@@ -501,9 +502,9 @@ CLauncherTurret::CLauncherTurret()
 
 CLauncherTurret::~CLauncherTurret()
 {
-	if (m_pHelicopter) // if helicopter was never set, ids were never set either
-		for (int i = 0; i < m_NumBones; i++)
-			Server()->SnapFreeID(m_apBones[i].m_ID);
+//	if (m_pHelicopter) // if helicopter was never set, ids were never set either
+//		for (int i = 0; i < m_NumBones; i++)
+//			Server()->SnapFreeID(m_apBones[i].m_ID);
 }
 
 void CLauncherTurret::Tick()
