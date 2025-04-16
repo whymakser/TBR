@@ -10,18 +10,18 @@ CTavern::CTavern(CGameContext *pGameServer) : CHouse(pGameServer, HOUSE_TAVERN)
 const char *CTavern::GetWelcomeMessage(int ClientID)
 {
 	static char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), GameServer()->m_apPlayers[ClientID]->Localize("Welcome to the tavern, %s! Press F4 to buy a grog."), Server()->ClientName(ClientID));
+	str_format(aBuf, sizeof(aBuf), Localizable("Welcome to the tavern, %s! Press F4 to buy a grog."), Server()->ClientName(ClientID));
 	return aBuf;
 }
 
 const char *CTavern::GetConfirmMessage(int ClientID)
 {
-	return GameServer()->m_apPlayers[ClientID]->Localize("Are you sure you want to buy a grog?");
+	return Localizable("Are you sure you want to buy a grog?");
 }
 
 const char *CTavern::GetEndMessage(int ClientID)
 {
-	return GameServer()->m_apPlayers[ClientID]->Localize("You canceled the purchase.");
+	return Localizable("You canceled the purchase.");
 }
 
 void CTavern::OnSuccess(int ClientID)

@@ -103,18 +103,18 @@ bool CShop::PageValid(int Page)
 const char *CShop::GetWelcomeMessage(int ClientID)
 {
 	static char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), GameServer()->m_apPlayers[ClientID]->Localize("Welcome to the shop, %s! Press F4 to start shopping."), Server()->ClientName(ClientID));
+	str_format(aBuf, sizeof(aBuf), Localizable("Welcome to the shop, %s! Press F4 to start shopping."), Server()->ClientName(ClientID));
 	return aBuf;
 }
 
 const char *CShop::GetConfirmMessage(int ClientID)
 {
-	return GameServer()->m_apPlayers[ClientID]->Localize("Are you sure you want to buy this item?");
+	return Localizable("Are you sure you want to buy this item?");
 }
 
 const char *CShop::GetEndMessage(int ClientID)
 {
-	return GameServer()->m_apPlayers[ClientID]->Localize("You canceled the purchase.");
+	return Localizable("You canceled the purchase.");
 }
 
 const char *CShop::GetHeadline(int Item)

@@ -12,7 +12,7 @@ CBank::CBank(CGameContext *pGameServer) : CHouse(pGameServer, HOUSE_BANK)
 const char *CBank::GetWelcomeMessage(int ClientID)
 {
 	static char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "Welcome to the bank, %s! Press F4 to manage your bank account.", Server()->ClientName(ClientID));
+	str_format(aBuf, sizeof(aBuf), Localizable("Welcome to the bank, %s! Press F4 to manage your bank account."), Server()->ClientName(ClientID));
 	return aBuf;
 }
 
@@ -22,11 +22,11 @@ const char *CBank::GetConfirmMessage(int ClientID)
 	static char aBuf[128];
 	if (m_aAssignmentMode[ClientID] == ASSIGNMENT_DEPOSIT)
 	{
-		str_format(aBuf, sizeof(aBuf), "Are you sure that you want to deposit %d money from your wallet to your bank account?", Amount);
+		str_format(aBuf, sizeof(aBuf), Localizable("Are you sure that you want to deposit %d money from your wallet to your bank account?"), Amount);
 	}
 	else if (m_aAssignmentMode[ClientID] == ASSIGNMENT_WITHDRAW)
 	{
-		str_format(aBuf, sizeof(aBuf), "Are you sure that you want to withdraw %d money from your bank account to your wallet?", Amount);
+		str_format(aBuf, sizeof(aBuf), Localizable("Are you sure that you want to withdraw %d money from your bank account to your wallet?"), Amount);
 	}
 	return aBuf;
 }
@@ -34,8 +34,8 @@ const char *CBank::GetConfirmMessage(int ClientID)
 const char *CBank::GetEndMessage(int ClientID)
 {
 	if (m_aClients[ClientID].m_State == STATE_CHOSE_ASSIGNMENT)
-		return "You can't use the bank without an account. Check '/account'.";
-	return "You cancelled the assignment.";
+		return Localizable("You can't use the bank without an account. Check '/account'.");
+	return Localizable("You cancelled the assignment.");
 }
 
 bool CBank::NotLoggedIn(int ClientID)
@@ -117,28 +117,31 @@ void CBank::OnPageChange(int ClientID)
 {
 	char aMsg[512];
 	const char *pFooter = "";
+	CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 	if (m_aClients[ClientID].m_Page <= PAGE_MAIN)
 	{
 		m_aAssignmentMode[ClientID] = ASSIGNMENT_NONE;
 		if (GameServer()->Config()->m_SvMoneyBankMode == 0)
 		{
-			str_format(aMsg, sizeof(aMsg), "Welcome to the bank!\n\nThis feature is currently disabled and your money is instantly saved.");
+			str_copy(aMsg, pPlayer->Localize("Welcome to the bank!\n\nThis feature is currently disabled and your money is instantly saved."), sizeof(aMsg));
 		}
 		else
 		{
-			str_format(aMsg, sizeof(aMsg), "Welcome to the bank!\n\nPlease select your option:\nF3: Deposit (+)\nF4: Withdraw (-).\n\nOnce you selected an option, shoot to the right to go one step forward, and shoot left to go one step back.");
+			str_copy(aMsg, pPlayer->Localize("Welcome to the bank!\n\nPlease select your option:\nF3: Deposit (+)\nF4: Withdraw (-).\n\nOnce you selected an option, shoot to the right to go one step forward, and shoot left to go one step back."), sizeof(aMsg));
 		}
 	}
 	else
 	{
-		pFooter = "Press F3 to confirm your assignment.";
-		const char *pAssignment = m_aAssignmentMode[ClientID] == ASSIGNMENT_DEPOSIT ? "D E P O S I T" : m_aAssignmentMode[ClientID] == ASSIGNMENT_WITHDRAW ? "W I T H D R A W" : "";
-		str_format(aMsg, sizeof(aMsg), "Bank: %lld\nWallet: %lld\n\n%s\n\n", GameServer()->m_Accounts[GameServer()->m_apPlayers[ClientID]->GetAccID()].m_Money, GameServer()->m_apPlayers[ClientID]->GetWalletMoney(), pAssignment);
+		pFooter = pPlayer->Localize("Press F3 to confirm your assignment.");
+		const char *pAssignment = m_aAssignmentMode[ClientID] == ASSIGNMENT_DEPOSIT ? pPlayer->Localize("D E P O S I T") :
+			m_aAssignmentMode[ClientID] == ASSIGNMENT_WITHDRAW ? pPlayer->Localize("W I T H D R A W") : "";
+		str_format(aMsg, sizeof(aMsg), "%s: %lld\n%s: %lld\n\n%s\n\n", pPlayer->Localize("Bank"), GameServer()->m_Accounts[pPlayer->GetAccID()].m_Money,
+			pPlayer->Localize("Wallet"), pPlayer->GetWalletMoney(), pAssignment);
 
 		char aAmount[64];
 		int Type = m_aClients[ClientID].m_Page;
 		if (Type == AMOUNT_EVERYTHING)
-			str_format(aAmount, sizeof(aAmount), "Everything (%d)", GetAmount(Type, ClientID));
+			str_format(aAmount, sizeof(aAmount), pPlayer->Localize("Everything (%d)"), GetAmount(Type, ClientID));
 		else
 			str_format(aAmount, sizeof(aAmount), "%d", GetAmount(Type));
 

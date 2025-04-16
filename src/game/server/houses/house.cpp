@@ -160,7 +160,7 @@ void CHouse::OnKeyPress(int ClientID, int Dir)
 void CHouse::ConfirmAssignment(int ClientID)
 {
 	char aBuf[128];
-	str_format(aBuf, sizeof(aBuf), "%s\n\nF3: yes\nF4: no", GetConfirmMessage(ClientID));
+	str_format(aBuf, sizeof(aBuf), "%s\n\nF3: yes\nF4: no", GameServer()->m_apPlayers[ClientID]->Localize(GetConfirmMessage(ClientID)));
 	SendWindow(ClientID, aBuf);
 	m_aClients[ClientID].m_State = STATE_CONFIRM;
 }
@@ -169,7 +169,7 @@ void CHouse::EndSession(int ClientID, bool Cancelled)
 {
 	if (Cancelled)
 	{
-		SendWindow(ClientID, GetEndMessage(ClientID));
+		SendWindow(ClientID, GameServer()->m_apPlayers[ClientID]->Localize(GetEndMessage(ClientID)));
 	}
 	else
 	{
