@@ -1923,100 +1923,100 @@ Aᴠᴀɪʟᴀʙʟᴇ Lᴀɴɢᴜᴀɢᴇs
 == Vᴇʀғᴜ̈ɢʙᴀʀᴇ Sᴘʀᴀᴄʜᴇɴ
 
 Rainbow will make your tee change the color very fast.
-== 
+== Regenbogen lässt deinen Tee sehr schnell die Farbe wechseln.
 
 Bloody will give your tee a permanent kill effect.
-== 
+== Bloody gibt deinem Tee einen permanenten Kill-Effekt.
 
 Police officers get help from the police bot. For more information about the specific police ranks, please say '/police'.
-== 
+== Polizisten erhalten Hilfe vom Polizei-Bot. Für weitere Informationen zu den spezifischen Polizeirängen, bitte '/police' eingeben.
 
 Using this item you can hide from other players behind bushes. If your ghost is activated you will be able to shoot plasma projectiles. How it works: '/helptoggle'
-== 
+== Mit diesem Item kannst du dich vor anderen Spielern hinter Büschen verstecken. Wenn dein Geist aktiviert ist, kannst du Plasmaprojektile schießen. Wie es funktioniert: '/helptoggle'
 
 If you have the room key you can enter the room. It's under the spawn and there is a money tile.
-== 
+== Wenn du den Raumschlüssel hast, kannst du den Raum betreten. Er befindet sich unter dem Spawn und dort gibt es ein Erfahrungsfeld.
 
 VIP Classic gives you some benefits, check '/vip'.
-== 
+== VIP Classic bietet dir einige Vorteile, siehe '/vip'.
 
 VIP+ gives you even more benefits than VIP Classic, check '/vip'.
-== 
+== VIP+ bietet dir noch mehr Vorteile als VIP Classic, siehe '/vip'.
 
 You will have shotgun if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
-== 
+== Du wirst eine Schrotflinte haben, wenn du respawnst. Für weitere Informationen über Spawn-Waffen, bitte '/spawnweapons' eingeben.
 
 You will have grenade if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
-== 
+== Du wirst eine Granate haben, wenn du respawnst. Für weitere Informationen über Spawn-Waffen, bitte '/spawnweapons' eingeben.
 
 You will have rifle if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
-== 
+== Du wirst ein Gewehr haben, wenn du respawnst. Für weitere Informationen über Spawn-Waffen, bitte '/spawnweapons' eingeben.
 
 It will make your jetpack gun be a ninja. Toggle it using '/ninjajetpack'.
-== 
+== Es macht deine Jetpack-Waffe zu einem Ninja. Schalte es mit '/ninjajetpack' um.
 
 Taser is a rifle that freezes a player. For more information about the taser and your taser stats, plase visit '/taser'.
-== 
+== Der Taser ist ein Gewehr, das einen Spieler einfriert. Für weitere Informationen über den Taser und deine Taser-Statistiken, besuche bitte '/taser'.
 
 Taser battery is required to use the taser. Maximum amount of ammo is 100. Plase visit '/taser'.
-== 
+== Eine Taser-Batterie wird benötigt, um den Taser zu benutzen. Maximale Munitionsmenge ist 100. Bitte besuche '/taser'.
 
 With Portal Rifle you can create two portals where your cursor is, then teleport between them.
-== 
+== Mit dem Portal-Gewehr kannst du zwei Portale dort erstellen, wo dein Cursor ist, und dann zwischen ihnen teleportieren.
 
 Create portal blockers hammer and this ammo with your cursor. See '/portal' for your current amount. How it works: '/helptoggle'
-== 
+== Erstelle Portal-Blocker-Hammer und diese Munition mit deinem Cursor. Siehe '/portal' für deine aktuelle Menge. Wie es funktioniert: '/helptoggle'
 
 Welcome to the shop, %s! Press F4 to start shopping.
-== 
+== Willkommen im Shop, %s! Drücke F4, um mit dem Einkaufen zu beginnen.
 
 Are you sure you want to buy this item?
-== 
+== Bist du sicher, dass du diesen Gegenstand kaufen möchtest?
 
 You canceled the purchase.
-== 
+== Du hast den Kauf abgebrochen.
 
 You own this item until you die.
-== 
+== Du besitzt diesen Gegenstand, bis du stirbst.
 
 You own this item until\nyou disconnect.
-== 
+== Du besitzt diesen Gegenstand, bis\ndu dich abmeldest.
 
 You own this item forever.
-== 
+== Du besitzt diesen Gegenstand für immer.
 
 You own this item for 30 days.
-== 
+== Du besitzt diesen Gegenstand für 30 Tage.
 
 You own this item for 20 days.
-== 
+== Du besitzt diesen Gegenstand für 20 Tage.
 
 You own this item for 7 days.
-== 
+== Du besitzt diesen Gegenstand für 7 Tage.
 
 You own this item for 5 days.
-== 
+== Du besitzt diesen Gegenstand für 5 Tage.
 
 Welcome to the shop!\n\nBy shooting to the right you go one site forward, and by shooting left you go one site back.
-== 
+== Willkommen im Shop!\n\nDurch Schießen nach rechts gehst du eine Seite vor, und durch Schießen nach links gehst du eine Seite zurück.
 
 for sale
-== 
+== zu verkaufen
 
 discount
-== 
+== Rabatt
 
 If you want to buy an item, press F3
-== 
+== Wenn du einen Gegenstand kaufen möchtest, drücke F3
 
 Welcome to the tavern, %s! Press F4 to buy a grog.
-== 
+== Willkommen in der Taverne, %s! Drücke F4, um einen Grog zu kaufen.
 
 Are you sure you want to buy a grog?
-== 
+== Bist du sicher, dass du einen Grog kaufen möchtest?
 
 Press F3 to confirm your assignment.
-== 
+== Drücke F3, um deine Zuweisung zu bestätigen.
 
 Welcome to the tavern!\n\nIf you would like to buy a grog for %d money, please press F3.
-== 
+== Willkommen in der Taverne!\n\nWenn du einen Grog für %d Geld kaufen möchtest, drücke bitte F3.
