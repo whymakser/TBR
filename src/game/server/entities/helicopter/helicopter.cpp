@@ -99,11 +99,6 @@ CHelicopter::CHelicopter(CGameWorld *pGameWorld, vec2 Pos)
 		Bone.Scale(scaleFactor);
 	//
 
-	for (int i = 0; i < NUM_BONES; i++)
-		m_aBones[i].m_ID = Server()->SnapNewID();
-	for (int i = 0; i < NUM_TRAILS; i++)
-		m_aTrails[i].m_ID = Server()->SnapNewID();
-
 	GameWorld()->InsertEntity(this);
 }
 
@@ -239,7 +234,7 @@ void CHelicopter::ApplyAcceleration()
 	if (((m_InputDirection == -1 && !m_Flipped && m_Vel.x < 0.f) ||
 		(m_InputDirection == 1 && m_Flipped && m_Vel.x > 0.f)) &&
 		(!m_pTurretAttachment || !m_pTurretAttachment->m_Shooting ||
-			(m_Flipped != m_pTurretAttachment->m_AimPosition.x < 0.f)))
+		(m_Flipped != m_pTurretAttachment->m_AimPosition.x < 0.f)))
 		Flip();
 
 	SetAngle(m_Vel.x);
@@ -252,10 +247,10 @@ void CHelicopter::DestroyThingsInItsPath()
 
 	CCharacter *aPossibleCollisions[5];
 	int numFound = GameWorld()->FindEntities(m_Pos,
-											 m_TopPropellerRadius + 200.f,
-											 (CEntity **)aPossibleCollisions,
-											 5,
-											 CGameWorld::ENTTYPE_CHARACTER);
+		m_TopPropellerRadius + 200.f,
+		(CEntity **)aPossibleCollisions,
+		5,
+		CGameWorld::ENTTYPE_CHARACTER);
 	if (!numFound)
 		return;
 
@@ -270,9 +265,9 @@ void CHelicopter::DestroyThingsInItsPath()
 		GetFullPropellerPositions(propellerPosA, propellerPosB);
 		bool collisionDetected =
 			MovingCircleHitsMovingSegment_Analytical(pChar->m_PrevPos - m_Pos, pChar->GetPos() - m_Pos,
-													 pChar->GetProximityRadius(),
-													 m_LastTopPropellerA, propellerPosA,
-													 m_LastTopPropellerB, propellerPosB);
+			pChar->GetProximityRadius(),
+			m_LastTopPropellerA, propellerPosA,
+			m_LastTopPropellerB, propellerPosB);
 		if (collisionDetected)
 		{
 			m_aBonedCharacters[cID] = Server()->Tick();
@@ -343,7 +338,7 @@ void CHelicopter::Dismount()
 	m_GroundVel = true;
 	if (GetOwner())
 	{
-		GetOwner()->m_pHelicopter = 0;
+		GetOwner()->m_pHelicopter = nullptr;
 		GetOwner()->SetWeapon(GetOwner()->GetLastWeapon());
 		GameServer()->SendTuningParams(m_Owner, GetOwner()->m_TuneZone);
 	}
@@ -389,7 +384,7 @@ void CHelicopter::Snap(int SnappingClient)
 		Bone.Snap(SnappingClient);
 
 	if (GetOwner() || !IsGrounded())
-		for (CTrail& m_aTrail : m_aTrails)
+		for (STrail& m_aTrail : m_aTrails)
 			m_aTrail.Snap(SnappingClient);
 
 	if (m_pTurretAttachment)
@@ -422,20 +417,20 @@ void CHelicopter::PutTurretToForeground()
 void CHelicopter::InitBody()
 {
 	SBone aBones[NUM_BONES_BODY] = {
-		SBone(this, 70, 45, 50, 60),
-		SBone(this, -55, 60, 50, 60),
-		SBone(this, -25, 40, -30, 60),
-		SBone(this, 25, 40, 30, 60),
-		SBone(this, 0, -40, 0, -60),
-		SBone(this, 35, 40, -35, 40),
-		SBone(this, 60, 10, 35, 40),
-		SBone(this, 25, -40, 60, 10),
-		SBone(this, -35, -40, 25, -40),
-		SBone(this, -45, 0, -35, -40),
-		SBone(this, -100, 0, -45, 0),
-		SBone(this, -120, -30, -100, 0),
-		SBone(this, -105, 20, -120, -30),
-		SBone(this, -35, 40, -105, 20),
+		SBone(this, Server()->SnapNewID(), 70, 45, 50, 60),
+		SBone(this, Server()->SnapNewID(), -55, 60, 50, 60),
+		SBone(this, Server()->SnapNewID(), -25, 40, -30, 60),
+		SBone(this, Server()->SnapNewID(), 25, 40, 30, 60),
+		SBone(this, Server()->SnapNewID(), 0, -40, 0, -60),
+		SBone(this, Server()->SnapNewID(), 35, 40, -35, 40),
+		SBone(this, Server()->SnapNewID(), 60, 10, 35, 40),
+		SBone(this, Server()->SnapNewID(), 25, -40, 60, 10),
+		SBone(this, Server()->SnapNewID(), -35, -40, 25, -40),
+		SBone(this, Server()->SnapNewID(), -45, 0, -35, -40),
+		SBone(this, Server()->SnapNewID(), -100, 0, -45, 0),
+		SBone(this, Server()->SnapNewID(), -120, -30, -100, 0),
+		SBone(this, Server()->SnapNewID(), -105, 20, -120, -30),
+		SBone(this, Server()->SnapNewID(), -35, 40, -105, 20),
 	}; // 0-4: base, 5: propeller bottom, 6-10: body, 11-13: tail
 	mem_copy(Body(), aBones, sizeof(SBone) * NUM_BONES_BODY);
 }
@@ -445,7 +440,7 @@ void CHelicopter::InitPropellers()
 	float Radius = m_TopPropellerRadius;
 	for (int i = 0; i < NUM_BONES_PROPELLERS_TOP; i++)
 	{
-		TopPropeller()[i] = SBone(this, vec2(Radius, -60.f), vec2(0, -60.f));
+		TopPropeller()[i] = SBone(this, Server()->SnapNewID(), vec2(Radius, -60.f), vec2(0, -60.f));
 		TopPropeller()[i].m_Color = LASERTYPE_DOOR;
 		Radius *= -1;
 	}
@@ -453,9 +448,9 @@ void CHelicopter::InitPropellers()
 	Radius = m_BackPropellerRadius;
 	for (int i = 0; i < NUM_BONES_PROPELLERS_BACK; i++)
 	{
-		BackPropeller()[i] = SBone(this, vec2(-110.f + Radius, -10.f), vec2(-110.f, -10.f));
+		BackPropeller()[i] = SBone(this, Server()->SnapNewID(), vec2(-110.f + Radius, -10.f), vec2(-110.f, -10.f));
 		Radius *= -1;
-		m_aTrails[i].m_pPos = &BackPropeller()[i].m_From;
+		m_aTrails[i] = STrail(this, Server()->SnapNewID(), &BackPropeller()[i].m_From);
 	}
 }
 
