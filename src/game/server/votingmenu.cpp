@@ -570,7 +570,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 		int NumWantedPlayers = clamp((int)m_vWantedPlayers.size() - StartIndex, 0, (int)NUM_WANTEDS_PER_PAGE);
 		int NumPages = GetNumWantedPages();
 		int NumEntriesCollapse = NumPages > 1 ? NUM_WANTEDS_PER_PAGE + 1 : NumWantedPlayers;
-		if (DoLineCollapse(Page, pNumOptions, COLLAPSE_HEADER_WANTED_PLAYERS, m_aClients[ClientID].m_ShowWantedPlayers, NumEntriesCollapse))
+		if (DoLineCollapse(Page, pNumOptions, pPlayer->Localize(COLLAPSE_HEADER_WANTED_PLAYERS), m_aClients[ClientID].m_ShowWantedPlayers, NumEntriesCollapse))
 		{
 			int PlayersLeft = NumWantedPlayers;
 			for (unsigned int i = StartIndex; i < m_vWantedPlayers.size() && PlayersLeft; i++)
@@ -599,7 +599,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 
 	bool ShowEuros = GameServer()->Config()->m_SvEuroMode || pAccount->m_Euros > 0;
 	bool ShowPortalDate = GameServer()->Config()->m_SvPortalRifleShop || pAccount->m_PortalRifle;
-	if (DoLineCollapse(Page, pNumOptions, COLLAPSE_HEADER_ACC_INFO, m_aClients[ClientID].m_ShowAccountInfo, 5 + (int)ShowEuros + (int)ShowPortalDate))
+	if (DoLineCollapse(Page, pNumOptions, pPlayer->Localize(COLLAPSE_HEADER_ACC_INFO), m_aClients[ClientID].m_ShowAccountInfo, 5 + (int)ShowEuros + (int)ShowPortalDate))
 	{
 		str_format(aBuf, sizeof(aBuf), "%s: %s", pPlayer->Localize("Account Name"), pAccount->m_Username);
 		DoLineText(Page, pNumOptions, aBuf);
@@ -657,7 +657,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 
 	int PlotID = GameServer()->GetPlotID(AccID);
 	bool BankEnabled = GameServer()->Config()->m_SvMoneyBankMode != 0;
-	if (DoLineCollapse(Page, pNumOptions, COLLAPSE_HEADER_ACC_STATS, m_aClients[ClientID].m_ShowAccountStats, 11 + (int)BankEnabled))
+	if (DoLineCollapse(Page, pNumOptions, pPlayer->Localize(COLLAPSE_HEADER_ACC_STATS), m_aClients[ClientID].m_ShowAccountStats, 11 + (int)BankEnabled))
 	{
 		str_format(aBuf, sizeof(aBuf), "%s [%d]", pPlayer->Localize("Level"), pAccount->m_Level);
 		DoLineText(Page, pNumOptions, aBuf);
@@ -719,7 +719,7 @@ void CVotingMenu::DoPageAccount(int ClientID, int *pNumOptions)
 	if (PlotID >= PLOT_START)
 	{
 		char aPlotHeader[32];
-		str_format(aPlotHeader, sizeof(aPlotHeader), "%s %d", COLLAPSE_HEADER_PLOT_INFO, PlotID);
+		str_format(aPlotHeader, sizeof(aPlotHeader), "%s %d", pPlayer->Localize(COLLAPSE_HEADER_PLOT_INFO), PlotID);
 		bool IsPlotDestroy = GameServer()->m_aPlots[PlotID].m_DestroyEndTick;
 		if (DoLineCollapse(Page, pNumOptions, aPlotHeader, m_aClients[ClientID].m_ShowPlotInfo, 4 + (int)IsPlotDestroy*2))
 		{
@@ -1188,12 +1188,10 @@ void CVotingMenu::DoLineText(int Page, int *pNumOptions, const char *pDescriptio
 bool CVotingMenu::DoLineCollapse(int Page, int *pNumOptions, const char *pDescription, bool ShowContent, int NumEntries)
 {
 	char aBuf[VOTE_DESC_LENGTH];
-	char aDescription[VOTE_DESC_LENGTH];
-	str_copy(aDescription, Localize(pDescription, m_TempLanguage), sizeof(aDescription));
 	const char *pPrefix = ShowContent ? "╭─" : ">";
 	const char *pSuffix = ShowContent ? "[‒]" : "[+]";
 	int PrefixLength = str_length(pPrefix);
-	int DescLength = str_length(aDescription);
+	int DescLength = str_length(pDescription);
 	int SuffixLength = str_length(pSuffix);
 	int TotalWidth = VOTE_DESC_LENGTH - 1; // -1 for null terminator ofc
 	int TotalSpaces = min(20, TotalWidth - PrefixLength - DescLength - SuffixLength);
@@ -1211,7 +1209,7 @@ bool CVotingMenu::DoLineCollapse(int Page, int *pNumOptions, const char *pDescri
 	if (ShowContent)
 		m_NumCollapseEntries = NumEntries;
 
-	str_format(aBuf, sizeof(aBuf), "%s%s%s%s%s", pPrefix, aSpacesBefore, aDescription, aSpacesAfter, pSuffix);
+	str_format(aBuf, sizeof(aBuf), "%s%s%s%s%s", pPrefix, aSpacesBefore, pDescription, aSpacesAfter, pSuffix);
 	ADDLINE_COLLAPSE(aBuf);
 	return ShowContent;
 }
