@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <optional>
 #include <string>
+#include <cstdint>
 
 #ifdef CONF_FAMILY_UNIX
 #include <sys/un.h>
@@ -1887,6 +1888,8 @@ float str_tofloat(const char *str);
 int str_isspace(char c);
 char str_uppercase(char c);
 unsigned str_quickhash(const char *str);
+
+uint32_t fnv1a(const char *str);
 
 struct SKELETON;
 void str_utf8_skeleton_begin(struct SKELETON* skel, const char* str);

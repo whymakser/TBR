@@ -21,6 +21,7 @@
 #include <list>
 #include <vector>
 #include <string>
+#include <map>
 
 #if defined (CONF_SQL)
 	#include "sql_connector.h"
@@ -555,6 +556,7 @@ public:
 
 	bool IsBrowserScoreFix();
 
+	void SetCountryCode(int ClientID, const char *pLanguageCode, bool Lookup, const char *pAddr);
 	void CountryLookup(int ClientID) override;
 	const char *GetCountryCode(int ClientID) override { return m_aClients[ClientID].m_aCountryCode; }
 
@@ -661,8 +663,8 @@ public:
 	};
 	void TranslateChat(int ClientID, const char *pMsg, int Mode) override;
 	int m_TranslateState;
-	const char *GetLanguage(int ClientID) override { return m_aClients[ClientID].m_aChatLanguage; }
-	void SetLanguage(int ClientID, const char *pLanguage) override { str_copy(m_aClients[ClientID].m_aChatLanguage, pLanguage, sizeof(m_aClients[ClientID].m_aChatLanguage)); }
+	const char *GetChatLanguage(int ClientID) override { return m_aClients[ClientID].m_aChatLanguage; }
+	void SetChatLanguage(int ClientID, const char *pLanguage) override { str_copy(m_aClients[ClientID].m_aChatLanguage, pLanguage, sizeof(m_aClients[ClientID].m_aChatLanguage)); }
 
 	const char *GetClientVersionStr(int ClientID) const;
 

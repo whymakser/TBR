@@ -1014,9 +1014,6 @@ Your previously collected money got added to your account due to login
 Successfully logged out
 == Erfolgreich ausgeloggt
 
-Load recent design '%s'?
-== Vorheriges Design laden '%s'?
-
 The plot auction by '%s' is cancelled
 == Die Grundstücksauktion von '%s' wurde abgebrochen
 
@@ -1072,7 +1069,7 @@ You have no double-xp lifes anymore (last use)
 == Du hast keine Doppel-XP-Leben mehr (letzte Verwendung)
 
 You will not receive sounds from the server while farming on a moneytile
-== Du wirst keine Sounds vom Server empfangen, während du auf einer Geldkachel farmst
+== Du wirst keine Sounds vom Server empfangen, während du auf einem Erfahrungsfeld farmst
 
 You will receive all sounds again
 == Du wirst wieder alle Sounds empfangen
@@ -1188,11 +1185,11 @@ You can't close your door because the police destroyed it
 You lost, you can wait for another round or leave the lobby using '/leave'
 == Du hast verloren, du kannst auf eine weitere Runde warten oder die Lobby mit '/leave' verlassen
 
-Too many players on police tiles
-== Zu viele Spieler auf den Polizei-Kacheln
+Too many players on police tiles [%d/%d]
+== Zu viele Spieler auf den Polizei-Feldern [%d/%d]
 
 You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'
-== Du musst eingeloggt sein, um Geldkacheln zu nutzen.\nErstelle ein Konto mit '/register <name> <pw> <pw>'
+== Du musst eingeloggt sein, um Erfahrungsfelder zu nutzen.\nErstelle ein Konto mit '/register <name> <pw> <pw>'
 
 Congratulations, +20%% taser shield, current: %d%%. Use '/taser' to check later.
 == Glückwunsch, +20%% Taser-Schild, aktuell: %d%%. Verwende '/taser', um es später zu überprüfen.
@@ -1505,3 +1502,551 @@ Your stake got returned: +%lld money.
 
 You got +%lld money from others leaving the game.
 == Du hast +%lld Geld von anderen erhalten, die das Spiel verlassen haben.
+
+Change language to %s?
+== Sprache auf %s ändern?
+
+Load recent design?
+== Lade vorheriges Design?
+
+F-DDrace is a mod by fokkonaut
+== F-DDrace ist eine Mod von fokkonaut
+
+This mod is based on Teeworlds 0.7 and also incorporates features, ideas, and partial implementations
+== Diese Mod basiert auf Teeworlds 0.7 und enthält auch Funktionen, Ideen und Teil-Implementierungen
+
+from DDNet++ by ChillerDragon, DDNet, and other community projects, aswell as many custom features!
+== von DDNet++ von ChillerDragon, DDNet und anderen Community-Projekten, sowie eine eigener Funktionen!
+
+If you want to check out the code or contribute, feel free to check out F-DDrace on GitHub:
+== Wenn du den Quellcode ansehen oder dazu beitragen möchtest, schau gerne bei F-DDrace auf GitHub vorbei:
+
+For more info, say '/cmdlist' or '/credits'
+== Für weitere Informationen gib '/cmdlist' oder '/credits' ein
+
+to check a server setting say /settings and setting's name, setting names are:
+== um eine Servereinstellung zu prüfen, gib /settings und den Namen der Einstellung ein, Einstellungsnamen sind:
+
+Teams are disabled
+== Teams sind deaktiviert
+
+This team can't be locked
+== Dieses Team kann nicht gesperrt werden
+
+'%s' unlocked your team.
+== '%s' hat dein Team entsperrt.
+
+Team locking is disabled on this server
+== Team-Sperrung ist auf diesem Server deaktiviert
+
+'%s' locked your team. After the race started killing will kill everyone in your team.
+== '%s' hat dein Team gesperrt. Nachdem das Rennen begonnen hat, wird das Sterben alle in deinem Team töten.
+
+Invites are disabled
+== Einladungen sind deaktiviert
+
+Player already invited
+== Spieler bereits eingeladen
+
+Can't invite this quickly
+== Kann nicht so schnell einladen
+
+'%s' invited you to team %d.
+== '%s' hat dich zu Team %d eingeladen.
+
+'%s' invited '%s' to your team.
+== '%s' hat '%s' in dein Team eingeladen.
+
+You are running a vote please try again after the vote is done!
+== Du führst gerade eine Abstimmung durch, bitte versuche es erneut, wenn die Abstimmung beendet ist!
+
+You must join a team and play with somebody or else you can't play
+== Du musst einem Team beitreten und mit jemandem spielen, sonst kannst du nicht spielen
+
+You can't change teams while you are dead/a spectator.
+== Du kannst keine Teams wechseln, während du tot/ein Zuschauer bist.
+
+You can't change teams that fast!
+== Du kannst nicht so schnell die Teams wechseln!
+
+You can't join teams in this minigame
+== Du kannst in diesem Minispiel keinem Team beitreten
+
+This team is locked using /lock. Only members of the team can unlock it using /lock.
+== Dieses Team ist mit /lock gesperrt. Nur Mitglieder des Teams können es mit /lock entsperren.
+
+This team is locked using /lock. Only members of the team can invite you or unlock it using /lock.
+== Dieses Team ist mit /lock gesperrt. Nur Mitglieder des Teams können dich einladen oder es mit /lock entsperren.
+
+This team already has the maximum allowed size of %d players
+== Dieses Team hat bereits die maximale erlaubte Größe von %d Spielern
+
+%s joined team %d
+== %s ist Team %d beigetreten
+
+You cannot join this team at this time
+== Du kannst diesem Team zurzeit nicht beitreten
+
+You can't check your team while you are dead/a spectator.
+== Du kannst dein Team nicht überprüfen, während du tot/ein Zuschauer bist.
+
+/me is disabled on this server
+== /me ist auf diesem Server deaktiviert
+
+E-Mail
+== E-Mail
+
+Discord server
+== Discord-Server
+
+%s was killed by %s
+== %s wurde von %s getötet
+
+'%s' banned '%s' for %d seconds from voting.
+== '%s' hat '%s' für %d Sekunden vom Abstimmen ausgeschlossen.
+
+'%s' unbanned '%s' from voting.
+== '%s' hat den Abstimmungsausschluss für '%s' aufgehoben.
+
+Use /pause first then you can kill
+== Benutze zuerst /pause, dann kannst neu spawnen
+
+Only %d active players are allowed
+== Es sind nur %d aktive Spieler erlaubt
+
+All players were moved to the game
+== Alle Spieler wurden ins Spiel verschoben
+
+All players were moved to the spectators
+== Alle Spieler wurden zu den Zuschauern verschoben
+
+Authorized player forced server option '%s' (%s)
+== Autorisierter Spieler erzwang Serveroption '%s' (%s)
+
+'%s' was moved to spectator (%s)
+== '%s' wurde zum Zuschauer verschoben (%s)
+
+Listing players with "%s" in name:
+== Liste der Spieler mit "%s" im Namen:
+
+Listing all players:
+== Liste aller Spieler:
+
+You can only vote after logging in.
+== Du kannst erst nach dem Einloggen abstimmen.
+
+Wait for current vote to end before calling a new one.
+== Warte, bis die aktuelle Abstimmung endet, bevor du eine neue startest.
+
+You must wait %d seconds before making your first vote.
+== Du musst %d Sekunden warten, bevor du deine erste Abstimmung starten kannst.
+
+You must wait %d seconds before making another vote.
+== Du musst %d Sekunden warten, bevor du eine weitere Abstimmung starten kannst.
+
+You are not permitted to vote for the next %d seconds.
+== Du darfst in den nächsten %d Sekunden nicht abstimmen.
+
+There's a %d second delay between map-votes, please wait %d seconds.
+== Es gibt eine Verzögerung von %d Sekunden zwischen Map-Abstimmungen, bitte warte %d Sekunden.
+
+%s has finished and didn't go through start yet, wait for him or join another team.
+== %s hat beendet und ist noch nicht durch den Start gegangen, warte auf ihn oder tritt einem anderen Team bei.
+
+%s wants to start a new round, kill or walk to start.
+== %s möchte eine neue Runde starten, spawne neu oder gehe zum Start.
+
+Team %d started with these %d players:
+== Team %d startete mit diesen %d Spielern:
+
+Your team would've finished in: %d minute(s) %5.2f second(s). Since you had practice mode enabled your rank doesn't count.
+== Dein Team hätte in: %d Minute(n) %5.2f Sekunde(n) beendet. Da du den Übungsmodus aktiviert hattest, zählt dein Rang nicht.
+
+%s joined team 0
+== %s ist Team 0 beigetreten
+
+Everyone in your locked team was killed because '%s' killed.
+== Alle in deinem gesperrten Team wurden getötet, weil '%s' neu gespawnt ist.
+
+Everyone in your locked team was killed because '%s' died.
+== Alle in deinem gesperrten Team wurden getötet, weil '%s' gestorben ist.
+
+Silent Farm
+== Stilles Farmen
+
+Ninjajetpack
+== Ninja-Jetpack
+
+Plot Spawn
+== Grundstück-Spawn
+
+Edit Plot
+== Grundstück bearbeiten
+
+Clear Plot
+== Grundstück leeren
+
+Rainbow
+== Regenbogen
+
+Bloody
+== Bloody
+
+Atom
+== Atom
+
+Trail
+== Spur
+
+Spread Gun
+== Streupistole
+
+Rainbow Hook
+== Regenbogen-Haken
+
+Rotating Ball
+== Rotierender Ball
+
+Epic Circle
+== Epischer Kreis
+
+Lovely
+== Lovely
+
+Rainbow Name
+== Regenbogen-Name
+
+Rainbow Speed
+== Regenbogen-Geschwindigkeit
+
+Sparkle
+== Funkeln
+
+Hide Drawings
+== Zeichnungen verstecken
+
+Weapon Indicator
+== Waffen-Indikator
+
+Zoom Cursor
+== Zoom-Cursor
+
+Resume Moved
+== Resume-Moved
+
+Hide Broadcasts
+== Broadcasts verstecken
+
+Local Chat
+== Lokaler Chat
+
+No minigame
+== Kein Minispiel
+
+You are wanted by the police for %lld seconds
+== Du wirst von der Polizei für %lld Sekunden gesucht
+
+Grog permille: %.1f‰ / %.1f‰
+== Grog Promille: %.1f‰ / %.1f‰
+
+You're not logged in.
+== Du bist nicht eingeloggt.
+
+Use '/login' to see more information about your account.
+== Benutze '/login', um mehr Informationen über dein Konto zu sehen.
+
+Rented until
+== Gemietet bis
+
+Door Health
+== Tür-Leben
+
+Destroy Seconds
+== Zerstörungssekunden
+
+You have to be in a team with other tees to start
+== Du musst in einem Team mit anderen Tees sein, um zu starten
+
+You can't hit others
+== Du kannst andere nicht treffen
+
+You can hit others
+== Du kannst andere treffen
+
+You can't collide with others
+== Du kannst nicht mit anderen kollidieren
+
+You can collide with others
+== Du kannst mit anderen kollidieren
+
+You can't hook others
+== Du kannst andere nicht mit dem Haken treffen
+
+You can hook others
+== Du kannst andere mit dem Haken treffen
+
+You got +1 jump and can jump %d times now
+== Du hast +1 Sprung erhalten und kannst jetzt %d Mal springen
+
+Your team was unlocked by an unlock team tile
+== Dein Team wurde durch ein Team-Entsperrungs-Feld entsperrt
+
+You are now in a solo part
+== Du bist jetzt in einem Solo-Abschnitt
+
+You are now out of the solo part
+== Du bist jetzt außerhalb des Solo-Abschnitts
+
+Teleport gun enabled
+== Teleport-Pistole aktiviert
+
+Teleport gun disabled
+== Teleport-Pistole deaktiviert
+
+Teleport grenade enabled
+== Teleport-Granate aktiviert
+
+Teleport grenade disabled
+== Teleport-Granate deaktiviert
+
+Teleport laser enabled
+== Teleport-Laser aktiviert
+
+Teleport laser disabled
+== Teleport-Laser deaktiviert
+
+You can hammer hit others
+== Du kannst andere mit dem Hammer treffen
+
+You can't hammer hit others
+== Du kannst andere nicht mit dem Hammer treffen
+
+You can shoot others with shotgun
+== Du kannst andere mit der Schrotflinte treffen
+
+You can't shoot others with shotgun
+== Du kannst andere nicht mit der Schrotflinte treffen
+
+You can shoot others with grenade
+== Du kannst andere mit Granaten treffen
+
+You can't shoot others with grenade
+== Du kannst andere nicht mit Granaten treffen
+
+You can shoot others with rifle
+== Du kannst andere mit dem Gewehr treffen
+
+You can't shoot others with rifle
+== Du kannst andere nicht mit dem Gewehr treffen
+
+Please join a team before you start
+== Bitte tritt einem Team bei, bevor du startest
+
+For more info, say '/helptoggle'
+== Für weitere Informationen, gib '/helptoggle' ein
+
+You only have your ground jump now
+== Du hast jetzt nur noch deinen Bodensprung
+
+You can jump 1 time
+== Du kannst 1 Mal springen
+
+You can jump %d times
+== Du kannst %d Mal springen
+
+~ S H O P ~
+== ~ L A D E N ~
+
+~ P L O T - S H O P ~
+== ~ G R U N D S T Ü C K S - L A D E N ~
+
+~ B A N K ~
+== ~ B A N K ~
+
+~ T A V E R N ~
+== ~ T A V E R N E ~
+
+{vote-header}
+Oᴘᴛɪᴏɴs
+== Oᴘᴛɪᴏɴᴇɴ
+
+{vote-header}
+Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs
+== Gᴇsᴜᴄʜᴛᴇ Sᴘɪᴇʟᴇʀ
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ Iɴғᴏ
+== Kᴏɴᴛᴏɪɴғᴏʀᴍᴀᴛɪᴏɴᴇɴ
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs
+== Kᴏɴᴛᴏsᴛᴀᴛɪsᴛɪᴋᴇɴ
+
+{vote-header}
+Pʟᴏᴛ
+== Gʀᴜɴᴅsᴛüᴄᴋ
+
+{vote-header}
+Vᴏᴛᴇs
+== Aʙsᴛɪᴍᴍᴜɴɢᴇɴ
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ
+== Kᴏɴᴛᴏ
+
+{vote-header}
+Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs
+== Sᴏɴsᴛɪɢᴇs
+
+{vote-header}
+Cᴏʟʟᴇᴄᴛᴀʙʟᴇs
+== Sᴀᴍᴍᴇʟᴏʙᴊᴇᴋᴛᴇ
+
+{vote-header}
+Dᴇsɪɢɴs
+== Dᴇsɪɢɴs
+
+{vote-header}
+Mɪɴɪɢᴀᴍᴇs
+== Mɪɴɪsᴘɪᴇʟᴇ
+
+{vote-header}
+Sᴄᴏʀᴇ Mᴏᴅᴇ
+== Pᴜɴᴋᴛᴇᴍᴏᴅᴜs
+
+{vote-header}
+Lᴀɴɢᴜᴀɢᴇs
+== Sᴘʀᴀᴄʜᴇɴ
+
+{vote-header}
+Aᴠᴀɪʟᴀʙʟᴇ Lᴀɴɢᴜᴀɢᴇs
+== Vᴇʀғᴜ̈ɢʙᴀʀᴇ Sᴘʀᴀᴄʜᴇɴ
+
+Rainbow will make your tee change the color very fast.
+== Regenbogen lässt deinen Tee sehr schnell die Farbe wechseln.
+
+Bloody will give your tee a permanent kill effect.
+== Bloody gibt deinem Tee einen permanenten Kill-Effekt.
+
+Police officers get help from the police bot. For more information about the specific police ranks, please say '/police'.
+== Polizisten erhalten Hilfe vom Polizei-Bot. Für weitere Informationen zu den spezifischen Polizeirängen, bitte '/police' eingeben.
+
+Using this item you can hide from other players behind bushes. If your ghost is activated you will be able to shoot plasma projectiles. How it works: '/helptoggle'
+== Mit diesem Item kannst du dich vor anderen Spielern hinter Büschen verstecken. Wenn dein Geist aktiviert ist, kannst du Plasmaprojektile schießen. Wie es funktioniert: '/helptoggle'
+
+If you have the room key you can enter the room. It's under the spawn and there is a money tile.
+== Wenn du den Raumschlüssel hast, kannst du den Raum betreten. Er befindet sich unter dem Spawn und dort gibt es ein Erfahrungsfeld.
+
+VIP Classic gives you some benefits, check '/vip'.
+== VIP Classic bietet dir einige Vorteile, siehe '/vip'.
+
+VIP+ gives you even more benefits than VIP Classic, check '/vip'.
+== VIP+ bietet dir noch mehr Vorteile als VIP Classic, siehe '/vip'.
+
+You will have shotgun if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
+== Du wirst eine Schrotflinte haben, wenn du respawnst. Für weitere Informationen über Spawn-Waffen, bitte '/spawnweapons' eingeben.
+
+You will have grenade if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
+== Du wirst eine Granate haben, wenn du respawnst. Für weitere Informationen über Spawn-Waffen, bitte '/spawnweapons' eingeben.
+
+You will have rifle if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
+== Du wirst ein Gewehr haben, wenn du respawnst. Für weitere Informationen über Spawn-Waffen, bitte '/spawnweapons' eingeben.
+
+It will make your jetpack gun be a ninja. Toggle it using '/ninjajetpack'.
+== Es macht deine Jetpack-Waffe zu einem Ninja. Schalte es mit '/ninjajetpack' um.
+
+Taser is a rifle that freezes a player. For more information about the taser and your taser stats, plase visit '/taser'.
+== Der Taser ist ein Gewehr, das einen Spieler einfriert. Für weitere Informationen über den Taser und deine Taser-Statistiken, besuche bitte '/taser'.
+
+Taser battery is required to use the taser. Maximum amount of ammo is 100. Plase visit '/taser'.
+== Eine Taser-Batterie wird benötigt, um den Taser zu benutzen. Maximale Munitionsmenge ist 100. Bitte besuche '/taser'.
+
+With Portal Rifle you can create two portals where your cursor is, then teleport between them.
+== Mit dem Portal-Gewehr kannst du zwei Portale dort erstellen, wo dein Cursor ist, und dann zwischen ihnen teleportieren.
+
+Create portal blockers hammer and this ammo with your cursor. See '/portal' for your current amount. How it works: '/helptoggle'
+== Erstelle Portal-Blocker-Hammer und diese Munition mit deinem Cursor. Siehe '/portal' für deine aktuelle Menge. Wie es funktioniert: '/helptoggle'
+
+Welcome to the shop, %s! Press F4 to start shopping.
+== Willkommen im Shop, %s! Drücke F4, um mit dem Einkaufen zu beginnen.
+
+Are you sure you want to buy this item?
+== Bist du sicher, dass du diesen Gegenstand kaufen möchtest?
+
+You canceled the purchase.
+== Du hast den Kauf abgebrochen.
+
+You own this item until you die.
+== Du besitzt diesen Gegenstand, bis du stirbst.
+
+You own this item until\nyou disconnect.
+== Du besitzt diesen Gegenstand, bis\ndu dich abmeldest.
+
+You own this item forever.
+== Du besitzt diesen Gegenstand für immer.
+
+You own this item for 30 days.
+== Du besitzt diesen Gegenstand für 30 Tage.
+
+You own this item for 20 days.
+== Du besitzt diesen Gegenstand für 20 Tage.
+
+You own this item for 7 days.
+== Du besitzt diesen Gegenstand für 7 Tage.
+
+You own this item for 5 days.
+== Du besitzt diesen Gegenstand für 5 Tage.
+
+Welcome to the shop!\n\nBy shooting to the right you go one site forward, and by shooting left you go one site back.
+== Willkommen im Shop!\n\nDurch Schießen nach rechts gehst du eine Seite vor, und durch Schießen nach links gehst du eine Seite zurück.
+
+for sale
+== zu verkaufen
+
+discount
+== Rabatt
+
+If you want to buy an item, press F3
+== Wenn du einen Gegenstand kaufen möchtest, drücke F3
+
+Welcome to the tavern, %s! Press F4 to buy a grog.
+== Willkommen in der Taverne, %s! Drücke F4, um einen Grog zu kaufen.
+
+Are you sure you want to buy a grog?
+== Bist du sicher, dass du einen Grog kaufen möchtest?
+
+Press F3 to confirm your assignment.
+== Drücke F3, um deine Zuweisung zu bestätigen.
+
+Welcome to the tavern!\n\nIf you would like to buy a grog for %d money, please press F3.
+== Willkommen in der Taverne!\n\nWenn du einen Grog für %d Geld kaufen möchtest, drücke bitte F3.
+
+Welcome to the bank, %s! Press F4 to manage your bank account.
+== Willkommen bei der Bank, %s! Drücke F4, um dein Bankkonto zu verwalten.
+
+Are you sure that you want to deposit %d money from your wallet to your bank account?
+== Bist du sicher, dass du %d Geld von deiner Geldbörse auf dein Bankkonto einzahlen möchtest?
+
+Are you sure that you want to withdraw %d money from your bank account to your wallet?
+== Bist du sicher, dass du %d Geld von deinem Bankkonto auf deine Geldbörse auszahlen möchtest?
+
+You can't use the bank without an account. Check '/account'.
+== Du kannst die Bank nicht ohne ein Konto nutzen. Überprüfe '/account'.
+
+You cancelled the assignment.
+== Du hast den Vorgang abgebrochen.
+
+Welcome to the bank!\n\nThis feature is currently disabled and your money is instantly saved.
+== Willkommen bei der Bank!\n\nDiese Funktion ist derzeit deaktiviert und dein Geld wird sofort gespeichert.
+
+Welcome to the bank!\n\nPlease select your option:\nF3: Deposit (+)\nF4: Withdraw (-).\n\nOnce you selected an option, shoot to the right to go one step forward, and shoot left to go one step back.
+== Willkommen bei der Bank!\n\nBitte wähle deine Option:\nF3: Einzahlen (+)\nF4: Abheben (-).\n\nNachdem du eine Option gewählt hast, schieße nach rechts, um einen Schritt vorwärts zu gehen, und schieße nach links, um einen Schritt zurück zu gehen.
+
+D E P O S I T
+== E I N Z A H L E N
+
+W I T H D R A W
+== A B H E B E N
+
+Everything (%d)
+== Alles (%d)

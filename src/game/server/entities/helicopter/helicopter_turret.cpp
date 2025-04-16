@@ -462,7 +462,7 @@ void CLauncherTurret::FireTurret()
 		startingPos,
 		m_pHelicopter->GetVel() * 0.5f + Direction * missileStartingSpeed,
 		Direction,
-		Server()->TickSpeed() * 3, 0);
+		Server()->TickSpeed() * 3);
 	GameServer()->CreateSound(startingPos, SOUND_GRENADE_FIRE, m_pHelicopter->GetOwner()->TeamMask());
 	GameServer()->CreateSound(startingPos, SOUND_GRENADE_EXPLODE, m_pHelicopter->GetOwner()->TeamMask());
 

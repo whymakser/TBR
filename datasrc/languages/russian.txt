@@ -1,5 +1,5 @@
 #
-# Author:
+# Author: claude.ai
 #
 
 /cmdlist will show a list of all chat commands
@@ -1014,9 +1014,6 @@ Your previously collected money got added to your account due to login
 Successfully logged out
 == Успешный выход из системы
 
-Load recent design '%s'?
-== Загрузить недавний дизайн '%s'?
-
 The plot auction by '%s' is cancelled
 == Аукцион участка от '%s' отменен
 
@@ -1188,8 +1185,8 @@ You can't close your door because the police destroyed it
 You lost, you can wait for another round or leave the lobby using '/leave'
 == Вы проиграли, вы можете дождаться следующего раунда или покинуть лобби с помощью '/leave'
 
-Too many players on police tiles
-== Слишком много игроков на полицейских плитках
+Too many players on police tiles [%d/%d]
+== Слишком много игроков на полицейских плитках [%d/%d]
 
 You need to be logged in to use moneytiles.\nGet an account with '/register <name> <pw> <pw>'
 == Вы должны быть авторизованы, чтобы использовать денежные плитки.\nПолучите аккаунт с помощью '/register <имя> <пароль> <пароль>'
@@ -1505,3 +1502,551 @@ Your stake got returned: +%lld money.
 
 You got +%lld money from others leaving the game.
 == Вы получили +%lld денег от других покинувших игру.
+
+Change language to %s?
+== Изменить язык на %s?
+
+Load recent design?
+== Загрузить недавний дизайн?
+
+F-DDrace is a mod by fokkonaut
+== F-DDrace - это мод от fokkonaut
+
+This mod is based on Teeworlds 0.7 and also incorporates features, ideas, and partial implementations
+== Этот мод основан на Teeworlds 0.7 и также включает в себя функции, идеи и частичные реализации
+
+from DDNet++ by ChillerDragon, DDNet, and other community projects, aswell as many custom features!
+== из DDNet++ от ChillerDragon, DDNet и других проектов сообщества, а также множество собственных функций!
+
+If you want to check out the code or contribute, feel free to check out F-DDrace on GitHub:
+== Если вы хотите изучить код или внести свой вклад, не стесняйтесь ознакомиться с F-DDrace на GitHub:
+
+For more info, say '/cmdlist' or '/credits'
+== Для дополнительной информации введите '/cmdlist' или '/credits'
+
+to check a server setting say /settings and setting's name, setting names are:
+== чтобы проверить настройку сервера, введите /settings и название настройки, названия настроек:
+
+Teams are disabled
+== Команды отключены
+
+This team can't be locked
+== Эта команда не может быть заблокирована
+
+'%s' unlocked your team.
+== '%s' разблокировал вашу команду.
+
+Team locking is disabled on this server
+== Блокировка команд отключена на этом сервере
+
+'%s' locked your team. After the race started killing will kill everyone in your team.
+== '%s' заблокировал вашу команду. После начала гонки смерть убьет всех в вашей команде.
+
+Invites are disabled
+== Приглашения отключены
+
+Player already invited
+== Игрок уже приглашен
+
+Can't invite this quickly
+== Нельзя приглашать так быстро
+
+'%s' invited you to team %d.
+== '%s' пригласил вас в команду %d.
+
+'%s' invited '%s' to your team.
+== '%s' пригласил '%s' в вашу команду.
+
+You are running a vote please try again after the vote is done!
+== Вы проводите голосование, пожалуйста, попробуйте снова после завершения голосования!
+
+You must join a team and play with somebody or else you can't play
+== Вы должны присоединиться к команде и играть с кем-то, иначе вы не сможете играть
+
+You can't change teams while you are dead/a spectator.
+== Вы не можете менять команды, пока вы мертвы/наблюдатель.
+
+You can't change teams that fast!
+== Вы не можете менять команды так быстро!
+
+You can't join teams in this minigame
+== Вы не можете присоединяться к командам в этой мини-игре
+
+This team is locked using /lock. Only members of the team can unlock it using /lock.
+== Эта команда заблокирована с помощью /lock. Только члены команды могут разблокировать ее с помощью /lock.
+
+This team is locked using /lock. Only members of the team can invite you or unlock it using /lock.
+== Эта команда заблокирована с помощью /lock. Только члены команды могут пригласить вас или разблокировать ее с помощью /lock.
+
+This team already has the maximum allowed size of %d players
+== В этой команде уже максимально допустимый размер - %d игроков
+
+%s joined team %d
+== %s присоединился к команде %d
+
+You cannot join this team at this time
+== Вы не можете присоединиться к этой команде в данный момент
+
+You can't check your team while you are dead/a spectator.
+== Вы не можете проверить свою команду, пока вы мертвы/наблюдатель.
+
+/me is disabled on this server
+== /me отключено на этом сервере
+
+E-Mail
+== Электронная почта
+
+Discord server
+== Сервер Discord
+
+%s was killed by %s
+== %s был убит %s
+
+'%s' banned '%s' for %d seconds from voting.
+== '%s' запретил '%s' голосовать на %d секунд.
+
+'%s' unbanned '%s' from voting.
+== '%s' снял запрет на голосование с '%s'.
+
+Use /pause first then you can kill
+== Сначала используйте /pause, затем вы сможете убивать
+
+Only %d active players are allowed
+== Разрешено только %d активных игроков
+
+All players were moved to the game
+== Все игроки были перемещены в игру
+
+All players were moved to the spectators
+== Все игроки были перемещены в наблюдатели
+
+Authorized player forced server option '%s' (%s)
+== Авторизованный игрок принудительно изменил параметр сервера '%s' (%s)
+
+'%s' was moved to spectator (%s)
+== '%s' был перемещен в наблюдатели (%s)
+
+Listing players with "%s" in name:
+== Список игроков с "%s" в имени:
+
+Listing all players:
+== Список всех игроков:
+
+You can only vote after logging in.
+== Вы можете голосовать только после входа в систему.
+
+Wait for current vote to end before calling a new one.
+== Дождитесь окончания текущего голосования, прежде чем начинать новое.
+
+You must wait %d seconds before making your first vote.
+== Вы должны подождать %d секунд перед своим первым голосованием.
+
+You must wait %d seconds before making another vote.
+== Вы должны подождать %d секунд перед следующим голосованием.
+
+You are not permitted to vote for the next %d seconds.
+== Вам не разрешено голосовать в течение следующих %d секунд.
+
+There's a %d second delay between map-votes, please wait %d seconds.
+== Между голосованиями за карты есть задержка в %d секунд, пожалуйста, подождите %d секунд.
+
+%s has finished and didn't go through start yet, wait for him or join another team.
+== %s закончил и еще не прошел через старт, подождите его или присоединитесь к другой команде.
+
+%s wants to start a new round, kill or walk to start.
+== %s хочет начать новый раунд, убейте или идите к старту.
+
+Team %d started with these %d players:
+== Команда %d началась с этими %d игроками:
+
+Your team would've finished in: %d minute(s) %5.2f second(s). Since you had practice mode enabled your rank doesn't count.
+== Ваша команда могла бы финишировать за: %d минут(ы) %5.2f секунд(ы). Поскольку у вас был включен режим практики, ваш ранг не учитывается.
+
+%s joined team 0
+== %s присоединился к команде 0
+
+Everyone in your locked team was killed because '%s' killed.
+== Все в вашей заблокированной команде были убиты, потому что '%s' убил.
+
+Everyone in your locked team was killed because '%s' died.
+== Все в вашей заблокированной команде были убиты, потому что '%s' умер.
+
+Silent Farm
+== Тихая ферма
+
+Ninjajetpack
+== Реактивный ранец ниндзя
+
+Plot Spawn
+== Спаун на участке
+
+Edit Plot
+== Редактировать участок
+
+Clear Plot
+== Очистить участок
+
+Rainbow
+== Радуга
+
+Bloody
+== Кровавый
+
+Atom
+== Атом
+
+Trail
+== След
+
+Spread Gun
+== Разброс оружия
+
+Rainbow Hook
+== Радужный крюк
+
+Rotating Ball
+== Вращающийся шар
+
+Epic Circle
+== Эпический круг
+
+Lovely
+== Прекрасный
+
+Rainbow Name
+== Радужное имя
+
+Rainbow Speed
+== Радужная скорость
+
+Sparkle
+== Блеск
+
+Hide Drawings
+== Скрыть рисунки
+
+Weapon Indicator
+== Индикатор оружия
+
+Zoom Cursor
+== Курсор масштабирования
+
+Resume Moved
+== Возобновить перемещение
+
+Hide Broadcasts
+== Скрыть трансляции
+
+Local Chat
+== Локальный чат
+
+No minigame
+== Нет мини-игры
+
+You are wanted by the police for %lld seconds
+== Вас разыскивает полиция в течение %lld секунд
+
+Grog permille: %.1f‰ / %.1f‰
+== Промилле грога: %.1f‰ / %.1f‰
+
+You're not logged in.
+== Вы не вошли в систему.
+
+Use '/login' to see more information about your account.
+== Используйте '/login', чтобы увидеть больше информации о своем аккаунте.
+
+Rented until
+== Арендовано до
+
+Door Health
+== Здоровье двери
+
+Destroy Seconds
+== Секунды уничтожения
+
+You have to be in a team with other tees to start
+== Вы должны быть в команде с другими персонажами, чтобы начать
+
+You can't hit others
+== Вы не можете бить других
+
+You can hit others
+== Вы можете бить других
+
+You can't collide with others
+== Вы не можете сталкиваться с другими
+
+You can collide with others
+== Вы можете сталкиваться с другими
+
+You can't hook others
+== Вы не можете цеплять других
+
+You can hook others
+== Вы можете цеплять других
+
+You got +1 jump and can jump %d times now
+== Вы получили +1 прыжок и теперь можете прыгать %d раз
+
+Your team was unlocked by an unlock team tile
+== Ваша команда была разблокирована плиткой разблокировки команды
+
+You are now in a solo part
+== Вы сейчас в одиночной части
+
+You are now out of the solo part
+== Вы теперь вышли из одиночной части
+
+Teleport gun enabled
+== Телепорт-пистолет включен
+
+Teleport gun disabled
+== Телепорт-пистолет отключен
+
+Teleport grenade enabled
+== Телепорт-граната включена
+
+Teleport grenade disabled
+== Телепорт-граната отключена
+
+Teleport laser enabled
+== Телепорт-лазер включен
+
+Teleport laser disabled
+== Телепорт-лазер отключен
+
+You can hammer hit others
+== Вы можете бить других молотом
+
+You can't hammer hit others
+== Вы не можете бить других молотом
+
+You can shoot others with shotgun
+== Вы можете стрелять в других из дробовика
+
+You can't shoot others with shotgun
+== Вы не можете стрелять в других из дробовика
+
+You can shoot others with grenade
+== Вы можете стрелять в других гранатой
+
+You can't shoot others with grenade
+== Вы не можете стрелять в других гранатой
+
+You can shoot others with rifle
+== Вы можете стрелять в других из винтовки
+
+You can't shoot others with rifle
+== Вы не можете стрелять в других из винтовки
+
+Please join a team before you start
+== Пожалуйста, присоединитесь к команде перед началом
+
+For more info, say '/helptoggle'
+== Для получения дополнительной информации введите '/helptoggle'
+
+You only have your ground jump now
+== Теперь у вас есть только прыжок с земли
+
+You can jump 1 time
+== Вы можете прыгнуть 1 раз
+
+You can jump %d times
+== Вы можете прыгнуть %d раз
+
+~ S H O P ~
+== ~ М А Г А З И Н ~
+
+~ P L O T - S H O P ~
+== ~ М А Г А З И Н  У Ч А С Т К О В ~
+
+~ B A N K ~
+== ~ Б А Н К ~
+
+~ T A V E R N ~
+== ~ Т А В Е Р Н А ~
+
+{vote-header}
+Oᴘᴛɪᴏɴs
+== Oᴘᴄɪи
+
+{vote-header}
+Wᴀɴᴛᴇᴅ Pʟᴀʏᴇʀs
+== Рᴏзыскивᴀᴇᴍыᴇ Игʀᴏки
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ Iɴғᴏ
+== Иɴғᴏʀᴍᴀция ᴏ Учёᴛɴᴏй Зᴀᴘиси
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ Sᴛᴀᴛs
+== Сᴛᴀᴛисᴛикᴀ Учёᴛɴᴏй Зᴀᴘиси
+
+{vote-header}
+Pʟᴏᴛ
+== Учᴀсᴛᴏк
+
+{vote-header}
+Vᴏᴛᴇs
+== Гᴏʟᴏᴄᴀ
+
+{vote-header}
+Aᴄᴄᴏᴜɴᴛ
+== Уᴄᴛʀᴀɴᴏᴠᴋᴀ
+
+{vote-header}
+Mɪsᴄᴇʟʟᴀɴᴇᴏᴜs
+== Пʀᴏᴄᴄᴇᴇᴘᴀ
+
+{vote-header}
+Cᴏʟʟᴇᴄᴛᴀʙʟᴇs
+== Кᴏʟʟᴇᴋᴄᴎиᴏɴɴʏᴇ Пʀᴇᴅᴍᴇᴛʏ
+
+{vote-header}
+Dᴇsɪɢɴs
+== Дизᴀйны
+
+{vote-header}
+Mɪɴɪɢᴀᴍᴇs
+== Mиɴиигʀы
+
+{vote-header}
+Sᴄᴏʀᴇ Mᴏᴅᴇ
+== Рᴇжɪᴍ Oчᴋᴏᴠ
+
+{vote-header}
+Lᴀɴɢᴜᴀɢᴇs
+== яᴢʏᴋɪ
+
+{vote-header}
+Aᴠᴀɪʟᴀʙʟᴇ Lᴀɴɢᴜᴀɢᴇs
+== Дᴏsᴛᴜᴘɴʏᴇ яᴢʏᴋɪ
+
+Rainbow will make your tee change the color very fast.
+== Радуга заставит ваш тройник очень быстро менять цвет.
+
+Bloody will give your tee a permanent kill effect.
+== Кровавый придаст вашему тройнику постоянный эффект убийства.
+
+Police officers get help from the police bot. For more information about the specific police ranks, please say '/police'.
+== Офицеры полиции получают помощь от полицейского бота. Для получения дополнительной информации о конкретных полицейских званиях, пожалуйста, введите '/police'.
+
+Using this item you can hide from other players behind bushes. If your ghost is activated you will be able to shoot plasma projectiles. How it works: '/helptoggle'
+== Используя этот предмет, вы можете прятаться от других игроков за кустами. Если ваш призрак активирован, вы сможете стрелять плазменными снарядами. Как это работает: '/helptoggle'
+
+If you have the room key you can enter the room. It's under the spawn and there is a money tile.
+== Если у вас есть ключ от комнаты, вы можете войти в неё. Она находится под точкой возрождения, и там есть денежная плитка.
+
+VIP Classic gives you some benefits, check '/vip'.
+== VIP Classic предоставляет вам некоторые преимущества, проверьте '/vip'.
+
+VIP+ gives you even more benefits than VIP Classic, check '/vip'.
+== VIP+ предоставляет вам ещё больше преимуществ, чем VIP Classic, проверьте '/vip'.
+
+You will have shotgun if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
+== У вас будет дробовик, если вы возродитесь. Для получения дополнительной информации о оружии возрождения, введите '/spawnweapons'.
+
+You will have grenade if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
+== У вас будет граната, если вы возродитесь. Для получения дополнительной информации о оружии возрождения, введите '/spawnweapons'.
+
+You will have rifle if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
+== У вас будет винтовка, если вы возродитесь. Для получения дополнительной информации о оружии возрождения, введите '/spawnweapons'.
+
+It will make your jetpack gun be a ninja. Toggle it using '/ninjajetpack'.
+== Это сделает ваш реактивный пистолет ниндзя. Переключите его с помощью '/ninjajetpack'.
+
+Taser is a rifle that freezes a player. For more information about the taser and your taser stats, plase visit '/taser'.
+== Электрошокер — это винтовка, которая замораживает игрока. Для получения дополнительной информации об электрошокере и ваших статистиках электрошокера, посетите '/taser'.
+
+Taser battery is required to use the taser. Maximum amount of ammo is 100. Plase visit '/taser'.
+== Для использования электрошокера требуется батарея. Максимальное количество боеприпасов — 100. Посетите '/taser'.
+
+With Portal Rifle you can create two portals where your cursor is, then teleport between them.
+== С Портальной Винтовкой вы можете создать два портала там, где находится ваш курсор, а затем телепортироваться между ними.
+
+Create portal blockers hammer and this ammo with your cursor. See '/portal' for your current amount. How it works: '/helptoggle'
+== Создайте молот блокиратора порталов и эти боеприпасы с помощью курсора. Смотрите '/portal' для информации о текущем количестве. Как это работает: '/helptoggle'
+
+Welcome to the shop, %s! Press F4 to start shopping.
+== Добро пожаловать в магазин, %s! Нажмите F4, чтобы начать покупки.
+
+Are you sure you want to buy this item?
+== Вы уверены, что хотите купить этот предмет?
+
+You canceled the purchase.
+== Вы отменили покупку.
+
+You own this item until you die.
+== Вы владеете этим предметом до вашей смерти.
+
+You own this item until\nyou disconnect.
+== Вы владеете этим предметом до тех пор,\nпока не отключитесь.
+
+You own this item forever.
+== Вы владеете этим предметом навсегда.
+
+You own this item for 30 days.
+== Вы владеете этим предметом в течение 30 дней.
+
+You own this item for 20 days.
+== Вы владеете этим предметом в течение 20 дней.
+
+You own this item for 7 days.
+== Вы владеете этим предметом в течение 7 дней.
+
+You own this item for 5 days.
+== Вы владеете этим предметом в течение 5 дней.
+
+Welcome to the shop!\n\nBy shooting to the right you go one site forward, and by shooting left you go one site back.
+== Добро пожаловать в магазин!\n\nСтреляя вправо, вы переходите на одну страницу вперёд, а стреляя влево, вы возвращаетесь на одну страницу назад.
+
+for sale
+== на продажу
+
+discount
+== скидка
+
+If you want to buy an item, press F3
+== Если вы хотите купить предмет, нажмите F3
+
+Welcome to the tavern, %s! Press F4 to buy a grog.
+== Добро пожаловать в таверну, %s! Нажмите F4, чтобы купить грог.
+
+Are you sure you want to buy a grog?
+== Вы уверены, что хотите купить грог?
+
+Press F3 to confirm your assignment.
+== Нажмите F3, чтобы подтвердить ваше назначение.
+
+Welcome to the tavern!\n\nIf you would like to buy a grog for %d money, please press F3.
+== Добро пожаловать в таверну!\n\nЕсли вы хотите купить грог за %d денег, пожалуйста, нажмите F3.
+
+Welcome to the bank, %s! Press F4 to manage your bank account.
+== Добро пожаловать в банк, %s! Нажмите F4, чтобы управлять своим банковским счетом.
+
+Are you sure that you want to deposit %d money from your wallet to your bank account?
+== Вы уверены, что хотите внести %d денег из своего кошелька на банковский счет?
+
+Are you sure that you want to withdraw %d money from your bank account to your wallet?
+== Вы уверены, что хотите снять %d денег с вашего банковского счета в кошелек?
+
+You can't use the bank without an account. Check '/account'.
+== Вы не можете пользоваться банком без счета. Проверьте '/account'.
+
+You cancelled the assignment.
+== Вы отменили операцию.
+
+Welcome to the bank!\n\nThis feature is currently disabled and your money is instantly saved.
+== Добро пожаловать в банк!\n\nЭта функция в настоящее время отключена, и ваши деньги мгновенно сохраняются.
+
+Welcome to the bank!\n\nPlease select your option:\nF3: Deposit (+)\nF4: Withdraw (-).\n\nOnce you selected an option, shoot to the right to go one step forward, and shoot left to go one step back.
+== Добро пожаловать в банк!\n\nПожалуйста, выберите опцию:\nF3: Внести деньги (+)\nF4: Снять деньги (-).\n\nПосле выбора опции, стреляйте вправо, чтобы перейти на шаг вперед, и стреляйте влево, чтобы вернуться на шаг назад.
+
+D E P O S I T
+== В Н Е С Т И
+
+W I T H D R A W
+== С Н Я Т Ь
+
+Everything (%d)
+== Всё (%d)

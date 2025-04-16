@@ -67,11 +67,12 @@ bool MovingCircleHitsMovingSegment_Analytical(
 	return distSq <= radius * radius;
 }
 
-CHelicopter::CHelicopter(CGameWorld *pGameWorld, vec2 Pos)
+CHelicopter::CHelicopter(CGameWorld *pGameWorld, vec2 Pos, int Team)
 	: CAdvancedEntity(pGameWorld, CGameWorld::ENTTYPE_HELICOPTER, Pos, vec2(80, 128))
 {
 	m_AllowVipPlus = false;
 	m_Elasticity = 0.f;
+	m_DDTeam = Team;
 
 	m_InputDirection = 0;
 	m_Health = 100.f;
@@ -246,10 +247,7 @@ void CHelicopter::DestroyThingsInItsPath()
 		return;
 
 	CCharacter *aPossibleCollisions[5];
-	int numFound = GameWorld()->FindEntities(m_Pos,
-		m_TopPropellerRadius + 200.f,
-		(CEntity **)aPossibleCollisions,
-		5, CGameWorld::ENTTYPE_CHARACTER);
+	int numFound = GameWorld()->FindEntities(m_Pos, m_TopPropellerRadius + 200.f, (CEntity **)aPossibleCollisions, 5, CGameWorld::ENTTYPE_CHARACTER, m_DDTeam);
 	if (!numFound)
 		return;
 

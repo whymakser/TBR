@@ -44,6 +44,8 @@ class CMissile : public CEntity
 	};
 
 	int m_Owner;
+	int m_DDTeam;
+	Mask128 m_TeamMask;
 	int m_LifeSpan;
 	int m_StartTick;
 
@@ -64,7 +66,7 @@ class CMissile : public CEntity
 	void HandleExplosions();
 
 public:
-	CMissile(CGameWorld *pGameWorld, int Owner, vec2 Pos, vec2 Vel, vec2 Direction, int Span, int Layer);
+	CMissile(CGameWorld *pGameWorld, int Owner, vec2 Pos, vec2 Vel, vec2 Direction, int Span);
 	~CMissile();
 
 	// Getting
