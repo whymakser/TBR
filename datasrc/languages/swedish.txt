@@ -2060,7 +2060,8 @@ Take cards
 Passed…
 == 
 
-Next move: %llds
+{durak-name}
+Next move: %ds
 == 
 
 '%s' is the Durák!
