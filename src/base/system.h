@@ -1888,6 +1888,8 @@ int str_isspace(char c);
 char str_uppercase(char c);
 unsigned str_quickhash(const char *str);
 
+unsigned fnv1a(const char *str);
+
 struct SKELETON;
 void str_utf8_skeleton_begin(struct SKELETON* skel, const char* str);
 int str_utf8_skeleton_next(struct SKELETON* skel);

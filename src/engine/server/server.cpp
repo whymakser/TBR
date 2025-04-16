@@ -2997,7 +2997,7 @@ int CServer::Run()
 								}
 								InFile.close();
 
-								unsigned int NewHash = str_quickhash(aAddrStr);
+								unsigned int NewHash = fnv1a(aAddrStr);
 								HashMap[NewHash] = pResult;
 
 								std::ofstream OutFile(aFile, std::ios::trunc); // overwrite file
@@ -4409,7 +4409,7 @@ void CServer::CountryLookup(int ClientID)
 				CountryHashMap[Hash] = aCode;
 		}
 
-		auto it = CountryHashMap.find(str_quickhash(aAddrStr));
+		auto it = CountryHashMap.find(fnv1a(aAddrStr));
 		if (it != CountryHashMap.end())
 		{
 			m_aClients[ClientID].m_CountryLookupState = CClient::COUNTRYLOOKUP_STATE_DONE;

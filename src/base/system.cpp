@@ -3380,6 +3380,17 @@ unsigned str_quickhash(const char *str)
 	return hash;
 }
 
+unsigned fnv1a(const char *str)
+{
+    unsigned hash = 2166136261u;
+    while (*str)
+    {
+        hash ^= (uint8_t)(*str++);
+        hash *= 16777619u;
+    }
+    return hash;
+}
+
 static const char *str_token_get(const char *str, const char *delim, int *length)
 {
 	size_t len = strspn(str, delim);
