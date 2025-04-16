@@ -94,8 +94,8 @@ vec2 CHelicopterTurret::GetTurretDirection()
 }
 
 CHelicopterTurret::CHelicopterTurret(int TurretType, int NumBones,
-									 const SBone& TurretBone, const vec2& Pivot,
-									 float AimingRange, int ShootingCooldown)
+	const SBone& TurretBone, const vec2& Pivot,
+	float AimingRange, int ShootingCooldown)
 {
 	m_TurretType = TurretType;
 	m_pHelicopter = nullptr;
@@ -151,7 +151,7 @@ bool CHelicopterTurret::TryBindHelicopter(CHelicopter *helicopter)
 	{
 		m_pHelicopter = helicopter;
 		for (int i = 0; i < m_NumBones; i++)
-			m_apBones[i].m_ID = Server()->SnapNewID();
+			m_apBones[i].AssignEntityAndID(m_pHelicopter, Server()->SnapNewID());
 
 		// Match helicopter posture initially
 		SetFlipped(m_pHelicopter->IsFlipped());
@@ -176,7 +176,7 @@ void CHelicopterTurret::Snap(int SnappingClient)
 		return;
 
 	for (int i = 0; i < m_NumBones; i++)
-		m_apBones[i].Snap(SnappingClient, m_pHelicopter);
+		m_apBones[i].Snap(SnappingClient);
 }
 
 void CHelicopterTurret::OnInput(CNetObj_PlayerInput *pNewInput)
@@ -327,7 +327,7 @@ void CMinigunTurret::FireTurret()
 
 CMinigunTurret::CMinigunTurret()
 	: CHelicopterTurret(TURRETTYPE_MINIGUN, NUM_BONES,
-						SBone(vec2(70.f, 50.f), vec2(-34.f, 50.f)),
+						SBone(nullptr, -1, vec2(70.f, 50.f), vec2(-34.f, 50.f)),
 						vec2(4.f, 50.f), 15.f, 5)
 {
 	m_pHelicopter = nullptr;
@@ -383,7 +383,7 @@ void CMinigunTurret::Snap(int SnappingClient)
 		return;
 
 	for (int i = 0; i < m_NumBones; i++)
-		m_apBones[i].Snap(SnappingClient, m_pHelicopter);
+		m_apBones[i].Snap(SnappingClient);
 }
 
 void CMinigunTurret::OnInput(CNetObj_PlayerInput *pNewInput)
@@ -470,7 +470,7 @@ void CLauncherTurret::FireTurret()
 
 CLauncherTurret::CLauncherTurret()
 	: CHelicopterTurret(TURRETTYPE_LAUNCHER, NUM_BONES,
-						SBone(vec2(70.f, 50.f), vec2(-44.f, 50.f)),
+						SBone(nullptr, -1, vec2(70.f, 50.f), vec2(-44.f, 50.f)),
 						vec2(-10.f, 50.f), 15.f, 50)
 {
 	m_pHelicopter = nullptr;
@@ -523,7 +523,7 @@ void CLauncherTurret::Snap(int SnappingClient)
 		return;
 
 	for (int i = 0; i < m_NumBones; i++)
-		m_apBones[i].Snap(SnappingClient, m_pHelicopter);
+		m_apBones[i].Snap(SnappingClient);
 }
 
 void CLauncherTurret::OnInput(CNetObj_PlayerInput *pNewInput)

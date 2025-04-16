@@ -48,7 +48,7 @@ private:
 	vec2 m_LastTopPropellerA, m_LastTopPropellerB;
 	void GetFullPropellerPositions(vec2& outPosA, vec2& outPosB);
 
-	CTrail m_aTrails[NUM_TRAILS];
+	STrail m_aTrails[NUM_TRAILS];
 	SBone m_aBones[NUM_BONES];
 	CHelicopterTurret *m_pTurretAttachment;
 

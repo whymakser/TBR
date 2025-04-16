@@ -10,16 +10,16 @@
 struct SBone
 {
 	CEntity *m_pEntity;
+	int m_ID;
 	vec2 m_From;
 	vec2 m_To;
-	int m_ID;
 	int m_Color;
 
-	SBone() : SBone(nullptr, 0, 0, 0, 0) { }
-	SBone(CEntity *pEntity, float FromX, float FromY, float ToX, float ToY)
-		: SBone(pEntity, vec2(FromX, FromY), vec2(ToX, ToY)) { }
-	SBone(CEntity *pEntity, vec2 From, vec2 To)
-		: m_pEntity(pEntity), m_From(From), m_To(To), m_ID(-1), m_Color(LASERTYPE_RIFLE) { }
+	SBone() : SBone(nullptr, -1, 0, 0, 0, 0) { }
+	SBone(CEntity *pEntity, int SnapID, float FromX, float FromY, float ToX, float ToY)
+		: SBone(pEntity, SnapID, vec2(FromX, FromY), vec2(ToX, ToY)) { }
+	SBone(CEntity *pEntity, int SnapID, vec2 From, vec2 To)
+		: m_pEntity(pEntity), m_ID(SnapID), m_From(From), m_To(To), m_Color(LASERTYPE_RIFLE) { }
 
 	// Sense
 	IServer *Server() { return m_pEntity->Server(); }
@@ -27,6 +27,16 @@ struct SBone
 	float GetLength() { return distance(m_To, m_From); }
 
 	// Manipulating
+	void AssignEntityAndID(CEntity* pEntity, int SnapID)
+	{
+		m_pEntity = pEntity;
+		m_ID = SnapID;
+	}
+	void UpdateLine(vec2 From, vec2 To)
+	{
+		m_From = From;
+		m_To = To;
+	}
 	void Flip()
 	{
 		m_From.x *= -1;
@@ -47,14 +57,15 @@ struct SBone
 	void Snap(int SnappingClient);
 };
 
-struct CTrail
+struct STrail
 {
 	CEntity *m_pEntity;
-	vec2 *m_pPos;
 	int m_ID;
+	vec2 *m_pPos;
 
 public:
-	CTrail(CEntity *pEntity, vec2 *pPos, int SnapID);
+	STrail() : m_pEntity(nullptr), m_ID(-1), m_pPos(nullptr) { };
+	STrail(CEntity *pEntity, int SnapID, vec2 *pPos) : m_pEntity(pEntity), m_ID(SnapID), m_pPos(pPos) { };
 
 	// Sense
 	IServer *Server() { return m_pEntity->Server(); }

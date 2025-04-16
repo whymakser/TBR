@@ -5,10 +5,9 @@
 #include "../../gamecontext.h"
 #include "bone.h"
 
-// option to draw bones without parents is possible but rn this gud \^-^/
 void SBone::Snap(int SnappingClient)
 {
-	if (!m_pEntity)
+	if (!m_pEntity || m_ID == -1)
 		return;
 
 	auto parentPos = m_pEntity->GetPos();
@@ -40,16 +39,9 @@ void SBone::Snap(int SnappingClient)
 	}
 }
 
-CTrail::CTrail(CEntity *pEntity, vec2 *pPos, int SnapID)
+void STrail::Snap(int SnappingClient)
 {
-	m_pEntity = pEntity;
-	m_pPos = pPos;
-	m_ID = SnapID;
-}
-
-void CTrail::Snap(int SnappingClient)
-{
-	if (!m_pEntity)
+	if (!m_pEntity || m_ID == -1)
 		return;
 
 	CNetObj_Projectile *pObj = static_cast<CNetObj_Projectile *>(Server()->SnapNewItem(NETOBJTYPE_PROJECTILE, m_ID, sizeof(CNetObj_Projectile)));
