@@ -1334,9 +1334,13 @@ void CGameContext::ConSendMotd(IConsole::IResult *pResult, void *pUserData)
 void CGameContext::ConHelicopter(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
-	int Victim = pResult->NumArguments() ? pResult->GetVictim() : pResult->m_ClientID;
+	int Victim = pResult->NumArguments() > 0 ? pResult->GetVictim() : pResult->m_ClientID;
 	CCharacter *pChr = pSelf->GetPlayerChar(Victim);
-	if (pChr) pSelf->SpawnHelicopter(pChr->GetPos());
+	if (pChr)
+	{
+		int TurretType = pResult->NumArguments() > 1 ? pResult->GetInteger(1) : 0;
+		pSelf->SpawnHelicopter(pChr->GetPos(), TurretType);
+	}
 }
 
 void CGameContext::ConRemoveHelicopters(IConsole::IResult *pResult, void *pUserData)
