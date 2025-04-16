@@ -819,7 +819,7 @@ const char *CDurak::GetCardSymbol(int Suit, int Rank, CDurakGame *pGame)
 	case CCard::IND_TOOLTIP_DEFENDER_PASSED: return Localizable("Passed…", "durak-name");
 	case CCard::IND_TOOLTIP_NEXT_MOVE:
 	{
-		str_format(aBuf, sizeof(aBuf), Localizable("Next move: %llds"), (pGame->m_NextMove - Server()->Tick()) / Server()->TickSpeed() + 1);
+		str_format(aBuf, sizeof(aBuf), Localizable("Next move: %ds", "durak-name"), (int)(pGame->m_NextMove - Server()->Tick()) / Server()->TickSpeed() + 1);
 		return aBuf;
 	}
 	}
