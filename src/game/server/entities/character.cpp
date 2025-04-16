@@ -5527,7 +5527,7 @@ void CCharacter::SetCheckpointList(std::vector< std::pair<int, int> > vCheckpoin
 
 bool CCharacter::TryMountHelicopter()
 {
-	CHelicopter *pHelicopter = (CHelicopter *)GameWorld()->ClosestEntity(m_Pos, 48.f, CGameWorld::ENTTYPE_HELICOPTER, 0, true);
+	CHelicopter *pHelicopter = (CHelicopter *)GameWorld()->ClosestEntity(m_Pos, 48.f, CGameWorld::ENTTYPE_HELICOPTER, 0, true, Team());
 	return pHelicopter && pHelicopter->Mount(m_pPlayer->GetCID());
 }
 
