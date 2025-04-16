@@ -37,6 +37,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <unordered_map>
 #include <engine/shared/linereader.h>
 #include <engine/external/json-parser/json.h>
 
@@ -2880,13 +2881,6 @@ int CServer::Run()
 			{
 				m_DnsblCache.m_vBlacklist.clear();
 				m_DnsblCache.m_vWhitelist.clear();
-				char aBuf[256];
-				str_format(aBuf, sizeof(aBuf), "%s/countries.txt", Config()->m_SvCountriesFilePath);
-				std::ofstream CountriesFile(aBuf, std::ios::trunc);
-				if (CountriesFile.is_open())
-					Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", "Cleared countries.txt due to long server runtime");
-				else
-					Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", "Failed to clear countries.txt, could not open file");
 			}
 
 			for (int i = 0; i < MAX_CLIENTS; i++)
@@ -2994,13 +2988,29 @@ int CServer::Run()
 							Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
 						}
 
-						char aFile[256];
-						str_format(aFile, sizeof(aFile), "%s/countries.txt", Config()->m_SvCountriesFilePath);
-						std::ofstream CountriesFile(aFile, std::ios_base::app | std::ios_base::out);
-						if (CountriesFile.is_open())
+						// Insert and sort for faster lookup
 						{
-							str_format(aBuf, sizeof(aBuf), "%u %s", str_quickhash(aAddrStr), m_aClients[i].m_aCountryCode);
-							CountriesFile << aBuf << "\n";
+							std::map<unsigned int, std::string> HashMap;
+							char aFile[256];
+							str_format(aFile, sizeof(aFile), "%s/countries.txt", Config()->m_SvCountriesFilePath);
+							std::ifstream InFile(aFile);
+							std::string Line;
+							while (std::getline(InFile, Line))
+							{
+								if (Line.empty() || Line[0] == '#') continue;
+								unsigned int Hash;
+								char aCode[CClient::COUNTRYCODE_STRSIZE];
+								if (sscanf(Line.c_str(), "%u %s", &Hash, aCode) == 2)
+									HashMap[Hash] = aCode;
+							}
+							InFile.close();
+
+							unsigned int NewHash = str_quickhash(aAddrStr);
+							HashMap[NewHash] = m_aClients[i].m_aCountryCode;
+
+							std::ofstream OutFile(aFile, std::ios::trunc); // overwrite file
+							for (const auto &[Hash, Code] : HashMap)
+								OutFile << Hash << " " << Code << "\n";
 						}
 
 						// Notify game and process language suggestion
@@ -4370,29 +4380,33 @@ void CServer::CountryLookup(int ClientID)
 	std::fstream CountriesFile(aFile);
 	if (CountriesFile.is_open())
 	{
-		unsigned int IPHash = str_quickhash(aAddrStr);
-		std::string data;
+		std::unordered_map<unsigned int, std::string> CountryHashMap;
 		char aCode[CClient::COUNTRYCODE_STRSIZE];
 		unsigned int Hash;
+		std::string data;
 		while (getline(CountriesFile, data))
 		{
 			const char *pLine = data.c_str();
 			if (!str_length(pLine) || pLine[0] == '#') // skip empty lines and comments
 				continue;
-			if (sscanf(pLine, "%u %s", &Hash, aCode) == 2 && Hash == IPHash)
-			{
-				m_aClients[ClientID].m_CountryLookupState = CClient::COUNTRYLOOKUP_STATE_DONE;
-				str_copy(m_aClients[ClientID].m_aCountryCode, aCode, sizeof(m_aClients[ClientID].m_aCountryCode));
+			if (sscanf(pLine, "%u %s", &Hash, aCode) == 2)
+				CountryHashMap[Hash] = aCode;
+		}
 
-				// Console output
-				char aBuf[256];
-				str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> found cached country=%s, suggesting '%s'", ClientID, aAddrStr, m_aClients[ClientID].m_aCountryCode,
-					g_Localization.GetLanguageFileName(g_Localization.GetLanguageByCode(m_aClients[ClientID].m_aCountryCode)));
-				Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
+		auto it = CountryHashMap.find(str_quickhash(aAddrStr));
+		if (it != CountryHashMap.end())
+		{
+			m_aClients[ClientID].m_CountryLookupState = CClient::COUNTRYLOOKUP_STATE_DONE;
+			str_copy(m_aClients[ClientID].m_aCountryCode, aCode, sizeof(m_aClients[ClientID].m_aCountryCode));
 
-				GameServer()->OnCountryCodeLookup(ClientID);
-				return;
-			}
+			// Console output
+			char aBuf[256];
+			str_format(aBuf, sizeof(aBuf), "ClientID=%d addr=<{%s}> found cached country=%s, suggesting '%s'", ClientID, aAddrStr, m_aClients[ClientID].m_aCountryCode,
+				g_Localization.GetLanguageFileName(g_Localization.GetLanguageByCode(m_aClients[ClientID].m_aCountryCode)));
+			Console()->Print(IConsole::OUTPUT_LEVEL_ADDINFO, "localization", aBuf);
+
+			GameServer()->OnCountryCodeLookup(ClientID);
+			return;
 		}
 	}
 
