@@ -629,16 +629,24 @@ void CCharacter::FireWeapon()
 					case CGameWorld::ENTTYPE_HELICOPTER: pHelicopter = (CHelicopter *)pEnt; break;
 					}
 
+					vec2 Dir;
+					if (length(pEnt->GetPos() - m_Pos) > 0.0f)
+						Dir = normalize(pEnt->GetPos() - m_Pos);
+					else
+						Dir = vec2(0.f, -1.f);
+
+					vec2 EffectPos = ProjStartPos;
+					if (length(pTarget->m_Pos - ProjStartPos) > 0.0f)
+						EffectPos = pEnt->GetPos() - normalize(pEnt->GetPos() - ProjStartPos) * GetProximityRadius() * 0.5f;
+					GameServer()->CreateHammerHit(EffectPos, TeamMask());
+
 					if (pTarget)
 					{
 						if ((pTarget == this || (pTarget->IsAlive() && !CanCollide(pTarget->GetPlayer()->GetCID()))))
 							continue;
 
 						// set his velocity to fast upward (for now)
-						vec2 EffectPos = ProjStartPos;
-						if (length(pTarget->m_Pos - ProjStartPos) > 0.0f)
-							EffectPos = pTarget->m_Pos - normalize(pTarget->m_Pos - ProjStartPos) * GetProximityRadius() * 0.5f;
-						GameServer()->CreateHammerHit(EffectPos, TeamMask());
+						
 
 						int TargetCID = pTarget->GetPlayer()->GetCID();
 						// transformation
@@ -651,12 +659,6 @@ void CCharacter::FireWeapon()
 
 						if (!TryCatchingWanted(TargetCID, EffectPos))
 						{
-							vec2 Dir;
-							if (length(pTarget->m_Pos - m_Pos) > 0.0f)
-								Dir = normalize(pTarget->m_Pos - m_Pos);
-							else
-								Dir = vec2(0.f, -1.f);
-
 							vec2 Temp = pTarget->m_Core.m_Vel + normalize(Dir + vec2(0.f, -1.1f)) * 10.0f;
 							Temp = ClampVel(pTarget->m_MoveRestrictions, Temp);
 							Temp -= pTarget->m_Core.m_Vel;
@@ -676,9 +678,11 @@ void CCharacter::FireWeapon()
 
 						Antibot()->OnHammerHit(m_pPlayer->GetCID(), TargetCID);
 					}
-					else if (pHelicopter && pHelicopter->OnTakeDamage())
+					else if (pHelicopter)
 					{
-
+						vec2 Temp = normalize(Dir + vec2(0.f, -1.1f)) * 10.0f;
+						Temp = pHelicopter->GetVel() + (vec2(0.f, -1.0f) + Temp) * Tuning()->m_HammerStrength;
+						pHelicopter->SetVel(ClampVel(pHelicopter->GetOwner() ? pHelicopter->GetMoveRestrictions() : m_MoveRestrictions, Temp));
 					}
 				}
 

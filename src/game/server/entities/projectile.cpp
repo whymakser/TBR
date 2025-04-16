@@ -133,7 +133,7 @@ void CProjectile::Tick()
 		return;
 	}
 
-	if (pTargetHelicopter && pTargetHelicopter->OnTakeDamage())
+	if (pTargetHelicopter)
 	{
 		GameServer()->CreateExplosion(ColPos, m_Owner, m_Type, m_Owner == -1, pTargetHelicopter->GetDDTeam(), m_TeamMask);
 		GameServer()->CreateSound(ColPos, m_SoundImpact, m_TeamMask);
