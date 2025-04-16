@@ -1885,11 +1885,7 @@ void CDurak::UpdateCardSnapMapping(int SnappingClient, const std::map<CCard *, i
 			m_aUpdateTeamsState[SnappingClient] = true;
 			if (!Server()->IsSevendown(SnappingClient))
 			{
-				const char *pName;
-				if (IsSpectator)
-					pName = GetCardSymbol(-1, -1);
-				else
-					pName = GameServer()->m_apPlayers[SnappingClient]->Localize(GetCardSymbol(pCard->m_Suit, pCard->m_Rank, pGame), "durak-name");
+				const char *pName = IsSpectator ? GetCardSymbol(-1, -1) : GetCardSymbol(pCard->m_Suit, pCard->m_Rank, pGame, SnappingClient);
 				CNetMsg_Sv_ClientInfo NewClientInfoMsg;
 				NewClientInfoMsg.m_ClientID = NewID;
 				NewClientInfoMsg.m_Local = 0;
@@ -1932,11 +1928,7 @@ void CDurak::SnapDurakCard(int SnappingClient, CDurakGame *pGame, CCard *pCard, 
 		int *pClientInfo = (int*)Server()->SnapNewItem(11 + NUM_NETOBJTYPES, ID, 17*4); // NETOBJTYPE_CLIENTINFO
 		if(!pClientInfo)
 			return;
-		const char *pName;
-		if (IsSpectator)
-			pName = GetCardSymbol(-1, -1);
-		else
-			pName = GameServer()->m_apPlayers[SnappingClient]->Localize(GetCardSymbol(pCard->m_Suit, pCard->m_Rank, pGame), "durak-name");
+		const char *pName = IsSpectator ? GetCardSymbol(-1, -1) : GetCardSymbol(pCard->m_Suit, pCard->m_Rank, pGame, SnappingClient);
 		StrToInts(&pClientInfo[0], 4, pName);
 		StrToInts(&pClientInfo[4], 3, "");
 		StrToInts(&pClientInfo[8], 6, pGame ? "x_spec" : "default");
