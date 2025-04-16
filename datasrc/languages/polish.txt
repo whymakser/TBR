@@ -2069,31 +2069,31 @@ Welcome to the tavern!\n\nIf you would like to buy a grog for %d money, please p
 == Witaj w tawernie!\n\nJeśli chcesz kupić grog za %d pieniędzy, naciśnij F3.
 
 Welcome to the bank, %s! Press F4 to manage your bank account.
-== 
+== Witaj w banku, %s! Naciśnij F4, aby zarządzać swoim kontem bankowym.
 
 Are you sure that you want to deposit %d money from your wallet to your bank account?
-== 
+== Czy na pewno chcesz wpłacić %d pieniędzy z portfela na swoje konto bankowe?
 
 Are you sure that you want to withdraw %d money from your bank account to your wallet?
-== 
+== Czy na pewno chcesz wypłacić %d pieniędzy ze swojego konta bankowego do portfela?
 
 You can't use the bank without an account. Check '/account'.
-== 
+== Nie możesz korzystać z banku bez konta. Sprawdź '/account'.
 
 You cancelled the assignment.
-== 
+== Anulowałeś zadanie.
 
 Welcome to the bank!\n\nThis feature is currently disabled and your money is instantly saved.
-== 
+== Witaj w banku!\n\nTa funkcja jest obecnie wyłączona, a twoje pieniądze są natychmiast zapisywane.
 
 Welcome to the bank!\n\nPlease select your option:\nF3: Deposit (+)\nF4: Withdraw (-).\n\nOnce you selected an option, shoot to the right to go one step forward, and shoot left to go one step back.
-== 
+== Witaj w banku!\n\nWybierz opcję:\nF3: Wpłata (+)\nF4: Wypłata (-).\n\nPo wybraniu opcji, strzelaj w prawo, aby przejść krok do przodu, i strzelaj w lewo, aby cofnąć się o krok.
 
 D E P O S I T
-== 
+== W P Ł A T A
 
 W I T H D R A W
-== 
+== W Y P Ł A T A
 
 Everything (%d)
-== 
+== Wszystko (%d)

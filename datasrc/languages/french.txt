@@ -2022,31 +2022,31 @@ Welcome to the tavern!\n\nIf you would like to buy a grog for %d money, please p
 == Bienvenue à la taverne !\n\nSi vous souhaitez acheter un grog pour %d pièces, veuillez appuyer sur F3.
 
 Welcome to the bank, %s! Press F4 to manage your bank account.
-== 
+== Bienvenue à la banque, %s ! Appuyez sur F4 pour gérer votre compte bancaire.
 
 Are you sure that you want to deposit %d money from your wallet to your bank account?
-== 
+== Êtes-vous sûr de vouloir déposer %d argent de votre portefeuille sur votre compte bancaire ?
 
 Are you sure that you want to withdraw %d money from your bank account to your wallet?
-== 
+== Êtes-vous sûr de vouloir retirer %d argent de votre compte bancaire vers votre portefeuille ?
 
 You can't use the bank without an account. Check '/account'.
-== 
+== Vous ne pouvez pas utiliser la banque sans compte. Vérifiez '/account'.
 
 You cancelled the assignment.
-== 
+== Vous avez annulé l'opération.
 
 Welcome to the bank!\n\nThis feature is currently disabled and your money is instantly saved.
-== 
+== Bienvenue à la banque !\n\nCette fonctionnalité est actuellement désactivée et votre argent est instantanément sauvegardé.
 
 Welcome to the bank!\n\nPlease select your option:\nF3: Deposit (+)\nF4: Withdraw (-).\n\nOnce you selected an option, shoot to the right to go one step forward, and shoot left to go one step back.
-== 
+== Bienvenue à la banque !\n\nVeuillez sélectionner votre option :\nF3 : Dépôt (+)\nF4 : Retrait (-).\n\nUne fois que vous avez sélectionné une option, tirez vers la droite pour avancer d'un pas, et tirez vers la gauche pour reculer d'un pas.
 
 D E P O S I T
-== 
+== D É P Ô T
 
 W I T H D R A W
-== 
+== R E T R A I T
 
 Everything (%d)
-== 
+== Tout (%d)

@@ -2022,31 +2022,31 @@ Welcome to the tavern!\n\nIf you would like to buy a grog for %d money, please p
 == Добро пожаловать в таверну!\n\nЕсли вы хотите купить грог за %d денег, пожалуйста, нажмите F3.
 
 Welcome to the bank, %s! Press F4 to manage your bank account.
-== 
+== Добро пожаловать в банк, %s! Нажмите F4, чтобы управлять своим банковским счетом.
 
 Are you sure that you want to deposit %d money from your wallet to your bank account?
-== 
+== Вы уверены, что хотите внести %d денег из своего кошелька на банковский счет?
 
 Are you sure that you want to withdraw %d money from your bank account to your wallet?
-== 
+== Вы уверены, что хотите снять %d денег с вашего банковского счета в кошелек?
 
 You can't use the bank without an account. Check '/account'.
-== 
+== Вы не можете пользоваться банком без счета. Проверьте '/account'.
 
 You cancelled the assignment.
-== 
+== Вы отменили операцию.
 
 Welcome to the bank!\n\nThis feature is currently disabled and your money is instantly saved.
-== 
+== Добро пожаловать в банк!\n\nЭта функция в настоящее время отключена, и ваши деньги мгновенно сохраняются.
 
 Welcome to the bank!\n\nPlease select your option:\nF3: Deposit (+)\nF4: Withdraw (-).\n\nOnce you selected an option, shoot to the right to go one step forward, and shoot left to go one step back.
-== 
+== Добро пожаловать в банк!\n\nПожалуйста, выберите опцию:\nF3: Внести деньги (+)\nF4: Снять деньги (-).\n\nПосле выбора опции, стреляйте вправо, чтобы перейти на шаг вперед, и стреляйте влево, чтобы вернуться на шаг назад.
 
 D E P O S I T
-== 
+== В Н Е С Т И
 
 W I T H D R A W
-== 
+== С Н Я Т Ь
 
 Everything (%d)
-== 
+== Всё (%d)

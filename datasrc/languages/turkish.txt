@@ -2022,31 +2022,31 @@ If you want to buy an item, press F3
 == Bir eşya satın almak istiyorsanız, F3'e basın
 
 Welcome to the bank, %s! Press F4 to manage your bank account.
-== 
+== Bankaya hoş geldiniz, %s! Banka hesabınızı yönetmek için F4'e basın.
 
 Are you sure that you want to deposit %d money from your wallet to your bank account?
-== 
+== Cüzdanınızdan banka hesabınıza %d para yatırmak istediğinizden emin misiniz?
 
 Are you sure that you want to withdraw %d money from your bank account to your wallet?
-== 
+== Banka hesabınızdan cüzdanınıza %d para çekmek istediğinizden emin misiniz?
 
 You can't use the bank without an account. Check '/account'.
-== 
+== Hesap olmadan bankayı kullanamazsınız. '/account' komutunu kontrol edin.
 
 You cancelled the assignment.
-== 
+== İşlemi iptal ettiniz.
 
 Welcome to the bank!\n\nThis feature is currently disabled and your money is instantly saved.
-== 
+== Bankaya hoş geldiniz!\n\nBu özellik şu anda devre dışı ve paranız anında kaydediliyor.
 
 Welcome to the bank!\n\nPlease select your option:\nF3: Deposit (+)\nF4: Withdraw (-).\n\nOnce you selected an option, shoot to the right to go one step forward, and shoot left to go one step back.
-== 
+== Bankaya hoş geldiniz!\n\nLütfen seçeneğinizi seçin:\nF3: Para Yatırma (+)\nF4: Para Çekme (-).\n\nBir seçenek seçtikten sonra, bir adım ileri gitmek için sağa, bir adım geri gitmek için sola ateş edin.
 
 D E P O S I T
-== 
+== P A R A  Y A T I R M A
 
 W I T H D R A W
-== 
+== P A R A  Ç E K M E
 
 Everything (%d)
-== 
+== Hepsi (%d)
