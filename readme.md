@@ -93,7 +93,7 @@ You can play Durák by mouse or via keyboarc controls (+left, +right, +jump, +sh
 	If you can't defend or do not want to, you can click in the table area to take the cards in order to speed up the process. Otherwise wait 1min.
 
 * **Server-side translation** <br>
-F-DDrace has a server-side translation feature using '/language'. <br>
+F-DDrace has a server-side translation feature using `/language`. <br>
 You can specify a default language using `sv_default_language` or turn on `sv_language_suggestion` to receive a vote question on join. <br>
 Language files are stored in `datasrc/languages` and are moved to `data/languages` upon compiling, like the rest of `datasrc`.
 
