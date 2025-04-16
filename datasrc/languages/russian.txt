@@ -2020,3 +2020,33 @@ Press F3 to confirm your assignment.
 
 Welcome to the tavern!\n\nIf you would like to buy a grog for %d money, please press F3.
 == Добро пожаловать в таверну!\n\nЕсли вы хотите купить грог за %d денег, пожалуйста, нажмите F3.
+
+Welcome to the bank, %s! Press F4 to manage your bank account.
+== 
+
+Are you sure that you want to deposit %d money from your wallet to your bank account?
+== 
+
+Are you sure that you want to withdraw %d money from your bank account to your wallet?
+== 
+
+You can't use the bank without an account. Check '/account'.
+== 
+
+You cancelled the assignment.
+== 
+
+Welcome to the bank!\n\nThis feature is currently disabled and your money is instantly saved.
+== 
+
+Welcome to the bank!\n\nPlease select your option:\nF3: Deposit (+)\nF4: Withdraw (-).\n\nOnce you selected an option, shoot to the right to go one step forward, and shoot left to go one step back.
+== 
+
+D E P O S I T
+== 
+
+W I T H D R A W
+== 
+
+Everything (%d)
+== 
