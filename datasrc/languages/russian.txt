@@ -1923,100 +1923,100 @@ Aᴠᴀɪʟᴀʙʟᴇ Lᴀɴɢᴜᴀɢᴇs
 == Дᴏsᴛᴜᴘɴʏᴇ яᴢʏᴋɪ
 
 Rainbow will make your tee change the color very fast.
-== 
+== Радуга заставит ваш тройник очень быстро менять цвет.
 
 Bloody will give your tee a permanent kill effect.
-== 
+== Кровавый придаст вашему тройнику постоянный эффект убийства.
 
 Police officers get help from the police bot. For more information about the specific police ranks, please say '/police'.
-== 
+== Офицеры полиции получают помощь от полицейского бота. Для получения дополнительной информации о конкретных полицейских званиях, пожалуйста, введите '/police'.
 
 Using this item you can hide from other players behind bushes. If your ghost is activated you will be able to shoot plasma projectiles. How it works: '/helptoggle'
-== 
+== Используя этот предмет, вы можете прятаться от других игроков за кустами. Если ваш призрак активирован, вы сможете стрелять плазменными снарядами. Как это работает: '/helptoggle'
 
 If you have the room key you can enter the room. It's under the spawn and there is a money tile.
-== 
+== Если у вас есть ключ от комнаты, вы можете войти в неё. Она находится под точкой возрождения, и там есть денежная плитка.
 
 VIP Classic gives you some benefits, check '/vip'.
-== 
+== VIP Classic предоставляет вам некоторые преимущества, проверьте '/vip'.
 
 VIP+ gives you even more benefits than VIP Classic, check '/vip'.
-== 
+== VIP+ предоставляет вам ещё больше преимуществ, чем VIP Classic, проверьте '/vip'.
 
 You will have shotgun if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
-== 
+== У вас будет дробовик, если вы возродитесь. Для получения дополнительной информации о оружии возрождения, введите '/spawnweapons'.
 
 You will have grenade if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
-== 
+== У вас будет граната, если вы возродитесь. Для получения дополнительной информации о оружии возрождения, введите '/spawnweapons'.
 
 You will have rifle if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
-== 
+== У вас будет винтовка, если вы возродитесь. Для получения дополнительной информации о оружии возрождения, введите '/spawnweapons'.
 
 It will make your jetpack gun be a ninja. Toggle it using '/ninjajetpack'.
-== 
+== Это сделает ваш реактивный пистолет ниндзя. Переключите его с помощью '/ninjajetpack'.
 
 Taser is a rifle that freezes a player. For more information about the taser and your taser stats, plase visit '/taser'.
-== 
+== Электрошокер — это винтовка, которая замораживает игрока. Для получения дополнительной информации об электрошокере и ваших статистиках электрошокера, посетите '/taser'.
 
 Taser battery is required to use the taser. Maximum amount of ammo is 100. Plase visit '/taser'.
-== 
+== Для использования электрошокера требуется батарея. Максимальное количество боеприпасов — 100. Посетите '/taser'.
 
 With Portal Rifle you can create two portals where your cursor is, then teleport between them.
-== 
+== С Портальной Винтовкой вы можете создать два портала там, где находится ваш курсор, а затем телепортироваться между ними.
 
 Create portal blockers hammer and this ammo with your cursor. See '/portal' for your current amount. How it works: '/helptoggle'
-== 
+== Создайте молот блокиратора порталов и эти боеприпасы с помощью курсора. Смотрите '/portal' для информации о текущем количестве. Как это работает: '/helptoggle'
 
 Welcome to the shop, %s! Press F4 to start shopping.
-== 
+== Добро пожаловать в магазин, %s! Нажмите F4, чтобы начать покупки.
 
 Are you sure you want to buy this item?
-== 
+== Вы уверены, что хотите купить этот предмет?
 
 You canceled the purchase.
-== 
+== Вы отменили покупку.
 
 You own this item until you die.
-== 
+== Вы владеете этим предметом до вашей смерти.
 
 You own this item until\nyou disconnect.
-== 
+== Вы владеете этим предметом до тех пор,\nпока не отключитесь.
 
 You own this item forever.
-== 
+== Вы владеете этим предметом навсегда.
 
 You own this item for 30 days.
-== 
+== Вы владеете этим предметом в течение 30 дней.
 
 You own this item for 20 days.
-== 
+== Вы владеете этим предметом в течение 20 дней.
 
 You own this item for 7 days.
-== 
+== Вы владеете этим предметом в течение 7 дней.
 
 You own this item for 5 days.
-== 
+== Вы владеете этим предметом в течение 5 дней.
 
 Welcome to the shop!\n\nBy shooting to the right you go one site forward, and by shooting left you go one site back.
-== 
+== Добро пожаловать в магазин!\n\nСтреляя вправо, вы переходите на одну страницу вперёд, а стреляя влево, вы возвращаетесь на одну страницу назад.
 
 for sale
-== 
+== на продажу
 
 discount
-== 
+== скидка
 
 If you want to buy an item, press F3
-== 
+== Если вы хотите купить предмет, нажмите F3
 
 Welcome to the tavern, %s! Press F4 to buy a grog.
-== 
+== Добро пожаловать в таверну, %s! Нажмите F4, чтобы купить грог.
 
 Are you sure you want to buy a grog?
-== 
+== Вы уверены, что хотите купить грог?
 
 Press F3 to confirm your assignment.
-== 
+== Нажмите F3, чтобы подтвердить ваше назначение.
 
 Welcome to the tavern!\n\nIf you would like to buy a grog for %d money, please press F3.
-== 
+== Добро пожаловать в таверну!\n\nЕсли вы хотите купить грог за %d денег, пожалуйста, нажмите F3.

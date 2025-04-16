@@ -1923,100 +1923,97 @@ Aᴠᴀɪʟᴀʙʟᴇ Lᴀɴɢᴜᴀɢᴇs
 == Mᴇᴠᴄᴜᴛ ᴅɪʟʟᴇʀ
 
 Rainbow will make your tee change the color very fast.
-== 
+== Gökkuşağı, tişörtünüzün rengini çok hızlı değiştirecektir.
 
 Bloody will give your tee a permanent kill effect.
-== 
+== Kanlı, tişörtünüze kalıcı bir öldürme efekti verecektir.
 
 Police officers get help from the police bot. For more information about the specific police ranks, please say '/police'.
-== 
+== Polis memurları polis botundan yardım alır. Belirli polis rütbeleri hakkında daha fazla bilgi için lütfen '/police' yazın.
 
 Using this item you can hide from other players behind bushes. If your ghost is activated you will be able to shoot plasma projectiles. How it works: '/helptoggle'
-== 
+== Bu eşyayı kullanarak diğer oyunculardan çalıların arkasına saklanabilirsiniz. Hayaletiniz etkinleştirilirse plazma mermileri atabileceksiniz. Nasıl çalışır: '/helptoggle'
 
 If you have the room key you can enter the room. It's under the spawn and there is a money tile.
-== 
+== Oda anahtarınız varsa odaya girebilirsiniz. Doğuş noktasının altındadır ve orada bir para karosu vardır.
 
 VIP Classic gives you some benefits, check '/vip'.
-== 
+== VIP Classic size bazı avantajlar sağlar, '/vip' kontrol edin.
 
 VIP+ gives you even more benefits than VIP Classic, check '/vip'.
-== 
+== VIP+, VIP Classic'ten daha fazla avantaj sağlar, '/vip' kontrol edin.
 
 You will have shotgun if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
-== 
+== Yeniden doğarsanız pompalı tüfeğiniz olacak. Başlangıç silahları hakkında daha fazla bilgi için lütfen '/spawnweapons' yazın.
 
 You will have grenade if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
-== 
+== Yeniden doğarsanız el bombanız olacak. Başlangıç silahları hakkında daha fazla bilgi için lütfen '/spawnweapons' yazın.
 
 You will have rifle if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
-== 
+== Yeniden doğarsanız tüfeğiniz olacak. Başlangıç silahları hakkında daha fazla bilgi için lütfen '/spawnweapons' yazın.
 
 It will make your jetpack gun be a ninja. Toggle it using '/ninjajetpack'.
-== 
+== Jetpack silahınızın ninja gibi olmasını sağlar. '/ninjajetpack' kullanarak açıp kapatabilirsiniz.
 
 Taser is a rifle that freezes a player. For more information about the taser and your taser stats, plase visit '/taser'.
-== 
+== Taser, bir oyuncuyu donduran bir tüfektir. Taser ve taser istatistikleriniz hakkında daha fazla bilgi için lütfen '/taser' adresini ziyaret edin.
 
 Taser battery is required to use the taser. Maximum amount of ammo is 100. Plase visit '/taser'.
-== 
+== Taser'ı kullanmak için taser pili gereklidir. Maksimum cephane miktarı 100'dür. Lütfen '/taser' adresini ziyaret edin.
 
 With Portal Rifle you can create two portals where your cursor is, then teleport between them.
-== 
+== Portal Tüfeği ile imlecinizin olduğu yerde iki portal oluşturabilir, ardından bunlar arasında ışınlanabilirsiniz.
 
 Create portal blockers hammer and this ammo with your cursor. See '/portal' for your current amount. How it works: '/helptoggle'
-== 
+== İmlecinizle portal engelleyici çekiç ve bu cephaneyi oluşturun. Mevcut miktarınız için '/portal' bakın. Nasıl çalışır: '/helptoggle'
 
 Welcome to the shop, %s! Press F4 to start shopping.
-== 
+== Mağazaya hoş geldiniz, %s! Alışverişe başlamak için F4'e basın.
 
 Are you sure you want to buy this item?
-== 
+== Bu eşyayı satın almak istediğinizden emin misiniz?
 
 You canceled the purchase.
-== 
+== Satın almayı iptal ettiniz.
 
 You own this item until you die.
-== 
+== Bu eşyaya ölene kadar sahip olursunuz.
 
 You own this item until\nyou disconnect.
-== 
+== Bu eşyaya bağlantınız\nkesene kadar sahip olursunuz.
 
 You own this item forever.
-== 
+== Bu eşyaya sonsuza dek sahip olursunuz.
 
 You own this item for 30 days.
-== 
+== Bu eşyaya 30 gün boyunca sahip olursunuz.
 
 You own this item for 20 days.
-== 
+== Bu eşyaya 20 gün boyunca sahip olursunuz.
 
 You own this item for 7 days.
-== 
+== Bu eşyaya 7 gün boyunca sahip olursunuz.
 
 You own this item for 5 days.
-== 
+== Bu eşyaya 5 gün boyunca sahip olursunuz.
 
 Welcome to the shop!\n\nBy shooting to the right you go one site forward, and by shooting left you go one site back.
-== 
+== Mağazaya hoş geldiniz!\n\nSağa doğru ateş ederek bir sayfa ileri gider, sola doğru ateş ederek bir sayfa geri gidersiniz.
 
 for sale
-== 
+== satılık
 
 discount
-== 
-
-If you want to buy an item, press F3
-== 
+== indirim
 
 Welcome to the tavern, %s! Press F4 to buy a grog.
-== 
+== Meyhaneye hoş geldiniz, %s! Bir grog satın almak için F4'e basın.
 
 Are you sure you want to buy a grog?
-== 
+== Bir grog satın almak istediğinizden emin misiniz?
 
 Press F3 to confirm your assignment.
-== 
+== Görevlendirmenizi onaylamak için F3'e basın.
 
 Welcome to the tavern!\n\nIf you would like to buy a grog for %d money, please press F3.
-== 
+== Meyhaneye hoş geldiniz!\n\nEğer %d para karşılığında bir grog satın almak isterseniz, lütfen F3'e basın.

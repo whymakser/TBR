@@ -1970,100 +1970,100 @@ Aᴠᴀɪʟᴀʙʟᴇ Lᴀɴɢᴜᴀɢᴇs
 == Dᴏsᴛęᴘɴᴇ Jęᴢʏᴋɪ
 
 Rainbow will make your tee change the color very fast.
-== 
+== Tęcza sprawi, że twój tee będzie bardzo szybko zmieniał kolor.
 
 Bloody will give your tee a permanent kill effect.
-== 
+== Krwawy nada twojemu tee permanentny efekt zabójstwa.
 
 Police officers get help from the police bot. For more information about the specific police ranks, please say '/police'.
-== 
+== Funkcjonariusze policji otrzymują pomoc od bota policyjnego. Aby uzyskać więcej informacji o konkretnych rangach policyjnych, wpisz '/police'.
 
 Using this item you can hide from other players behind bushes. If your ghost is activated you will be able to shoot plasma projectiles. How it works: '/helptoggle'
-== 
+== Używając tego przedmiotu, możesz ukryć się przed innymi graczami za krzakami. Jeśli twój duch jest aktywowany, będziesz mógł strzelać pociskami plazmowymi. Jak to działa: '/helptoggle'
 
 If you have the room key you can enter the room. It's under the spawn and there is a money tile.
-== 
+== Jeśli masz klucz do pokoju, możesz wejść do pomieszczenia. Znajduje się pod miejscem odrodzenia i jest tam kafelek z pieniędzmi.
 
 VIP Classic gives you some benefits, check '/vip'.
-== 
+== VIP Classic daje ci pewne korzyści, sprawdź '/vip'.
 
 VIP+ gives you even more benefits than VIP Classic, check '/vip'.
-== 
+== VIP+ daje ci jeszcze więcej korzyści niż VIP Classic, sprawdź '/vip'.
 
 You will have shotgun if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
-== 
+== Będziesz mieć strzelbę, jeśli się odrodzisz. Aby uzyskać więcej informacji o broniach startowych, wpisz '/spawnweapons'.
 
 You will have grenade if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
-== 
+== Będziesz mieć granat, jeśli się odrodzisz. Aby uzyskać więcej informacji o broniach startowych, wpisz '/spawnweapons'.
 
 You will have rifle if you respawn. For more information about spawn weapons, please type '/spawnweapons'.
-== 
+== Będziesz mieć karabin, jeśli się odrodzisz. Aby uzyskać więcej informacji o broniach startowych, wpisz '/spawnweapons'.
 
 It will make your jetpack gun be a ninja. Toggle it using '/ninjajetpack'.
-== 
+== Sprawi, że twoja broń z plecakiem odrzutowym stanie się ninja. Przełącz to za pomocą '/ninjajetpack'.
 
 Taser is a rifle that freezes a player. For more information about the taser and your taser stats, plase visit '/taser'.
-== 
+== Paralizator to karabin, który zamraża gracza. Aby uzyskać więcej informacji o paralizatorze i twoich statystykach paralizatora, odwiedź '/taser'.
 
 Taser battery is required to use the taser. Maximum amount of ammo is 100. Plase visit '/taser'.
-== 
+== Do korzystania z paralizatora wymagana jest bateria. Maksymalna ilość amunicji to 100. Odwiedź '/taser'.
 
 With Portal Rifle you can create two portals where your cursor is, then teleport between them.
-== 
+== Za pomocą Karabinu Portalowego możesz tworzyć dwa portale w miejscu, gdzie znajduje się twój kursor, a następnie teleportować się między nimi.
 
 Create portal blockers hammer and this ammo with your cursor. See '/portal' for your current amount. How it works: '/helptoggle'
-== 
+== Stwórz młotek blokujący portale i tę amunicję za pomocą kursora. Zobacz '/portal', aby sprawdzić aktualną ilość. Jak to działa: '/helptoggle'
 
 Welcome to the shop, %s! Press F4 to start shopping.
-== 
+== Witaj w sklepie, %s! Naciśnij F4, aby rozpocząć zakupy.
 
 Are you sure you want to buy this item?
-== 
+== Czy na pewno chcesz kupić ten przedmiot?
 
 You canceled the purchase.
-== 
+== Anulowałeś zakup.
 
 You own this item until you die.
-== 
+== Posiadasz ten przedmiot do momentu śmierci.
 
 You own this item until\nyou disconnect.
-== 
+== Posiadasz ten przedmiot do momentu\nodłączenia się.
 
 You own this item forever.
-== 
+== Posiadasz ten przedmiot na zawsze.
 
 You own this item for 30 days.
-== 
+== Posiadasz ten przedmiot przez 30 dni.
 
 You own this item for 20 days.
-== 
+== Posiadasz ten przedmiot przez 20 dni.
 
 You own this item for 7 days.
-== 
+== Posiadasz ten przedmiot przez 7 dni.
 
 You own this item for 5 days.
-== 
+== Posiadasz ten przedmiot przez 5 dni.
 
 Welcome to the shop!\n\nBy shooting to the right you go one site forward, and by shooting left you go one site back.
-== 
+== Witaj w sklepie!\n\nStrzelając w prawo, przechodzisz jedną stronę do przodu, a strzelając w lewo, cofasz się o jedną stronę.
 
 for sale
-== 
+== na sprzedaż
 
 discount
-== 
+== zniżka
 
 If you want to buy an item, press F3
-== 
+== Jeśli chcesz kupić przedmiot, naciśnij F3
 
 Welcome to the tavern, %s! Press F4 to buy a grog.
-== 
+== Witaj w tawernie, %s! Naciśnij F4, aby kupić grog.
 
 Are you sure you want to buy a grog?
-== 
+== Czy na pewno chcesz kupić grog?
 
 Press F3 to confirm your assignment.
-== 
+== Naciśnij F3, aby potwierdzić swoje przypisanie.
 
 Welcome to the tavern!\n\nIf you would like to buy a grog for %d money, please press F3.
-== 
+== Witaj w tawernie!\n\nJeśli chcesz kupić grog za %d pieniędzy, naciśnij F3.
