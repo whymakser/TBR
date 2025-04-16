@@ -4413,7 +4413,7 @@ void CServer::CountryLookup(int ClientID)
 		if (it != CountryHashMap.end())
 		{
 			m_aClients[ClientID].m_CountryLookupState = CClient::COUNTRYLOOKUP_STATE_DONE;
-			SetCountryCode(ClientID, aCode, false, aAddrStr);
+			SetCountryCode(ClientID, it->second, false, aAddrStr);
 			GameServer()->OnCountryCodeLookup(ClientID);
 			return;
 		}
