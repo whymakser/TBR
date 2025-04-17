@@ -133,14 +133,6 @@ void CProjectile::Tick()
 		return;
 	}
 
-	if (pTargetHelicopter)
-	{
-		GameServer()->CreateExplosion(ColPos, m_Owner, m_Type, m_Owner == -1, pTargetHelicopter->GetDDTeam(), m_TeamMask);
-		GameServer()->CreateSound(ColPos, m_SoundImpact, m_TeamMask);
-		GameWorld()->DestroyEntity(this);
-		return;
-	}
-
 	if (!IsWeaponCollide && (
 		(pTargetChr && (m_Owner == -1 || pTargetChr == pOwnerChar || (pOwnerChar ? !(pOwnerChar->m_Hit & CCharacter::DISABLE_HIT_GRENADE) : Config()->m_SvHit)))
 		|| Collide || GameLayerClipped(m_CurPos)))
@@ -172,7 +164,7 @@ void CProjectile::Tick()
 			}
 		}
 
-		if (pOwnerChar && ColPos && !GameLayerClipped(ColPos) &&
+		if (pOwnerChar && !pOwnerChar->m_pHelicopter && ColPos && !GameLayerClipped(ColPos) &&
 			((m_Type == WEAPON_GRENADE && pOwnerChar->m_HasTeleGrenade) || (m_Type == WEAPON_GUN && pOwnerChar->m_HasTeleGun)))
 		{
 			int MapIndex = GameServer()->Collision()->GetPureMapIndex(pTargetChr ? pTargetChr->GetPos() : ColPos);
@@ -213,6 +205,14 @@ void CProjectile::Tick()
 					pOwnerChar->m_TeleGunTeleport = true;
 					pOwnerChar->m_IsBlueTeleGunTeleport = TileFIndex == TILE_ALLOW_BLUE_TELE_GUN || IsBlueSwitchTeleGun;
 				}
+			}
+		}
+		else if (pTargetHelicopter)
+		{
+			if (m_Explosive)
+			{
+				GameServer()->CreateExplosion(ColPos, m_Owner, m_Type, m_Owner == -1, pTargetHelicopter->GetDDTeam(), m_TeamMask);
+				GameServer()->CreateSound(ColPos, m_SoundImpact, m_TeamMask);
 			}
 		}
 
