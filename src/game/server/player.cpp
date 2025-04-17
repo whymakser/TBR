@@ -1095,6 +1095,11 @@ void CPlayer::OnDisconnect()
 
 	GameServer()->m_VotingMenu.Reset(m_ClientID);
 	g_Localization.TryUnload(GameServer(), m_Language);
+	if (m_VoteQuestionType == VOTE_QUESTION_LANGUAGE_SUGGESTION)
+	{
+		/// Unload suggested language from cache again
+		OnEndVoteQuestion(-1);
+	}
 
 	for (int i = 0; i < MAX_CLIENTS; i++)
 	{
