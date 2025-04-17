@@ -1191,7 +1191,7 @@ bool CVotingMenu::DoLineCollapse(int Page, int *pNumOptions, const char *pDescri
 	const char *pPrefix = ShowContent ? "╭─" : ">";
 	const char *pSuffix = ShowContent ? "[‒]" : "[+]";
 	int PrefixLength = str_length(pPrefix);
-	int DescLength = str_length(pDescription);
+	int DescLength = min(str_length(pDescription), (int)VOTE_DESC_LENGTH - 1);
 	int SuffixLength = str_length(pSuffix);
 	int TotalWidth = VOTE_DESC_LENGTH - 1; // -1 for null terminator ofc
 	int TotalSpaces = min(20, TotalWidth - PrefixLength - DescLength - SuffixLength);
