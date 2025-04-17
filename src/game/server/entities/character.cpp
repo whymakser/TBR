@@ -2232,7 +2232,7 @@ int CCharacter::GetDDNetCharacterFlags(int SnappingClient)
 		Flags |= CHARACTERFLAG_NO_COLLISION;
 	if(!m_Core.m_Hook || !Tuning()->m_PlayerHooking || (m_Passive && !m_Super) || Helicopter)
 		Flags |= CHARACTERFLAG_NO_HOOK;
-	if(m_SuperJump)
+	if(m_SuperJump && !Helicopter)
 		Flags |= CHARACTERFLAG_ENDLESS_JUMP;
 	if(m_Jetpack && (GameServer()->GetWeaponType(GetActiveWeapon()) != WEAPON_GUN || GetActiveWeapon() == WEAPON_GUN))
 		Flags |= CHARACTERFLAG_JETPACK;
