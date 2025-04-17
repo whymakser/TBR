@@ -48,13 +48,19 @@ bool CLaser::HitEntity(vec2 From, vec2 To)
 	bool CheckPlotTaserDestroy = false;
 	bool PlotDoorOnly = true;
 	int Types = (1<<CGameWorld::ENTTYPE_CHARACTER);
-	if (Config()->m_SvInteractiveDrops && m_Type == WEAPON_SHOTGUN)
+	if (m_Type == WEAPON_SHOTGUN)
 	{
-		Types |= (1<<CGameWorld::ENTTYPE_FLAG) | (1<<CGameWorld::ENTTYPE_PICKUP_DROP) | (1<<CGameWorld::ENTTYPE_MONEY) | (1<<CGameWorld::ENTTYPE_GROG) | (1<<CGameWorld::ENTTYPE_HELICOPTER);
+		if (Config()->m_SvInteractiveDrops)
+		{
+			Types |= (1<<CGameWorld::ENTTYPE_FLAG) | (1<<CGameWorld::ENTTYPE_PICKUP_DROP) | (1<<CGameWorld::ENTTYPE_MONEY) | (1<<CGameWorld::ENTTYPE_GROG) | (1<<CGameWorld::ENTTYPE_HELICOPTER);
+		}
 	}
 	else if (m_Type == WEAPON_TASER)
 	{
-		Types |= (1<<CGameWorld::ENTTYPE_HELICOPTER);
+		if (Config()->m_SvInteractiveDrops)
+		{
+			Types |= (1<<CGameWorld::ENTTYPE_HELICOPTER);
+		}
 		CPlayer *pOwner = m_Owner >= 0 ? GameServer()->m_apPlayers[m_Owner] : 0;
 		if (pOwner)
 		{

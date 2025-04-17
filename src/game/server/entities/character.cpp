@@ -613,7 +613,11 @@ void CCharacter::FireWeapon()
 					break;
 
 				CCharacter* apEnts[MAX_CLIENTS];
-				int Types = (1<<CGameWorld::ENTTYPE_CHARACTER) | (1<<CGameWorld::ENTTYPE_HELICOPTER);
+				int Types = (1<<CGameWorld::ENTTYPE_CHARACTER);
+				if (Config()->m_SvInteractiveDrops)
+				{
+					Types |= (1<<CGameWorld::ENTTYPE_HELICOPTER);
+				}
 				int Num = GameWorld()->FindEntitiesTypes(ProjStartPos, GetProximityRadius() * 0.5f, (CEntity * *)apEnts, MAX_CLIENTS, Types, Team());
 
 				int Hits = 0;
