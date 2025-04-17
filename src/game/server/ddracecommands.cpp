@@ -2459,7 +2459,7 @@ void CGameContext::ConListLoadedLanguages(IConsole::IResult *pResult, void *pUse
 			continue;
 		int NumUsed = 0;
 		for (int c = 0; c < MAX_CLIENTS; c++)
-			if (pSelf->m_apPlayers[c] && pSelf->m_apPlayers[c]->m_Language == i)
+			if (pSelf->m_apPlayers[c] && !pSelf->m_apPlayers[c]->m_IsDummy && pSelf->m_apPlayers[c]->m_Language == i)
 				NumUsed++;
 		str_format(aBuf, sizeof(aBuf), "%s (%d players)", g_Localization.GetLanguageFileName(i), NumUsed);
 		pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", aBuf);
