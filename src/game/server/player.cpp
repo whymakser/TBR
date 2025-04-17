@@ -1094,11 +1094,11 @@ void CPlayer::OnDisconnect()
 	Controller->m_Teams.SetForceCharacterTeam(m_ClientID, 0);
 
 	GameServer()->m_VotingMenu.Reset(m_ClientID);
-	g_Localization.TryUnload(GameServer(), m_Language);
+
+	// Invalidate our own language already, so that g_localization::TryUnload might succeed in SetLanguage
+	SetLanguage(-1, true);
 	if (m_VoteQuestionType == VOTE_QUESTION_LANGUAGE_SUGGESTION)
 	{
-		// Invalidate our own language already, so that g_localization::TryUnload might succeed
-		m_Language = -1;
 		/// Unload suggested language from cache again
 		OnEndVoteQuestion();
 	}
