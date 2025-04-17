@@ -1198,13 +1198,19 @@ bool CVotingMenu::DoLineCollapse(int Page, int *pNumOptions, const char *pDescri
 	int SpacesBefore = min(13, (int)(TotalSpaces * 0.7f));
 	int SpacesAfter = TotalSpaces - SpacesBefore;
 
-	char aSpacesBefore[VOTE_DESC_LENGTH];
-	memset(aSpacesBefore, ' ', SpacesBefore);
-	aSpacesBefore[SpacesBefore] = '\0';
+	char aSpacesBefore[VOTE_DESC_LENGTH] = { '\0' };
+	if (SpacesBefore)
+	{
+		memset(aSpacesBefore, ' ', SpacesBefore);
+		aSpacesBefore[SpacesBefore] = '\0';
+	}
 
-	char aSpacesAfter[VOTE_DESC_LENGTH];
-	memset(aSpacesAfter, ' ', SpacesAfter);
-	aSpacesAfter[SpacesAfter] = '\0';
+	char aSpacesAfter[VOTE_DESC_LENGTH] = { '\0' };
+	if (SpacesAfter)
+	{
+		memset(aSpacesAfter, ' ', SpacesAfter);
+		aSpacesAfter[SpacesAfter] = '\0';
+	}
 
 	if (ShowContent)
 		m_NumCollapseEntries = NumEntries;
