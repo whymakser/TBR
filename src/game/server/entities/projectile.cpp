@@ -139,9 +139,9 @@ void CProjectile::Tick()
 		return;
 	}
 
-	if (!IsWeaponCollide && (
+	if (!IsWeaponCollide && (Collide || GameLayerClipped(m_CurPos) || (pTargetHelicopter && !pTargetChr) ||
 		(pTargetChr && (m_Owner == -1 || pTargetChr == pOwnerChar || (pOwnerChar ? !(pOwnerChar->m_Hit & CCharacter::DISABLE_HIT_GRENADE) : Config()->m_SvHit)))
-		|| Collide || GameLayerClipped(m_CurPos)))
+		))
 	{
 		if (m_Explosive/*??*/ && (!pTargetChr || (pTargetChr && (!m_Freeze || (m_Type == WEAPON_SHOTGUN && Collide)))))
 		{

@@ -177,6 +177,12 @@ bool CLaser::HitEntity(vec2 From, vec2 To)
 	}
 	else if (m_Type == WEAPON_TASER)
 	{
+		/*if (pEnt->GetObjType() == CGameWorld::ENTTYPE_HELICOPTER)
+		{
+			CHelicopter* pHelicopter = (CHelicopter*)pEnt;
+			pHelicopter->Dismount();
+			return true;
+		} else*/
 		if (pChr)
 		{
 			int RandomPercentage = random(0, 100);
@@ -213,12 +219,6 @@ bool CLaser::HitEntity(vec2 From, vec2 To)
 			m_TaserStrength -= 2;
 			if (m_TaserStrength <= 0)
 				m_Energy = -1;
-			return true;
-		}
-		else if (pEnt->GetObjType() == CGameWorld::ENTTYPE_HELICOPTER)
-		{
-			CHelicopter *pHelicopter = (CHelicopter *)pEnt;
-			pHelicopter->Dismount();
 			return true;
 		}
 	}
