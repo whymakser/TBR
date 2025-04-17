@@ -158,23 +158,15 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 	}
 	else if (m_Type == WEAPON_LASER)
 	{
-		if (IsCharacter)
+		if (pChr->m_IsZombie)
 		{
-			if (pChr->m_IsZombie)
-			{
-				vec2 Pos = At + normalize(At - From) * vec2(-32.f, -32.f);
-				GameServer()->CreateExplosion(Pos, m_Owner, WEAPON_LASER, true, pOwnerChar ? pOwnerChar->Team() : pChr->Team(), m_TeamMask);
-			}
-			else
-			{
-				pChr->m_GotLasered = true;
-				pChr->UnFreeze();
-			}
+			vec2 Pos = At + normalize(At - From) * vec2(-32.f, -32.f);
+			GameServer()->CreateExplosion(Pos, m_Owner, WEAPON_LASER, true, pOwnerChar ? pOwnerChar->Team() : pChr->Team(), m_TeamMask);
 		}
-		else if (pEnt->GetObjType() == CGameWorld::ENTTYPE_HELICOPTER)
+		else
 		{
-			CHelicopter *pHelicopter = (CHelicopter *)pEnt;
-			pHelicopter->Dismount();
+			pChr->m_GotLasered = true;
+			pChr->UnFreeze();
 		}
 	}
 	else if (m_Type == WEAPON_TASER)
@@ -216,6 +208,11 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 			if (m_TaserStrength <= 0)
 				m_Energy = -1;
 			return true;
+		}
+		else if (pEnt->GetObjType() == CGameWorld::ENTTYPE_HELICOPTER)
+		{
+			CHelicopter *pHelicopter = (CHelicopter *)pEnt;
+			pHelicopter->Dismount();
 		}
 	}
 	pChr->TakeDamage(vec2(0.f, 0.f), vec2(0, 0), g_pData->m_Weapons.m_aId[GameServer()->GetWeaponType(m_Type)].m_Damage, m_Owner, m_Type);

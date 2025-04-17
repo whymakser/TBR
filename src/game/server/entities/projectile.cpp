@@ -93,7 +93,8 @@ void CProjectile::Tick()
 	if (pOwnerChar ? !(pOwnerChar->m_Hit & CCharacter::DISABLE_HIT_GRENADE) : Config()->m_SvHit)
 	{
 		int Types = (1<<CGameWorld::ENTTYPE_CHARACTER) | (1<<CGameWorld::ENTTYPE_HELICOPTER);
-		CEntity *pTargetEnt = GameWorld()->IntersectEntityTypes(PrevPos, ColPos, m_Freeze ? 1.0f : 6.0f, ColPos, pOwnerChar, m_Owner, Types);
+		CEntity *pNotThis = pOwnerChar && pOwnerChar->m_pHelicopter ? (CEntity *)pOwnerChar->m_pHelicopter : (CEntity *)pOwnerChar;
+		CEntity *pTargetEnt = GameWorld()->IntersectEntityTypes(PrevPos, ColPos, m_Freeze ? 1.0f : 6.0f, ColPos, pNotThis, m_Owner, Types);
 		if (pTargetEnt)
 		{
 			if (pTargetEnt->GetObjType() == CGameWorld::ENTTYPE_CHARACTER)
