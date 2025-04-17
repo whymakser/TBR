@@ -47,7 +47,7 @@ private:
 
 	int m_CollisionState;
 
-	void HitCharacter();
+	void HitEntity();
 	void Move();
 
 };

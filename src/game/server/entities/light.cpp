@@ -23,7 +23,7 @@ CLight::CLight(CGameWorld *pGameWorld, vec2 Pos, float Rotation, int Length,
 	Step();
 }
 
-bool CLight::HitCharacter()
+bool CLight::HitEntity()
 {
 	std::list<CCharacter *> HitCharacters =
 			GameWorld()->IntersectedCharacters(m_Pos, m_To, 0.0f, 0);
@@ -103,7 +103,7 @@ void CLight::Tick()
 		Step();
 	}
 
-	HitCharacter();
+	HitEntity();
 	return;
 
 }

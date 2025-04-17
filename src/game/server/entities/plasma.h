@@ -16,7 +16,7 @@ class CPlasma: public CEntity
 	int m_Freeze;
 
 	bool m_Explosive;
-	bool HitCharacter();
+	bool HitEntity();
 	void Move();
 public:
 

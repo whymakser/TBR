@@ -25,7 +25,7 @@ class CLightsaber : public CEntity
 	int m_LastHit[MAX_CLIENTS];
 
 	void PlaySound();
-	bool HitCharacter();
+	bool HitEntity();
 	void Step();
 public:
 	CLightsaber(CGameWorld *pGameWorld, vec2 Pos, int Owner);

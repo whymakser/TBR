@@ -39,7 +39,7 @@ CLaser::CLaser(CGameWorld* pGameWorld, vec2 Pos, vec2 Direction, float StartEner
 	DoBounce();
 }
 
-bool CLaser::HitCharacter(vec2 From, vec2 To)
+bool CLaser::HitEntity(vec2 From, vec2 To)
 {
 	vec2 At;
 	CCharacter* pOwnerChar = GameServer()->GetPlayerChar(m_Owner);
@@ -90,7 +90,7 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 		{
 			pChr = (CCharacter *)pIntersected;
 		}
-		else if (m_Type == WEAPON_SHOTGUN)
+		else if (m_Type == WEAPON_SHOTGUN || m_Type == WEAPON_TASER)
 		{
 			pEnt = (CAdvancedEntity *)pIntersected;
 			if (pEnt->GetObjType() == CGameWorld::ENTTYPE_FLAG)
@@ -213,7 +213,7 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 		{
 			CHelicopter *pHelicopter = (CHelicopter *)pEnt;
 			pHelicopter->Dismount();
-			return;
+			return true;
 		}
 	}
 	pChr->TakeDamage(vec2(0.f, 0.f), vec2(0, 0), g_pData->m_Weapons.m_aId[GameServer()->GetWeaponType(m_Type)].m_Damage, m_Owner, m_Type);
@@ -248,7 +248,7 @@ void CLaser::DoBounce()
 
 	if (Res)
 	{
-		if (!HitCharacter(m_Pos, To))
+		if (!HitEntity(m_Pos, To))
 		{
 			// intersected
 			m_From = m_Pos;
@@ -293,7 +293,7 @@ void CLaser::DoBounce()
 	}
 	else
 	{
-		if (!HitCharacter(m_Pos, To))
+		if (!HitEntity(m_Pos, To))
 		{
 			m_From = m_Pos;
 			m_Pos = To;

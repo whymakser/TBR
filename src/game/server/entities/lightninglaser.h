@@ -58,7 +58,7 @@ public:
 	void InitTarget();
 	void UpdateDirection(vec2 From);
 	bool TargetBehindWall(vec2 From);
-	void HitCharacter();
+	void HitEntity();
 	void GenerateLights();
 
 	bool TargetAlive() { return (m_Target.m_ID != -1 && GameServer()->GetPlayerChar(m_Target.m_ID)) ? true : false; }
