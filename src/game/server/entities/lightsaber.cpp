@@ -53,7 +53,7 @@ void CLightsaber::PlaySound()
 	}
 }
 
-bool CLightsaber::HitEntity()
+bool CLightsaber::HitCharacter()
 {
 	std::list<CCharacter *> HitCharacters = GameWorld()->IntersectedCharacters(m_Pos, m_To, 0.0f, m_pOwner, m_Owner);
 	if (HitCharacters.empty())
@@ -88,7 +88,7 @@ void CLightsaber::Tick()
 		m_EvalTick = Server()->Tick();
 	Step();
 
-	HitEntity();
+	HitCharacter();
 
 	if (m_Extending && m_Length < EXTENDED_LENGTH)
 	{

@@ -121,7 +121,7 @@ void CLightningLaser::GenerateLights()
 	}
 }
 
-void CLightningLaser::HitEntity()
+void CLightningLaser::HitCharacter()
 {
 	for(int i = 1; i < m_Count; i ++)
 	{
@@ -171,7 +171,7 @@ void CLightningLaser::Tick()
 		m_StartTick--;
 	}
 
-	HitEntity();
+	HitCharacter();
 }
 
 void CLightningLaser::Snap(int SnappingClient)

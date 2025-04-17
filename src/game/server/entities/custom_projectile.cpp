@@ -60,7 +60,7 @@ void CCustomProjectile::Tick()
 	}
 
 	Move();
-	HitEntity();
+	HitCharacter();
 
 	if (GameServer()->Collision()->IsSolid(m_Pos.x, m_Pos.y))
 	{
@@ -116,7 +116,7 @@ void CCustomProjectile::Move()
 	m_Core *= m_Accel;
 }
 
-void CCustomProjectile::HitEntity()
+void CCustomProjectile::HitCharacter()
 {
 	vec2 NewPos = m_Pos + m_Core;
 	CCharacter* pHit = GameWorld()->IntersectCharacter(m_PrevPos, NewPos, 6.0f, NewPos, m_pOwner, m_Owner);

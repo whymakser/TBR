@@ -15,7 +15,7 @@ class CLight: public CEntity
 
 	int m_Tick;
 
-	bool HitEntity();
+	bool HitCharacter();
 	void Move();
 	void Step();
 public:
