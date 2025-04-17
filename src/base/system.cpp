@@ -3380,6 +3380,24 @@ unsigned str_quickhash(const char *str)
 	return hash;
 }
 
+unsigned str_quickhash_raw(const char *str)
+{
+	unsigned hash = 5381;
+	for(; *str; str++)
+	{
+		if(*str == '\n')
+		{
+			hash = ((hash << 5) + hash) + '\\';
+			hash = ((hash << 5) + hash) + 'n';
+		}
+		else
+		{
+			hash = ((hash << 5) + hash) + (*str); /* hash * 33 + c */
+		}
+	}
+	return hash;
+}
+
 uint32_t fnv1a(const char *str)
 {
 	uint32_t hash = 2166136261u;
