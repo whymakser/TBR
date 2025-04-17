@@ -508,7 +508,7 @@ void CCharacter::FireWeapon()
 
 	// F-DDrace
 	vec2 ProjStartPos = m_Pos+TempDirection*GetProximityRadius()*0.75f;
-	Config()->m_SvTestingCommands = 1;
+
 	// doing this before the loop so that m_LastTaserUse is not yet updated when having spread taser
 	int TaserStrength = 0;
 	if (GetActiveWeapon() == WEAPON_TASER)
