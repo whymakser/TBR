@@ -213,6 +213,7 @@ bool CLaser::HitCharacter(vec2 From, vec2 To)
 		{
 			CHelicopter *pHelicopter = (CHelicopter *)pEnt;
 			pHelicopter->Dismount();
+			return;
 		}
 	}
 	pChr->TakeDamage(vec2(0.f, 0.f), vec2(0, 0), g_pData->m_Weapons.m_aId[GameServer()->GetWeaponType(m_Type)].m_Damage, m_Owner, m_Type);
