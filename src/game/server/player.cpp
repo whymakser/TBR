@@ -1098,7 +1098,7 @@ void CPlayer::OnDisconnect()
 	if (m_VoteQuestionType == VOTE_QUESTION_LANGUAGE_SUGGESTION)
 	{
 		/// Unload suggested language from cache again
-		OnEndVoteQuestion(-1);
+		OnEndVoteQuestion();
 	}
 
 	for (int i = 0; i < MAX_CLIENTS; i++)
