@@ -1097,6 +1097,8 @@ void CPlayer::OnDisconnect()
 	g_Localization.TryUnload(GameServer(), m_Language);
 	if (m_VoteQuestionType == VOTE_QUESTION_LANGUAGE_SUGGESTION)
 	{
+		// Invalidate our own language already, so that g_localization::TryUnload might succeed
+		m_Language = -1;
 		/// Unload suggested language from cache again
 		OnEndVoteQuestion();
 	}

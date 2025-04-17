@@ -2441,10 +2441,14 @@ void CGameContext::ConReloadDesigns(IConsole::IResult *pResult, void *pUserData)
 void CGameContext::ConReloadLanguages(IConsole::IResult *pResult, void *pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
-	// If unloaded, load again
 	for (unsigned int i = 0; i < g_Localization.Languages().size(); i++)
-		if (g_Localization.TryUnload(pSelf, i))
+	{
+		if (g_Localization.Languages()[i].m_Loaded)
+		{
+			g_Localization.Unload(i);
 			g_Localization.Load(i);
+		}
+	}
 	pSelf->Console()->Print(IConsole::OUTPUT_LEVEL_STANDARD, "localization", "Reloaded languages");
 }
 

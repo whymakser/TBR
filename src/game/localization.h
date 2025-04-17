@@ -47,6 +47,12 @@ public:
 		m_Loaded = false;
 		m_Available = false;
 	}
+	~CLanguage()
+	{
+		m_vStrings.clear();
+		delete m_pStringsHeap;
+		m_pStringsHeap = 0;
+	}
 
 	std::string m_Name;
 	std::string m_FileName;
@@ -66,8 +72,6 @@ class CLocalizationDatabase
 	class IStorage *m_pStorage;
 	class CConfig *m_pConfig;
 
-	void Unload(int Language);
-
 public:
 	void LoadIndexfile(class IStorage *pStorage, class CConfig *pConfig);
 	std::vector<CLanguage> &Languages() { return m_vLanguages; }
@@ -78,6 +82,7 @@ public:
 
 	bool Load(const char *pFilename, bool Force = false);
 	bool Load(int Language);
+	void Unload(int Language);
 	bool TryUnload(class CGameContext *pGameServer, int Language);
 	int GetLanguage(const char *pFileName);
 	int GetLanguageByCode(const char *pLanguageCode);
