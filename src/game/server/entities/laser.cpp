@@ -159,7 +159,6 @@ bool CLaser::HitEntity(vec2 From, vec2 To)
 				((CFlag *)pEnt)->SetAtStand(false);
 
 			pEnt->SetVel(ClampVel(pEnt->GetMoveRestrictions(), Temp));
-			return true;
 		}
 	}
 	else if (m_Type == WEAPON_LASER)
@@ -219,10 +218,13 @@ bool CLaser::HitEntity(vec2 From, vec2 To)
 			m_TaserStrength -= 2;
 			if (m_TaserStrength <= 0)
 				m_Energy = -1;
-			return true;
 		}
 	}
-	pChr->TakeDamage(vec2(0.f, 0.f), vec2(0, 0), g_pData->m_Weapons.m_aId[GameServer()->GetWeaponType(m_Type)].m_Damage, m_Owner, m_Type);
+
+	if (IsCharacter)
+	{
+		pChr->TakeDamage(vec2(0.f, 0.f), vec2(0, 0), g_pData->m_Weapons.m_aId[GameServer()->GetWeaponType(m_Type)].m_Damage, m_Owner, m_Type);
+	}
 	return true;
 }
 
