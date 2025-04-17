@@ -464,7 +464,7 @@ void CPlayer::Tick()
 	{
 		if (Server()->Tick() >= m_VoteQuestionEndTick)
 		{
-			OnEndVoteQuestion();
+			OnEndVoteQuestion(GetDefaultResult(m_VoteQuestionType));
 		}
 		else
 		{
@@ -2284,6 +2284,19 @@ void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 		Server()->SendMsg(&Msg, MSGFLAG_VITAL, m_ClientID);
 	}
 	GameServer()->SendVoteStatus(m_ClientID, 2, 2, 0);
+
+	CNetMsg_Sv_YourVote Msg = { GetDefaultResult(Type) };
+	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, m_ClientID);
+}
+
+int CPlayer::GetDefaultResult(VoteQuestionType Type)
+{
+	switch (Type)
+	{
+	case VOTE_QUESTION_DESIGN: return -1;
+	case VOTE_QUESTION_LANGUAGE_SUGGESTION: return 1;
+	}
+	return -1;
 }
 
 void CPlayer::OnEndVoteQuestion(int Result)
