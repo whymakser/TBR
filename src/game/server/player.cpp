@@ -2300,7 +2300,7 @@ int CPlayer::GetDefaultResult(VoteQuestionType Type)
 	{
 	case VOTE_QUESTION_DESIGN: return -1;
 	case VOTE_QUESTION_LANGUAGE_SUGGESTION: return 1;
-	case VOTE_QUESTION_NONE: return -1;
+	default: return -1;
 	}
 }
 
