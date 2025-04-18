@@ -299,7 +299,7 @@ void CDurak::OnPlayerLeave(int ClientID, bool Disconnect, bool Shutdown)
 			pPlayer->m_ForceSpawnPos = vec2(-1, -1);
 			pPlayer->m_ShowName = true;
 			pPlayer->SetName(Server()->ClientName(ClientID));
-			pPlayer->SetClan(Server()->ClientName(ClientID));
+			pPlayer->SetClan(Server()->ClientClan(ClientID));
 			pPlayer->UpdateInformation();
 			break;
 		}
