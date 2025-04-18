@@ -1223,9 +1223,8 @@ void CDurak::UpdateGame(int Game)
 		return;
 	}
 
-	bool ProcessMove = pGame->ProcessNextMove(Server()->Tick());
 	bool AttackersEndedMove = false;
-	if(!ProcessMove && pGame->NextMoveSoon(Server()->Tick()))
+	if(pGame->NextMoveSoon(Server()->Tick()))
 	{
 		SetTurnTooltip(Game, CCard::TOOLTIP_NEXT_MOVE);
 	}
@@ -1240,6 +1239,7 @@ void CDurak::UpdateGame(int Game)
 		}
 	}
 
+	bool ProcessMove = pGame->ProcessNextMove(Server()->Tick());
 	if (ProcessMove || AttackersEndedMove)
 	{
 		bool AllAttacksDefended = true;
