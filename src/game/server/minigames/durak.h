@@ -788,7 +788,7 @@ class CDurak : public CMinigame
 	bool HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg);
 
 	template<typename... Args>
-	void SendChatToDeployedStakePlayers(int Game, int NotThisID, const char *pFormat, Args&&... args);
+	void ProposeNewStake(int Game, int NotThisID, const char *pFormat, Args&&... args);
 	template<typename... Args>
 	void SendChatToParticipants(int Game, const char *pFormat, Args&&... args);
 

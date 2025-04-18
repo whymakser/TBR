@@ -245,8 +245,7 @@ bool CDurak::TryEnterBetStake(int ClientID, const char *pMessage)
 		{
 			VALIDATE_WALLET();
 
-			SendChatToDeployedStakePlayers(Game, ClientID, Localizable("'%s' proposed a new stake, please enter the current stake of '%lld' or propose a new one in the chat."), Server()->ClientName(ClientID), Stake);
-
+			ProposeNewStake(Game, ClientID, Localizable("'%s' proposed a new stake, please enter the current stake of '%lld' or propose a new one in the chat."), Server()->ClientName(ClientID), Stake);
 			pGame->m_Stake = Stake;
 			pPlayer->m_Stake = Stake;
 			UpdatePassive(ClientID, 30);
@@ -598,7 +597,7 @@ void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 }
 
 template<typename... Args>
-void CDurak::SendChatToDeployedStakePlayers(int Game, int NotThisID, const char *pFormat, Args&&... args)
+void CDurak::ProposeNewStake(int Game, int NotThisID, const char *pFormat, Args&&... args)
 {
 	if (Game < 0 || Game >= (int)m_vpGames.size())
 		return;
@@ -608,6 +607,8 @@ void CDurak::SendChatToDeployedStakePlayers(int Game, int NotThisID, const char 
 		int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
 		if (ClientID != -1 && pGame->m_aSeats[i].m_Player.m_Stake != -1 && (NotThisID == -1 || ClientID != NotThisID))
 		{
+			// Reset stake
+			pGame->m_aSeats[i].m_Player.m_Stake = -1;
 			char aBuf[256];
 			CFormatArg aArgs[] = { CFormatArg(std::forward<Args>(args))... };
 			str_format_args(aBuf, sizeof(aBuf), GameServer()->m_apPlayers[ClientID]->Localize(pFormat), aArgs, std::size(aArgs));
