@@ -419,6 +419,8 @@ void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 	if (Direction || HookColl || Jump)
 	{
 		pSeat->m_Player.m_KeyboardControl = true;
+		// Dont switch back to mouse control for 1 sec
+		pSeat->m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed();
 	}
 
 	if (Direction)
@@ -582,10 +584,11 @@ void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 		{
 			pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 		}
-		pSeat->m_Player.m_KeyboardControl = false;
+
 		if (pSeat->m_Player.m_LastCursorMove < Server()->Tick())
 		{
 			pSeat->m_Player.m_LastCursorMove = Server()->Tick();
+			pSeat->m_Player.m_KeyboardControl = false;
 		}
 	}
 
@@ -1442,12 +1445,7 @@ void CDurak::TakeCardsFromTable(int Game)
 		{
 			EndMove(Game, pSeat);
 			SetTurnTooltip(Game, CCard::TOOLTIP_NEXT_MOVE);
-			// Force next move in 5 sec so others can throw in cards still
-			const int64 NextMoveTick = Server()->Tick() + Server()->TickSpeed() * 5;
-			if (pGame->m_NextMove > NextMoveTick)
-			{
-				pGame->m_NextMove = NextMoveTick;
-			}
+			SetNextMoveSoon(Game);
 		}
 		// Clicking it again will not help and will not speed up the process
 		return;
@@ -1772,7 +1770,7 @@ void CDurak::PrepareStaticCards(CDurakGame *pGame, CDurakGame::SSeat *pSeat)
 						}
 					}
 
-					if (pSeat->m_Player.m_KeyboardControl || pSeat->m_Player.m_LastCursorMove < Server()->Tick() - Server()->TickSpeed() * 0.15f)
+					if (pSeat->m_Player.m_KeyboardControl || pSeat->m_Player.m_LastCursorMove < Server()->Tick() - Server()->TickSpeed() / 8)
 					{
 						pCard->SetTooltip(pSeat->m_Player.m_Tooltip);
 					}
