@@ -1444,7 +1444,6 @@ void CDurak::TakeCardsFromTable(int Game)
 		if (!pSeat->m_Player.m_EndedMove)
 		{
 			EndMove(Game, pSeat);
-			SetTurnTooltip(Game, CCard::TOOLTIP_NEXT_MOVE);
 			SetNextMoveSoon(Game);
 		}
 		// Clicking it again will not help and will not speed up the process

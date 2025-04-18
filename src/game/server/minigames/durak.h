@@ -645,7 +645,8 @@ public:
 		// Remove card from hand
 		RemoveCard(Seat, pCard);
 
-		if (!NextMoveSoon(Tick))
+		// Also update timer if attacker waited 59 seconds to place first card. give defender the opportunity to defend.
+		if (!NextMoveSoon(Tick) || GetOpenAttacks().size() == 1)
 		{
 			m_NextMove = 0;
 		}
