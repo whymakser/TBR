@@ -4032,7 +4032,10 @@ int main(int argc, const char **argv) // ignore_convention
 	if(!UseDefaultConfig)
 	{
 		// execute autoexec file
-		pConsole->ExecuteFile("autoexec.cfg");
+		if (!pConsole->ExecuteFile("autoexec.cfg"))
+		{
+			pConsole->ExecuteFile("autoexec_server.cfg");
+		}
 
 		// parse the command line arguments
 		if(argc > 1) // ignore_convention
