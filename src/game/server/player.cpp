@@ -2771,7 +2771,7 @@ void CPlayer::MinigameAfkCheck()
 	}
 	else if (TimeLeft <= 10 && Server()->Tick() % Server()->TickSpeed() == 0)
 	{
-		char aBuf[64];
+		char aBuf[256];
 		str_format(aBuf, sizeof(aBuf), Localize("Please move within %d seconds or you will leave the minigame"), TimeLeft);
 		GameServer()->SendChatTarget(m_ClientID, aBuf);
 	}
