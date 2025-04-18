@@ -437,6 +437,11 @@ public:
 		return -1;
 	}
 
+	bool NextMoveSoon(int Tick)
+	{
+		return m_NextMove && m_NextMove > Tick && Tick + SERVER_TICK_SPEED * 5 > m_NextMove;
+	}
+
 	bool ProcessNextMove(int64 CurrentTick)
 	{
 		if (!m_NextMove)
@@ -583,11 +588,6 @@ public:
 			return false;
 		}
 		return true;
-	}
-
-	bool NextMoveSoon(int Tick)
-	{
-		return m_NextMove && m_NextMove > Tick && Tick + SERVER_TICK_SPEED * 5 >= m_NextMove;
 	}
 
 	bool CanProcessWin(int Seat)
