@@ -1672,7 +1672,7 @@ Everyone in your locked team was killed because '%s' died.
 == Все в вашей заблокированной команде были убиты, потому что '%s' умер.
 
 Silent Farm
-== Тихая ферма
+== Тихий фарм
 
 Ninjajetpack
 == Реактивный ранец ниндзя
