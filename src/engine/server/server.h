@@ -14,7 +14,7 @@
 #include <engine/shared/netban.h>
 #include <engine/shared/http.h>
 #include "register.h"
-#include <engine/shared/fifo.h>"
+#include <engine/shared/fifo.h>
 
 #include "antibot.h"
 #include "authmanager.h"
