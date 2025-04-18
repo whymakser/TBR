@@ -439,7 +439,7 @@ public:
 
 	bool NextMoveSoon(int Tick)
 	{
-		return m_NextMove && m_NextMove < Tick + SERVER_TICK_SPEED * 5;
+		return m_NextMove && m_NextMove > Tick && m_NextMove < Tick + SERVER_TICK_SPEED * 5;
 	}
 
 	bool ProcessNextMove(int64 CurrentTick)

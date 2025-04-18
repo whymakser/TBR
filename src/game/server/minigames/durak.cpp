@@ -1228,6 +1228,7 @@ void CDurak::UpdateGame(int Game)
 		return;
 	}
 
+	bool ProcessMove = pGame->ProcessNextMove(Server()->Tick());
 	bool AttackersEndedMove = false;
 	if(pGame->NextMoveSoon(Server()->Tick()))
 	{
@@ -1236,7 +1237,7 @@ void CDurak::UpdateGame(int Game)
 	else
 	{
 		AttackersEndedMove = pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_EndedMove && pGame->m_aSeats[pGame->GetNextPlayer(pGame->m_DefenderIndex)].m_Player.m_EndedMove;
-		if (AttackersEndedMove)
+		if (AttackersEndedMove && !ProcessMove)
 		{
 			SetNextMoveSoon(Game);
 			// Process next tick, and send tooltip next move
@@ -1244,7 +1245,6 @@ void CDurak::UpdateGame(int Game)
 		}
 	}
 
-	bool ProcessMove = pGame->ProcessNextMove(Server()->Tick());
 	if (ProcessMove || AttackersEndedMove)
 	{
 		bool AllAttacksDefended = true;
