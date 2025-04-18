@@ -145,7 +145,8 @@ void CProjectile::Tick()
 	{
 		if (m_Explosive/*??*/ && (!pTargetChr || (pTargetChr && (!m_Freeze || (m_Type == WEAPON_SHOTGUN && Collide)))))
 		{
-			GameServer()->CreateExplosion(ColPos, m_Owner, m_Type, m_Owner == -1, (!pTargetChr ? -1 : pTargetChr->Team()), m_TeamMask);
+			int ActivatedTeam = pTargetChr ? pTargetChr->Team() : (pTargetEntity ? pTargetEntity->GetDDTeam() : -1);
+			GameServer()->CreateExplosion(ColPos, m_Owner, m_Type, m_Owner == -1, ActivatedTeam, m_TeamMask);
 			GameServer()->CreateSound(ColPos, m_SoundImpact, m_TeamMask);
 		}
 		else if (m_Freeze)
@@ -159,11 +160,12 @@ void CProjectile::Tick()
 		// F-DDrace
 		if (pTargetEntity)
 		{
-			if (m_Explosive)
+			// Don't trigger a double explosion. Explosive is checked above.
+			/*if (m_Explosive)
 			{
 				GameServer()->CreateExplosion(ColPos, m_Owner, m_Type, m_Owner == -1, pTargetEntity->GetDDTeam(), m_TeamMask);
 				GameServer()->CreateSound(ColPos, m_SoundImpact, m_TeamMask);
-			}
+			}*/
 		}
 		else if (pTargetChr)
 		{
