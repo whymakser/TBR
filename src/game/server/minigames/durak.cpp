@@ -127,12 +127,17 @@ void CDurak::OnCharacterSpawn(CCharacter *pChr)
 	if (!InDurakGame(ClientID))
 		return;
 
-	// Player can't move while playing and grenade, hammer, shotgun doesn't affect them, so we dont have to forcefully set the position in Tick anymore
 	int Game = GetGameByClient(ClientID);
+	CDurakGame *pGame = m_vpGames[Game];
+	CDurakGame::SSeat *pSeat = pGame->GetSeatByClient(ClientID);
+
+	// Player can't move while playing and grenade, hammer, shotgun doesn't affect them, so we dont have to forcefully set the position in Tick anymore
 	pChr->ForceSetPos(GameServer()->Collision()->GetPos(m_vpGames[Game]->GetSeatByClient(ClientID)->m_MapIndex));
 	// Update velocity, so we are always perfectly on the seat.
 	pChr->SetCoreVel(vec2(0.f, 0.f));
 	pChr->Core()->m_ActivelyPlayingDurak = ActivelyPlaying(ClientID);
+	// Disable passive also when won already, on next round
+	pChr->EpicCircle(pGame->m_DefenderIndex == pSeat->m_ID, -1, true);
 
 	CLockedTune Tune("gravity", 0.3f);
 	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Tune);
@@ -1295,9 +1300,6 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 		int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
 		if (ClientID == -1)
 			continue;
-		// Disable passive also when won already, on next round
-		CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
-		if (pChr) pChr->EpicCircle(pGame->m_DefenderIndex == i, -1, true);
 
 		if (pGame->m_aSeats[i].m_Player.m_Stake >= 0)
 		{
@@ -1307,6 +1309,7 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 			pGame->m_aSeats[i].m_Player.m_EndedMove = false;
 			pGame->m_aSeats[i].m_Player.m_CanSetNextMove = true;
 			GameServer()->m_apPlayers[ClientID]->m_ShowName = true;
+			CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
 			if (pChr)
 			{
 				OnCharacterSpawn(pChr);
