@@ -686,11 +686,11 @@ void CCharacter::FireWeapon()
 					}
 					else if (pEntity)
 					{
-						/*if (pEntity->GetObjType() == CGameWorld::ENTTYPE_HELICOPTER)
+						if (pEntity->GetObjType() == CGameWorld::ENTTYPE_FLAG)
 						{
-							if (((CHelicopter *)pEntity)->OnTakeDamage())
-								continue;
-						}*/
+							if (((CFlag *)pEntity)->GetCarrier())
+								continue; // carrier is getting hit
+						}
 
 						GameServer()->CreateHammerHit(EffectPos, TeamMask());
 						vec2 Temp = normalize(Dir + vec2(0.f, -1.1f)) * 10.0f;
