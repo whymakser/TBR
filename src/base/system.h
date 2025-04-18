@@ -255,7 +255,7 @@ unsigned io_read(IOHANDLE io, void *buffer, unsigned size);
 		- Guarantees that result will contain zero-termination.
 		- The result must be freed after it has been used.
 */
-void io_read_all(IOHANDLE io, void **result, unsigned *result_len);
+bool io_read_all(IOHANDLE io, void **result, unsigned *result_len);
 
 /*
 	Function: io_read_all_str

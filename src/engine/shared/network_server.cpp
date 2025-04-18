@@ -12,11 +12,6 @@
 
 #include <engine/shared/protocol.h>
 
-static SECURITY_TOKEN ToSecurityToken(const unsigned char *pData)
-{
-	return (int)pData[0] | (pData[1] << 8) | (pData[2] << 16) | (pData[3] << 24);
-}
-
 bool CNetServer::Open(NETADDR BindAddr, CConfig *pConfig, IConsole *pConsole, IEngine *pEngine, CNetBan *pNetBan,
 	int MaxClients, int MaxClientsPerIP, NETFUNC_NEWCLIENT pfnNewClient, NETFUNC_DELCLIENT pfnDelClient,
 	NETFUNC_CLIENTREJOIN pfnClientRejoin, NETFUNC_CLIENTCANCLOSE pfnClientCanClose, void *pUser)

@@ -143,6 +143,9 @@ typedef int SECURITY_TOKEN;
 
 static const unsigned char SECURITY_TOKEN_MAGIC[] = {'T', 'K', 'E', 'N'};
 
+SECURITY_TOKEN ToSecurityToken(const unsigned char *pData);
+void WriteSecurityToken(unsigned char *pData, SECURITY_TOKEN Token);
+
 enum
 {
 	NET_SECURITY_TOKEN_UNKNOWN = -1,
