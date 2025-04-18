@@ -445,7 +445,7 @@ public:
 	bool ProcessNextMove(int64 CurrentTick)
 	{
 		if (!m_NextMove)
-			m_NextMove = CurrentTick + SERVER_TICK_SPEED * 45;
+			m_NextMove = CurrentTick + SERVER_TICK_SPEED * 60;
 		return m_NextMove <= CurrentTick;
 	}
 
