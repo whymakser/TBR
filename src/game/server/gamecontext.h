@@ -326,7 +326,7 @@ public:
 	void SendChatFormat(int ChatterClientID, int Mode, int To, int Flags, const char* pFormat, Args&&... args)
 	{
 		CFormatArg aArgs[] = { CFormatArg(std::forward<Args>(args))... };
-		SendChat(ChatterClientID, CHAT_ALL, To, pFormat, -1, Flags, aArgs, std::size(aArgs));
+		SendChat(ChatterClientID, Mode, To, pFormat, -1, Flags, aArgs, std::size(aArgs));
 	}
 
 	void SendBroadcast(const char* pText, int ClientID, bool IsImportant = true, CFormatArg *pArgs = 0, int NumArgs = 0);
