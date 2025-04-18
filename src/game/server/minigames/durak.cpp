@@ -416,7 +416,7 @@ void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 	bool Jump = !pSeat->m_Player.m_LastInput.m_Jump ? pNewInput->m_Jump : false;
 
 	pSeat->m_Player.m_LastKeyboardControl = pSeat->m_Player.m_KeyboardControl;
-	if (Direction || HookColl || Jump)
+	if ((Direction || HookColl || Jump) && !pSeat->m_Player.m_KeyboardControl)
 	{
 		pSeat->m_Player.m_KeyboardControl = true;
 		// Dont switch back to mouse control for 1 sec
