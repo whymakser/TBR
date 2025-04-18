@@ -292,15 +292,21 @@ void CDurak::OnPlayerLeave(int ClientID, bool Disconnect, bool Shutdown)
 			}
 			m_vpGames[g]->m_aSeats[i].m_Player.Reset();
 
+			CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 			if (!GameServer()->Collision()->TileUsed(TILE_DURAK_LOBBY) && !Shutdown) // don't kill player on shutdown, we need character for SaveCharacter()
 			{
 				GameServer()->SetMinigame(ClientID, MINIGAME_NONE, false, false);
 			}
+			else if (pPlayer->GetCharacter())
+			{
+				pPlayer->GetCharacter()->EpicCircle(false, -1, true);
+			}
+
 			pTeams->SetForceCharacterTeam(ClientID, 0);
 			// Set before tunings
 			m_aInDurakGame[ClientID] = false;
 			GameServer()->SendTuningParams(ClientID);
-			CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
+			
 			pPlayer->m_ForceSpawnPos = vec2(-1, -1);
 			pPlayer->m_ShowName = true;
 			pPlayer->SetName(Server()->ClientName(ClientID));
