@@ -139,8 +139,10 @@ void CDurak::OnCharacterSpawn(CCharacter *pChr)
 	// Disable passive also when won already, on next round
 	pChr->EpicCircle(pGame->m_DefenderIndex == pSeat->m_ID, -1, true);
 
-	CLockedTune Tune("gravity", 0.3f);
-	GameServer()->SetLockedTune(&pChr->m_LockedTunings, Tune);
+	CLockedTune TuneGravity("gravity", 0.3f);
+	GameServer()->SetLockedTune(&pChr->m_LockedTunings, TuneGravity);
+	CLockedTune TuneHookLength("hook_length", 540.f);
+	GameServer()->SetLockedTune(&pChr->m_LockedTunings, TuneHookLength);
 	pChr->ApplyLockedTunings();
 }
 
@@ -378,13 +380,15 @@ int CDurak::GetTeam(int ClientID, int MapID)
 
 bool CDurak::OnDropMoney(int ClientID, int Amount, bool OnDeath)
 {
+	// Disallow accidental money dropping in durak game
+	// When m_vpGames[Game]->m_Running is true, player is sent to minigame. so we dont have to check for running && ondeath anymore since its included
+	if (OnDeath && GameServer()->m_apPlayers[ClientID]->m_Minigame == MINIGAME_DURAK)
+		return true;
+
 	int Game = GetGameByClient(ClientID);
 	// If the game is running already, the money has been subtracted already
 	if (Game < 0)
 		return false;
-	// Disallow accidental money dropping in durak game
-	if (m_vpGames[Game]->m_Running && OnDeath)
-		return true;
 	bool CanDrop = GameServer()->m_apPlayers[ClientID]->GetUsableMoney() - Amount >= m_vpGames[Game]->GetSeatByClient(ClientID)->m_Player.m_Stake;
 	if (!CanDrop)
 	{
@@ -1246,7 +1250,7 @@ void CDurak::UpdateGame(int Game)
 	else
 	{
 		AttackersEndedMove = pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_EndedMove && pGame->m_aSeats[pGame->GetNextPlayer(pGame->m_DefenderIndex)].m_Player.m_EndedMove;
-		if (AttackersEndedMove && !ProcessMove)
+		if (AttackersEndedMove && !ProcessMove && pGame->GetOpenAttacks().empty())
 		{
 			SetNextMoveSoon(Game);
 			// Process next tick, and send tooltip next move
