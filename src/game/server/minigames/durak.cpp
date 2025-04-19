@@ -353,6 +353,11 @@ int CDurak::GetTeam(int ClientID, int MapID)
 
 	if (!InDurakGame(ProcessedID))
 		return -1;
+
+	int Team = GameServer()->GetDDRaceTeam(ProcessedID);
+	if (Team == TEAM_SUPER && GameServer()->GetPlayerChar(ProcessedID))
+		Team = GameServer()->GetPlayerChar(ProcessedID)->m_TeamBeforeSuper;
+
 	int HighestDurakID = GameServer()->m_World.GetFirstDurakID(ClientID);
 	if (MapID > HighestDurakID - m_aDurakNumReserved[ClientID] && MapID <= HighestDurakID)
 	{
@@ -360,7 +365,7 @@ int CDurak::GetTeam(int ClientID, int MapID)
 		if (MapID == m_aLastSnapID[ClientID][&m_aStaticCards[DURAK_TEXT_KEYBOARD_CONTROL]] || MapID == m_aLastSnapID[ClientID][&m_aStaticCards[DURAK_TEXT_TOOLTIP]])
 			return 0;
 		if (GameServer()->Config()->m_SvDurakTeamColor)
-			return GameServer()->GetDDRaceTeam(ProcessedID);
+			return Team;
 		return 0;
 	}
 
@@ -372,7 +377,7 @@ int CDurak::GetTeam(int ClientID, int MapID)
 	if (Server()->ReverseTranslate(ID, ClientID))
 	{
 		// Player or self
-		if (ID == ProcessedID || GameServer()->GetDDRaceTeam(ID) == GameServer()->GetDDRaceTeam(ProcessedID))
+		if (ID == ProcessedID || GameServer()->GetDDRaceTeam(ID) == Team)
 			return 0;
 	}
 	return -1;
