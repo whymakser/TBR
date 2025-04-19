@@ -181,7 +181,7 @@ bool CHttpRequest::ConfigureHandle(void *pHandle)
 		curl_easy_setopt(pH, CURLOPT_TIMECONDITION, CURL_TIMECOND_IFMODSINCE);
 	}
 
-	// ‘CURLOPT_PROTOCOLS’ is deprecated: since 7.85.0. Use CURLOPT_PROTOCOLS_STR
+	// 'CURLOPT_PROTOCOLS' is deprecated: since 7.85.0. Use CURLOPT_PROTOCOLS_STR
 	// Wait until all platforms have 7.85.0
 #ifdef __GNUC__
 #pragma GCC diagnostic push
@@ -208,7 +208,7 @@ bool CHttpRequest::ConfigureHandle(void *pHandle)
 	curl_easy_setopt(pH, CURLOPT_WRITEFUNCTION, WriteCallback);
 	curl_easy_setopt(pH, CURLOPT_NOPROGRESS, 0L);
 	curl_easy_setopt(pH, CURLOPT_PROGRESSDATA, this);
-	// ‘CURLOPT_PROGRESSFUNCTION’ is deprecated: since 7.32.0. Use CURLOPT_XFERINFOFUNCTION
+	// 'CURLOPT_PROGRESSFUNCTION' is deprecated: since 7.32.0. Use CURLOPT_XFERINFOFUNCTION
 	// See problems with curl_off_t type in header file in https://github.com/ddnet/ddnet/pull/6185/
 #ifdef __GNUC__
 #pragma GCC diagnostic push
@@ -321,7 +321,7 @@ size_t CHttpRequest::OnData(char *pData, size_t DataSize)
 	{
 		return DataSize;
 	}
-
+	
 	sha256_update(&m_ActualSha256Ctx, pData, DataSize);
 
 	size_t Result = DataSize;
