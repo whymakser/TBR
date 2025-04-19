@@ -837,9 +837,30 @@ void CGameContext::SendBroadcast(const char* pText, int ClientID, bool IsImporta
 	if (!IsImportant && m_apPlayers[ClientID]->m_LastBroadcastImportance && m_apPlayers[ClientID]->m_LastBroadcast > Server()->Tick() - Server()->TickSpeed() * 10)
 		return;
 
+	char aText[1024];
+	str_copy(aText, pText, sizeof(aText));
+	// This is done clientside in 0.7, but DDNet clients only parse aBuf[i] == '\n'
+	if (Server()->IsSevendown(ClientID))
+	{
+		int i, j;
+		for(i = 0, j = 0; aText[i]; i++, j++)
+		{
+			if(aText[i] == '\\' && aText[i + 1] == 'n')
+			{
+				aText[j] = '\n';
+				i++;
+			}
+			else if(i != j)
+			{
+				aText[j] = aText[i];
+			}
+		}
+		aText[j] = '\0';
+	}
+
 	CNetMsg_Sv_Broadcast Msg;
-	char aBuf[256];
-	str_format_args(aBuf, sizeof(aBuf), m_apPlayers[ClientID]->Localize(pText), pArgs, NumArgs);
+	char aBuf[1024];
+	str_format_args(aBuf, sizeof(aBuf), m_apPlayers[ClientID]->Localize(aText), pArgs, NumArgs);
 	Msg.m_pMessage = aBuf;
 	Server()->SendPackMsg(&Msg, MSGFLAG_VITAL, ClientID);
 	m_apPlayers[ClientID]->m_LastBroadcast = Server()->Tick();
@@ -3525,27 +3546,7 @@ void CGameContext::ConSay(IConsole::IResult *pResult, void *pUserData)
 void CGameContext::ConBroadcast(IConsole::IResult* pResult, void* pUserData)
 {
 	CGameContext *pSelf = (CGameContext *)pUserData;
-
-	// This is done clientside in 0.7, but DDNet clients only parse aBuf[i] == '\n'
-	char aBuf[1024];
-	str_copy(aBuf, pResult->GetString(0), sizeof(aBuf));
-
-	int i, j;
-	for(i = 0, j = 0; aBuf[i]; i++, j++)
-	{
-		if(aBuf[i] == '\\' && aBuf[i + 1] == 'n')
-		{
-			aBuf[j] = '\n';
-			i++;
-		}
-		else if(i != j)
-		{
-			aBuf[j] = aBuf[i];
-		}
-	}
-	aBuf[j] = '\0';
-
-	pSelf->SendBroadcast(aBuf, -1);
+	pSelf->SendBroadcast(pResult->GetString(0), -1);
 }
 
 void CGameContext::ConSetTeam(IConsole::IResult *pResult, void *pUserData)
