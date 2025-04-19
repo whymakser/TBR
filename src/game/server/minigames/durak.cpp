@@ -588,7 +588,7 @@ void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 			}
 		}
 	}
-	else if (abs(pNewInput->m_TargetX - pSeat->m_Player.m_LastInput.m_TargetX) > 2.f || abs(pNewInput->m_TargetY - pSeat->m_Player.m_LastInput.m_TargetY) > 2.f)
+	else if (abs(pNewInput->m_TargetX - pSeat->m_Player.m_LastInput.m_TargetX) > 3.f || abs(pNewInput->m_TargetY - pSeat->m_Player.m_LastInput.m_TargetY) > 3.f)
 	{
 		if (pSeat->m_Player.m_KeyboardControl)
 		{
@@ -1779,7 +1779,7 @@ void CDurak::PrepareStaticCards(CDurakGame *pGame, CDurakGame::SSeat *pSeat)
 						}
 					}
 
-					if (pSeat->m_Player.m_KeyboardControl || pSeat->m_Player.m_LastCursorMove < Server()->Tick() - Server()->TickSpeed() / 8)
+					if (pSeat->m_Player.m_KeyboardControl || pSeat->m_Player.m_LastCursorMove < Server()->Tick() - Server()->TickSpeed() / 10)
 					{
 						pCard->SetTooltip(pSeat->m_Player.m_Tooltip);
 					}
