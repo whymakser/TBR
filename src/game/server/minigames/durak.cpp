@@ -844,7 +844,8 @@ const char *CDurak::GetCardSymbol(int Suit, int Rank, CDurakGame *pGame, int Sna
 		case CCard::IND_TOOLTIP_TAKE_CARDS: return Localize("Take cards", "durak-name");
 		case CCard::IND_TOOLTIP_ATTACKERS_TURN:
 		{
-			str_format(aBuf, sizeof(aBuf), "%s", Server()->ClientName(pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_ClientID));
+			int ClientID = pGame->m_DurakClientID != -1 ? pGame->m_DurakClientID : pGame->m_aSeats[pGame->m_AttackerIndex].m_Player.m_ClientID;
+			str_format(aBuf, sizeof(aBuf), "%s", Server()->ClientName(ClientID));
 			return aBuf;
 		}
 		case CCard::IND_TOOLTIP_DEFENDER_PASSED: return Localize("Passed…", "durak-name");
@@ -1238,6 +1239,9 @@ void CDurak::UpdateGame(int Game)
 		pGame->m_GameOverTick = Server()->Tick();
 		std::pair<int, int64> Pair(pGame->m_DurakClientID, pGame->m_GameOverTick);
 		m_vLastDuraks.push_back(Pair);
+
+		// Abuse tooltip attackers turn for showing durak's name in the end, it's handled there
+		SetTurnTooltip(Game, CCard::TOOLTIP_ATTACKERS_TURN);
 		return;
 	}
 
@@ -1616,10 +1620,14 @@ void CDurak::Snap(int SnappingClient)
 		return;
 
 	int ClientID = SnappingClient;
+	bool IsSpectator = false;
+
 	CPlayer *pSnap = GameServer()->m_apPlayers[SnappingClient];
-	if ((pSnap->GetTeam() == TEAM_SPECTATORS || pSnap->IsPaused()) && pSnap->GetSpectatorID() >= 0)
+	if ((pSnap->GetTeam() == TEAM_SPECTATORS || pSnap->IsPaused()) && pSnap->GetSpectatorID() >= 0 && pSnap->GetSpectatorID() != SnappingClient)
+	{
 		ClientID = pSnap->GetSpectatorID();
-	bool IsSpectator = SnappingClient != ClientID;
+		IsSpectator = true;
+	}
 
 	int Game = GetGameByClient(ClientID);
 	CDurakGame *pGame = Game >= 0 ? m_vpGames[Game] : 0;
@@ -1627,7 +1635,15 @@ void CDurak::Snap(int SnappingClient)
 	CDurakGame::SSeat *pSeat = 0;
 	if (pGame)
 	{
-		pSeat = IsSpectator && pGame->m_DefenderIndex != -1 ? &pGame->m_aSeats[pGame->m_DefenderIndex] : pGame->GetSeatByClient(ClientID);
+		if (pGame->m_DurakClientID != -1)
+		{
+			pSeat = pGame->GetSeatByClient(pGame->m_DurakClientID);
+			IsSpectator = false;
+		}
+		else
+		{
+			pSeat = IsSpectator && pGame->m_DefenderIndex != -1 ? &pGame->m_aSeats[pGame->m_DefenderIndex] : pGame->GetSeatByClient(ClientID);
+		}
 	}
 
 	// Prepare snap ids..
