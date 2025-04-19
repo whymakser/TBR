@@ -1101,7 +1101,7 @@ void CPlayer::OnDisconnect()
 	GameServer()->m_VotingMenu.Reset(m_ClientID);
 
 	// Invalidate our own language already, so that g_localization::TryUnload might succeed in SetLanguage
-	SetLanguage(-1, true);
+	SetLanguage(-1, true, false);
 	if (m_VoteQuestionType == VOTE_QUESTION_LANGUAGE_SUGGESTION)
 	{
 		/// Unload suggested language from cache again
@@ -2795,16 +2795,19 @@ const char *CPlayer::Localize(const char *pText, const char *pContext)
 	return ::Localize(pText, m_Language, pContext);
 }
 
-void CPlayer::SetLanguage(int Language, bool Silent)
+void CPlayer::SetLanguage(int Language, bool Silent, bool UpdateDummy)
 {
 	if (Language == m_Language)
 		return;
 
-	int DummyID = Server()->GetDummy(m_ClientID);
-	if (DummyID != -1)
+	if (UpdateDummy)
 	{
-		// Always keep track of dummy language
-		GameServer()->m_apPlayers[DummyID]->m_Language = Language;
+		int DummyID = Server()->GetDummy(m_ClientID);
+		if (DummyID != -1)
+		{
+			// Always keep track of dummy language
+			GameServer()->m_apPlayers[DummyID]->m_Language = Language;
+		}
 	}
 
 	int PrevLanguage = m_Language;
