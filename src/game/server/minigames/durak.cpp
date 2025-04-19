@@ -392,7 +392,7 @@ bool CDurak::OnDropMoney(int ClientID, int Amount, bool OnDeath)
 
 	int Game = GetGameByClient(ClientID);
 	// If the game is running already, the money has been subtracted already
-	if (Game < 0)
+	if (Game < 0 || m_vpGames[Game]->m_Running)
 		return false;
 	bool CanDrop = GameServer()->m_apPlayers[ClientID]->GetUsableMoney() - Amount >= m_vpGames[Game]->GetSeatByClient(ClientID)->m_Player.m_Stake;
 	if (!CanDrop)
