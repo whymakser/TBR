@@ -648,7 +648,7 @@ void CCharacter::FireWeapon()
 
 					if (pTarget)
 					{
-						if ((pTarget == this || (pTarget->IsAlive() && !CanCollide(pTarget->GetPlayer()->GetCID()))))
+						if (pTarget == this || !pTarget->IsAlive() || !CanCollide(pTarget->GetPlayer()->GetCID()))
 							continue;
 
 						GameServer()->CreateHammerHit(EffectPos, TeamMask());
@@ -5760,8 +5760,10 @@ bool CCharacter::TryCatchingWanted(int TargetCID, vec2 EffectPos)
 		pTarget->GetPlayer()->BankTransaction(-Corrupt, aBuf);
 		str_format(aBuf, sizeof(aBuf), "corrupted by gangster '%s'", Server()->ClientName(TargetCID));
 		m_pPlayer->BankTransaction(Corrupt, aBuf);
+
 		str_format(aBuf, sizeof(aBuf), pTarget->GetPlayer()->Localize("You paid %d money to '%s' to reduce your jailtime by 5 minutes"), Corrupt, Server()->ClientName(m_pPlayer->GetCID()));
 		GameServer()->SendChatTarget(TargetCID, aBuf);
+
 		str_format(aBuf, sizeof(aBuf), m_pPlayer->Localize("You got %d money from '%s' to reduce his jailtime by 5 minutes"), Corrupt, Server()->ClientName(TargetCID));
 		GameServer()->SendChatTarget(m_pPlayer->GetCID(), aBuf);
 		Minutes -= 5;
