@@ -2184,9 +2184,8 @@ void CPlayer::OnLogin(bool ForceDesignLoad)
 
 	GameServer()->StartResendingVotes(m_ClientID, false);
 
-	if (GameServer()->Config()->m_SvMoneyBankMode == 0)
+	if (GameServer()->Config()->m_SvMoneyBankMode == 0 && BankTransaction(GetWalletMoney(), "automatic wallet to bank due to login and disabled bank"))
 	{
-		BankTransaction(GetWalletMoney(), "automatic wallet to bank due to login and disabled bank");
 		// Manually set wallet money instead of using WalletTransaction, because SvMoneyBankMode 0 redirects walelttransactions to bank, which doesn't make any sense here
 		SetWalletMoney(0);
 		GameServer()->SendChatTarget(m_ClientID, Localize("Your previously collected money got added to your account due to login"));
