@@ -639,7 +639,7 @@ void CGameTeams::OnFinish(CPlayer* Player, float Time, const char *pTimestamp)
 	char aBuf[128];
 	SetCpActive(Player, -2);
 	str_format(aBuf, sizeof(aBuf),
-			Player->Localize("%s finished in: %d minute(s) %5.2f second(s)"),
+			Localizable("%s finished in: %d minute(s) %5.2f second(s)"),
 			Server()->ClientName(Player->GetCID()), (int)Time / 60,
 			Time - ((int)Time / 60 * 60));
 	if (GameServer()->Config()->m_SvHideScore)
