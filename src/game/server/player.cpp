@@ -2263,7 +2263,7 @@ void CPlayer::StartVoteQuestion(VoteQuestionType Type)
 	case CPlayer::VOTE_QUESTION_LANGUAGE_SUGGESTION:
 	{
 		int LanguageFromCode = g_Localization.GetLanguageByCode(Server()->GetCountryCode(m_ClientID));
-		if (str_comp(g_Localization.GetLanguageFileName(LanguageFromCode), GameServer()->Config()->m_SvDefaultLanguage) == 0)
+		if (!g_Localization.Languages()[LanguageFromCode].m_Available || str_comp(g_Localization.GetLanguageFileName(LanguageFromCode), GameServer()->Config()->m_SvDefaultLanguage) == 0)
 			return;
 
 		str_format(aText, sizeof(aText), ::Localize("Change language to %s?", LanguageFromCode), g_Localization.GetLanguageString(LanguageFromCode));
