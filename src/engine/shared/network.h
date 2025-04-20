@@ -230,11 +230,13 @@ class CNetBase
 
 	class CConfig *m_pConfig;
 	class IEngine *m_pEngine;
-	NETSOCKET m_aSocket[NUM_SOCKETS];
 	IOHANDLE m_DataLogSent;
 	IOHANDLE m_DataLogRecv;
 	CHuffman m_Huffman;
 	unsigned char m_aRequestTokenBuf[NET_TOKENREQUEST_DATASIZE];
+
+protected:
+	NETSOCKET m_aSocket[NUM_SOCKETS];
 
 public:
 	CNetBase();
@@ -251,7 +253,6 @@ public:
 	void SendControlMsgWithToken(const NETADDR *pAddr, TOKEN Token, int Ack, int ControlMsg, TOKEN MyToken, bool Extended, int Socket);
 	void SendPacketConnless(const NETADDR *pAddr, TOKEN Token, TOKEN ResponseToken, const void *pData, int DataSize, bool Sevendown, int Socket);
 	void SendPacket(const NETADDR *pAddr, CNetPacketConstruct *pPacket, bool Sevendown, int Socket, SECURITY_TOKEN SecurityToken = NET_SECURITY_TOKEN_UNSUPPORTED);
-	int UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketConstruct *pPacket, bool *pSevendown, int Socket, int *pSize);
 	int UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct *pPacket, bool *pSevendown);
 };
 

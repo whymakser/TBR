@@ -135,6 +135,9 @@ SECURITY_TOKEN CNetServer::GetSecurityToken(const NETADDR &Addr)
 */
 int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken, bool *pSevendown, int Socket)
 {
+	if (!m_aSocket[Socket])
+		return 0;
+
 	while(1)
 	{
 		// check for a chunk
@@ -143,36 +146,37 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken, bool *pSevendown,
 		
 		// TODO: empty the recvinfo
 		NETADDR Addr;
-		int Size = 0;
-		*pSevendown = true;
-		int Result = UnpackPacket(&Addr, m_RecvUnpacker.m_aBuffer, &m_RecvUnpacker.m_Data, pSevendown, Socket, &Size);
+		unsigned char *pData;
+		int Bytes = net_udp_recv(m_aSocket[Socket], &Addr, &pData);
+
 		// no more packets for now
-		if(Result > 0)
-			break;
+ 		if(Bytes <= 0)
+ 			break;
 
-		if(!Result)
+		// check for bans
+		char aBuf[128];
+		int LastInfoQuery;
+		if(NetBan() && NetBan()->IsBanned(&Addr, aBuf, sizeof(aBuf), &LastInfoQuery))
 		{
-			// check for bans
-			char aBuf[128];
-			int LastInfoQuery;
-			if(NetBan() && NetBan()->IsBanned(&Addr, aBuf, sizeof(aBuf), &LastInfoQuery))
+			// banned, reply with a message (5 second cooldown)
+			int Time = time_timestamp();
+			if(LastInfoQuery + 5 < Time)
 			{
-				// banned, reply with a message (5 second cooldown)
-				int Time = time_timestamp();
-				if(LastInfoQuery + 5 < Time)
+				if (Config()->m_SvDiscordURL[0])
 				{
-					if (Config()->m_SvDiscordURL[0])
-					{
-						char aTemp[128];
-						str_format(aTemp, sizeof(aTemp), " - Appeal: %s", Config()->m_SvDiscordURL);
-						str_append(aBuf, aTemp, sizeof(aBuf));
-					}
-
-					SendControlMsg(&Addr, m_RecvUnpacker.m_Data.m_ResponseToken, 0, NET_CTRLMSG_CLOSE, aBuf, str_length(aBuf) + 1, *pSevendown, Socket, NET_SECURITY_TOKEN_UNSUPPORTED);
+					char aTemp[128];
+					str_format(aTemp, sizeof(aTemp), " - Appeal: %s", Config()->m_SvDiscordURL);
+					str_append(aBuf, aTemp, sizeof(aBuf));
 				}
-				continue;
-			}
 
+				SendControlMsg(&Addr, m_RecvUnpacker.m_Data.m_ResponseToken, 0, NET_CTRLMSG_CLOSE, aBuf, str_length(aBuf) + 1, *pSevendown, Socket, NET_SECURITY_TOKEN_UNSUPPORTED);
+			}
+			continue;
+		}
+
+		*pSevendown = true;
+		if(UnpackPacket(pData, Bytes, &m_RecvUnpacker.m_Data, pSevendown) == 0)
+		{
 			if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONNLESS)
 			{
 				if (!*pSevendown && (SECURITY_TOKEN)m_RecvUnpacker.m_Data.m_Token != GetGlobalToken())
@@ -215,7 +219,7 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken, bool *pSevendown,
 				if (*pSevendown && Slot != -1 && !m_aSlots[Slot].m_Connection.m_Sevendown)
 				{
 					*pSevendown = false;
-					if (UnpackPacket(m_RecvUnpacker.m_aBuffer, Size, &m_RecvUnpacker.m_Data, pSevendown))
+					if (UnpackPacket(pData, Bytes, &m_RecvUnpacker.m_Data, pSevendown))
 						continue;
 				}
 

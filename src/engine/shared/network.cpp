@@ -283,22 +283,6 @@ void CNetBase::SendPacket(const NETADDR *pAddr, CNetPacketConstruct *pPacket, bo
 		}
 	}
 }
-int CNetBase::UnpackPacket(NETADDR *pAddr, unsigned char *pBuffer, CNetPacketConstruct *pPacket, bool *pSevendown, int Socket, int *pSize)
-{
-	if (!m_aSocket[Socket])
-		return 1;
-
-	int Size = net_udp_recv(m_aSocket[Socket], pAddr, &pBuffer);
-	// no more packets for now
-	if(Size <= 0)
-		return 1;
-
-	int Result = UnpackPacket(pBuffer, Size, pPacket, pSevendown);
-	if(pSize)
-		*pSize = Size;
-	return Result;
-}
-
 
 // TODO: rename this function
 int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct *pPacket, bool *pSevendown)
