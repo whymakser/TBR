@@ -968,8 +968,7 @@ void CDurak::UpdateGame(int Game)
 					// Forcefully process win on last player, we do not want any money glitched away.
 					// In this case the "Durak", or simply last player, will benefit from other's leaving the round
 					// If anyone has won before, the durak/losers stake has been given to the winner already. Again: No money dupe xD
-					// If nobody won before, we enter WinPos = 0, to receive our own stake as we didn't lose, but also the money of people who left.
-					ProcessPlayerWin(Game, pSeat, pGame->m_vWinners.size() ? -1 : 0, true);
+					ProcessPlayerWin(Game, pSeat, -1);
 					break;
 				}
 			}
@@ -1536,7 +1535,7 @@ void CDurak::SetTurnTooltip(int Game, int Tooltip)
 	}
 }
 
-void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bool ForceEnd)
+void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos)
 {
 	CDurakGame *pGame = m_vpGames[Game];
 	int ClientID = pSeat->m_Player.m_ClientID;
@@ -1611,7 +1610,7 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bo
 	pPlayer->m_ConfettiWinEffectTick = Server()->Tick();
 
 	// Update acc stats
-	if (!ForceEnd && pPlayer->GetAccID() >= ACC_START)
+	if (WinPos >= 0 && pPlayer->GetAccID() >= ACC_START)
 	{
 		GameServer()->m_Accounts[pPlayer->GetAccID()].m_DurakWins++;
 	}

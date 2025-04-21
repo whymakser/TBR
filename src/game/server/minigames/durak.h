@@ -785,7 +785,7 @@ class CDurak : public CMinigame
 	void ProcessCardPlacement(int Game, CDurakGame::SSeat *pSeat, CCard *pFlyingPointToCard);
 	void SetTurnTooltip(int Game, int Tooltip);
 	void SetNextMoveSoon(int Game);
-	void ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bool ForceEnd = false);
+	void ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos);
 	bool HandleMoneyTransaction(int ClientID, int Amount, const char *pMsg);
 
 	template<typename... Args>
