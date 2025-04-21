@@ -307,9 +307,9 @@ void CDurak::OnPlayerLeave(int ClientID, bool Disconnect, bool Shutdown)
 				pPlayer->GetCharacter()->EpicCircle(false, -1, true);
 			}
 
-			pTeams->SetForceCharacterTeam(ClientID, 0);
-			// Set before tunings
+			// Set before tunings and team leaving
 			m_aInDurakGame[ClientID] = false;
+			pTeams->SetForceCharacterTeam(ClientID, 0);
 			GameServer()->SendTuningParams(ClientID);
 			
 			pPlayer->m_ForceSpawnPos = vec2(-1, -1);
