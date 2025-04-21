@@ -1348,7 +1348,7 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 		}
 		else if (pChr)
 		{
-			// Just disable our passive, if we won already and was the defender before.
+			// Just disable our epic circle, if we won already and was the defender before.
 			pChr->EpicCircle(false, -1, true);
 		}
 	}
