@@ -1558,7 +1558,7 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos)
 
 	// WinPos == -1: Force last player, if somebody won before, 0: nobody won before
 	int64 ReturnStake = 0;
-	if (WinPos >= 0 && pSeat->m_Player.m_Stake >= 0)
+	if (pSeat->m_Player.m_Stake >= 0)
 	{
 		ReturnStake = pSeat->m_Player.m_Stake;
 		HandleMoneyTransaction(ClientID, ReturnStake, "Durák stake return");
