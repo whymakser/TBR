@@ -1790,7 +1790,7 @@ void CGameContext::OnClientEnter(int ClientID)
 	}
 
 	int DummyID = Server()->GetDummy(ClientID);
-	if (DummyID != -1)
+	if (DummyID != -1 && m_apPlayers[DummyID])
 	{
 		// Always keep track of dummy language
 		m_apPlayers[ClientID]->SetLanguage(m_apPlayers[DummyID]->m_Language, true);

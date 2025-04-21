@@ -445,6 +445,7 @@ public:
 	void SendMapData(int ClientID, int Chunk, bool FakeMap);
 	void SendMap(int ClientID);
 	void SendFakeMap(int ClientID);
+	void SendMapReload(int ClientID);
 	void SendConnectionReady(int ClientID);
 	void SendRconLine(int ClientID, const char *pLine);
 	static void SendRconLineAuthed(const char *pLine, void *pUser, bool Highlighted);
