@@ -285,7 +285,7 @@ void CNetBase::SendPacket(const NETADDR *pAddr, CNetPacketConstruct *pPacket, bo
 }
 
 // TODO: rename this function
-int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct *pPacket, bool *pSevendown)
+int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct *pPacket, bool Sevendown)
 {
 	// log the data
 	if(m_DataLogRecv)
@@ -297,21 +297,12 @@ int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct
 		io_flush(m_DataLogRecv);
 	}
 
-	// check the size
-	if(Size < NET_PACKETHEADERSIZE || Size > NET_MAX_PACKETSIZE)
-	{
-		if(m_pConfig->m_Debug)
-			dbg_msg("network", "packet too small, size=%d", Size);
-		return -1;
-	}
-
 	// read the packet
 	pPacket->m_Flags = (pBuffer[0]&0xfc)>>2;
 
 	if(pPacket->m_Flags&NET_PACKETFLAG_CONNLESS)
 	{
-		*pSevendown = (pBuffer[0] & 0x3) != 1;
-		int HeaderSize = *pSevendown ? 6 : NET_PACKETHEADERSIZE_CONNLESS;
+		int HeaderSize = Sevendown ? 6 : NET_PACKETHEADERSIZE_CONNLESS;
 		if(Size < HeaderSize)
 		{
 			if(m_pConfig->m_Debug)
@@ -325,7 +316,7 @@ int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct
 		pPacket->m_Token = NET_TOKEN_NONE;
 		pPacket->m_ResponseToken = NET_TOKEN_NONE;
 
-		if (*pSevendown)
+		if (Sevendown)
 		{
 			//static const unsigned char NET_HEADER_EXTENDED[] = {'x', 'e'};
 			mem_copy(pPacket->m_aExtraData, pBuffer + 2/*sizeof(NET_HEADER_EXTENDED)*/, sizeof(pPacket->m_aExtraData));
@@ -349,9 +340,6 @@ int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct
 	}
 	else
 	{
-		if (pPacket->m_Flags & 1)
-			*pSevendown = false;
-
 		if(Size - NET_PACKETHEADERSIZE > NET_MAX_PAYLOAD)
 		{
 			if(m_pConfig->m_Debug)
@@ -359,8 +347,15 @@ int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct
 			return -1;
 		}
 
-		int HeaderSize = *pSevendown ? 3 : NET_PACKETHEADERSIZE;
-		if (*pSevendown)
+		int HeaderSize = Sevendown ? 3 : NET_PACKETHEADERSIZE;
+		if(Size < HeaderSize)
+		{
+			if(m_pConfig->m_Debug)
+				dbg_msg("net", "packet too small, size=%d", Size);
+			return -1;
+		}
+
+		if (Sevendown)
 		{
 			pPacket->m_Token = NET_TOKEN_NONE;
 			int Flags = 0;
@@ -395,7 +390,7 @@ int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct
 	}
 
 	// set the response token (a bit hacky because this function shouldn't know about control packets)
-	if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL && !*pSevendown)
+	if(pPacket->m_Flags&NET_PACKETFLAG_CONTROL && !Sevendown)
 	{
 		if(pPacket->m_DataSize >= 5) // control byte + token
 		{

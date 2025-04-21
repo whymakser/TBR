@@ -174,10 +174,13 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken, bool *pSevendown,
 			continue;
 		}
 
-		*pSevendown = true;
-		if(UnpackPacket(pData, Bytes, &m_RecvUnpacker.m_Data, pSevendown) == 0)
+		// early unpack flags, to later unpack packet only once
+		m_RecvUnpacker.m_Data.m_Flags = (pData[0]&0xfc)>>2;
+
+		if (m_RecvUnpacker.m_Data.m_Flags & NET_PACKETFLAG_CONNLESS)
 		{
-			if(m_RecvUnpacker.m_Data.m_Flags&NET_PACKETFLAG_CONNLESS)
+			*pSevendown = (pData[0] & 0x3) != 1;
+			if(UnpackPacket(pData, Bytes, &m_RecvUnpacker.m_Data, *pSevendown) == 0)
 			{
 				if (!*pSevendown && (SECURITY_TOKEN)m_RecvUnpacker.m_Data.m_Token != GetGlobalToken())
 				{
@@ -200,32 +203,43 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken, bool *pSevendown,
 					*pResponseToken = m_RecvUnpacker.m_Data.m_ResponseToken;
 				return 1;
 			}
-			else
+		}
+		else
+		{
+			if(Bytes - NET_PACKETHEADERSIZE > NET_MAX_PAYLOAD)
 			{
-				int Slot = -1;
-				// try to find matching slot
-				for(int i = 0; i < NET_MAX_CLIENTS; i++)
-				{
-					if(m_aSlots[i].m_Connection.State() == NET_CONNSTATE_OFFLINE)
-						continue;
+				if(Config()->m_Debug)
+					dbg_msg("network", "packet payload too big, size=%d", Bytes);
+				continue;
+			}
+			if(Bytes < 3)
+			{
+				if(Config()->m_Debug)
+					dbg_msg("net", "packet too small, size=%d", Bytes);
+				continue;
+			}
 
-					if(net_addr_comp(m_aSlots[i].m_Connection.PeerAddress(), &Addr, true) == 0)
-					{
-						Slot = i;
-						break;
-					}
-				}
-
-				if (*pSevendown && Slot != -1 && !m_aSlots[Slot].m_Connection.m_Sevendown)
-				{
-					*pSevendown = false;
-					if (UnpackPacket(pData, Bytes, &m_RecvUnpacker.m_Data, pSevendown))
-						continue;
-				}
-
-				if (*pSevendown && !Config()->m_SvAllowSevendown)
+			int Slot = -1;
+			// try to find matching slot
+			for(int i = 0; i < NET_MAX_CLIENTS; i++)
+			{
+				if(m_aSlots[i].m_Connection.State() == NET_CONNSTATE_OFFLINE)
 					continue;
 
+				if(net_addr_comp(m_aSlots[i].m_Connection.PeerAddress(), &Addr, true) == 0)
+				{
+					Slot = i;
+					break;
+				}
+			}
+
+			// Determine version and unpack packet once
+			*pSevendown = Slot != -1 ? m_aSlots[Slot].m_Connection.m_Sevendown : (m_RecvUnpacker.m_Data.m_Flags & 1) == 0;
+			if (*pSevendown && !Config()->m_SvAllowSevendown)
+				continue;
+
+			if (UnpackPacket(pData, Bytes, &m_RecvUnpacker.m_Data, *pSevendown) == 0)
+			{
 				int ControlMsg = m_RecvUnpacker.m_Data.m_aChunkData[0];
 				bool Control = (m_RecvUnpacker.m_Data.m_Flags & NET_PACKETFLAG_CONTROL);
 				bool AcceptConnect = false;
