@@ -293,6 +293,9 @@ void CDurak::OnPlayerLeave(int ClientID, bool Disconnect, bool Shutdown)
 				}
 			}
 			m_vpGames[g]->m_aSeats[i].m_Player.Reset();
+			// Don't let others wait, even though we resetted.
+			// We don't have to care about the player values anymore because a new CDurakGame is created and this one will get deleted.
+			m_vpGames[g]->m_aSeats[i].m_Player.m_EndedMove = true;
 
 			CPlayer *pPlayer = GameServer()->m_apPlayers[ClientID];
 			if (!GameServer()->Collision()->TileUsed(TILE_DURAK_LOBBY) && !Shutdown) // don't kill player on shutdown, we need character for SaveCharacter()
@@ -434,8 +437,8 @@ void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 	if ((Direction || HookColl || Jump) && !pSeat->m_Player.m_KeyboardControl)
 	{
 		pSeat->m_Player.m_KeyboardControl = true;
-		// Dont switch back to mouse control for half a sec
-		pSeat->m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed() / 2;
+		// Dont switch back to mouse control for 1/3 sec
+		pSeat->m_Player.m_LastCursorMove = Server()->Tick() + Server()->TickSpeed() / 3;
 	}
 
 	if (Direction)
@@ -604,6 +607,9 @@ void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 		{
 			pSeat->m_Player.m_LastCursorMove = Server()->Tick();
 			pSeat->m_Player.m_KeyboardControl = false;
+			if (pSeat->m_Player.m_SelectedAttack != -1)
+				pGame->m_Attacks[pSeat->m_Player.m_SelectedAttack].m_Offense.SetHovered(false);
+			pSeat->m_Player.m_SelectedAttack = -1;
 		}
 	}
 
@@ -1322,6 +1328,7 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 		if (ClientID == -1)
 			continue;
 
+		CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
 		if (pGame->m_aSeats[i].m_Player.m_Stake >= 0)
 		{
 			// Making sure to update handcards for 0.7 here, because we can not catch every case from within CDurakGame where SortHand() gets called for example.
@@ -1330,7 +1337,6 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 			pGame->m_aSeats[i].m_Player.m_EndedMove = false;
 			pGame->m_aSeats[i].m_Player.m_CanSetNextMove = true;
 			GameServer()->m_apPlayers[ClientID]->m_ShowName = true;
-			CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
 			if (pChr)
 			{
 				OnCharacterSpawn(pChr);
@@ -1339,6 +1345,11 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 			{
 				GameServer()->SendTuningParams(ClientID);
 			}
+		}
+		else if (pChr)
+		{
+			// Just disable our passive, if we won already and was the defender before.
+			pChr->EpicCircle(false, -1, true);
 		}
 	}
 }

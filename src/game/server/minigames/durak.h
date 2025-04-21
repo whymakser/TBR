@@ -645,10 +645,17 @@ public:
 		// Remove card from hand
 		RemoveCard(Seat, pCard);
 
-		// Also update timer if attacker waited 59 seconds to place first card. give defender the opportunity to defend.
-		if (!NextMoveSoon(Tick) || GetOpenAttacks().size() == 1)
+		if (!NextMoveSoon(Tick))
 		{
+			// Reset timer to 60 sec
 			m_NextMove = 0;
+		}
+		else if (GetOpenAttacks().size() == 1)
+		{
+			// Also update timer if attacker waited 59 seconds to place first card.
+			// give defender the opportunity to defend, but only 30 sec, dont delay it even more
+			m_NextMove = -1;
+			m_NextMove = Tick + SERVER_TICK_SPEED * 30;
 		}
 		return Used;
 	}
@@ -731,7 +738,16 @@ public:
 			[&](const CCard &c) { return c.m_Suit == pCard->m_Suit && c.m_Rank == pCard->m_Rank; }),
 			vHand.end());
 
-		m_aSeats[Seat].m_Player.m_HoveredCard = -1;
+		for (int i = 0; i < (int)m_aSeats[Seat].m_Player.m_vHandCards.size(); i++)
+		{
+			if (m_aSeats[Seat].m_Player.m_HoveredCard == i)
+			{
+				m_aSeats[Seat].m_Player.m_vHandCards[i].SetHovered(false);
+				m_aSeats[Seat].m_Player.m_HoveredCard = -1;
+				break;
+			}
+		}
+
 		m_aSeats[Seat].m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 		if (m_Deck.IsEmpty() && m_aSeats[Seat].m_Player.m_vHandCards.empty() && std::find(m_vWinners.begin(), m_vWinners.end(), Seat) == m_vWinners.end())
 		{
