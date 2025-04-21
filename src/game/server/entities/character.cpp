@@ -2565,7 +2565,7 @@ void CCharacter::ApplyLockedTunings(bool SendTuningParams)
 	CTuningParams* pTunings = m_TuneZone > 0 ? &GameServer()->TuningList()[m_TuneZone] : GameServer()->Tuning();
 	m_Core.m_Tuning = *GameServer()->ApplyLockedTunings(pTunings, m_LockedTunings);
 	if (SendTuningParams)
-		GameServer()->SendTuningParams(m_pPlayer->GetCID());
+		GameServer()->SendTuningParams(m_pPlayer->GetCID(), m_TuneZone);
 }
 
 CTuningParams *CCharacter::Tuning()
@@ -4040,7 +4040,10 @@ bool CCharacter::UnFreeze()
 		m_FrozenLastTick = true;
 		m_FirstFreezeTick = 0;
 
-		GameServer()->SendTuningParams(m_pPlayer->GetCID(), m_TuneZone);
+		if (!Server()->IsSevendown(m_pPlayer->GetCID()) && Config()->m_SvFreezePrediction)
+		{
+			GameServer()->SendTuningParams(m_pPlayer->GetCID(), m_TuneZone);
+		}
 
 		if (!m_GotLasered && !GameServer()->Arenas()->FightStarted(m_pPlayer->GetCID()))
 		{

@@ -310,7 +310,7 @@ void CDurak::OnPlayerLeave(int ClientID, bool Disconnect, bool Shutdown)
 			// Set before tunings and team leaving
 			m_aInDurakGame[ClientID] = false;
 			pTeams->SetForceCharacterTeam(ClientID, 0);
-			GameServer()->SendTuningParams(ClientID);
+			GameServer()->SendTuningParams(ClientID, pPlayer->GetCharacter() ? pPlayer->GetCharacter()->m_TuneZone : 0);
 			
 			pPlayer->m_ForceSpawnPos = vec2(-1, -1);
 			pPlayer->m_ShowName = true;
@@ -1370,8 +1370,8 @@ void CDurak::EndMove(int Game, CDurakGame::SSeat *pSeat, bool Force)
 	pSeat->m_Player.m_EndedMove = true;
 	pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 	GameServer()->m_apPlayers[ClientID]->m_ShowName = false;
-	GameServer()->SendTuningParams(ClientID);
 	CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
+	GameServer()->SendTuningParams(ClientID, pChr ? pChr->m_TuneZone : 0);
 	if (pChr)
 	{
 		pChr->Core()->m_ActivelyPlayingDurak = false;
