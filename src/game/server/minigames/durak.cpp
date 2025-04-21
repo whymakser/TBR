@@ -686,7 +686,7 @@ bool CDurak::StartGame(int Game)
 
 	CGameTeams *pTeams = &((CGameControllerDDRace *)GameServer()->m_pController)->m_Teams;
 	int FirstFreeTeam = -1;
-	for (int i = 1; i < VANILLA_MAX_CLIENTS; i++)
+	for (int i = 1; i < MAX_CLIENTS; i++)
 	{
 		if (pTeams->Count(i) == 0)
 		{
