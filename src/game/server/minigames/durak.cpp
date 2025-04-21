@@ -1556,7 +1556,7 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos, bo
 
 	// First winner get's the stake of the loser, plus the stake of those who left inbetween
 	int64 WinStake = 0;
-	if (WinPos <= 0)
+	if (WinPos == 0)
 	{
 		WinStake = pGame->m_Stake;
 		HandleMoneyTransaction(ClientID, WinStake, "Durák win");
