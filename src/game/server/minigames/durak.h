@@ -734,19 +734,19 @@ public:
 	void RemoveCard(int Seat, CCard *pCard)
 	{
 		auto &vHand = m_aSeats[Seat].m_Player.m_vHandCards;
-		vHand.erase(std::remove_if(vHand.begin(), vHand.end(),
-			[&](const CCard &c) { return c.m_Suit == pCard->m_Suit && c.m_Rank == pCard->m_Rank; }),
-			vHand.end());
-
-		for (int i = 0; i < (int)m_aSeats[Seat].m_Player.m_vHandCards.size(); i++)
+		for (int i = 0; i < (int)vHand.size(); i++)
 		{
 			if (m_aSeats[Seat].m_Player.m_HoveredCard == i)
 			{
-				m_aSeats[Seat].m_Player.m_vHandCards[i].SetHovered(false);
+				vHand[i].SetHovered(false);
 				m_aSeats[Seat].m_Player.m_HoveredCard = -1;
 				break;
 			}
 		}
+
+		vHand.erase(std::remove_if(vHand.begin(), vHand.end(),
+			[&](const CCard &c) { return c.m_Suit == pCard->m_Suit && c.m_Rank == pCard->m_Rank; }),
+			vHand.end());
 
 		m_aSeats[Seat].m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 		if (m_Deck.IsEmpty() && m_aSeats[Seat].m_Player.m_vHandCards.empty() && std::find(m_vWinners.begin(), m_vWinners.end(), Seat) == m_vWinners.end())
