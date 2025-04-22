@@ -361,7 +361,7 @@ int CNetBase::UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct
 	else
 	{
 		if (pPacket->m_Flags & 1)
- 			*pSevendown = false;
+			*pSevendown = false;
 
 		if(Size - NET_PACKETHEADERSIZE > NET_MAX_PAYLOAD)
 		{
