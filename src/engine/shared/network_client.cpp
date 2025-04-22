@@ -81,7 +81,8 @@ int CNetClient::Recv(CNetChunk *pChunk, TOKEN *pResponseToken)
  		if(Bytes <= 0)
  			break;
 
-		if (UnpackPacket(pData, Bytes, &m_RecvUnpacker.m_Data, false) == 0)
+		bool Sevendown = false;
+		if (UnpackPacket(pData, Bytes, &m_RecvUnpacker.m_Data, &Sevendown) == 0)
 		{
 			if(m_Connection.State() != NET_CONNSTATE_OFFLINE && m_Connection.State() != NET_CONNSTATE_ERROR && net_addr_comp(m_Connection.PeerAddress(), &Addr, true) == 0)
 			{
