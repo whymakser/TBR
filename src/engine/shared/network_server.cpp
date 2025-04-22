@@ -175,22 +175,22 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken, bool *pSevendown,
 		}
 
 		// early unpack flags, to later unpack packet only once
-		m_RecvUnpacker.m_Data.m_Flags = (pData[0]&0xfc)>>2;
+		if (UnpackFlagsRaw(pData, Bytes, &m_RecvUnpacker.m_Data))
+			continue;
 
 		if (m_RecvUnpacker.m_Data.m_Flags & NET_PACKETFLAG_CONNLESS)
 		{
-			*pSevendown = (pData[0] & 0x3) != 1;
-			if(UnpackPacket(pData, Bytes, &m_RecvUnpacker.m_Data, *pSevendown) == 0)
+			if(UnpackPacket(pData, Bytes, &m_RecvUnpacker.m_Data, pSevendown) == 0)
 			{
+				if (*pSevendown && !Config()->m_SvAllowSevendown)
+					continue;
+
 				if (!*pSevendown && (SECURITY_TOKEN)m_RecvUnpacker.m_Data.m_Token != GetGlobalToken())
 				{
 					int Accept = m_TokenManager.ProcessMessage(&Addr, &m_RecvUnpacker.m_Data, Socket);
 					if (Accept <= 0)
 						continue;
 				}
-
-				if (*pSevendown && !Config()->m_SvAllowSevendown)
-					continue;
 
 				pChunk->m_Flags = NETSENDFLAG_CONNLESS;
 				pChunk->m_ClientID = -1;
@@ -206,19 +206,6 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken, bool *pSevendown,
 		}
 		else
 		{
-			if(Bytes - NET_PACKETHEADERSIZE > NET_MAX_PAYLOAD)
-			{
-				if(Config()->m_Debug)
-					dbg_msg("network", "packet payload too big, size=%d", Bytes);
-				continue;
-			}
-			if(Bytes < 3)
-			{
-				if(Config()->m_Debug)
-					dbg_msg("net", "packet too small, size=%d", Bytes);
-				continue;
-			}
-
 			int Slot = -1;
 			// try to find matching slot
 			for(int i = 0; i < NET_MAX_CLIENTS; i++)
@@ -234,12 +221,16 @@ int CNetServer::Recv(CNetChunk *pChunk, TOKEN *pResponseToken, bool *pSevendown,
 			}
 
 			// Determine version and unpack packet once
-			*pSevendown = Slot != -1 ? m_aSlots[Slot].m_Connection.m_Sevendown : (m_RecvUnpacker.m_Data.m_Flags & 1) == 0;
-			if (*pSevendown && !Config()->m_SvAllowSevendown)
-				continue;
-
-			if (UnpackPacket(pData, Bytes, &m_RecvUnpacker.m_Data, *pSevendown) == 0)
+			if (Slot != -1)
 			{
+				*pSevendown = m_aSlots[Slot].m_Connection.m_Sevendown;
+			}
+
+			if (UnpackPacket(pData, Bytes, &m_RecvUnpacker.m_Data, pSevendown) == 0)
+			{
+				if (*pSevendown && !Config()->m_SvAllowSevendown)
+					continue;
+
 				int ControlMsg = m_RecvUnpacker.m_Data.m_aChunkData[0];
 				bool Control = (m_RecvUnpacker.m_Data.m_Flags & NET_PACKETFLAG_CONTROL);
 				bool AcceptConnect = false;

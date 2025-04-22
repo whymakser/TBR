@@ -253,7 +253,8 @@ public:
 	void SendControlMsgWithToken(const NETADDR *pAddr, TOKEN Token, int Ack, int ControlMsg, TOKEN MyToken, bool Extended, int Socket);
 	void SendPacketConnless(const NETADDR *pAddr, TOKEN Token, TOKEN ResponseToken, const void *pData, int DataSize, bool Sevendown, int Socket);
 	void SendPacket(const NETADDR *pAddr, CNetPacketConstruct *pPacket, bool Sevendown, int Socket, SECURITY_TOKEN SecurityToken = NET_SECURITY_TOKEN_UNSUPPORTED);
-	int UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct *pPacket, bool Sevendown);
+	int UnpackPacket(unsigned char *pBuffer, int Size, CNetPacketConstruct *pPacket, bool *pSevendown);
+	int UnpackFlagsRaw(unsigned char *pBuffer, int Size, CNetPacketConstruct *pPacket);
 };
 
 class CNetTokenManager
