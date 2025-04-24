@@ -67,7 +67,7 @@ public:
 
 	// Manipulating
 	bool TryBindHelicopter(CHelicopter *helicopter);
-	virtual void ApplyScale(float TurretScale);
+	void ApplyScale(float TurretScale);
 
 	// Ticking
 	virtual void Tick();

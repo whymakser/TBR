@@ -307,6 +307,12 @@ void CDurak::OnPlayerLeave(int ClientID, bool Disconnect, bool Shutdown)
 				pPlayer->GetCharacter()->EpicCircle(false, -1, true);
 			}
 
+			// Other's can click end move, but why wait for nothing
+			if (m_vpGames[g]->m_DefenderIndex == i)
+			{
+				SetNextMoveSoon(g);
+			}
+
 			// Set before tunings and team leaving
 			m_aInDurakGame[ClientID] = false;
 			pTeams->SetForceCharacterTeam(ClientID, 0);
@@ -534,7 +540,7 @@ void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 	}
 	else if (Jump)
 	{
-		if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_NONE)
+		if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_NONE || pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_ATTACKERS_TURN)
 		{
 			// Hovered / Selected card
 			if (pCard && !pSeat->m_Player.m_EndedMove)
@@ -1331,26 +1337,35 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 		CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
 		if (pGame->m_aSeats[i].m_Player.m_Stake >= 0)
 		{
-			// Making sure to update handcards for 0.7 here, because we can not catch every case from within CDurakGame where SortHand() gets called for example.
-			UpdateHandcards(Game, &pGame->m_aSeats[i]);
-			pGame->m_aSeats[i].m_Player.m_LastNumHandCards = -1; // Get our specific name back
-			pGame->m_aSeats[i].m_Player.m_EndedMove = false;
-			pGame->m_aSeats[i].m_Player.m_CanSetNextMove = true;
-			GameServer()->m_apPlayers[ClientID]->m_ShowName = true;
-			if (pChr)
-			{
-				OnCharacterSpawn(pChr);
-			}
-			else // ApplyLockedTunings takes care of sending tunes already
-			{
-				GameServer()->SendTuningParams(ClientID);
-			}
+			SetPlaying(g, i);
 		}
 		else if (pChr)
 		{
 			// Just disable our epic circle, if we won already and was the defender before.
 			pChr->EpicCircle(false, -1, true);
 		}
+	}
+}
+
+void CDurak::SetPlaying(int Game, int Seat)
+{
+	CDurakGame *pGame = m_vpGames[Game];
+	int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
+	CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
+
+	// Making sure to update handcards for 0.7 here, because we can not catch every case from within CDurakGame where SortHand() gets called for example.
+	UpdateHandcards(Game, &pGame->m_aSeats[i]);
+	pGame->m_aSeats[i].m_Player.m_LastNumHandCards = -1; // Get our specific name back
+	pGame->m_aSeats[i].m_Player.m_EndedMove = false;
+	pGame->m_aSeats[i].m_Player.m_CanSetNextMove = true;
+	GameServer()->m_apPlayers[ClientID]->m_ShowName = ActivelyPlaying(ClientID);
+	if (pChr)
+	{
+		OnCharacterSpawn(pChr);
+	}
+	else // ApplyLockedTunings takes care of sending tunes already
+	{
+		GameServer()->SendTuningParams(ClientID);
 	}
 }
 
@@ -1417,13 +1432,11 @@ bool CDurak::TryPass(int Game, int Seat, CCard *pCard)
 	{
 		SetTurnTooltip(Game, CCard::TOOLTIP_DEFENDER_PASSED);
 		ProcessCardPlacement(Game, &pGame->m_aSeats[Seat], &m_vpGames[Game]->m_Attacks[Attack].m_Offense);
+		SetPlaying(Game, pGame->m_DefenderIndex);
 		// update epic circle defender indicator on pass, not only nextround
 		CCharacter *pOldDefender = GameServer()->GetPlayerChar(pGame->m_aSeats[Seat].m_Player.m_ClientID);
 		if (pOldDefender)
 			pOldDefender->EpicCircle(false, -1, true);
-		CCharacter *pNewDefender = GameServer()->GetPlayerChar(pGame->m_aSeats[pGame->m_DefenderIndex].m_Player.m_ClientID);
-		if (pNewDefender)
-			pNewDefender->EpicCircle(true, -1, true);
 		return true;
 	}
 	return false;
@@ -1670,12 +1683,12 @@ void CDurak::Snap(int SnappingClient)
 		if (m_vpGames.size())
 		{
 			vec2 Pos = m_vpGames[0]->m_TablePos;
-			Pos.y += DURAK_CARD_NAME_OFFSET;
-
-			if (::NetworkClipped(GameServer(), SnappingClient, m_vpGames[0]->m_TablePos))
+			if (::NetworkClipped(GameServer(), SnappingClient, Pos))
 				return;
 
 			// Abusing tooltip and keyboard control for stats
+			Pos.y += DURAK_CARD_NAME_OFFSET;
+
 			if (m_aStaticCards[DURAK_TEXT_TOOLTIP].m_Active)
 			{
 				if (pSeat)

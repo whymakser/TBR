@@ -475,7 +475,7 @@ public:
 	void SendRedirectSaveTeeAdd(int Port, const char *pHash) override;
 	void SendRedirectSaveTeeRemove(int Port, const char *pHash) override;
 	void SendRedirectSaveTeeImpl(bool Add, int Port, const char *pHash);
-	void SendPlayerCountUpdate(bool Shutdown = false);
+	void SendPlayerCountUpdate(bool Shutdown = false) override;
 
 	void PumpNetwork();
 

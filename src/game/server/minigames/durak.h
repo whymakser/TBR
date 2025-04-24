@@ -792,6 +792,7 @@ class CDurak : public CMinigame
 	bool StartGame(int Game);
 	void EndGame(int Game);
 	void StartNextRound(int Game, bool SuccessfulDefense = false);
+	void SetPlaying(int Game, int Seat);
 	void UpdateHandcards(int Game, CDurakGame::SSeat *pSeat);
 	void TakeCardsFromTable(int Game);
 	void EndMove(int Game, CDurakGame::SSeat *pSeat, bool Force = false);
