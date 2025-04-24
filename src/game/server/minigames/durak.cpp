@@ -540,7 +540,7 @@ void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 	}
 	else if (Jump)
 	{
-		if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_NONE || pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_ATTACKERS_TURN)
+		if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_NONE)
 		{
 			// Hovered / Selected card
 			if (pCard && !pSeat->m_Player.m_EndedMove)
@@ -595,7 +595,7 @@ void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 			{
 				EndMove(Game, pSeat);
 			}
-			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_NEXT_MOVE)
+			else
 			{
 				pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 				pSeat->m_Player.m_CanSetNextMove = false;
