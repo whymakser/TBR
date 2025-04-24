@@ -1337,7 +1337,7 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 		CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
 		if (pGame->m_aSeats[i].m_Player.m_Stake >= 0)
 		{
-			SetPlaying(g, i);
+			SetPlaying(Game, i);
 		}
 		else if (pChr)
 		{
@@ -1350,14 +1350,14 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 void CDurak::SetPlaying(int Game, int Seat)
 {
 	CDurakGame *pGame = m_vpGames[Game];
-	int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
+	int ClientID = pGame->m_aSeats[Seat].m_Player.m_ClientID;
 	CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
 
 	// Making sure to update handcards for 0.7 here, because we can not catch every case from within CDurakGame where SortHand() gets called for example.
-	UpdateHandcards(Game, &pGame->m_aSeats[i]);
-	pGame->m_aSeats[i].m_Player.m_LastNumHandCards = -1; // Get our specific name back
-	pGame->m_aSeats[i].m_Player.m_EndedMove = false;
-	pGame->m_aSeats[i].m_Player.m_CanSetNextMove = true;
+	UpdateHandcards(Game, &pGame->m_aSeats[Seat]);
+	pGame->m_aSeats[Seat].m_Player.m_LastNumHandCards = -1; // Get our specific name back
+	pGame->m_aSeats[Seat].m_Player.m_EndedMove = false;
+	pGame->m_aSeats[Seat].m_Player.m_CanSetNextMove = true;
 	GameServer()->m_apPlayers[ClientID]->m_ShowName = ActivelyPlaying(ClientID);
 	if (pChr)
 	{
