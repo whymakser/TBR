@@ -595,10 +595,15 @@ void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 			{
 				EndMove(Game, pSeat);
 			}
-			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_NEXT_MOVE || pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_ATTACKERS_TURN || pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_DEFENDER_PASSED)
+			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_NEXT_MOVE)
 			{
 				pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
 				pSeat->m_Player.m_CanSetNextMove = false;
+			}
+			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_ATTACKERS_TURN || pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_DEFENDER_PASSED)
+			{
+				pSeat->m_Player.m_Tooltip = CCard::TOOLTIP_NONE;
+				pSeat->m_Player.m_CanSetNextMove = true;
 			}
 		}
 	}
