@@ -2015,7 +2015,7 @@ bool CCharacter::CanSnapCharacter(int SnappingClient)
 
 bool CCharacter::IsSnappingCharacterInView(int SnappingClientId)
 {
-	//int Id = m_pPlayer->GetCID();
+	int Id = m_pPlayer->GetCID();
 
 	// explicitly check for /showall in NetworkClippedLine, in case a client that doesnt support showdistance wants to see characters while zooming out
 	// only characters will be sent over large distances when showall is used, other entities are only snapped in a close range or
@@ -2024,7 +2024,7 @@ bool CCharacter::IsSnappingCharacterInView(int SnappingClientId)
 	// A player may not be clipped away if his hook or a hook attached to him is in the field of view
 	bool PlayerAndHookNotInView = NetworkClippedLine(SnappingClientId, m_Pos, m_Core.m_HookPos, true);
 	bool AttachedHookInView = false;
-	/*if(PlayerAndHookNotInView)
+	if(PlayerAndHookNotInView)
 	{
 		for(const auto &AttachedPlayerId : m_Core.m_AttachedPlayers)
 		{
@@ -2038,7 +2038,7 @@ bool CCharacter::IsSnappingCharacterInView(int SnappingClientId)
 				}
 			}
 		}
-	}*/
+	}
 	if(PlayerAndHookNotInView && !AttachedHookInView)
 	{
 		return false;
