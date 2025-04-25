@@ -590,6 +590,7 @@ void CDurak::OnInput(CCharacter *pChr, CNetObj_PlayerInput *pNewInput)
 			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_TAKE_CARDS)
 			{
 				TakeCardsFromTable(Game);
+				pSeat->m_Player.m_CanSetNextMove = true;
 			}
 			else if (pSeat->m_Player.m_Tooltip == CCard::TOOLTIP_END_MOVE)
 			{
