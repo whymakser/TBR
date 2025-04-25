@@ -598,6 +598,7 @@ bool CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 
 	// client id used to check against muted
 	int MuteChecked = ChatterClientID;
+	bool SlashMe = false;
 
 	char aBuf[512], aText[256];
 	if (Mode == CHAT_POLICE_CHANNEL)
@@ -638,6 +639,7 @@ bool CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 		ChatterClientID = -1;
 		// if '/me' is used, still dont send the message when sender is muted
 		MuteChecked = SpamProtectionClientID;
+		SlashMe = true;
 	}
 	else
 	{
@@ -701,7 +703,7 @@ bool CGameContext::SendChat(int ChatterClientID, int Mode, int To, const char *p
 					bool Send = (Server()->IsSevendown(i) && (Flags&CHAT_SEVENDOWN)) || (!Server()->IsSevendown(i) && (Flags&CHAT_SEVEN));
 					if (Send)
 					{
-						if (ChatterClientID == -1)
+						if (ChatterClientID == -1 && !SlashMe)
 						{
 							str_format_args(aText, sizeof(aText), m_apPlayers[i]->Localize(pText), pArgs, NumArgs);
 							Msg.m_pMessage = aText;
