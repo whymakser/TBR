@@ -1333,7 +1333,6 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 {
 	CDurakGame *pGame = m_vpGames[Game];
 	pGame->NextRound(SuccessfulDefense);
-	SetTurnTooltip(Game, CCard::TOOLTIP_ATTACKERS_TURN);
 	for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 	{
 		int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
@@ -1351,6 +1350,7 @@ void CDurak::StartNextRound(int Game, bool SuccessfulDefense)
 			pChr->EpicCircle(false, -1, true);
 		}
 	}
+	SetTurnTooltip(Game, CCard::TOOLTIP_ATTACKERS_TURN);
 }
 
 void CDurak::SetPlaying(int Game, int Seat)
@@ -1368,6 +1368,7 @@ void CDurak::SetPlaying(int Game, int Seat)
 	{
 		pGame->m_aSeats[Seat].m_Player.m_LastNumHandCards = -1; // Get our specific name back
 		GameServer()->m_apPlayers[ClientID]->m_ShowName = true;
+		// important so we dont override our specific name
 		GameServer()->m_apPlayers[ClientID]->m_RemovedName = false;
 	}
 	else
@@ -1447,9 +1448,6 @@ bool CDurak::TryPass(int Game, int Seat, CCard *pCard)
 	int Attack = pGame->TryPass(Seat, pCard);
 	if (Attack != -1)
 	{
-		SetTurnTooltip(Game, CCard::TOOLTIP_DEFENDER_PASSED);
-		ProcessCardPlacement(Game, &pGame->m_aSeats[Seat], &m_vpGames[Game]->m_Attacks[Attack].m_Offense);
-
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 		{
 			int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
@@ -1463,6 +1461,9 @@ bool CDurak::TryPass(int Game, int Seat, CCard *pCard)
 				SetPlaying(Game, i);
 			}
 		}
+
+		SetTurnTooltip(Game, CCard::TOOLTIP_DEFENDER_PASSED);
+		ProcessCardPlacement(Game, &pGame->m_aSeats[Seat], &m_vpGames[Game]->m_Attacks[Attack].m_Offense);
 
 		// update epic circle defender indicator on pass, not only nextround
 		CCharacter *pOldDefender = GameServer()->GetPlayerChar(pGame->m_aSeats[Seat].m_Player.m_ClientID);
