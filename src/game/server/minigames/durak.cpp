@@ -1361,10 +1361,21 @@ void CDurak::SetPlaying(int Game, int Seat)
 
 	// Making sure to update handcards for 0.7 here, because we can not catch every case from within CDurakGame where SortHand() gets called for example.
 	UpdateHandcards(Game, &pGame->m_aSeats[Seat]);
-	pGame->m_aSeats[Seat].m_Player.m_LastNumHandCards = -1; // Get our specific name back
 	pGame->m_aSeats[Seat].m_Player.m_EndedMove = false;
 	pGame->m_aSeats[Seat].m_Player.m_CanSetNextMove = true;
-	GameServer()->m_apPlayers[ClientID]->m_ShowName = ActivelyPlaying(ClientID);
+
+	if (ActivelyPlaying(ClientID))
+	{
+		pGame->m_aSeats[Seat].m_Player.m_LastNumHandCards = -1; // Get our specific name back
+		GameServer()->m_apPlayers[ClientID]->m_ShowName = true;
+	}
+	else
+	{
+		// don't update lastnumhandcards, so name does not get updated again
+		GameServer()->m_apPlayers[ClientID]->m_ShowName = false;
+	}
+
+	// Process spawning and handling new round
 	if (pChr)
 	{
 		OnCharacterSpawn(pChr);
