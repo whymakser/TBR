@@ -1449,7 +1449,24 @@ bool CDurak::TryPass(int Game, int Seat, CCard *pCard)
 	{
 		SetTurnTooltip(Game, CCard::TOOLTIP_DEFENDER_PASSED);
 		ProcessCardPlacement(Game, &pGame->m_aSeats[Seat], &m_vpGames[Game]->m_Attacks[Attack].m_Offense);
-		SetPlaying(Game, pGame->m_DefenderIndex);
+
+		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
+		{
+			int ClientID = pGame->m_aSeats[i].m_Player.m_ClientID;
+			if (ClientID == -1)
+				continue;
+
+			CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
+			if (pGame->GetStateBySeat(i) != DURAK_PLAYERSTATE_NONE)
+			{
+				SetPlaying(Game, i);
+			}
+			else if (pChr)
+			{
+				OnCharacterSpawn(pChr);
+			}
+		}
+
 		// update epic circle defender indicator on pass, not only nextround
 		CCharacter *pOldDefender = GameServer()->GetPlayerChar(pGame->m_aSeats[Seat].m_Player.m_ClientID);
 		if (pOldDefender)
