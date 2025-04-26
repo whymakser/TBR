@@ -1455,6 +1455,8 @@ bool CDurak::TryPass(int Game, int Seat, CCard *pCard)
 			if (ClientID == -1)
 				continue;
 
+			// Don't get false results from GetStateBySeat
+			pGame->m_aSeats[i].m_Player.m_EndedMove = false;
 			CCharacter *pChr = GameServer()->GetPlayerChar(ClientID);
 			if (pGame->GetStateBySeat(i) != DURAK_PLAYERSTATE_NONE)
 			{
