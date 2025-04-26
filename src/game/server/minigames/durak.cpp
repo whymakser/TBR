@@ -1371,8 +1371,7 @@ void CDurak::SetPlaying(int Game, int Seat)
 	}
 	else
 	{
-		// don't update lastnumhandcards, so name does not get updated again
-		GameServer()->m_apPlayers[ClientID]->m_ShowName = false;
+		EndMove(Game, &pGame->m_aSeats[Seat], true);
 	}
 
 	// Process spawning and handling new round
