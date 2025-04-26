@@ -429,8 +429,7 @@ public:
 	{
 		for (int i = 0; i < MAX_DURAK_PLAYERS; i++)
 		{
-			int p = Prev ? -1 : 1;
-			int NextIndex = (CurrentIndex + p*(i + 1)) % MAX_DURAK_PLAYERS;
+			int NextIndex = (CurrentIndex + (Prev ? -1 : 1)*(i + 1) + MAX_DURAK_PLAYERS) % MAX_DURAK_PLAYERS;
 			if (m_aSeats[NextIndex].m_Player.m_ClientID != -1 && m_aSeats[NextIndex].m_Player.m_Stake >= 0 && (!CheckHands || m_aSeats[NextIndex].m_Player.m_vHandCards.size()))
 				return NextIndex;
 		}
