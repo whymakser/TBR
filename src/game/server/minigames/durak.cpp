@@ -1368,6 +1368,7 @@ void CDurak::SetPlaying(int Game, int Seat)
 	{
 		pGame->m_aSeats[Seat].m_Player.m_LastNumHandCards = -1; // Get our specific name back
 		GameServer()->m_apPlayers[ClientID]->m_ShowName = true;
+		GameServer()->m_apPlayers[ClientID]->m_RemovedName = false;
 	}
 	else
 	{
