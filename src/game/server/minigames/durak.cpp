@@ -1653,7 +1653,13 @@ void CDurak::ProcessPlayerWin(int Game, CDurakGame::SSeat *pSeat, int WinPos)
 	}
 	GameServer()->SendChatTarget(ClientID, aBuf);
 
-	if (pGame->m_LeftPlayersStake)
+	if (WinPos == -1 && !pGame->m_vWinners.empty())
+	{
+		// No money dupe. If a player won already, the stake of the last player got taken already.
+		pGame->m_LeftPlayersStake -= pGame->m_Stake;
+	}
+
+	if (pGame->m_LeftPlayersStake > 0)
 	{
 		HandleMoneyTransaction(ClientID, pGame->m_LeftPlayersStake, "Durák stake of left players");
 		str_format(aBuf, sizeof(aBuf), GameServer()->m_apPlayers[ClientID]->Localize("You got +%lld money from others leaving the game."), pGame->m_LeftPlayersStake);
