@@ -1480,15 +1480,15 @@ bool CDurak::TryAttack(int Game, int Seat, CCard *pCard)
 	int Attack = pGame->TryAttack(Seat, pCard, Server()->Tick());
 	if (Attack != -1)
 	{
-		SetTurnTooltip(Game, CCard::TOOLTIP_NONE);
-		ProcessCardPlacement(Game, &pGame->m_aSeats[Seat], &m_vpGames[Game]->m_Attacks[Attack].m_Offense);
-
 		// Last attack, end move of everyone, only defender has to still play
 		if (Attack == MAX_DURAK_ATTACKS - 1)
 		{
 			EndMove(Game, &pGame->m_aSeats[pGame->m_AttackerIndex]);
 			EndMove(Game, &pGame->m_aSeats[pGame->GetNextPlayer(pGame->m_DefenderIndex)]);
 		}
+
+		SetTurnTooltip(Game, CCard::TOOLTIP_NONE);
+		ProcessCardPlacement(Game, &pGame->m_aSeats[Seat], &m_vpGames[Game]->m_Attacks[Attack].m_Offense);
 		return true;
 	}
 	return false;
