@@ -1725,6 +1725,7 @@ void CCharacter::Die(int Weapon, bool UpdateTeeControl, bool OnArenaDie)
 					GameServer()->SendChatFormat(-1, CHAT_ALL, -1, CGameContext::CHATFLAG_ALL, Localizable("%s is on a killing spree with %d kills"), Server()->ClientName(Killer), pKillerChar->m_KillStreak);
 				GameServer()->CreateFinishConfetti(pKillerChar->GetPos(), pKillerChar->TeamMask());
 			}
+			GameServer()->CreateFinishConfetti(pKillerChar->GetPos(), pKillerChar->TeamMask());
 		}
 
 		if (m_KillStreak >= 5)
@@ -1740,7 +1741,6 @@ void CCharacter::Die(int Weapon, bool UpdateTeeControl, bool OnArenaDie)
 					Server()->ClientName(m_pPlayer->GetCID()), Server()->ClientName(Killer), m_KillStreak);
 			}
 			pKiller->GiveXP(250, "for ending a killing spree");
-			GameServer()->CreateFinishConfetti(pKillerChar->GetPos(), pKillerChar->TeamMask());
 		}
 
 		if (CountKill && pKiller->GetAccID() >= ACC_START && (!m_pPlayer->m_IsDummy || Config()->m_SvDummyBlocking))
