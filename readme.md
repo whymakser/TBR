@@ -30,7 +30,7 @@ F-DDrace is an "open world" game type where you can do whatever you want - chat,
 
 **Durák card game:** Play by mouse or keyboard (`+left`, `+right`, `+jump`, `+showhookcoll`). Requires: `cl_show_direction 0; cl_nameplates_size 50; cl_nameplates_offset 30; cl_show_others_alpha 40;` Keyboard controls: select cards using A/D, submit using SPACE, go back using HOOK-COLLISION. When you select a card with SPACE, you can choose what to do with it using A/D again and submit with SPACE again. Attacker drags cards to table, defender can defend by dragging cards onto offense cards or place same rank to push attack to next player.
 
-**Server-side translation:** Use `/language` to switch languages. Set default with `sv_default_language` or enable suggestions with `sv_language_suggestion`. Language files are in `datasrc/languages` and moved to `data/languages` upon compiling.
+**Server-side translation:** Use `/language` to switch languages. Set default with `sv_default_language` or enable suggestions with `sv_language_suggestion`. Language files are in [`datasrc/languages`](https://github.com/fokkonaut/F-DDrace/tree/F-DDrace/datasrc/languages) and moved to `data/languages` upon compiling.
 
 **Flags and weapon drops:** Drop flags with `F3`, weapons with `F4`. They interact with explosions, shotgun, speedups, teleporters, doors, portals. Flags can be hooked smoothly by players and you can spectate them using the spectate menu (`bind x +spectate`).
 
