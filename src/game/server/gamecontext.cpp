@@ -8311,6 +8311,7 @@ static void ConAz(IConsole::IResult *pResult, void *pUserData)
     str_format(aCmd, sizeof(aCmd), "totele %d", 35);
     pSelf->Console()->ExecuteLine(aCmd, ClientID);
 }
+		{
 
 		if (Minigame == MINIGAME_SURVIVAL)
 		{
