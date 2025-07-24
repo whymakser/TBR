@@ -6,6 +6,7 @@
 #include <base/hash_ctxt.h>
 
 #include <engine/shared/config.h>
+#include <engine/shared/console.h>
 #include <engine/shared/memheap.h>
 #include <engine/shared/datafile.h>
 #include <engine/shared/json.h>
@@ -8300,6 +8301,16 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force, bool DoCh
 		{
 			((CGameControllerDDRace *)m_pController)->m_Teams.SetForceCharacterTeam(ClientID, 0);
 		}
+		
+
+static void ConAz(IConsole::IResult *pResult, void *pUserData)
+{
+    CGameContext *pSelf = (CGameContext *)pUserData;
+    int ClientID = pResult->GetClientID();
+    char aCmd[32];
+    str_format(aCmd, sizeof(aCmd), "totele %d", 35);
+    pSelf->Console()->ExecuteLine(aCmd, ClientID);
+}
 
 		if (Minigame == MINIGAME_SURVIVAL)
 		{
@@ -8598,14 +8609,4 @@ void CGameContext::InstagibTick(int Type)
 	//m_apPlayers[Winner]->GiveXP(250, "for winning an instagib round");
 
 	// add instagib here
-}
-
-void CGameContext::ConAz(CConsole::IResult *pResult, void *pUserData)
-{
-    CGameContext *pSelf = (CGameContext *)pUserData;
-    int ClientID = pResult->GetClientID();
-
-    char aCmd[32];
-    str_format(aCmd, sizeof(aCmd), "totele %d", 35);
-    pSelf->Console()->ExecuteLine(aCmd, ClientID);
 }
