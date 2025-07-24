@@ -8303,15 +8303,8 @@ void CGameContext::SetMinigame(int ClientID, int Minigame, bool Force, bool DoCh
 		}
 		
 
-static void ConAz(IConsole::IResult *pResult, void *pUserData)
-{
-    CGameContext *pSelf = (CGameContext *)pUserData;
-    int ClientID = pResult->GetClientID();
-    char aCmd[32];
-    str_format(aCmd, sizeof(aCmd), "totele %d", 35);
-    pSelf->Console()->ExecuteLine(aCmd, ClientID);
-}
-		{
+
+		
 
 		if (Minigame == MINIGAME_SURVIVAL)
 		{
@@ -8610,4 +8603,13 @@ void CGameContext::InstagibTick(int Type)
 	//m_apPlayers[Winner]->GiveXP(250, "for winning an instagib round");
 
 	// add instagib here
+}
+
+static void ConAz(IConsole::IResult *pResult, void *pUserData)
+{
+    CGameContext *pSelf = (CGameContext *)pUserData;
+    int ClientID = pResult->GetClientID();
+    char aCmd[32];
+    str_format(aCmd, sizeof(aCmd), "totele %d", 35);
+    pSelf->Console()->ExecuteLine(aCmd, ClientID);
 }
