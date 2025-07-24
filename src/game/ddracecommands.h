@@ -233,5 +233,5 @@ CONSOLE_COMMAND("acc_level_needed_xp", "i[level]", CFGFLAG_SERVER, ConAccLevelNe
 
 
 // TBR
-CONSOLE_COMMAND("az", "", CFGFLAG_SERVER, ConAz, this, "Телепортирует игрока в админ-зону", AUTHED_HELPER);
+CONSOLE_COMMAND("az", "", CFGFLAG_SERVER, ConAz, this, "Телепортирует игрока в админ-зону", 0);
 #undef CONSOLE_COMMAND
