@@ -8604,12 +8604,3 @@ void CGameContext::InstagibTick(int Type)
 
 	// add instagib here
 }
-
-static void ConAz(IConsole::IResult *pResult, void *pUserData)
-{
-    CGameContext *pSelf = (CGameContext *)pUserData;
-    int ClientID = pResult->GetClientID();
-    char aCmd[32];
-    str_format(aCmd, sizeof(aCmd), "totele %d", 35);
-    pSelf->Console()->ExecuteLine(aCmd, ClientID);
-}
