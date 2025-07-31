@@ -8603,4 +8603,110 @@ void CGameContext::InstagibTick(int Type)
 	//m_apPlayers[Winner]->GiveXP(250, "for winning an instagib round");
 
 	// add instagib here
+	#include <engine/shared/console.h>
+#include <cstdlib> // Для rand()
+
+// Очередь дуэлей
+static int g_DuelQueue[MAX_CLIENTS] = {0};
+static int g_DuelQueueCount = 0;
+
+// Текущая арена (телепортер ID: 100 = арена 1, 101 = арена 2)
+static int g_DefaultArenaTeleportID = 100; // По умолчанию арена 1
+
+void CGameContext::OnClientChat(int ClientID, const char *pMsg)
+{
+    if(str_comp_nocase(pMsg, "/arena_search") == 0)
+    {
+        if (ClientID < 0 || ClientID >= MAX_CLIENTS || !m_apPlayers[ClientID])
+        {
+            SendChatTarget(ClientID, "Ошибка: Игрок не найден.");
+            return;
+        }
+
+        // Проверяем, не в очереди ли игрок
+        for (int i = 0; i < g_DuelQueueCount; i++)
+        {
+            if (g_DuelQueue[i] == ClientID)
+            {
+                SendChatTarget(ClientID, "Ты уже в очереди на дуэль!");
+                return;
+            }
+        }
+
+        // Добавляем игрока в очередь
+        g_DuelQueue[g_DuelQueueCount++] = ClientID;
+        char aBuf[256];
+        str_format(aBuf, sizeof(aBuf), "%s добавлен в очередь на дуэль. В очереди: %d игрок(ов).", m_apPlayers[ClientID]->GetName(), g_DuelQueueCount);
+        SendChat(-1, aBuf);
+
+        // Если в очереди ≥2 игрока, выбираем двух случайно
+        if (g_DuelQueueCount >= 2)
+        {
+            int Player1, Player2;
+            if (g_DuelQueueCount == 2)
+            {
+                Player1 = g_DuelQueue[0];
+                Player2 = g_DuelQueue[1];
+            }
+            else
+            {
+                int Index1 = rand() % g_DuelQueueCount;
+                Player1 = g_DuelQueue[Index1];
+                for (int i = Index1; i < g_DuelQueueCount - 1; i++)
+                    g_DuelQueue[i] = g_DuelQueue[i + 1];
+                g_DuelQueueCount--;
+
+                int Index2 = rand() % g_DuelQueueCount;
+                Player2 = g_DuelQueue[Index2];
+                for (int i = Index2; i < g_DuelQueueCount - 1; i++)
+                    g_DuelQueue[i] = g_DuelQueue[i + 1];
+                g_DuelQueueCount--;
+            }
+
+            if (m_apPlayers[Player1] && m_apPlayers[Player2])
+            {
+                // Помещаем игроков в одну команду (team 1)
+                m_apPlayers[Player1]->SetTeam(1, false);
+                m_apPlayers[Player2]->SetTeam(1, false);
+
+                // Телепортируем на текущую арену
+                char aCmd[32];
+                str_format(aCmd, sizeof(aCmd), "totele %d", g_DefaultArenaTeleportID);
+                Console()->ExecuteLine(aCmd, Player1);
+                Console()->ExecuteLine(aCmd, Player2);
+
+                // Включаем мини-игру "Duel" (ID 1)
+                SetMinigame(Player1, 1, true, true);
+                SetMinigame(Player2, 1, true, true);
+
+                str_format(aBuf, sizeof(aBuf), "Дуэль началась на арене %d между %s и %s!", (g_DefaultArenaTeleportID == 100) ? 1 : 2, m_apPlayers[Player1]->GetName(), m_apPlayers[Player2]->GetName());
+                SendChat(-1, aBuf);
+            }
+            else
+            {
+                SendChatTarget(ClientID, "Ошибка: Один из игроков недоступен.");
+                g_DuelQueueCount = 0;
+            }
+        }
+        return;
+    }
+
+    if(str_startswith(pMsg, "/set_default_arena "))
+    {
+        int Arena;
+        if (sscanf(pMsg, "/set_default_arena %d", &Arena) != 1 || (Arena != 1 && Arena != 2))
+        {
+            SendChatTarget(ClientID, "Ошибка: Используй /set_default_arena {1,2}");
+            return;
+        }
+
+        g_DefaultArenaTeleportID = (Arena == 1) ? 100 : 101;
+        char aBuf[256];
+        str_format(aBuf, sizeof(aBuf), "%s установил арену %d для дуэлей.", m_apPlayers[ClientID]->GetName(), Arena);
+        SendChat(-1, aBuf);
+        return;
+    }
+
+    // Существующие команды (/1vs1, /rules и др.) остаются без изменений
+}
 }
