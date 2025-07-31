@@ -157,7 +157,7 @@ class CGameContext : public IGameServer
 	static void TeeHistorianWrite(const void *pData, int DataSize, void *pUser);
 
 	static void ConTuneParam(IConsole::IResult *pResult, void *pUserData);
-        static void OnClientChat(int ClientID, const char *pMsg);
+        void OnClientChat(int ClientID, const char *pMsg);
 	static void ConToggleTuneParam(IConsole::IResult* pResult, void* pUserData);
 	static void ConTuneReset(IConsole::IResult *pResult, void *pUserData);
 	static void ConTunes(IConsole::IResult *pResult, void *pUserData);
