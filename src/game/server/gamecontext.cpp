@@ -8603,7 +8603,8 @@ void CGameContext::InstagibTick(int Type)
 	//m_apPlayers[Winner]->GiveXP(250, "for winning an instagib round");
 
 	// add instagib here
-	#include <engine/shared/console.h>
+}
+#include <engine/shared/console.h>
 #include <cstdlib> // Для rand()
 
 // Очередь дуэлей
@@ -8615,6 +8616,8 @@ static int g_DefaultArenaTeleportID = 100; // По умолчанию арена
 
 void CGameContext::OnClientChat(int ClientID, const char *pMsg)
 {
+    // Существующий код /1vs1 и других команд остаётся
+    // Добавляем новые команды
     if(str_comp_nocase(pMsg, "/arena_search") == 0)
     {
         if (ClientID < 0 || ClientID >= MAX_CLIENTS || !m_apPlayers[ClientID])
@@ -8707,6 +8710,5 @@ void CGameContext::OnClientChat(int ClientID, const char *pMsg)
         return;
     }
 
-    // Существующие команды (/1vs1, /rules и др.) остаются без изменений
-}
+    // Существующий код для /1vs1, /rules и других команд остаётся
 }
